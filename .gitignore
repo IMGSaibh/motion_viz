@@ -1,0 +1,41 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+venv/
+*.log
+*.sqlite3
+.DS_Store
+
+# === Poetry ===
+poetry.lock
+
+# === FastAPI / Temp Files ===
+*.db
+*.tmp
+*.bak
+
+# === VSCode ===
+.vscode/
+
+# === Frontend (Node.js, Vite, React) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# === System Files ===
+Thumbs.db
+ehthumbs.db
+*.swp
+
+# === Node ===
+node_modules/
+dist/
+.vscode/

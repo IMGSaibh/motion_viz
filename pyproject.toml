@@ -1,0 +1,28 @@
+[project]
+name = "motion-viz"
+version = "0.1.0"
+description = "Visualisierung von Motion-Capture-Daten"
+authors = [
+    { name = "mathias gewissen", email = "mathias.gewissen@htw-dresden.de" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "bvh>=0.3.0",
+    "numpy>=1.26.0",
+    "python-multipart (>=0.0.20,<0.0.21)"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.3.0",
+    "isort>=5.13.0",
+    "pytest>=8.1.0"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
