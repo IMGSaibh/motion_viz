@@ -26,11 +26,26 @@ class App
     const torus = createTorus();
     const orbitControls = createOrbitControls(camera, renderer);
 
+    
     loop.updatables.push(torus);
     loop.updatables.push(orbitControls);
     
-    const bvhPlayer = new BVHPlayer(scene);
-    bvhPlayer.loadBVH('http://127.0.0.1:8000/data/bvh/test.bvh');
+    // const bvhPlayer = new BVHPlayer(scene);
+    // bvhPlayer.loadBVH('http://127.0.0.1:8000/data/bvh/test.bvh');
+    
+    const bvhPlayer = new BVHPlayer();
+    bvhPlayer.load('http://127.0.0.1:8000/data/bvh/test.bvh').then((object3D) => {
+      scene.add(object3D);
+      loop.updatables.push(object3D);
+
+      // Taste zum Abspielen
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          bvhPlayer.play();
+        }
+      });
+    });
+
     scene.add(torus);
 
     // TODO: implement resizer
