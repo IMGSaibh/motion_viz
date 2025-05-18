@@ -1,30 +1,14 @@
-# from fastapi import FastAPI
-# from fastapi.responses import HTMLResponse
-
-# app = FastAPI()
-
-# @app.get("/", response_class=HTMLResponse)
-# async def index():
-#     return """
-#     <html>
-#         <head>
-#             <title>Motion Capture Visualization</title>
-#         </head>
-#         <body>
-#             <h1>Motion Capture Visualization läuft</h1>
-#             <p>Hier kommt später die 3D-Visualisierung rein.</p>
-#         </body>
-#     </html>
-#     """
-import os
 from fastapi import FastAPI
 from motion_viz.api import motion
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import FileResponse
 app = FastAPI()
 
-# CORS erlauben für React-Vite
+favicon_path = 'src/frontend/public/human.ico'
+
+
+# allow CORS for React-Vite
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -36,13 +20,13 @@ app.add_middleware(
 app.include_router(motion.router, prefix="/motion")
 
 # http://localhost:8000/data/bvh/test.bvh
-# app.mount("/data", StaticFiles(directory="data"), name="data")
+app.mount("/data", StaticFiles(directory="data"), name="data")
+app.mount("/src", StaticFiles(directory="src/frontend/public"), name="favicon")
 
-app.mount(
-    "/static", 
-    StaticFiles(directory=os.path.join(os.path.dirname(__file__), "../../data")),
-    name="static"
-)
+
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon() -> FileResponse:
+    return FileResponse(favicon_path)
 
 @app.get("/")
 def read_root():

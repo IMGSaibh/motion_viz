@@ -2,6 +2,7 @@
 
 Visualisierung von Motion Capture Daten mit FastAPI Backend und React Frontend (3D-Visualisierung mit react-three-fiber).
 
+[https://discoverthreejs.com/book/](https://discoverthreejs.com/book/)
 
 ## Voraussetzungen
 

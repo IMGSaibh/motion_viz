@@ -4,11 +4,14 @@ from tempfile import NamedTemporaryFile
 
 router = APIRouter()
 
+from typing import Any, Dict
+
 @router.post("/upload_bvh")
-async def upload_bvh(file: UploadFile = File(...)):
-    if not file.filename.endswith(".bvh"):
+async def upload_bvh(file: UploadFile = File(...)) -> Dict[str, Any]:
+    if not file.filename or not file.filename.endswith(".bvh"):
         raise HTTPException(status_code=400, detail="Nur .bvh Dateien erlaubt")
 
+    print(f"Datei empfangen: {file.filename}")
     # Temporäre Datei erstellen und Upload speichern
     try:
         with NamedTemporaryFile(delete=True) as tmp:
@@ -25,7 +28,6 @@ async def upload_bvh(file: UploadFile = File(...)):
                 "joints": parser.get_joint_names(),
                 "frame_count": parser.get_frame_count(),
                 "frame_time": parser.get_frame_time(),
-                "frames_shape": parser.get_frames_np().shape,
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"parsing error: {e}")

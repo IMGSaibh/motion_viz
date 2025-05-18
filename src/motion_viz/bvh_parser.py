@@ -4,10 +4,9 @@ import numpy as np
 class BvhParser:
     def __init__(self, filename: str):
         self.filename = filename
-        self.joints = []         # list of joint names
-        self.hierarchy = {}      # TODO implement Tree/graph hierarchy
-        self.frames = []         # frames
-        self.frames_np = None    # frames as numpy array
+        self.joints: list[str] = []         # list of joint names
+        self.hierarchy = {}                 # TODO implement Tree/graph hierarchy
+        self.frames: list[list[float]] = [] # frames
         self.frame_time = 0.0
 
     def parse(self):
@@ -16,8 +15,8 @@ class BvhParser:
 
         hierarchy_started = False
         motion_started = False
-        hierarchy_lines = []
-        motion_lines = []
+        hierarchy_lines: list[str] = []
+        motion_lines: list[str] = []
 
         for line in lines:
             line = line.strip()
@@ -40,15 +39,15 @@ class BvhParser:
         # Motion-Daten als NumPy Array speichern (Frames x Channels)
         self.frames_np = np.array(self.frames, dtype=np.float32)
 
-    def _parse_hierarchy(self, lines):
+    def _parse_hierarchy(self, lines: list[str]) -> None:
         for line in lines:
             if line.startswith("ROOT") or line.startswith("JOINT"):
                 parts = line.split()
                 if len(parts) > 1:
                     self.joints.append(parts[1])
 
-    def _parse_motion(self, lines):
-        frames_line = lines[0]
+    def _parse_motion(self, lines: list[str]):
+        frames_line: str = lines[0]
         m = re.match(r"Frames:\s+(\d+)", frames_line)
         if not m:
             raise ValueError("Frames-Zeile nicht gefunden")
@@ -73,6 +72,3 @@ class BvhParser:
 
     def get_frame_time(self):
         return self.frame_time
-
-    def get_frames_np(self):
-        return self.frames_np
