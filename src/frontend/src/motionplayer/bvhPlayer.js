@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BVHLoader } from 'three/examples/jsm/loaders/BVHLoader.js';
+import { BVHLoader } from '../../node_modules/three/examples/jsm/loaders/BVHLoader.js';
 
 export class BVHPlayer {
   constructor() {
@@ -9,9 +9,8 @@ export class BVHPlayer {
     this.clipAction = null;
     this.skeletonHelper = null;
 
-    this.object3D = new THREE.Group(); // <--- Das ist dein Objekt mit .tick()
+    this.object3D = new THREE.Group();
 
-    // tick als Methode definieren, du kannst es später auch überschreiben
     this.object3D.tick = (delta) => {
       if (this.mixer) this.mixer.update(delta);
     };
@@ -60,9 +59,14 @@ export class BVHPlayer {
     }
   }
 
-  reset() {
+  stop() {
     if (this.clipAction) {
       this.clipAction.stop();
+    }
+  }
+
+  reset() {
+    if (this.clipAction) {
       this.clipAction.reset();
     }
   }

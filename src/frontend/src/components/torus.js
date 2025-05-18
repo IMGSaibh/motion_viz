@@ -30,7 +30,7 @@ function createTorus()
           uniforms.u_resolution.value.x = window.innerWidth;
           uniforms.u_resolution.value.y = window.innerHeight;
         }
-        // increase the cube's rotation each frame
+        // increase rotation each frame
         torus.rotation.z += radiansPerSecond * delta;
         torus.rotation.x += radiansPerSecond * delta;
         torus.rotation.y += radiansPerSecond * delta;
