@@ -1,74 +1,63 @@
 import * as THREE from 'three';
 import { BVHLoader } from '../../node_modules/three/examples/jsm/loaders/BVHLoader.js';
 
-export class BVHPlayer {
-  constructor() {
+export class BVHPlayer 
+{
+  constructor() 
+  {
     this.loader = new BVHLoader();
-
+    this.bvhObject = new THREE.Group();
     this.mixer = null;
     this.clipAction = null;
     this.skeletonHelper = null;
+    this.isPlaying = false;
 
-    this.object3D = new THREE.Group();
-
-    this.object3D.tick = (delta) => {
-      if (this.mixer) this.mixer.update(delta);
+    this.bvhObject.tick = (delta) => 
+    {
+      if (this.mixer && this.isPlaying) this.mixer.update(delta);
     };
   }
 
-  async load(url) {
-    return new Promise((resolve, reject) => {
-      this.loader.load(
-        url,
-        (result) => {
-          const { skeleton, clip } = result;
 
-          const rootBone = skeleton.bones[0];
+  async load(url)
+  {
+    return new Promise((resolve, reject) => 
+    {
+      this.loader.load(url, (result) => 
+      {
+          this.skeletonHelper = new THREE.SkeletonHelper(result.skeleton.bones[0]);
+          this.bvhObject.add(result.skeleton.bones[0]);
+          this.bvhObject.add(this.skeletonHelper);
 
-          // Setup SkeletonHelper
-          this.skeletonHelper = new THREE.SkeletonHelper(rootBone);
-          this.skeletonHelper.skeleton = skeleton;
+          this.mixer = new THREE.AnimationMixer(result.skeleton.bones[0]);
+          this.clipAction = this.mixer.clipAction(result.clip);
 
-          // Animation
-          this.mixer = new THREE.AnimationMixer(rootBone);
-          this.clipAction = this.mixer.clipAction(clip);
-          this.clipAction.loop = THREE.LoopOnce;
-          this.clipAction.clampWhenFinished = true;
+          // terminate Promise and return this.bvhObject
+          resolve(this.bvhObject);
 
-          // Add to main object3D
-          this.object3D.add(rootBone);
-          this.object3D.add(this.skeletonHelper);
-
-          // Optional: Reset on finish
-          this.mixer.addEventListener('finished', () => {
-            this.reset();
-          });
-
-          resolve(this.object3D);
-        },
-        undefined,
-        (error) => reject(error)
+        }, undefined, (error) => reject(error)
       );
-    });
+    })
   }
 
-  play() {
-    if (this.clipAction) {
-      this.reset();
-      this.clipAction.play();
-    }
+  play() 
+  {
+    this.isPlaying = true;
+    if (this.clipAction) this.clipAction.play();
   }
 
-  stop() {
-    if (this.clipAction) {
-      this.clipAction.stop();
-    }
+  stop() 
+  {
+    if (this.clipAction) this.clipAction.stop();
   }
 
-  reset() {
-    if (this.clipAction) {
-      this.clipAction.reset();
-    }
+  reset() 
+  {
+    if (this.clipAction) this.clipAction.reset();
+  }
+  pause() 
+  {
+    this.isPlaying = false;
   }
 }
 

@@ -36,7 +36,7 @@ class Loop
         // only call the getDelta function once per frame!
         const delta = clock.getDelta();
 
-        // Code to update all objects animations 
+        // update all objects animations 
         for(const object of this.updatables)
         {
             object.tick(delta);
