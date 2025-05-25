@@ -13,7 +13,7 @@ function createScene() {
   const zAxis = createThickAxis(0x0000ff, [0,0,0], [0,0,50], 3);
   scene.add(xAxis, yAxis, zAxis);  
   
-  scene.background = new Color('black');
+  scene.background = new Color('white');
   return scene;
 }
 

@@ -1,73 +1,85 @@
 import * as THREE from 'three';
+import { Timeline } from '../components/timeline.js';
 import { FBXLoader } from '../../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
-export class FBXPlayer {
-  constructor(scene) {
-    this.scene = scene;
+export class FBXPlayer 
+{
+  constructor() 
+  {
     this.loader = new FBXLoader();
-
-    this.mixer = null;
-    this.model = null;
-    this.duration = 0;
-    this.isPlaying = false;
-
     this.fbxObject = new THREE.Group();
+    this.mixer = null;
+    this.clipAction = null;
+    this.skeletonHelper = null;
+    this.isPlaying = false;
+    // in fbx there are no frames. fbx uses keyframes, so frameTime is not necessarily constant.
+    this.frameCount = 0;
+    this.frameTime = 0;
+    this.duration = 0;
+    this.fps = 0;
+
+    this.fbxObject.tick = (delta) => 
+    {
+      if (this.mixer && this.isPlaying) this.mixer.update(delta);
+    };
   }
 
-  async loadFBX(url) {
-    return new Promise((resolve, reject) => {
-      this.loader.load(
-        url,
-        (object) => {
-          this.model = object;
-          this.fbxObject.add(object);
-          this.scene.add(this.fbxObject);
+  async loadFBX(url) 
+  {
+    return new Promise((resolve, reject) => 
+    {
+      this.loader.load(url, (result) => 
+      {
+        this.fbxObject.add(result);
 
-          // Setup animation
-          if (object.animations.length > 0) {
-            this.mixer = new THREE.AnimationMixer(object);
-            const action = this.mixer.clipAction(object.animations[0]);
-            action.play();
 
-            this.duration = object.animations[0].duration;
-            this.isPlaying = true;
-          }
+        this.mixer = new THREE.AnimationMixer(result);
+        this.clipAction = this.mixer.clipAction(result.animations[0]);
+        this.duration = this.clipAction.getClip().duration;
 
-          // Add tick function for animation loop
-          this.fbxObject.tick = (delta) => {
-            if (this.mixer && this.isPlaying) {
-              this.mixer.update(delta);
 
-              if (this.mixer.time >= this.duration) {
-                this.reset();
-              }
-            }
-          };
+        const track = this.clipAction.getClip().tracks[0];
+        this.frameCount = track.times.length;
+        
+        // Keyframes can be irregularly distributed, so frameTime is not necessarily constant.
+        this.frameTime = track.times[1] - track.times[0];
 
-          resolve(this.fbxObject);
-        },
-        undefined,
-        (error) => reject(error)
-      );
+        if (track.times.length >= 2) 
+        {
+          this.fps = (1 / this.frameTime).toFixed(2);
+        } 
+        else 
+        {
+          console.log('Nicht genug Keyframes zum Berechnen der FPS.');
+        }
+
+        // show skeleton
+        this.skeletonHelper = new THREE.SkeletonHelper(result);
+        this.fbxObject.add(this.skeletonHelper);
+
+        // terminate Promise and return this.fbxObject
+        resolve(this.fbxObject);
+      }, undefined, (error) => reject(error));
     });
   }
 
-  play() {
+  play() 
+  {
     this.isPlaying = true;
+    if (this.clipAction) this.clipAction.play();
   }
 
-  stop() {
+  stop() 
+  {
+    if (this.clipAction) this.clipAction.stop();
+  }
+
+  reset() 
+  {
+    if (this.clipAction) this.clipAction.reset();
+  }
+  pause() 
+  {
     this.isPlaying = false;
-  }
-
-  reset() {
-    if (this.mixer) {
-      this.mixer.setTime(0);
-      this.isPlaying = false;
-    }
-  }
-
-  getObject() {
-    return this.fbxObject;
   }
 }

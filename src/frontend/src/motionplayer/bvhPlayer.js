@@ -11,6 +11,10 @@ export class BVHPlayer
     this.clipAction = null;
     this.skeletonHelper = null;
     this.isPlaying = false;
+    this.frameCount = 0;
+    this.frameTime = 0;
+    this.duration = 0;
+    this.fps = 0;
 
     this.bvhObject.tick = (delta) => 
     {
@@ -25,18 +29,23 @@ export class BVHPlayer
     {
       this.loader.load(url, (result) => 
       {
-          this.skeletonHelper = new THREE.SkeletonHelper(result.skeleton.bones[0]);
-          this.bvhObject.add(result.skeleton.bones[0]);
-          this.bvhObject.add(this.skeletonHelper);
+        const track = result.clip.tracks[0];
+        this.frameCount = track.times.length;
+        this.frameTime = track.times[1] - track.times[0];
+        this.duration = this.frameCount * this.frameTime;
+        this.fps = (1 / this.frameTime).toFixed(2);
 
-          this.mixer = new THREE.AnimationMixer(result.skeleton.bones[0]);
-          this.clipAction = this.mixer.clipAction(result.clip);
+        this.skeletonHelper = new THREE.SkeletonHelper(result.skeleton.bones[0]);
+        this.bvhObject.add(result.skeleton.bones[0]);
+        this.bvhObject.add(this.skeletonHelper);
 
-          // terminate Promise and return this.bvhObject
-          resolve(this.bvhObject);
+        this.mixer = new THREE.AnimationMixer(result.skeleton.bones[0]);
+        this.clipAction = this.mixer.clipAction(result.clip);
 
-        }, undefined, (error) => reject(error)
-      );
+        // terminate Promise and return this.bvhObject
+        resolve(this.bvhObject);
+
+      }, undefined, (error) => reject(error));
     })
   }
 

@@ -6,7 +6,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-
 #scene-container
 {
     /* tell our scene container to take up the full page */
@@ -14,3 +13,30 @@ html, body, #root {
     width: 100%;
     height: 100%;
 }
+
+#timeline-container {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-family: sans-serif;
+}
+
+#frame-slider {
+  flex-grow: 1;
+    pointer-events: auto;
+  z-index: 10;
+}
+
+#frame-label {
+  white-space: nowrap;
+}
+
+
