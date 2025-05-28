@@ -1,11 +1,10 @@
 from fastapi import FastAPI
-from motion_viz.api import motion
+from backend.api import motion
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+
 app = FastAPI()
-
-
 
 # allow CORS for React-Vite
 app.add_middleware(

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from motion_viz.bvh_parser import BvhParser
+from backend.bvh_parser import BvhParser
 from tempfile import NamedTemporaryFile
+from typing import Any, Dict
 
 router = APIRouter()
 
-from typing import Any, Dict
 
 @router.post("/upload_bvh")
 async def upload_bvh(file: UploadFile = File(...)) -> Dict[str, Any]:

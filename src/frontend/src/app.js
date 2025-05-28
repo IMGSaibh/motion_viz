@@ -40,21 +40,21 @@ class App
 
 
 
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
-    // loop.updatables.push(this.bvhPlayer.bvhObject);
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvhPlayer.bvhObject);
+    loop.updatables.push(this.bvhPlayer.bvhObject);
 
-    // const timeline = new Timeline(this.bvhPlayer);
-    // loop.updatables.push(timeline.timelineObject);
-
-
-    await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
-    scene.add(this.fbxPlayer.fbxObject);
-    loop.updatables.push(this.fbxPlayer.fbxObject);
-
-
-    const timeline = new Timeline(this.fbxPlayer);
+    const timeline = new Timeline(this.bvhPlayer);
     loop.updatables.push(timeline.timelineObject);
+
+
+    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
+    // scene.add(this.fbxPlayer.fbxObject);
+    // loop.updatables.push(this.fbxPlayer.fbxObject);
+
+
+    // const timeline = new Timeline(this.fbxPlayer);
+    // loop.updatables.push(timeline.timelineObject);
 
     loop.start();
 
