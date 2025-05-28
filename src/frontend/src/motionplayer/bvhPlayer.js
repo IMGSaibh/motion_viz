@@ -48,24 +48,6 @@ export class BVHPlayer
       }, undefined, (error) => reject(error));
     })
   }
-
-  play() 
-  {
-    this.isPlaying = true;
-    if (this.clipAction) this.clipAction.play();
-  }
-
-  // stop() also calls reset() in three js
-  stop() 
-  {
-    this.isPlaying = false;
-    if (this.clipAction) this.clipAction.stop();
-  }
-  
-  pause() 
-  {
-    this.isPlaying = false;
-  }
 }
 
 

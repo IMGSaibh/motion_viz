@@ -17,9 +17,9 @@ export class Timeline {
     this.label.textContent = `Frame: 0 / ${this.motionObject.frameCount}`;
     
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') this.motionObject.play();
-      if (e.code === 'KeyS') this.motionObject.stop();
-      if (e.code === 'KeyP') this.motionObject.pause();
+      if (e.code === 'Space') this.play();
+      if (e.code === 'KeyS') this.stop();
+      if (e.code === 'KeyP') this.pause();
     });
 
 
@@ -40,12 +40,10 @@ export class Timeline {
     {
       if (this.motionObject.mixer) 
       {
-        // TODO: check if this can be implemented without clipAction.Play() 
         this.motionObject.clipAction.play();
         this.currentTime = parseFloat(e.target.value);
         this.motionObject.mixer.setTime(this.currentTime / this.motionObject.fps);
         this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
-        console.log(`Slider is moved`);
       }
     });
 
@@ -57,13 +55,13 @@ export class Timeline {
 
   update(delta) 
   {
-    if (!this.motionObject.mixer || this.isUserDragging || !this.motionObject.isPlaying) return;
-    else if (this.motionObject.mixer.time >= this.motionObject.duration) 
+    if (this.isUserDragging || !this.motionObject.isPlaying) return;
+    else if (this.getCurrentFrame() == this.motionObject.frameCount) 
     {
       this.stop();
       return;
     }
-    this.motionObject.play();
+    this.motionObject.clipAction.play();
     this.currentTime = this.motionObject.mixer.time;
     this.slider.value = this.getCurrentFrame();
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
@@ -75,6 +73,12 @@ export class Timeline {
     return Math.floor(this.motionObject.mixer.time * this.motionObject.fps);
   }
 
+  play() 
+  {
+    this.motionObject.isPlaying = true;
+    this.motionObject.clipAction.play();
+  }
+
   stop() 
   {
     this.currentTime = 0;
@@ -83,6 +87,11 @@ export class Timeline {
     this.motionObject.clipAction.stop();
     this.motionObject.mixer.time = 0;
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
+  }
+
+  pause() 
+  {
+    this.motionObject.isPlaying = false;
   }
 }
 
