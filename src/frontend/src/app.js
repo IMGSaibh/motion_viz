@@ -58,17 +58,6 @@ class App
 
     loop.start();
 
-
-
-    // window.addEventListener('keydown', (e) => {
-    //   if (e.code === 'KeyF') this.fbxPlayer.play();
-    //   if (e.code === 'KeyD') this.fbxPlayer.stop();
-    //   if (e.code === 'KeyA') this.fbxPlayer.pause();
-    // });
-
-    // const timeline = new Timeline(this.fbxPlayer);
-    // loop.updatables.push(timeline.timelineObject);
-    // loop.start();
   }
   
   stop()
