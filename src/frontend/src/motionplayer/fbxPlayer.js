@@ -69,15 +69,13 @@ export class FBXPlayer
     if (this.clipAction) this.clipAction.play();
   }
 
+  // stop() also calls reset() in three js
   stop() 
   {
+    this.isPlaying = false;
     if (this.clipAction) this.clipAction.stop();
   }
-
-  reset() 
-  {
-    if (this.clipAction) this.clipAction.reset();
-  }
+  
   pause() 
   {
     this.isPlaying = false;

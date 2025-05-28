@@ -40,31 +40,30 @@ class App
 
 
 
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/test.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
-    // loop.updatables.push(this.bvhPlayer.bvhObject);
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvhPlayer.bvhObject);
+    loop.updatables.push(this.bvhPlayer.bvhObject);
 
+
+
+    const timeline = new Timeline(this.bvhPlayer);
+    loop.updatables.push(timeline.timelineObject);
+
+    loop.start();
+
+
+    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
+    // scene.add(this.fbxPlayer.fbxObject);
+    // loop.updatables.push(this.fbxPlayer.fbxObject);
     // window.addEventListener('keydown', (e) => {
-    //   if (e.code === 'Space') this.bvhPlayer.play();
-    //   if (e.code === 'KeyS') this.bvhPlayer.stop();
-    //   if (e.code === 'KeyP') this.bvhPlayer.pause();
-    //   if (e.code === 'KeyR') this.bvhPlayer.reset();
+    //   if (e.code === 'KeyF') this.fbxPlayer.play();
+    //   if (e.code === 'KeyD') this.fbxPlayer.stop();
+    //   if (e.code === 'KeyA') this.fbxPlayer.pause();
     // });
 
-
-    await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
-    scene.add(this.fbxPlayer.fbxObject);
-    loop.updatables.push(this.fbxPlayer.fbxObject);
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyF') this.fbxPlayer.play();
-      if (e.code === 'KeyD') this.fbxPlayer.stop();
-      if (e.code === 'KeyA') this.fbxPlayer.pause();
-      if (e.code === 'KeyR') this.fbxPlayer.reset();
-    });
-
-    const timeline = new Timeline(this.fbxPlayer);
-    loop.updatables.push(timeline.timelineObject);
-    loop.start();
+    // const timeline = new Timeline(this.fbxPlayer);
+    // loop.updatables.push(timeline.timelineObject);
+    // loop.start();
   }
   
   stop()

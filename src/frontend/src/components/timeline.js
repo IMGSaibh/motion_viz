@@ -1,88 +1,88 @@
-
-
 export class Timeline {
   constructor(motionObject) 
   {
     this.container = document.getElementById('timeline-container');
-
+    this.motionObject = motionObject;
     this.slider = document.getElementById('frame-slider');
     this.label = document.getElementById('frame-label');
     this.slider.type = 'range';
-    this.fps = motionObject.fps;
-    this.mixer = motionObject.mixer;
-    this.frameCount = motionObject.frameCount;
-    this.duration = motionObject.duration;
-    this.clipAction = motionObject.clipAction;
     this.slider.min = 0;
-    this.slider.max = this.frameCount;
+    this.slider.max = this.motionObject.frameCount;
     this.slider.step = 1;
     this.slider.value = 0;
-    
     this.currentTime = 0;
     this.isUserDragging = false;
-
+    this.timelineObject = {};
     this.container.appendChild(this.slider);
-    this.label.textContent = `Frame: 0 / ${this.frameCount}`;
+    this.label.textContent = `Frame: 0 / ${this.motionObject.frameCount}`;
+    
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') this.motionObject.play();
+      if (e.code === 'KeyS') this.motionObject.stop();
+      if (e.code === 'KeyP') this.motionObject.pause();
+    });
 
 
-    // Events for Drag
     this.slider.addEventListener('pointerdown', () => 
     {
       this.isUserDragging = true;
+      this.motionObject.isPlaying = false;
     });
 
     document.addEventListener('pointerup', () => 
     {
       this.isUserDragging = false;
+      this.motionObject.isPlaying = false;
     });
 
     // input-Event executes always when the slider is moved
     this.slider.addEventListener('input', (e) => 
     {
-      if (this.mixer) 
+      if (this.motionObject.mixer) 
       {
+        // TODO: check if this can be implemented without clipAction.Play() 
+        this.motionObject.clipAction.play();
         this.currentTime = parseFloat(e.target.value);
-        this.mixer.setTime(this.currentTime / this.fps);
-        this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.frameCount}`;
-
+        this.motionObject.mixer.setTime(this.currentTime / this.motionObject.fps);
+        this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
+        console.log(`Slider is moved`);
       }
     });
 
-    // Timeline object, which ticks within the animation loop
-    this.timelineObject = 
+    this.timelineObject.tick = (delta) =>
     {
-      tick: (delta) => this.update(delta)
-    };
+      if (this.motionObject.isPlaying) this.update(delta);
+    }
   }
 
   update(delta) 
   {
-    if (!this.mixer || this.isUserDragging) return;
-    else if (this.mixer.time >= this.duration) 
+    if (!this.motionObject.mixer || this.isUserDragging || !this.motionObject.isPlaying) return;
+    else if (this.motionObject.mixer.time >= this.motionObject.duration) 
     {
-      this.reset();
+      this.stop();
       return;
     }
-    this.clipAction.play();
-    this.currentTime = this.mixer.time;
+    this.motionObject.play();
+    this.currentTime = this.motionObject.mixer.time;
     this.slider.value = this.getCurrentFrame();
-    this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.frameCount}`;
+    this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
 
   }
 
   getCurrentFrame() 
   {
-    if (!this.mixer) return 0;
-    return Math.floor(this.mixer.time * this.fps);
+    return Math.floor(this.motionObject.mixer.time * this.motionObject.fps);
   }
 
-  reset() 
+  stop() 
   {
     this.currentTime = 0;
-    if (this.mixer) this.mixer.setTime(0);
     this.slider.value = 0;
-    this.clipAction.reset();
-    this.clipAction.stop();
+    this.motionObject.isPlaying = false;
+    this.motionObject.clipAction.stop();
+    this.motionObject.mixer.time = 0;
+    this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
   }
 }
 
