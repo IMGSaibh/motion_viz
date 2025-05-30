@@ -1,5 +1,5 @@
 [project]
-name = "motion-viz"
+name = "backend"
 version = "0.1.0"
 description = "Visualisierung von Motion-Capture-Daten"
 authors = [
@@ -11,9 +11,10 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.29.0",
-    "bvh>=0.3.0",
     "numpy>=1.26.0",
-    "python-multipart (>=0.0.20,<0.0.21)"
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "bvhtoolbox (>=0.1.3,<0.2.0)",
+    "setuptools (>=80.9.0,<81.0.0)"
 ]
 
 [project.optional-dependencies]

@@ -34,6 +34,47 @@ class App
 
   }
 
+  upload_file()
+  { 
+    document.getElementById("upload-btn").addEventListener("click", async () => 
+    {
+      const input = document.getElementById("bvh-upload");
+      const upload_status = document.getElementById("upload-status");
+      const file = input.files[0];
+      if (!file) 
+      {
+        alert("Bitte eine .bvh-Datei auswählen.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("http://localhost:8000/motion/upload_bvh_numpy", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) 
+        {
+          const error = await response.json();
+          throw new Error(error.detail || "Unbekannter Fehler");
+        }
+
+        const result = await response.json();
+        upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy (${result.frames} Frames)`;
+      } 
+      catch (error) 
+      {
+        upload_status.textContent = `❌ Fehler: ${error.message}`;
+        console.error("Upload-Fehler:", error);
+      }
+    });
+
+
+  }
+
   // use start and stop for animation and frame stream
   async start()
   {

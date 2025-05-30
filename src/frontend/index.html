@@ -9,9 +9,17 @@
     <!-- <link rel="stylesheet" href="src/frontend/src/custom.css" /> is included via FastAPI in file /src/main.jsx -->
   </head>
   <body>
+    <div id="ui-overlay">
+      <input type="file" id="bvh-upload" accept=".bvh" />
+      <button id="upload-btn">Upload & Convert to NumPy</button>
+      <div id="upload-status"></div>
+    </div>
+
     <!-- Three JS <canvas> is inserted here -->
     <div id="scene-container">
     </div>
+
+
     <div id="timeline-container">
       <input type="range" id="frame-slider" min="0" max="100" value="0" />
     <div id="frame-label">Frame: 0 / 0</div>

@@ -14,6 +14,37 @@ html, body, #root {
     height: 100%;
 }
 
+
+
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+#ui-overlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-family: sans-serif;
+}
+
+#ui-overlay button,
+#ui-overlay input {
+  margin-top: 5px;
+  display: block;
+}
+
+
+
+
 #timeline-container {
   position: absolute;
   bottom: 20px;
