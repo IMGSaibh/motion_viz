@@ -50,29 +50,27 @@ class App
       const formData = new FormData();
       formData.append("file", file);
 
-      try {
+      try 
+      {
         const response = await fetch("http://localhost:8000/motion/upload_bvh_numpy", {
-          method: "POST",
-          body: formData,
-        });
+        method: "POST",
+        body: formData,
+      });
 
-        if (!response.ok) 
-        {
-          const error = await response.json();
-          throw new Error(error.detail || "Unbekannter Fehler");
-        }
+      if (!response.ok) 
+      {
+        const error = await response.json();
+        throw new Error(error.detail || "Unbekannter Fehler");
+      }
 
         const result = await response.json();
-        upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy (${result.frames} Frames)`;
+        upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy`;
       } 
       catch (error) 
       {
         upload_status.textContent = `❌ Fehler: ${error.message}`;
-        console.error("Upload-Fehler:", error);
       }
     });
-
-
   }
 
   // use start and stop for animation and frame stream
@@ -81,7 +79,7 @@ class App
 
 
 
-    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/BentForward_SR.bvh')
     scene.add(this.bvhPlayer.bvhObject);
     loop.updatables.push(this.bvhPlayer.bvhObject);
 

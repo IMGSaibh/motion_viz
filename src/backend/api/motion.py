@@ -1,4 +1,5 @@
-import bvhtoolbox
+from fileinput import filename
+from turtle import up
 from backend.motion_parser.bvh_parser import BvhParser
 from fastapi import UploadFile, File, APIRouter
 from pathlib import Path
@@ -9,8 +10,17 @@ router = APIRouter()
 async def upload_bvh_numpy(file: UploadFile = File(...)):
     contents = await file.read()
     bvh_data = contents.decode("utf-8")
+    uploaded_filename = file.filename or "new_motion_file"
+    filenameNoEnding = Path(uploaded_filename).stem
+    json_path = Path("data/json/BentForward_SR.json")
 
-    json_path = Path("data/json/100style.json")
-
-    BvhParser(bvh_data, json_path)
-    return {"message": "Upload erfolgreich"}
+    bvh_parser = BvhParser(bvh_data, json_path)
+    bvh_parser.load_json_descriptor_file()
+    bvh_parser.bvhtree_to_data()
+    bvh_parser.build_graph()
+    bvh_parser.save_as_numpy(filenameNoEnding)
+    
+    return {
+        "message": "Upload erfolgreich",
+        "filename": filenameNoEnding,
+    }
