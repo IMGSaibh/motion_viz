@@ -3,6 +3,7 @@ import { createCamera } from './components/camera.js';
 import { createOrbitControls } from './components/orbitcontrol.js';
 import { BVHPlayer } from './motionplayer/bvhPlayer.js';
 import { FBXPlayer } from './motionplayer/fbxPlayer.js';
+import { NumpyPlayer } from './motionplayer/numpyPlayer.js';
 import { createScene } from './components/scene.js';
 import { createRenderer } from './system/renderer.js';
 import { Resizer } from './system/resizer.js';
@@ -30,6 +31,7 @@ class App
         
     this.bvhPlayer = new BVHPlayer();
     this.fbxPlayer = new FBXPlayer();
+    this.NumpyPlayer = new NumpyPlayer();
     const resizer = new Resizer(container, camera, renderer);
 
   }
@@ -79,7 +81,7 @@ class App
 
 
 
-    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/BentForward_SR.bvh')
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
     scene.add(this.bvhPlayer.bvhObject);
     loop.updatables.push(this.bvhPlayer.bvhObject);
 
@@ -87,12 +89,23 @@ class App
     loop.updatables.push(timeline.timelineObject);
 
 
+    // ==============================================================================================
+    
     // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
     // scene.add(this.fbxPlayer.fbxObject);
     // loop.updatables.push(this.fbxPlayer.fbxObject);
 
 
     // const timeline = new Timeline(this.fbxPlayer);
+    // loop.updatables.push(timeline.timelineObject);
+
+    // ==============================================================================================
+
+    await this.NumpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.bvh.npy');
+    scene.add(this.NumpyPlayer.npyObject);
+    loop.updatables.push(this.NumpyPlayer.npyObject);
+
+    // const timeline = new Timeline(this.NumpyPlayer);
     // loop.updatables.push(timeline.timelineObject);
 
     loop.start();

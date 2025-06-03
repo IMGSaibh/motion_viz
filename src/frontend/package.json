@@ -8,6 +8,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "npyjs": "^0.7.0",
     "three": "^0.176.0"
   },
   "devDependencies": {

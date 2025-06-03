@@ -130,3 +130,4 @@ class BvhParser:
         savePath_npy = Path(f"data/numpy/{filename}")
         savePath_npy.parent.mkdir(parents=True, exist_ok=True)
         np.save(savePath_npy, self.dataset)
+        print(f"shape {self.dataset.shape}")
