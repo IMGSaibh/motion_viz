@@ -1,8 +1,8 @@
 export class Timeline {
   constructor(motionObject) 
   {
-    this.container = document.getElementById('timeline-container');
     this.motionObject = motionObject;
+    this.container = document.getElementById('timeline-container');
     this.slider = document.getElementById('frame-slider');
     this.label = document.getElementById('frame-label');
     this.slider.type = 'range';

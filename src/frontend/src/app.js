@@ -9,6 +9,7 @@ import { createRenderer } from './system/renderer.js';
 import { Resizer } from './system/resizer.js';
 import { Loop } from './system/loop.js';
 import { Timeline } from './components/timeline.js';
+import { NumpyTimeline } from './components/timelineNumpy.js';
 
 let camera;
 let renderer;
@@ -31,7 +32,7 @@ class App
         
     this.bvhPlayer = new BVHPlayer();
     this.fbxPlayer = new FBXPlayer();
-    this.NumpyPlayer = new NumpyPlayer();
+    this.numpyPlayer = new NumpyPlayer();
     const resizer = new Resizer(container, camera, renderer);
 
   }
@@ -81,12 +82,12 @@ class App
 
 
 
-    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    scene.add(this.bvhPlayer.bvhObject);
-    loop.updatables.push(this.bvhPlayer.bvhObject);
+    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    // scene.add(this.bvhPlayer.bvhObject);
+    // loop.updatables.push(this.bvhPlayer.bvhObject);
 
-    const timeline = new Timeline(this.bvhPlayer);
-    loop.updatables.push(timeline.timelineObject);
+    // const timeline = new Timeline(this.bvhPlayer);
+    // loop.updatables.push(timeline.timelineObject);
 
 
     // ==============================================================================================
@@ -95,18 +96,24 @@ class App
     // scene.add(this.fbxPlayer.fbxObject);
     // loop.updatables.push(this.fbxPlayer.fbxObject);
 
-
     // const timeline = new Timeline(this.fbxPlayer);
     // loop.updatables.push(timeline.timelineObject);
 
     // ==============================================================================================
 
-    await this.NumpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.bvh.npy');
-    scene.add(this.NumpyPlayer.npyObject);
-    loop.updatables.push(this.NumpyPlayer.npyObject);
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.bvh.npy');
+    scene.add(this.numpyPlayer.npyObject);
+    loop.updatables.push(this.numpyPlayer.npyObject);
 
-    // const timeline = new Timeline(this.NumpyPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
+    timelineNumpy.play();
+
+    // timeline.onFrameChange((f) => {
+    //   console.log('Current Frame:', f);
+    // });
+
+    // const npytimeline = new NumpyTimeline(this.NumpyPlayer);
+    // loop.updatables.push(timeline.npytimeline);
 
     loop.start();
 

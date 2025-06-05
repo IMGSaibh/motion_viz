@@ -1,5 +1,5 @@
-from fileinput import filename
-from turtle import up
+# from fileinput import filename
+# from turtle import up
 
 import numpy as np
 from backend.motion_parser.bvh_parser import BvhParser
@@ -34,7 +34,7 @@ async def upload_bvh_numpy(file: UploadFile = File(...)):
     bvh_data = contents.decode("utf-8")
     uploaded_filename = file.filename or "new_motion_file"
     filenameNoEnding = Path(uploaded_filename).stem
-    json_path = Path("data/json/BentForward_SR.json")
+    # json_path = Path("data/json/BentForward_SR.json")
 
     dataset, names = bvh_to_numpy(bvh_data)
     print(dataset.shape)  # (frames, joints, 3)
