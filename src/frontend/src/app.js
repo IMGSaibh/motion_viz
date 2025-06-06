@@ -106,14 +106,7 @@ class App
     loop.updatables.push(this.numpyPlayer.npyObject);
 
     const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
-    timelineNumpy.play();
-
-    // timeline.onFrameChange((f) => {
-    //   console.log('Current Frame:', f);
-    // });
-
-    // const npytimeline = new NumpyTimeline(this.NumpyPlayer);
-    // loop.updatables.push(timeline.npytimeline);
+    loop.updatables.push(timelineNumpy.npyTimelineObject);
 
     loop.start();
 

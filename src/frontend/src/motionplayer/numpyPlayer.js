@@ -43,10 +43,12 @@ export class NumpyPlayer {
     });
   }
 
-  createSpheres() {
+  createSpheres() 
+  {
     const material = new THREE.MeshStandardMaterial({ color: 0xff6666 });
 
-    for (let i = 0; i < this.jointCount; i++) {
+    for (let i = 0; i < this.jointCount; i++) 
+    {
       const geom = new THREE.SphereGeometry(2, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npyObject.add(sphere);
@@ -80,12 +82,12 @@ export class NumpyPlayer {
 
   getFrameCount() 
   {
-    return this.motionArray.shape[0]; // total frames
+    return this.motionArray.shape[0];
   }
 
   getFPS() 
   {
-    return this.fps; // musst du beim Laden setzen
+    return this.fps;
   }
 
   isPlaying() 
@@ -96,7 +98,7 @@ export class NumpyPlayer {
   gotoFrame(frameIdx) 
   {
     this.currentFrame = frameIdx;
-    this.setJointPositions(frameIdx); // sollte bereits existieren
+    this.setJointPositions(frameIdx); 
   }
 
 }

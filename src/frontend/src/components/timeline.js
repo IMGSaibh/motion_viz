@@ -1,4 +1,5 @@
-export class Timeline {
+export class Timeline 
+{
   constructor(motionObject) 
   {
     this.motionObject = motionObject;
@@ -11,28 +12,13 @@ export class Timeline {
     this.slider.step = 1;
     this.slider.value = 0;
     this.currentTime = 0;
-    this.isUserDragging = false;
     this.timelineObject = {};
     this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.motionObject.frameCount}`;
     
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') this.play();
+      if (e.code === 'Space') this.play_pause();
       if (e.code === 'KeyS') this.stop();
-      if (e.code === 'KeyP') this.pause();
-    });
-
-
-    this.slider.addEventListener('pointerdown', () => 
-    {
-      this.isUserDragging = true;
-      this.motionObject.isPlaying = false;
-    });
-
-    document.addEventListener('pointerup', () => 
-    {
-      this.isUserDragging = false;
-      this.motionObject.isPlaying = false;
     });
 
     // input-Event executes always when the slider is moved
@@ -55,11 +41,10 @@ export class Timeline {
 
   update(delta) 
   {
-    if (this.isUserDragging || !this.motionObject.isPlaying) return;
+    if (!this.motionObject.isPlaying) return;
     else if (this.getCurrentFrame() == this.motionObject.frameCount) 
     {
-      this.stop();
-      return;
+      this.motionObject.isPlaying = false;
     }
     this.motionObject.clipAction.play();
     this.currentTime = this.motionObject.mixer.time;
@@ -68,15 +53,18 @@ export class Timeline {
 
   }
 
-  getCurrentFrame() 
-  {
-    return Math.floor(this.motionObject.mixer.time * this.motionObject.fps);
-  }
 
-  play() 
+  play_pause() 
   {
-    this.motionObject.isPlaying = true;
-    this.motionObject.clipAction.play();
+    // toggle play/pause
+    this.motionObject.isPlaying = !this.motionObject.isPlaying;
+    if(this.getCurrentFrame() == this.motionObject.frameCount)
+    {
+      this.motionObject.mixer.setTime(0);
+      this.slider.value = 0;
+      this.currentTime = 0;
+      this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
+    }
   }
 
   stop() 
@@ -84,14 +72,14 @@ export class Timeline {
     this.currentTime = 0;
     this.slider.value = 0;
     this.motionObject.isPlaying = false;
-    this.motionObject.clipAction.stop();
     this.motionObject.mixer.time = 0;
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
   }
 
-  pause() 
+  getCurrentFrame() 
   {
-    this.motionObject.isPlaying = false;
+    return Math.floor(this.motionObject.mixer.time * this.motionObject.fps);
   }
+
 }
 
