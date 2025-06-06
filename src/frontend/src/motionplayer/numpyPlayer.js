@@ -12,19 +12,18 @@ export class NumpyPlayer {
     this.npyObject = new THREE.Group();
     this.motionArray = null;
     this.jointCount = 0;
+    this.isPlaying = false;
+
 
     this.npyObject.tick = (delta) => {
-      this.update(delta);
+      if (this.isPlaying) this.update(delta);
     };
   }
 
   async load(url) {
     return new Promise(async (resolve, reject) => {
       try {
-        // Lade npyjs vom CDN (du kannst auch lokal installieren)
-        // const npyjs = (await import('https://cdn.jsdelivr.net/npm/npyjs@0.0.8/index.min.js')).default;
         const loader = new npyjs();
-
         const response = await fetch(url);
         const arrayBuffer = await response.arrayBuffer();
         const parsed = loader.parse(arrayBuffer);
@@ -44,10 +43,12 @@ export class NumpyPlayer {
     });
   }
 
-  createSpheres() {
+  createSpheres() 
+  {
     const material = new THREE.MeshStandardMaterial({ color: 0xff6666 });
 
-    for (let i = 0; i < this.jointCount; i++) {
+    for (let i = 0; i < this.jointCount; i++) 
+    {
       const geom = new THREE.SphereGeometry(2, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npyObject.add(sphere);
@@ -67,13 +68,6 @@ export class NumpyPlayer {
     }
   }
 
-  // setJointPositions(frameIdx) {
-  //   for (let i = 0; i < this.jointCount; i++) {
-  //     const [x, y, z] = this.motionArray[frameIdx * this.jointCount * 3 + i * 3 + 0];
-  //     this.joints[i].position.set(x, y, z);
-  //   }
-  // }
-
   setJointPositions(frameIdx) 
   {
     const base = frameIdx * this.jointCount * 3;
@@ -85,4 +79,26 @@ export class NumpyPlayer {
       this.joints[i].position.set(x, y, z);
     }
   }
+
+  getFrameCount() 
+  {
+    return this.motionArray.shape[0];
+  }
+
+  getFPS() 
+  {
+    return this.fps;
+  }
+
+  isPlaying() 
+  {
+    return this._isPlaying || false;
+  }
+
+  gotoFrame(frameIdx) 
+  {
+    this.currentFrame = frameIdx;
+    this.setJointPositions(frameIdx); 
+  }
+
 }
