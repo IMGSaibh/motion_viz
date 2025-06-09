@@ -1,7 +1,15 @@
-import numpy as np
+from ast import List
 import math
+from pathlib import Path
+from turtle import pos
+import bvhtoolbox
+import numpy as np
 from bvh import Bvh
-
+from pprint import pprint
+from bvhtoolbox.bvhtransforms import get_rotation_matrices, get_translations, get_affines
+#     # vs code workspacefolder
+#     workspacefolder = Path.cwd()
+#     bvh_path = Path.joinpath(workspacefolder, "data/bvh/BentForward_SR.bvh")
 
 def rotation_matrix_xyz(x, y, z, order):
     rx = np.array([
@@ -32,46 +40,61 @@ def rotation_matrix_xyz(x, y, z, order):
 def bvh_to_numpy(bvh_text: str):
     bvh = Bvh(bvh_text)
     joint_list = bvh.get_joints()
-    joint_names = [j.name for j in joint_list]
     joint_index_map = {j.name: idx for idx, j in enumerate(joint_list)}
 
     nframes = bvh.nframes
     njoints = len(joint_list)
 
-    output = np.zeros((nframes, njoints, 3), dtype=np.float32)
+    npyDataset = np.zeros((nframes, njoints, 3), dtype=np.float32)
 
     for frame_idx in range(nframes):
-        joint_world_pos = {}
-        joint_world_rot = {}
+        joint_world_positions = {}
+        joint_world_rotations = {}
 
         for joint in joint_list:
-            name = joint.name
-            offset = np.array(bvh.joint_offset(name))
+            # The offset information also indicates the length and direction
+            # used for drawing the parent segment.
+            offset = np.array(bvh.joint_offset(joint.name))
 
-            parent = bvh.joint_parent(name)
+            channels = bvh.joint_channels(joint.name)
+            joint_position_channels = []
+            joint_rotation_channels = []
+            if len(channels) == 6:
+                joint_position_channels = bvh.joint_channels(joint.name)[:3]
+                joint_rotation_channels = bvh.joint_channels(joint.name)[-3:]
+
+            else:
+                joint_rotation_channels = bvh.joint_channels(joint.name)
+
+
+
+
+            parent = bvh.joint_parent(joint.name)
             parent_name = parent.name if parent else None
 
             # --- Initiale Position
             if parent is None:
-                # Root: Position kommt aus den ersten drei Channels
-                pos = np.array(bvh.frame_joint_channels(frame_idx, name, ["Xposition", "Yposition", "Zposition"]))
-                joint_world_pos[name] = pos
-                rot_vals = bvh.frame_joint_channels(frame_idx, name, bvh.joint_channels(name)[-3:])
-                rot_order = ''.join(c[0].upper() for c in bvh.joint_channels(name)[-3:])
-                joint_world_rot[name] = rotation_matrix_xyz(*rot_vals, order=rot_order)
+                # paretnt: postion and rotation comes from the channel values
+                joint_world_positions[joint.name] = np.array(bvh.frame_joint_channels(frame_idx, joint.name, joint_position_channels))
+                rotation_values = bvh.frame_joint_channels(frame_idx, joint.name, joint_rotation_channels)
+                rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
+                joint_world_rotations[joint.name] = rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
             else:
-                # Children: Position ergibt sich aus Parent + FK
-                parent_pos = joint_world_pos[parent_name]
-                parent_rot = joint_world_rot[parent_name]
+                # child: position is clalculated from parent + FK
+                parent_pos = joint_world_positions[parent_name]
+                parent_rot = joint_world_rotations[parent_name]
 
-                rot_vals = bvh.frame_joint_channels(frame_idx, name, bvh.joint_channels(name))
-                rot_order = ''.join(c[0].upper() for c in bvh.joint_channels(name))
-                local_rot = rotation_matrix_xyz(*rot_vals, order=rot_order)
+                rotation_values = bvh.frame_joint_channels(frame_idx, joint.name, joint_rotation_channels)
+                rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
+                local_rot = rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
 
-                joint_world_rot[name] = parent_rot @ local_rot
-                joint_world_pos[name] = parent_pos + parent_rot @ offset
+                joint_world_rotations[joint.name] = parent_rot @ local_rot
+                joint_world_positions[joint.name] = parent_pos + parent_rot @ offset
 
-            # Speichern
-            output[frame_idx, joint_index_map[name]] = joint_world_pos[name]
+            # save
+            npyDataset[frame_idx, joint_index_map[joint.name]] = joint_world_positions[joint.name]
 
-    return output, joint_names
+    return npyDataset
+
+
+

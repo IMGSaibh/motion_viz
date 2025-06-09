@@ -45,7 +45,7 @@ export class NumpyPlayer {
 
   createSpheres() 
   {
-    const material = new THREE.MeshStandardMaterial({ color: 0xff6666 });
+    const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
     for (let i = 0; i < this.jointCount; i++) 
     {

@@ -101,7 +101,7 @@ class App
 
     // ==============================================================================================
 
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.bvh.npy');
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
     scene.add(this.numpyPlayer.npyObject);
     loop.updatables.push(this.numpyPlayer.npyObject);
 

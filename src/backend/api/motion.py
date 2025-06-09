@@ -34,16 +34,16 @@ async def upload_bvh_numpy(file: UploadFile = File(...)):
     bvh_data = contents.decode("utf-8")
     uploaded_filename = file.filename or "new_motion_file"
     filenameNoEnding = Path(uploaded_filename).stem
+    
     # json_path = Path("data/json/BentForward_SR.json")
 
-    dataset, names = bvh_to_numpy(bvh_data)
-    print(dataset.shape)  # (frames, joints, 3)
-    savePath_npy = Path(f"data/numpy/{uploaded_filename}")
+    dataset = bvh_to_numpy(bvh_data)
+    savePath_npy = Path(f"data/numpy/{filenameNoEnding}")
 
     np.save(savePath_npy, dataset)
 
     
     return {
         "message": "Upload erfolgreich",
-        "filename": filenameNoEnding,
+        "filename": uploaded_filename,
     }
