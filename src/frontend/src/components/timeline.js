@@ -48,6 +48,7 @@ export class Timeline
       this.motionObject.isPlaying = false;
     }
     this.motionObject.clipAction.play();
+    this.motionObject.mixer.update(delta);
     this.currentTime = this.motionObject.mixer.time;
     this.slider.value = this.getCurrentFrame();
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.motionObject.frameCount}`;
@@ -59,6 +60,7 @@ export class Timeline
   {
     // toggle play/pause
     this.motionObject.isPlaying = !this.motionObject.isPlaying;
+
     if(this.getCurrentFrame() == this.motionObject.frameCount)
     {
       this.motionObject.mixer.setTime(0);

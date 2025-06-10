@@ -81,33 +81,28 @@ class App
   async start()
   {
 
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvhPlayer.bvhObject);
 
-
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
-    // loop.updatables.push(this.bvhPlayer.bvhObject);
-
-    // const timeline = new Timeline(this.bvhPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    const timeline = new Timeline(this.bvhPlayer);
+    loop.updatables.push(timeline.timelineObject);
 
 
     // ==============================================================================================
     
     // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
     // scene.add(this.fbxPlayer.fbxObject);
-    // loop.updatables.push(this.fbxPlayer.fbxObject);
 
     // const timelineFBX = new TimelineFBX(this.fbxPlayer);
     // loop.updatables.push(timelineFBX.fbxTimelineObject);
 
     // ==============================================================================================
 
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
-    scene.add(this.numpyPlayer.npyObject);
-    loop.updatables.push(this.numpyPlayer.npyObject);
+    // await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
+    // scene.add(this.numpyPlayer.npyObject);
 
-    const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
-    loop.updatables.push(timelineNumpy.npyTimelineObject);
+    // const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
+    // loop.updatables.push(timelineNumpy.npyTimelineObject);
 
     loop.start();
 

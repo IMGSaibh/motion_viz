@@ -15,7 +15,7 @@ export class TimelineFBX
     this.slider.max = this.keyframeCount;
     this.slider.step = 1;
     this.slider.value = 0;
-
+    this.isPlaying = false;
     this.currentKeyFrame = 0;
     this.elapsedTime = 0;
     
@@ -39,13 +39,15 @@ export class TimelineFBX
 
     this.fbxTimelineObject.tick = (delta) =>
     {
-      if (this.fbxObject.isPlaying) this.update(delta);
+      if (this.isPlaying) this.update(delta);
     }
   }
 
       update(delta) 
     {   
         if (!this.fbxObject.mixer) return;
+
+        this.fbxObject.mixer.update(delta);
         this.fbxObject.clipAction.play();
         const time = this.fbxObject.mixer.time;
         // console.log(`Time ${time} from Keyframe: ${this.currentKeyFrame}`);
@@ -68,7 +70,7 @@ export class TimelineFBX
         if (this.currentKeyFrame >= this.keyframeCount) 
         {
             this.currentKeyFrame = this.keyframeCount;
-            this.fbxObject.isPlaying = false;
+            this.isPlaying = false;
         }
 
         this.currentKeyFrame = closestIndex;
@@ -79,7 +81,7 @@ export class TimelineFBX
   play_pause() 
   {
     // toggle play/pause
-    this.fbxObject.isPlaying = !this.fbxObject.isPlaying;
+    this.isPlaying = !this.isPlaying;
     if (this.currentKeyFrame >= this.keyframeCount) 
     {
       this.currentKeyFrame = 0;
@@ -92,7 +94,7 @@ stop()
   {
     this.slider.value = 0;
     this.currentKeyFrame = 0;
-    this.fbxObject.isPlaying = false;
+    this.isPlaying = false;
     this.fbxObject.mixer.stopAllAction();
     this.fbxObject.mixer.setTime(0);
     this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.keyframeCount}`;
