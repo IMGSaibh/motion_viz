@@ -10,6 +10,7 @@ import { Resizer } from './system/resizer.js';
 import { Loop } from './system/loop.js';
 import { Timeline } from './components/timeline.js';
 import { NumpyTimeline } from './components/timelineNumpy.js';
+import { TimelineFBX } from './components/timelineFBX.js';
 
 let camera;
 let renderer;
@@ -92,16 +93,16 @@ class App
 
     // ==============================================================================================
     
-    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
+    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
     // scene.add(this.fbxPlayer.fbxObject);
     // loop.updatables.push(this.fbxPlayer.fbxObject);
 
-    // const timeline = new Timeline(this.fbxPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    // const timelineFBX = new TimelineFBX(this.fbxPlayer);
+    // loop.updatables.push(timelineFBX.fbxTimelineObject);
 
     // ==============================================================================================
 
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.bvh.npy');
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
     scene.add(this.numpyPlayer.npyObject);
     loop.updatables.push(this.numpyPlayer.npyObject);
 

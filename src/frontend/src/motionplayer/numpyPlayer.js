@@ -3,25 +3,27 @@ import npyjs from 'npyjs';
 
 export class NumpyPlayer {
   constructor() {
-    this.joints = [];
-    this.frameCount = 0;
+    this.npyObject = new THREE.Group();
+    this.motionArray = null;
+    this.isPlaying = false;
     this.currentFrame = 0;
+    this.frameCount = 0;
+    this.jointCount = 0;
+    this.joints = [];
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.npyObject = new THREE.Group();
-    this.motionArray = null;
-    this.jointCount = 0;
-    this.isPlaying = false;
 
 
-    this.npyObject.tick = (delta) => {
+    this.npyObject.tick = (delta) => 
+    {
       if (this.isPlaying) this.update(delta);
     };
   }
 
   async load(url) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => 
+    {
       try {
         const loader = new npyjs();
         const response = await fetch(url);
@@ -45,7 +47,7 @@ export class NumpyPlayer {
 
   createSpheres() 
   {
-    const material = new THREE.MeshStandardMaterial({ color: 0xff6666 });
+    const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
     for (let i = 0; i < this.jointCount; i++) 
     {
@@ -56,13 +58,15 @@ export class NumpyPlayer {
     }
   }
 
-  update(delta) {
+  update(delta) 
+  {
     if (!this.motionArray) return;
 
     this.elapsed += delta * this.speed;
     const frameIdx = Math.floor(this.elapsed * this.fps) % this.frameCount;
 
-    if (frameIdx !== this.currentFrame) {
+    if (frameIdx !== this.currentFrame) 
+    {
       this.currentFrame = frameIdx;
       this.setJointPositions(frameIdx);
     }
@@ -80,20 +84,20 @@ export class NumpyPlayer {
     }
   }
 
-  getFrameCount() 
-  {
-    return this.motionArray.shape[0];
-  }
+  // getFrameCount() 
+  // {
+  //   return this.motionArray.shape[0];
+  // }
 
-  getFPS() 
-  {
-    return this.fps;
-  }
+  // getFPS() 
+  // {
+  //   return this.fps;
+  // }
 
-  isPlaying() 
-  {
-    return this._isPlaying || false;
-  }
+  // isPlaying() 
+  // {
+  //   return this._isPlaying || false;
+  // }
 
   gotoFrame(frameIdx) 
   {
