@@ -2,10 +2,11 @@
 # from turtle import up
 
 import numpy as np
+from backend.motion_parser import bvh_parser_2
 from backend.motion_parser.bvh_parser import BvhParser
 from fastapi import UploadFile, File, APIRouter
 from pathlib import Path
-from backend.motion_parser.bvh_parser_2 import bvh_to_numpy
+from backend.motion_parser.bvh_parser_2 import BVHParser_2
 
 router = APIRouter()
 
@@ -37,11 +38,16 @@ async def upload_bvh_numpy(file: UploadFile = File(...)):
     
     # json_path = Path("data/json/BentForward_SR.json")
 
-    dataset = bvh_to_numpy(bvh_data)
-    savePath_npy = Path(f"data/numpy/{filenameNoEnding}")
+    bvhParser = BVHParser_2(bvh_data)
 
+    dataset = bvhParser.bvh_to_numpy()
+    savePath_npy = Path(f"data/numpy/{filenameNoEnding}")
     np.save(savePath_npy, dataset)
 
+#     # vs code workspacefolder
+    workspacefolder = Path.cwd()
+    bvh_skeleton_path = Path.joinpath(workspacefolder, f"data/json/{filenameNoEnding}_skeleton.json")
+    bvhParser.export_skeleton(bvh_skeleton_path)
     
     return {
         "message": "Upload erfolgreich",

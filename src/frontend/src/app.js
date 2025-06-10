@@ -38,6 +38,44 @@ class App
 
   }
 
+  async initialize()
+  {
+    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    // scene.add(this.bvhPlayer.bvhObject);
+    
+    // const timeline = new Timeline(this.bvhPlayer);
+    // loop.updatables.push(timeline.timelineObject);
+    
+    
+    // ==============================================================================================
+    
+    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
+    // scene.add(this.fbxPlayer.fbxObject);
+    
+    // const timelineFBX = new TimelineFBX(this.fbxPlayer);
+    // loop.updatables.push(timelineFBX.fbxTimelineObject);
+    
+    // ==============================================================================================
+    
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
+    scene.add(this.numpyPlayer.npyObject);
+    
+    const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
+    loop.updatables.push(timelineNumpy.npyTimelineObject);
+
+  }
+  
+  // use start and stop for animation and frame stream
+  start()
+  {
+    loop.start();
+  }
+  
+  stop()
+  {
+    loop.stop();
+  }
+
   upload_file()
   { 
     document.getElementById("upload-btn").addEventListener("click", async () => 
@@ -50,23 +88,23 @@ class App
         alert("Bitte eine .bvh-Datei auswählen.");
         return;
       }
-
+  
       const formData = new FormData();
       formData.append("file", file);
-
+  
       try 
       {
         const response = await fetch("http://localhost:8000/motion/upload_bvh_numpy", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) 
       {
         const error = await response.json();
         throw new Error(error.detail || "Unbekannter Fehler");
       }
-
+  
         const result = await response.json();
         upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy`;
       } 
@@ -76,42 +114,7 @@ class App
       }
     });
   }
-
-  // use start and stop for animation and frame stream
-  async start()
-  {
-
-    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    scene.add(this.bvhPlayer.bvhObject);
-
-    const timeline = new Timeline(this.bvhPlayer);
-    loop.updatables.push(timeline.timelineObject);
-
-
-    // ==============================================================================================
-    
-    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
-    // scene.add(this.fbxPlayer.fbxObject);
-
-    // const timelineFBX = new TimelineFBX(this.fbxPlayer);
-    // loop.updatables.push(timelineFBX.fbxTimelineObject);
-
-    // ==============================================================================================
-
-    // await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
-    // scene.add(this.numpyPlayer.npyObject);
-
-    // const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
-    // loop.updatables.push(timelineNumpy.npyTimelineObject);
-
-    loop.start();
-
-  }
-  
-  stop()
-  {
-    loop.stop();
-  }
 }
+
 
 export { App };
