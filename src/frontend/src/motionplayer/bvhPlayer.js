@@ -9,17 +9,11 @@ export class BVHPlayer
     this.bvhObject = new THREE.Group();
     this.skeletonHelper = null;
     this.clipAction = null;
-    this.isPlaying = false;
     this.frameCount = 0;
     this.frameTime = 0;
     this.duration = 0;
     this.mixer = null;
     this.fps = 0;
-
-    this.bvhObject.tick = (delta) => 
-    {
-      if (this.mixer && this.isPlaying) this.mixer.update(delta);
-    };
   }
 
 

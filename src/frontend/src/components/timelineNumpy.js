@@ -14,7 +14,7 @@ export class NumpyTimeline
     this.slider.step = 1;
     this.slider.value = 0;
 
-    this.currentFrame = 0;
+    this.frameIdx = 0;
     this.elapsedTime = 0;
 
     this.fps = npyObject.fps;
@@ -35,9 +35,9 @@ export class NumpyTimeline
     // input-Event executes always when the slider is moved
     this.slider.addEventListener('input', (e) => 
     {
-        this.currentFrame = parseFloat(e.target.value);
-        this.gotoFrame(this.currentFrame);
-        this.label.textContent = `Frame: ${this.currentFrame} / ${this.frameCount}`;
+        this.frameIdx = parseFloat(e.target.value);
+        this.gotoFrame(this.frameIdx);
+        this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
     });
 
     this.npyTimelineObject.tick = (delta) =>
@@ -55,16 +55,16 @@ export class NumpyTimeline
     while (this.elapsedTime >= this.frameDuration) 
     {
       this.elapsedTime -= this.frameDuration;
-      this.currentFrame++;
+      this.frameIdx++;
       
-      if (this.currentFrame >= this.frameCount) 
+      if (this.frameIdx >= this.frameCount) 
       {
-        this.currentFrame = this.frameCount;
+        this.frameIdx = this.frameCount;
         this.npyObject.isPlaying = false;
       }
-      this.gotoFrame(this.currentFrame);
-      this.slider.value = this.currentFrame;
-      this.label.textContent = `Frame: ${this.currentFrame} / ${this.frameCount}`;
+      this.gotoFrame(this.frameIdx);
+      this.slider.value = this.frameIdx;
+      this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
     }
   }
 
@@ -72,30 +72,31 @@ export class NumpyTimeline
   {
     // toggle play/pause
     this.npyObject.isPlaying = !this.npyObject.isPlaying;
-    if (this.currentFrame >= this.frameCount) 
+    if (this.frameIdx >= this.frameCount) 
     {
-      this.currentFrame = 0;
+      this.frameIdx = 0;
       this.slider.value = 0;
-      this.label.textContent = `Frame: ${this.currentFrame} / ${this.frameCount}`;
+      this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
     }
   }
 
   stop() 
   {
-    this.currentFrame = 0;
+    this.frameIdx = 0;
     this.slider.value = 0;
     this.npyObject.isPlaying = false;
-    this.label.textContent = `Frame: ${this.currentFrame} / ${this.frameCount}`;
+    this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
   }
 
 
   gotoFrame(frameIndex) 
   {
-    this.currentFrame = Math.max(0, Math.min(frameIndex, this.frameCount));
-    // avoid index mismatch
-    if (this.currentFrame < this.frameCount) 
+    this.frameIdx = Math.max(0, Math.min(frameIndex, this.frameCount));
+    // avoid index mismatch in setJointPositions()
+    // last frameIdx leads last undefined joint positions 
+    if (this.frameIdx < this.frameCount) 
     {
-      this.npyObject.gotoFrame(this.currentFrame);
+      this.npyObject.setJointPositions(this.frameIdx);
     }
   }
 }

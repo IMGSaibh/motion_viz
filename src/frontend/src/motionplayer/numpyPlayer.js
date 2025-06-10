@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import npyjs from 'npyjs';
 
-export class NumpyPlayer {
-  constructor() {
+export class NumpyPlayer 
+{
+  constructor() 
+  {
     this.npyObject = new THREE.Group();
     this.motionArray = null;
-    this.isPlaying = false;
     this.currentFrame = 0;
     this.frameCount = 0;
     this.jointCount = 0;
@@ -13,18 +14,14 @@ export class NumpyPlayer {
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-
-
-    this.npyObject.tick = (delta) => 
-    {
-      if (this.isPlaying) this.update(delta);
-    };
   }
 
-  async load(url) {
+  async load(url) 
+  {
     return new Promise(async (resolve, reject) => 
     {
-      try {
+      try 
+      {
         const loader = new npyjs();
         const response = await fetch(url);
         const arrayBuffer = await response.arrayBuffer();
@@ -39,7 +36,8 @@ export class NumpyPlayer {
 
         resolve(this.npyObject);
 
-      } catch (e) {
+      } catch (e) 
+      {
         reject(e);
       }
     });
@@ -58,20 +56,6 @@ export class NumpyPlayer {
     }
   }
 
-  update(delta) 
-  {
-    if (!this.motionArray) return;
-
-    this.elapsed += delta * this.speed;
-    const frameIdx = Math.floor(this.elapsed * this.fps) % this.frameCount;
-
-    if (frameIdx !== this.currentFrame) 
-    {
-      this.currentFrame = frameIdx;
-      this.setJointPositions(frameIdx);
-    }
-  }
-
   setJointPositions(frameIdx) 
   {
     const base = frameIdx * this.jointCount * 3;
@@ -82,27 +66,6 @@ export class NumpyPlayer {
       const z = this.motionArray[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
     }
-  }
-
-  // getFrameCount() 
-  // {
-  //   return this.motionArray.shape[0];
-  // }
-
-  // getFPS() 
-  // {
-  //   return this.fps;
-  // }
-
-  // isPlaying() 
-  // {
-  //   return this._isPlaying || false;
-  // }
-
-  gotoFrame(frameIdx) 
-  {
-    this.currentFrame = frameIdx;
-    this.setJointPositions(frameIdx); 
   }
 
 }
