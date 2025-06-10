@@ -1,9 +1,10 @@
 export class NumpyTimeline 
 {
-  constructor(npyMotionObject) 
+  constructor(npyObject) 
   {
-    this.npyMotionObject = npyMotionObject;
-    this.frameCount = npyMotionObject.frameCount;
+    this.npyTimelineObject = {};
+    this.npyObject = npyObject;
+    this.frameCount = npyObject.frameCount;
     this.container = document.getElementById('timeline-container');
     this.slider = document.getElementById('frame-slider');
     this.label = document.getElementById('frame-label');
@@ -15,19 +16,18 @@ export class NumpyTimeline
 
     this.currentFrame = 0;
     this.elapsedTime = 0;
-    this.isUserDragging = false;
 
-    this.fps = npyMotionObject.fps;
+    this.fps = npyObject.fps;
     // 1 / fps gives us the duration of one frame in seconds
     // cause we use three.js delta, we need to convert it to seconds
     this.frameDuration = 1 / this.fps;
 
     this._onFrameChange = null;
-    this.npyTimelineObject = {};
     this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.frameCount}`;
 
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => 
+    {
       if (e.code === 'Space') this.play_pause();
       if (e.code === 'KeyS') this.stop();
     });
@@ -42,14 +42,14 @@ export class NumpyTimeline
 
     this.npyTimelineObject.tick = (delta) =>
     {
-      if (this.npyMotionObject.isPlaying) this.update(delta);
+      if (this.npyObject.isPlaying) this.update(delta);
     }
 
   }
 
   update(delta) 
   {
-    if (this.isUserDragging || !this.npyMotionObject.isPlaying) return;
+    if (!this.npyObject.isPlaying) return;
 
     this.elapsedTime += delta;
     while (this.elapsedTime >= this.frameDuration) 
@@ -60,7 +60,7 @@ export class NumpyTimeline
       if (this.currentFrame >= this.frameCount) 
       {
         this.currentFrame = this.frameCount;
-        this.npyMotionObject.isPlaying = false;
+        this.npyObject.isPlaying = false;
       }
       this.gotoFrame(this.currentFrame);
       this.slider.value = this.currentFrame;
@@ -71,7 +71,7 @@ export class NumpyTimeline
   play_pause() 
   {
     // toggle play/pause
-    this.npyMotionObject.isPlaying = !this.npyMotionObject.isPlaying;
+    this.npyObject.isPlaying = !this.npyObject.isPlaying;
     if (this.currentFrame >= this.frameCount) 
     {
       this.currentFrame = 0;
@@ -84,7 +84,7 @@ export class NumpyTimeline
   {
     this.currentFrame = 0;
     this.slider.value = 0;
-    this.npyMotionObject.isPlaying = false;
+    this.npyObject.isPlaying = false;
     this.label.textContent = `Frame: ${this.currentFrame} / ${this.frameCount}`;
   }
 
@@ -95,7 +95,7 @@ export class NumpyTimeline
     // avoid index mismatch
     if (this.currentFrame < this.frameCount) 
     {
-      this.npyMotionObject.gotoFrame(this.currentFrame);
+      this.npyObject.gotoFrame(this.currentFrame);
     }
   }
 }

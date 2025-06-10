@@ -2,21 +2,22 @@ export class Timeline
 {
   constructor(motionObject) 
   {
+    this.timelineObject = {};
     this.motionObject = motionObject;
     this.container = document.getElementById('timeline-container');
     this.slider = document.getElementById('frame-slider');
     this.label = document.getElementById('frame-label');
+    this.slider.max = this.motionObject.frameCount;
     this.slider.type = 'range';
     this.slider.min = 0;
-    this.slider.max = this.motionObject.frameCount;
     this.slider.step = 1;
     this.slider.value = 0;
     this.currentTime = 0;
-    this.timelineObject = {};
     this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.motionObject.frameCount}`;
     
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => 
+    {
       if (e.code === 'Space') this.play_pause();
       if (e.code === 'KeyS') this.stop();
     });
