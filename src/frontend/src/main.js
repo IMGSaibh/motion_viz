@@ -6,7 +6,9 @@ function main()
 	const container = document.querySelector('#scene-container');
 	const app = new App(container);
 	
-	app.upload_file()
+	app.upload_file();
+	app.initialize();
+	
 	// start the loop (produce a stream of frames)
 	app.start();
 
