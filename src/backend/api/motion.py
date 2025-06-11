@@ -10,6 +10,7 @@ from backend.motion_parser.bvh_parser_2 import BVHParser_2
 from backend.motion_parser.csv_parser import CSVParser
 
 router = APIRouter()
+workspacefolder = Path.cwd()
 
 # @router.post("/upload_bvh_numpy")
 # async def upload_bvh_numpy(file: UploadFile = File(...)):
@@ -46,7 +47,6 @@ async def upload_bvh_numpy(file: UploadFile = File(...)):
     np.save(savePath_npy, dataset)
 
     # vs code workspacefolder
-    workspacefolder = Path.cwd()
     bvh_skeleton_path = Path.joinpath(workspacefolder, f"data/json/{filenameNoEnding}_skeleton.json")
     bvhParser.export_skeleton(bvh_skeleton_path)
     
@@ -59,5 +59,9 @@ async def upload_bvh_numpy(file: UploadFile = File(...)):
 @router.post("/process_csv2numpy")
 async def process_csv2numpy():
     workspacefolder = Path.cwd()
-    csv_path = Path.joinpath(workspacefolder, "data/csv/L01_S01_R24.csv")
+    csv_path = Path.joinpath(workspacefolder, "data/csv/test.csv")
     csvParser = CSVParser(csv_path)
+    dataset = csvParser.csv_to_numpy()
+    savePath_npy =Path.joinpath(workspacefolder, f"data/numpy/{csv_path.stem}")
+    np.save(savePath_npy, dataset)
+    csvParser.export_skeleton(Path.joinpath(workspacefolder, f"data/json/{csv_path.stem}_skeleton.json"))

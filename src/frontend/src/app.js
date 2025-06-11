@@ -40,11 +40,11 @@ class App
 
   async initialize()
   {
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
+    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvhPlayer.bvhObject);
     
-    // const timeline = new Timeline(this.bvhPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    const timeline = new Timeline(this.bvhPlayer);
+    loop.updatables.push(timeline.timelineObject);
     
     
     // ==============================================================================================
@@ -59,6 +59,9 @@ class App
     
     await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
     scene.add(this.numpyPlayer.npyObject);
+
+    this.numpyPlayer.createSpheres();
+    this.numpyPlayer.parserHierarchyFile("//127.0.0.1:8000/data/json/Combo_Punch_skeleton.json");
     
     const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
     loop.updatables.push(timelineNumpy.npyTimelineObject);
@@ -134,8 +137,7 @@ class App
           throw new Error(error.detail || "Unbekannter Fehler");
         }
   
-        const result = await response.json();
-        upload_status.textContent = `✅ Verarbeitet & gespeichert als: ${result.filename}.npy`;
+        upload_status.textContent = `✅ Finshed: CSV zu Numpy konvertiert!`;
       } 
       catch (error) 
       {
