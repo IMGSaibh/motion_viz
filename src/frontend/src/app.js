@@ -40,11 +40,11 @@ class App
 
   async initialize()
   {
-    await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    scene.add(this.bvhPlayer.bvhObject);
+    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    // scene.add(this.bvhPlayer.bvhObject);
     
-    const timeline = new Timeline(this.bvhPlayer);
-    loop.updatables.push(timeline.timelineObject);
+    // const timeline = new Timeline(this.bvhPlayer);
+    // loop.updatables.push(timeline.timelineObject);
     
     
     // ==============================================================================================
@@ -57,11 +57,11 @@ class App
     
     // ==============================================================================================
     
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/Combo_Punch.npy');
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/test.npy');
     scene.add(this.numpyPlayer.npyObject);
 
     this.numpyPlayer.createSpheres();
-    this.numpyPlayer.parserHierarchyFile("//127.0.0.1:8000/data/json/Combo_Punch_skeleton.json");
+    this.numpyPlayer.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/test_skeleton.json");
     
     const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
     loop.updatables.push(timelineNumpy.npyTimelineObject);

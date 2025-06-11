@@ -49,19 +49,20 @@ export class NumpyPlayer
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(2, 16, 16);
+      const geom = new THREE.SphereGeometry(0.02, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npyObject.add(sphere);
       this.joints.push(sphere);
     }
   }
 
-  async parserHierarchyFile(url) 
+  async parseHierarchyFileBVH(url) 
   {
     const response = await fetch(url);
     const skeleton = await response.json();
     this.jointNames = skeleton.joints;
-    this.createSkeletonLines(skeleton.hierarchy);
+    // this.createSkeletonLines(skeleton.hierarchy);
+    this.createSkeletonLinesCSV_KinectV1(skeleton.joints ,skeleton.hierarchy);
   }
 
   setJointPositions(frameIdx) 
@@ -101,7 +102,30 @@ export class NumpyPlayer
       const line = new THREE.Line(geometry, this.boneMaterial);
       this.npyObject.add(line);
       this.bones.push({ line, childIdx, parentIdx });
-      // console.log(`Creating bone from`, this.bones);
+    }
+  }
+
+  createSkeletonLinesCSV_KinectV1(joints, hierarchy) 
+  {
+    this.bones = [];
+
+    for (const [parentName, childName] of hierarchy) 
+    {
+      const parentIdx = joints.indexOf(parentName);
+      const childIdx = joints.indexOf(childName);
+
+      if (parentIdx === -1 || childIdx === -1) 
+      {
+        console.warn(`Invalid joint name in hierarchy: ${parentName} -> ${childName}`);
+        continue;
+      }
+
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(), new THREE.Vector3()
+      ]);
+      const line = new THREE.Line(geometry, this.boneMaterial);
+      this.npyObject.add(line);
+      this.bones.push({ line, parentIdx, childIdx });
     }
   }
 

@@ -64,4 +64,5 @@ async def process_csv2numpy():
     dataset = csvParser.csv_to_numpy()
     savePath_npy =Path.joinpath(workspacefolder, f"data/numpy/{csv_path.stem}")
     np.save(savePath_npy, dataset)
+    # TODO: it is kinect_v1_hierarchy and it needs still ordering correspond to the joints 
     csvParser.export_skeleton(Path.joinpath(workspacefolder, f"data/json/{csv_path.stem}_skeleton.json"))
