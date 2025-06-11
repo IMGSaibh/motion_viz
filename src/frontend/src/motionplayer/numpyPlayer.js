@@ -32,15 +32,8 @@ export class NumpyPlayer
         const [frameCount, jointCount, _] = parsed.shape;
         this.frameCount = frameCount;
         this.jointCount = jointCount;
-
-        this.createSpheres();
-        fetch("//127.0.0.1:8000/data/json/Combo_Punch_skeleton.json").then((res) => res.json()).then((skeleton) => 
-        {
-          this.jointNames = skeleton.joints;
-          this.createSkeletonLines(skeleton.hierarchy);
-        });
-
-
+        this.boneMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        
         resolve(this.npyObject);
 
       } catch (e) 
@@ -56,11 +49,20 @@ export class NumpyPlayer
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(2, 16, 16);
+      const geom = new THREE.SphereGeometry(0.02, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npyObject.add(sphere);
       this.joints.push(sphere);
     }
+  }
+
+  async parseHierarchyFileBVH(url) 
+  {
+    const response = await fetch(url);
+    const skeleton = await response.json();
+    this.jointNames = skeleton.joints;
+    // this.createSkeletonLines(skeleton.hierarchy);
+    this.createSkeletonLinesCSV_KinectV1(skeleton.joints ,skeleton.hierarchy);
   }
 
   setJointPositions(frameIdx) 
@@ -90,16 +92,40 @@ export class NumpyPlayer
   createSkeletonLines(hierarchy) 
   {
     this.bones = [];
-
+    // TODO: improve performance
     for (const [childIdx, parentIdx] of hierarchy) 
     {
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      // const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
       const geometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(), new THREE.Vector3()
       ]);
-      const line = new THREE.Line(geometry, material);
+      const line = new THREE.Line(geometry, this.boneMaterial);
       this.npyObject.add(line);
       this.bones.push({ line, childIdx, parentIdx });
+    }
+  }
+
+  createSkeletonLinesCSV_KinectV1(joints, hierarchy) 
+  {
+    this.bones = [];
+
+    for (const [parentName, childName] of hierarchy) 
+    {
+      const parentIdx = joints.indexOf(parentName);
+      const childIdx = joints.indexOf(childName);
+
+      if (parentIdx === -1 || childIdx === -1) 
+      {
+        console.warn(`Invalid joint name in hierarchy: ${parentName} -> ${childName}`);
+        continue;
+      }
+
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(), new THREE.Vector3()
+      ]);
+      const line = new THREE.Line(geometry, this.boneMaterial);
+      this.npyObject.add(line);
+      this.bones.push({ line, parentIdx, childIdx });
     }
   }
 

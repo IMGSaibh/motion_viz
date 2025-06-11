@@ -7,6 +7,7 @@ function main()
 	const app = new App(container);
 	
 	app.upload_file();
+	app.process_csv2numpy();
 	app.initialize();
 	
 	// start the loop (produce a stream of frames)
