@@ -81,7 +81,7 @@ class App
     document.getElementById("upload-btn").addEventListener("click", async () => 
     {
       const input = document.getElementById("bvh-upload");
-      const upload_status = document.getElementById("upload-status");
+      const upload_status = document.getElementById("process-status");
       const file = input.files[0];
       if (!file) 
       {
@@ -114,6 +114,36 @@ class App
       }
     });
   }
+
+  process_csv2numpy()
+  {
+    document.getElementById("process-btn").addEventListener("click", async () => 
+    {
+      const input = document.getElementById("csv-upload");
+      const upload_status = document.getElementById("upload-status");
+
+      try 
+      {
+        const response = await fetch("http://localhost:8000/motion/process_csv2numpy", {
+          method: "POST",
+        });
+  
+        if (!response.ok) 
+        {
+          const error = await response.json();
+          throw new Error(error.detail || "Unbekannter Fehler");
+        }
+  
+        const result = await response.json();
+        upload_status.textContent = `✅ Verarbeitet & gespeichert als: ${result.filename}.npy`;
+      } 
+      catch (error) 
+      {
+        upload_status.textContent = `❌ Fehler: ${error.message}`;
+      }
+    });
+  }
+
 }
 
 
