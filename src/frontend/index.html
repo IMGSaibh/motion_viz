@@ -10,11 +10,20 @@
   </head>
   <body>
     <div id="ui-overlay">
+      <input type="file" id="upload_files" multiple />
+      <button id="client_uploads-btn">Upload Files</button>
+      <div id="client_uploads-status"></div>
+
       <input type="file" id="bvh-upload" accept=".bvh" />
       <button id="upload-btn">Upload & Convert to NumPy</button>
       <div id="upload-status"></div>
+
       <button id="process-btn">Process CSV</button>
       <div id="process-status"></div>
+
+      <button id="convert_bvh_to_numpy-btn">Convert BVH to NPY</button>
+      <div id="convert_bvh_to_numpy-status"></div>
+    
     </div>
 
     <!-- Three JS <canvas> is inserted here -->

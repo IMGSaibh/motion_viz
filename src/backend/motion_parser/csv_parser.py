@@ -16,13 +16,12 @@ class CSVParser:
 
         coord_cols = [col for col in dataframe.columns if re.match(r'.*[XYZ]$', col)]
         
-        # Extrahiere Basis-Joint-Namen
+        # extract joint-namens
         joint_basenames = sorted(set(re.sub(r'[XYZ]$', '', name) for name in coord_cols))
         self.joint_names = joint_basenames
         self.joint_count = len(self.joint_names)
         self.nframes = dataframe.shape[0]
 
-        # NumPy-Array initialisieren
         data = np.zeros((self.nframes, self.joint_count, 3), dtype=np.float32)
         
         for i, joint in enumerate(self.joint_names):
@@ -33,12 +32,8 @@ class CSVParser:
 
         return data
     
-    # def export_skeleton(self, output_path: Path):
-    #     with open(output_path, "w") as f:
-    #             json.dump(self.joint_names, f, indent=2)
-    
     def export_skeleton(self, output_path: Path):
-        # Kinect Skeleton Hierarchie (V1)
+        # kinect skeleton hierarchy (V1)
         hierarchy = [
             ("HipCenter", "Spine"),
             ("Spine", "ShoulderCenter"),

@@ -79,6 +79,49 @@ class App
     loop.stop();
   }
 
+  upload_files()
+  {
+    document.getElementById("client_uploads-btn").addEventListener("click", async () => 
+    {
+      const input = document.getElementById("upload_files");
+      const status = document.getElementById("client_uploads-status");
+      const files = input.files;
+      if (files.length === 0) 
+      {
+        alert("❌ Please choose one or more motion capture files.");
+        return;
+      }
+
+      const formData = new FormData();
+      for (const file of files) 
+      {
+        formData.append("files", file);
+      }
+      
+      try 
+      {
+      const serverResponse = await fetch("http://localhost:8000/motion/uploads", {
+        method: "POST",
+        body: formData,
+      });
+
+      
+      if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message} ❌ ${apiResponse.not_supported_files}`;
+      } 
+      catch (error) 
+      {
+        status.textContent = `❌ error: ${error.message}`;
+      }
+
+    });
+  }
+
   upload_file()
   { 
     document.getElementById("upload-btn").addEventListener("click", async () => 
@@ -122,8 +165,7 @@ class App
   {
     document.getElementById("process-btn").addEventListener("click", async () => 
     {
-      const input = document.getElementById("csv-upload");
-      const upload_status = document.getElementById("upload-status");
+      const upload_status = document.getElementById("process-status");
 
       try 
       {
@@ -134,7 +176,7 @@ class App
         if (!response.ok) 
         {
           const error = await response.json();
-          throw new Error(error.detail || "Unbekannter Fehler");
+          throw new Error(error.detail || "unknown error");
         }
   
         upload_status.textContent = `✅ Finshed: CSV zu Numpy konvertiert!`;
@@ -146,6 +188,33 @@ class App
     });
   }
 
+  async callConvertBvh2Numpy() 
+  {
+    document.getElementById("convert_bvh_to_numpy-btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_bvh_to_numpy-status");
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_numpy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message}!`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
 }
 
 
