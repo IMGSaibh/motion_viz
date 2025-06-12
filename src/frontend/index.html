@@ -11,8 +11,11 @@
   <body>
     <div id="ui-overlay">
       <input type="file" id="upload_files" multiple />
-      <button id="client_uploads-btn">Upload Files</button>
-      <div id="client_uploads-status"></div>
+      <button id="client_uploads_btn">Upload Files</button>
+      <div id="client_uploads_status"></div>
+
+      <button id="process_bvh_files_btn">Convert BVH to NPY</button>
+      <div id="process_bvh_files_status"></div>
 
       <input type="file" id="bvh-upload" accept=".bvh" />
       <button id="upload-btn">Upload & Convert to NumPy</button>
@@ -21,8 +24,6 @@
       <button id="process-btn">Process CSV</button>
       <div id="process-status"></div>
 
-      <button id="convert_bvh_to_numpy-btn">Convert BVH to NPY</button>
-      <div id="convert_bvh_to_numpy-status"></div>
     
     </div>
 

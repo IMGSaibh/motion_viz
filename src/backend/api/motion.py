@@ -72,19 +72,19 @@ async def upload(files: List[UploadFile] = File(...)):
     }
 
 
-@router.post("/convert_bvh_to_numpy")
-async def convert_bvh_to_numpy():
+@router.post("/process_bvh_files")
+async def process_bvh_files():
     workspacefolder = Path.cwd()
     bvh_path = Path.joinpath(workspacefolder, "data/bvh/test.bvh")
 
-    # TODO: search data/bvh for bvh files and convert them all to numpy
+    # TODO: read data/bvh for bvh files and write a for loop to later process all bvh files
+    # TODO: make sure a folder data/numpy_groundtruth exists
     # TODO: save all numpy files in data/numpy_groundtruth folder
     # TODO: save skeleton in data/Skeleton folder
     # TODO: name all skeleton files like the bvh file, but with _skeleton.json ending
 
     return {
-        "message": "bvh to numpy conversion finshed",
-        "path": bvh_path
+        "message": "write user message here",
     }
 
 

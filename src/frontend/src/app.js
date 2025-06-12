@@ -81,10 +81,10 @@ class App
 
   upload_files()
   {
-    document.getElementById("client_uploads-btn").addEventListener("click", async () => 
+    document.getElementById("client_uploads_btn").addEventListener("click", async () => 
     {
       const input = document.getElementById("upload_files");
-      const status = document.getElementById("client_uploads-status");
+      const status = document.getElementById("client_uploads_status");
       const files = input.files;
       if (files.length === 0) 
       {
@@ -117,6 +117,34 @@ class App
       catch (error) 
       {
         status.textContent = `❌ error: ${error.message}`;
+      }
+
+    });
+  }
+
+  process_bvh_files() 
+  {
+    document.getElementById("process_bvh_files_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("process_bvh_files_status");
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/process_bvh_files", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message}!`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
       }
 
     });
@@ -188,33 +216,7 @@ class App
     });
   }
 
-  async callConvertBvh2Numpy() 
-  {
-    document.getElementById("convert_bvh_to_numpy-btn").addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_bvh_to_numpy-status");
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_numpy", {
-          method: "POST"
-        });
 
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = `✅ ${apiResponse.message}!`;
-
-      }
-      catch (error) 
-      {
-        status.textContent = `❌${error.message}`;
-      }
-
-    });
-  }
 }
 
 
