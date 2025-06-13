@@ -1,16 +1,16 @@
 
 import { createCamera } from './components/camera.js';
 import { createOrbitControls } from './components/orbitcontrol.js';
-import { BVHPlayer } from './motionplayer/bvhPlayer.js';
-import { FBXPlayer } from './motionplayer/fbxPlayer.js';
-import { NumpyPlayer } from './motionplayer/numpyPlayer.js';
+import { BVH_loader } from './motion_loader/bvh_loader.js';
+import { FBX_Loader } from './motion_loader/fbx_loader.js';
+import { NPY_loader } from './motion_loader/npy_loader.js';
 import { createScene } from './components/scene.js';
 import { createRenderer } from './system/renderer.js';
 import { Resizer } from './system/resizer.js';
 import { Loop } from './system/loop.js';
-import { Timeline } from './components/timeline.js';
-import { NumpyTimeline } from './components/timelineNumpy.js';
-import { TimelineFBX } from './components/timelineFBX.js';
+import { BVH_Player } from './components/bvh_player.js';
+import { NPY_Player } from './components/npy_player.js';
+import { FBX_Player } from './components/fbx_player.js';
 
 let camera;
 let renderer;
@@ -31,40 +31,40 @@ class App
     loop.updatables.push(orbitControls);
 
         
-    this.bvhPlayer = new BVHPlayer();
-    this.fbxPlayer = new FBXPlayer();
-    this.numpyPlayer = new NumpyPlayer();
+    this.bvh_loader = new BVH_loader();
+    this.fbx_loader = new FBX_Loader();
+    this.npy_loader = new NPY_loader();
     const resizer = new Resizer(container, camera, renderer);
 
   }
 
   async initialize()
   {
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
+    // await this.bvh_loader.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    // scene.add(this.bvh_loader.bvh_object);
     
-    // const timeline = new Timeline(this.bvhPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    // const bvh_player = new BVH_Player(this.bvh_loader);
+    // loop.updatables.push(bvh_player.bvh_player_object);
     
-    
-    // ==============================================================================================
-    
-    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
-    // scene.add(this.fbxPlayer.fbxObject);
-    
-    // const timelineFBX = new TimelineFBX(this.fbxPlayer);
-    // loop.updatables.push(timelineFBX.fbxTimelineObject);
     
     // ==============================================================================================
     
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy_groundtruth/test.npy');
-    scene.add(this.numpyPlayer.npyObject);
+    // await this.fbx_loader.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
+    // scene.add(this.fbx_loader.fbx_object);
+    
+    // const fbx_player = new FBX_Player(this.fbx_loader);
+    // loop.updatables.push(fbx_player.fbx_player_object);
+    
+    // ==============================================================================================
+    
+    await this.npy_loader.load('//127.0.0.1:8000/data/numpy_groundtruth/Amature.npy');
+    scene.add(this.npy_loader.npy_object);
 
-    this.numpyPlayer.createSpheres();
-    this.numpyPlayer.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/test_skeleton_groundtruth.json");
+    this.npy_loader.createSpheres();
+    this.npy_loader.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/Amature_skeleton_groundtruth.json");
     
-    const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
-    loop.updatables.push(timelineNumpy.npyTimelineObject);
+    const npy_player = new NPY_Player(this.npy_loader);
+    loop.updatables.push(npy_player.npy_player_object);
 
   }
   
@@ -112,7 +112,7 @@ class App
         }
         
         const apiResponse = await serverResponse.json();
-        status.textContent = `✅ ${apiResponse.message} ❌ ${apiResponse.not_supported_files}`;
+        status.textContent = `✅ ${apiResponse.message} ${apiResponse.not_supported_files && '❌ ' + apiResponse.not_supported_files}`;
       } 
       catch (error) 
       {
@@ -139,8 +139,9 @@ class App
         }
         
         const apiResponse = await serverResponse.json();
-        status.textContent = `✅ ${apiResponse.message}!`;
-
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
       }
       catch (error) 
       {
@@ -168,7 +169,9 @@ class App
         }
         
         const apiResponse = await serverResponse.json();
-        status.textContent = `✅ ${apiResponse.message}!`;
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
 
       }
       catch (error) 

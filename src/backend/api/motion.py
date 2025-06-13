@@ -3,32 +3,10 @@ from typing import List
 from pathlib import Path
 from fastapi import UploadFile, File, APIRouter
 from backend.motion_parser.csv_parser import CSVParser
-# from backend.motion_parser.bvh_parser import BvhParser
-from backend.motion_parser import bvh_parser_2, csv_parser
-from backend.motion_parser.bvh_parser_2 import BVHParser_2
+from backend.motion_parser.bvh_parser import BVHParser
 
 router = APIRouter()
 workspacefolder = Path.cwd()
-
-# @router.post("/upload_bvh_numpy")
-# async def upload_bvh_numpy(file: UploadFile = File(...)):
-#     contents = await file.read()
-#     bvh_data = contents.decode("utf-8")
-#     uploaded_filename = file.filename or "new_motion_file"
-#     filenameNoEnding = Path(uploaded_filename).stem
-#     json_path = Path("data/json/BentForward_SR.json")
-
-#     bvh_parser = BvhParser(bvh_data, json_path)
-#     bvh_parser.load_json_descriptor_file()
-#     bvh_parser.bvhtree_to_data()
-#     bvh_parser.build_graph()
-#     bvh_parser.save_as_numpy(filenameNoEnding)
-    
-#     return {
-#         "message": "Upload erfolgreich",
-#         "filename": filenameNoEnding,
-#     }
-
 
 @router.post("/uploads")
 async def upload(files: List[UploadFile] = File(...)):
@@ -83,13 +61,16 @@ async def process_bvh_files():
     bvh_files = list(bvh_dir_path.glob("*.bvh"))
 
     if not bvh_files:
-        return {"message": "⚠️ Found no .bvh-Files."}
+        return {
+            "warning": "Found no .bvh-Files.",
+            "message": "",
+        }
 
     for bvh_file in bvh_files:
         with open(bvh_file, "r") as file:
             bvh_data = file.read()
 
-        bvh_parser = BVHParser_2(bvh_data)
+        bvh_parser = BVHParser(bvh_data)
 
         dataset = bvh_parser.bvh_to_numpy()
         save_npy_path = Path.joinpath(numpy_groundtruth_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
@@ -101,6 +82,7 @@ async def process_bvh_files():
 
     return {
         "message": ".bvh-files converted",
+        "warning": "",
     }
 
 
@@ -117,7 +99,10 @@ async def process_csv_files():
     csv_files = list(csv_dir_path.glob("*.csv"))
 
     if not csv_files:
-        return {"message": "⚠️ Found no .csv-Files."}
+        return {
+            "warning": "Found no .csv-Files.",
+            "message": "",
+        }
 
     for csv_file in csv_files:
         csv_parser = CSVParser(csv_file)
@@ -131,5 +116,6 @@ async def process_csv_files():
     
     return {
         "message": ".csv-files converted",
+        "warning": "",
     }
 

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { BVHLoader } from '../../node_modules/three/examples/jsm/loaders/BVHLoader.js';
 
-export class BVHPlayer 
+export class BVH_loader 
 {
   constructor() 
   {
     this.loader = new BVHLoader();
-    this.bvhObject = new THREE.Group();
+    this.bvh_object = new THREE.Group();
     this.skeletonHelper = null;
     this.clipAction = null;
     this.frameCount = 0;
@@ -30,14 +30,14 @@ export class BVHPlayer
         this.fps = (1 / this.frameTime).toFixed(2);
 
         this.skeletonHelper = new THREE.SkeletonHelper(result.skeleton.bones[0]);
-        this.bvhObject.add(result.skeleton.bones[0]);
-        this.bvhObject.add(this.skeletonHelper);
+        this.bvh_object.add(result.skeleton.bones[0]);
+        this.bvh_object.add(this.skeletonHelper);
 
         this.mixer = new THREE.AnimationMixer(result.skeleton.bones[0]);
         this.clipAction = this.mixer.clipAction(result.clip);
 
         // terminate Promise and return this.bvhObject
-        resolve(this.bvhObject);
+        resolve(this.bvh_object);
 
       }, undefined, (error) => reject(error));
     })
