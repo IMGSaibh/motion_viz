@@ -57,11 +57,11 @@ class App
     
     // ==============================================================================================
     
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/test.npy');
+    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy_groundtruth/test.npy');
     scene.add(this.numpyPlayer.npyObject);
 
     this.numpyPlayer.createSpheres();
-    this.numpyPlayer.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/test_skeleton.json");
+    this.numpyPlayer.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/test_skeleton_groundtruth.json");
     
     const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
     loop.updatables.push(timelineNumpy.npyTimelineObject);
@@ -150,73 +150,34 @@ class App
     });
   }
 
-  upload_file()
-  { 
-    document.getElementById("upload-btn").addEventListener("click", async () => 
-    {
-      const input = document.getElementById("bvh-upload");
-      const upload_status = document.getElementById("process-status");
-      const file = input.files[0];
-      if (!file) 
-      {
-        alert("Bitte eine .bvh-Datei auswählen.");
-        return;
-      }
-  
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      try 
-      {
-        const response = await fetch("http://localhost:8000/motion/upload_bvh_numpy", {
-        method: "POST",
-        body: formData,
-      });
-  
-      if (!response.ok) 
-      {
-        const error = await response.json();
-        throw new Error(error.detail || "Unbekannter Fehler");
-      }
-  
-        const result = await response.json();
-        upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy`;
-      } 
-      catch (error) 
-      {
-        upload_status.textContent = `❌ Fehler: ${error.message}`;
-      }
-    });
-  }
-
-  process_csv2numpy()
+  process_csv_files()
   {
-    document.getElementById("process-btn").addEventListener("click", async () => 
+    document.getElementById("process_csv_files_btn").addEventListener("click", async () => 
     {
-      const upload_status = document.getElementById("process-status");
+      const status = document.getElementById("process_csv_files_status");
 
       try 
       {
-        const response = await fetch("http://localhost:8000/motion/process_csv2numpy", {
-          method: "POST",
+        const serverResponse = await fetch("http://localhost:8000/motion/process_csv_files", {
+          method: "POST"
         });
-  
-        if (!response.ok) 
+
+        if (!serverResponse.ok) 
         {
-          const error = await response.json();
-          throw new Error(error.detail || "unknown error");
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
         }
-  
-        upload_status.textContent = `✅ Finshed: CSV zu Numpy konvertiert!`;
-      } 
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message}!`;
+
+      }
       catch (error) 
       {
-        upload_status.textContent = `❌ Fehler: ${error.message}`;
+        status.textContent = `❌${error.message}`;
       }
+
     });
   }
-
-
 }
 
 

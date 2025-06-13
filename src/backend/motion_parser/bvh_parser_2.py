@@ -73,7 +73,7 @@ class BVHParser_2:
 
         return self.npyDataset
     
-    def export_skeleton(self, output_path: Path):
+    def export_skeleton_groundtruth(self, output_path: Path):
         skeleton = {
             "joints": self.joint_names,
             "hierarchy": self.joint_hierarchy

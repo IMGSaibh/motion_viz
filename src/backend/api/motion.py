@@ -75,53 +75,61 @@ async def upload(files: List[UploadFile] = File(...)):
 @router.post("/process_bvh_files")
 async def process_bvh_files():
     workspacefolder = Path.cwd()
-    bvh_path = Path.joinpath(workspacefolder, "data/bvh/test.bvh")
+    bvh_dir_path = Path.joinpath(workspacefolder, "data/bvh/")
+    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
+    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    bvh_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
-    # TODO: read data/bvh for bvh files and write a for loop to later process all bvh files
-    # TODO: make sure a folder data/numpy_groundtruth exists
-    # TODO: save all numpy files in data/numpy_groundtruth folder
-    # TODO: save skeleton in data/Skeleton folder
-    # TODO: name all skeleton files like the bvh file, but with _skeleton.json ending
+    bvh_files = list(bvh_dir_path.glob("*.bvh"))
+
+    if not bvh_files:
+        return {"message": "⚠️ Found no .bvh-Files."}
+
+    for bvh_file in bvh_files:
+        with open(bvh_file, "r") as file:
+            bvh_data = file.read()
+
+        bvh_parser = BVHParser_2(bvh_data)
+
+        dataset = bvh_parser.bvh_to_numpy()
+        save_npy_path = Path.joinpath(numpy_groundtruth_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
+        np.save(save_npy_path, dataset)
+
+
+        save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton_groundtruth.json")
+        bvh_parser.export_skeleton_groundtruth(save_json_skeleton_path)
 
     return {
-        "message": "write user message here",
+        "message": ".bvh-files converted",
     }
 
 
-@router.post("/upload_bvh_numpy")
-async def upload_bvh_numpy(file: UploadFile = File(...)):
-    contents = await file.read()
-    bvh_data = contents.decode("utf-8")
-    uploaded_filename = file.filename or "new_motion_file"
-    filenameNoEnding = Path(uploaded_filename).stem
-    
-    # json_path = Path("data/json/BentForward_SR.json")
+@router.post("/process_csv_files")
+async def process_csv_files():
 
-    bvhParser = BVHParser_2(bvh_data)
-
-    dataset = bvhParser.bvh_to_numpy()
-    savePath_npy = Path(f"data/numpy/{filenameNoEnding}")
-    np.save(savePath_npy, dataset)
-
-    # vs code workspacefolder
-    bvh_skeleton_path = Path.joinpath(workspacefolder, f"data/json/{filenameNoEnding}_skeleton.json")
-    bvhParser.export_skeleton(bvh_skeleton_path)
-    
-    return {
-        "message": "Upload erfolgreich",
-        "filename": uploaded_filename,
-    }
-
-
-@router.post("/process_csv2numpy")
-async def process_csv2numpy():
     workspacefolder = Path.cwd()
-    csv_path = Path.joinpath(workspacefolder, "data/csv/test.csv")
-    csvParser = CSVParser(csv_path)
-    dataset = csvParser.csv_to_numpy()
-    savePath_npy =Path.joinpath(workspacefolder, f"data/numpy/{csv_path.stem}")
-    np.save(savePath_npy, dataset)
-    # TODO: it is kinect_v1_hierarchy and it needs still ordering correspond to the joints 
-    csvParser.export_skeleton(Path.joinpath(workspacefolder, f"data/json/{csv_path.stem}_skeleton.json"))
+    csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
+    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
+    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    csv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
+
+    csv_files = list(csv_dir_path.glob("*.csv"))
+
+    if not csv_files:
+        return {"message": "⚠️ Found no .csv-Files."}
+
+    for csv_file in csv_files:
+        csv_parser = CSVParser(csv_file)
+        dataset = csv_parser.csv_to_numpy()
+
+        save_npy_path =Path.joinpath(numpy_groundtruth_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
+        np.save(save_npy_path, dataset)
+        # TODO: it is kinect_v1_hierarchy and it needs still ordering correspond to the joints 
+        save_json_skeleton_path = Path.joinpath(csv_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_groundtruth.json")
+        csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+    
+    return {
+        "message": ".csv-files converted",
+    }
 

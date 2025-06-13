@@ -1,8 +1,8 @@
-import json
-from pathlib import Path
 import re
-import pandas as pd
+import json
 import numpy as np
+import pandas as pd
+from pathlib import Path
 
 class CSVParser:
     def __init__(self, file_path):
@@ -32,7 +32,7 @@ class CSVParser:
 
         return data
     
-    def export_skeleton(self, output_path: Path):
+    def export_skeleton_groundtruth(self, output_path: Path):
         # kinect skeleton hierarchy (V1)
         hierarchy = [
             ("HipCenter", "Spine"),
@@ -56,7 +56,7 @@ class CSVParser:
             ("AnkleRight", "FootRight")
         ]
 
-        # Optional: nur gültige Verbindungen exportieren
+        # export only joints that are present in the CSV file
         valid_hierarchy = [
             [a, b] for a, b in hierarchy
             if a in self.joint_names and b in self.joint_names
