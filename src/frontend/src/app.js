@@ -8,9 +8,9 @@ import { createScene } from './components/scene.js';
 import { createRenderer } from './system/renderer.js';
 import { Resizer } from './system/resizer.js';
 import { Loop } from './system/loop.js';
-import { BVH_Player } from './components/bvh_player.js';
-import { NPY_Player } from './components/npy_player.js';
-import { FBX_Player } from './components/fbx_player.js';
+import { BVH_Player } from './motion_player/bvh_player.js';
+import { NPY_Player } from './motion_player/npy_player.js';
+import { FBX_Player } from './motion_player/fbx_player.js';
 
 let camera;
 let renderer;
@@ -40,11 +40,11 @@ class App
 
   async initialize()
   {
-    // await this.bvh_loader.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvh_loader.bvh_object);
+    await this.bvh_loader.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvh_loader.bvh_object);
     
-    // const bvh_player = new BVH_Player(this.bvh_loader);
-    // loop.updatables.push(bvh_player.bvh_player_object);
+    const bvh_player = new BVH_Player(this.bvh_loader);
+    loop.updatables.push(bvh_player.bvh_player_object);
     
     
     // ==============================================================================================
@@ -57,14 +57,14 @@ class App
     
     // ==============================================================================================
     
-    await this.npy_loader.load('//127.0.0.1:8000/data/numpy_groundtruth/Amature.npy');
-    scene.add(this.npy_loader.npy_object);
+    // await this.npy_loader.load('//127.0.0.1:8000/data/numpy_groundtruth/Combo_Punch.npy');
+    // scene.add(this.npy_loader.npy_object);
 
-    this.npy_loader.createSpheres();
-    this.npy_loader.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/Amature_skeleton_groundtruth.json");
+    // this.npy_loader.createSpheres();
+    // this.npy_loader.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/Combo_Punch_skeleton_groundtruth.json");
     
-    const npy_player = new NPY_Player(this.npy_loader);
-    loop.updatables.push(npy_player.npy_player_object);
+    // const npy_player = new NPY_Player(this.npy_loader);
+    // loop.updatables.push(npy_player.npy_player_object);
 
   }
   
@@ -122,14 +122,14 @@ class App
     });
   }
 
-  process_bvh_files() 
+  convert_bvh_to_npy() 
   {
     document.getElementById("process_bvh_files_btn").addEventListener("click", async () => 
     {
       const status = document.getElementById("process_bvh_files_status");
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/process_bvh_files", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", {
           method: "POST"
         });
 

@@ -50,8 +50,8 @@ async def upload(files: List[UploadFile] = File(...)):
     }
 
 
-@router.post("/process_bvh_files")
-async def process_bvh_files():
+@router.post("/convert_bvh_to_npy")
+async def convert_bvh_to_npy():
     workspacefolder = Path.cwd()
     bvh_dir_path = Path.joinpath(workspacefolder, "data/bvh/")
     numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")

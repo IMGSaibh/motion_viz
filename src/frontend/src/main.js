@@ -8,7 +8,7 @@ function main()
 	
 	app.initialize();
 	app.upload_files();
-	app.process_bvh_files();
+	app.convert_bvh_to_npy();
 	app.process_csv_files();
 	
 	// start the loop (produce a stream of frames)
