@@ -1,133 +1,83 @@
 import json
-from pathlib import Path
-import select
 import bvhtoolbox
 import numpy as np
+from pathlib import Path
 from backend.utils import Utils
 
 
-class BvhParser:
-    def __init__(self, bvh_data: str, descriptor_file_path: Path):
+class BVHParser:
+    def __init__(self, bvh_data: str):
+        self.bvh_tree = bvhtoolbox.BvhTree(bvh_data)
+        self.joint_list = self.bvh_tree.get_joints(end_sites=False)
+        self.nframes = self.bvh_tree.nframes
+        self.njoints = len(self.joint_list)
+        self.npyDataset = np.zeros((self.nframes, self.njoints, 3), dtype=np.float32)
+        self.joint_index_map = {j.name: idx for idx, j in enumerate(self.joint_list)}
+        self.joint_hierarchy = []
+        self.joint_names = [j.name for j in self.joint_list]
 
-        self.bvh_text = bvh_data
-        self.descriptor_file_path = descriptor_file_path
-        self.descriptor = {}
-        self.graph = []
-        self.offsets = []
-        self.rot_inds = []
-        self.pos_inds = []
-        self.channel_counter = 0
-        self.dataset = {}
-        self.framecount = 0
-        self.descriptor = {}
+    def bvh_to_numpy(self):
 
-    def load_json_descriptor_file(self):
+        for frame_idx in range(self.nframes):
+            joint_world_positions = {}
+            joint_world_rotations = {}
 
-        with open(self.descriptor_file_path, "r") as read_desc_file:
-            self.descriptor = json.load(read_desc_file)
+            for joint in self.joint_list:
+                # The offset information also indicates the length and direction
+                # used for drawing the parent segment.
+                offset = np.array(self.bvh_tree.joint_offset(joint.name))
+                channels = self.bvh_tree.joint_channels(joint.name)
+                joint_position_channels = []
+                joint_rotation_channels = []
 
-        
-    def bvhtree_to_data(self, order=["Xrotation","Yrotation","Zrotation"]):
+                if len(channels) == 6:
+                    joint_position_channels = self.bvh_tree.joint_channels(joint.name)[:3]
+                    joint_rotation_channels = self.bvh_tree.joint_channels(joint.name)[-3:]
 
-        self.bvh_tree = bvhtoolbox.BvhTree(self.bvh_text)
+                else:
+                    joint_rotation_channels = self.bvh_tree.joint_channels(joint.name)
 
-        if self.descriptor["rotation-representation"] == "euler_zxy":
-            order = ["Zrotation","Xrotation","Yrotation"]
 
-        elif self.descriptor["rotation-representation"] == "euler_yxz":
-            order = ["Yrotation","Xrotation","Zrotation"]
-        else:
-            print("Rot order in json not def for bvh")
+                parent = self.bvh_tree.joint_parent(joint.name)
+                parent_name = parent.name if parent else None
 
-        for joint in self.bvh_tree.get_joints(end_sites=False):      
+                # --- Joint Hierarchy
+                if parent:
+                    self.joint_hierarchy.append([self.joint_index_map[joint.name], self.joint_index_map[parent.name]])
 
-            offs = self.bvh_tree.joint_offset(joint.name)
-            self.offsets.append(offs)
 
-            jid = self.bvh_tree.get_joint_index(joint.name)             
+                # --- Initiale Position
+                if parent is None:
+                    # paretnt: postion and rotation comes from the channel values
+                    joint_world_positions[joint.name] = np.array(self.bvh_tree.frame_joint_channels(frame_idx, joint.name, joint_position_channels))
+                    rotation_values = self.bvh_tree.frame_joint_channels(frame_idx, joint.name, joint_rotation_channels)
+                    rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
+                    joint_world_rotations[joint.name] = Utils.rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
+                else:
+                    # child: position is clalculated from parent + FK
+                    parent_pos = joint_world_positions[parent_name]
+                    parent_rot = joint_world_rotations[parent_name]
 
-            naj = joint.name     
-            nap = self.bvh_tree.joint_parent(joint.name)
+                    rotation_values = self.bvh_tree.frame_joint_channels(frame_idx, joint.name, joint_rotation_channels)
+                    rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
+                    local_rot = Utils.rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
 
-            if nap is not None:
-                pid = self.bvh_tree.get_joint_index(nap.name)
-            else:
-                pid = -1            
-            
-            item_dict = {}
-            item_dict['id']= jid
-            item_dict['pid'] = pid
-            item_dict['name'] = joint.name
+                    joint_world_rotations[joint.name] = parent_rot @ local_rot
+                    joint_world_positions[joint.name] = parent_pos + parent_rot @ offset
 
-            self.graph.append(item_dict)
-        
-            chans = self.bvh_tree.joint_channels(joint.name)
+                self.npyDataset[frame_idx, self.joint_index_map[joint.name]] = joint_world_positions[joint.name]
 
-            joint_pos_inds = []
-            joint_rot_inds = []
-            
-            # do position channels
-            x_pind = Utils.get_index_of_key(arr=chans, key="Xposition")
-            y_pind = Utils.get_index_of_key(arr=chans, key="Yposition")
-            z_pind = Utils.get_index_of_key(arr=chans, key="Zposition")         
-            
-            joint_pos_inds.append(x_pind + self.channel_counter)
-            joint_pos_inds.append(y_pind + self.channel_counter)
-            joint_pos_inds.append(z_pind + self.channel_counter)
-
-            self.pos_inds.append(joint_pos_inds)
-            
-            #removes all unmatched indices (-1)
-            joint_pos_inds = [x for x in joint_pos_inds if x != -1]
-
-            # do rotation channels
-
-            x_rind = Utils.get_index_of_key(arr=chans, key=order[0])
-            y_rind = Utils.get_index_of_key(arr=chans, key=order[1])
-            z_rind = Utils.get_index_of_key(arr=chans, key=order[2])   
-
-            joint_rot_inds.append(x_rind + self.channel_counter)
-            joint_rot_inds.append(y_rind + self.channel_counter)
-            joint_rot_inds.append(z_rind + self.channel_counter)
-            
-            #removes all unmatched indices (-1)
-            joint_rot_inds = [x for x in joint_rot_inds if x != -1]
-
-            self.rot_inds.append(joint_rot_inds)
-
-            self.channel_counter += len(chans)                
-
+        return self.npyDataset
     
-    def build_graph(self):
-        id_map_rev = {}
+    def export_skeleton_groundtruth(self, output_path: Path):
+        skeleton = {
+            "joints": self.joint_names,
+            "hierarchy": self.joint_hierarchy
+        }
 
-        id_map_rev[-1] = -1
-        counter = 0
-        for j in self.graph:
-            id_map_rev[j['id']] = counter
-            counter += 1
-            
-        mapped_graph = []
-        for j in self.graph:
-            mapped_dict = {}
-            mapped_id = id_map_rev[j['id']]
-            mapped_pid = id_map_rev[j['pid']]
-            mapped_dict['id'] = mapped_id
-            mapped_dict['pid'] = mapped_pid
-            mapped_dict['name'] = j['name']
-            mapped_graph.append(mapped_dict)
+        with open(output_path, "w") as f:
+            json.dump(skeleton, f, indent=2)
 
 
-        self.descriptor["joint-offsets"] = self.offsets
-        self.descriptor["joint-rot-cols"] = self.rot_inds
-        self.descriptor["joint-pos-cols"] = self.pos_inds
-        self.descriptor["joint-graph"] = mapped_graph
 
 
-    def save_as_numpy(self, filename: str = "new_motion_file"):
-        self.dataset = np.array(self.bvh_tree.frames)
-        self.framecount = self.dataset.shape[0]
-        savePath_npy = Path(f"data/numpy/{filename}")
-        savePath_npy.parent.mkdir(parents=True, exist_ok=True)
-        np.save(savePath_npy, self.dataset)
-        print(f"shape {self.dataset.shape}")

@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import npyjs from 'npyjs';
 
-export class NumpyPlayer 
+export class NPY_loader 
 {
   constructor() 
   {
-    this.npyObject = new THREE.Group();
+    this.npy_object = new THREE.Group();
     this.motionArray = null;
     this.currentFrame = 0;
     this.frameCount = 0;
@@ -34,7 +34,7 @@ export class NumpyPlayer
         this.jointCount = jointCount;
         this.boneMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         
-        resolve(this.npyObject);
+        resolve(this.npy_object);
 
       } catch (e) 
       {
@@ -49,9 +49,9 @@ export class NumpyPlayer
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(0.02, 16, 16);
+      const geom = new THREE.SphereGeometry(1.2, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
-      this.npyObject.add(sphere);
+      this.npy_object.add(sphere);
       this.joints.push(sphere);
     }
   }
@@ -61,8 +61,8 @@ export class NumpyPlayer
     const response = await fetch(url);
     const skeleton = await response.json();
     this.jointNames = skeleton.joints;
-    // this.createSkeletonLines(skeleton.hierarchy);
-    this.createSkeletonLinesCSV_KinectV1(skeleton.joints ,skeleton.hierarchy);
+    this.createSkeletonLines(skeleton.hierarchy);
+    // this.createSkeletonLinesCSV_KinectV1(skeleton.joints ,skeleton.hierarchy);
   }
 
   setJointPositions(frameIdx) 
@@ -100,7 +100,7 @@ export class NumpyPlayer
         new THREE.Vector3(), new THREE.Vector3()
       ]);
       const line = new THREE.Line(geometry, this.boneMaterial);
-      this.npyObject.add(line);
+      this.npy_object.add(line);
       this.bones.push({ line, childIdx, parentIdx });
     }
   }
@@ -124,7 +124,7 @@ export class NumpyPlayer
         new THREE.Vector3(), new THREE.Vector3()
       ]);
       const line = new THREE.Line(geometry, this.boneMaterial);
-      this.npyObject.add(line);
+      this.npy_object.add(line);
       this.bones.push({ line, parentIdx, childIdx });
     }
   }

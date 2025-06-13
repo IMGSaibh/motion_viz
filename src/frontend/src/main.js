@@ -6,9 +6,10 @@ function main()
 	const container = document.querySelector('#scene-container');
 	const app = new App(container);
 	
-	app.upload_file();
-	app.process_csv2numpy();
 	app.initialize();
+	app.upload_files();
+	app.convert_bvh_to_npy();
+	app.process_csv_files();
 	
 	// start the loop (produce a stream of frames)
 	app.start();

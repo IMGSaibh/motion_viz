@@ -1,16 +1,16 @@
 
 import { createCamera } from './components/camera.js';
 import { createOrbitControls } from './components/orbitcontrol.js';
-import { BVHPlayer } from './motionplayer/bvhPlayer.js';
-import { FBXPlayer } from './motionplayer/fbxPlayer.js';
-import { NumpyPlayer } from './motionplayer/numpyPlayer.js';
+import { BVH_loader } from './motion_loader/bvh_loader.js';
+import { FBX_Loader } from './motion_loader/fbx_loader.js';
+import { NPY_loader } from './motion_loader/npy_loader.js';
 import { createScene } from './components/scene.js';
 import { createRenderer } from './system/renderer.js';
 import { Resizer } from './system/resizer.js';
 import { Loop } from './system/loop.js';
-import { Timeline } from './components/timeline.js';
-import { NumpyTimeline } from './components/timelineNumpy.js';
-import { TimelineFBX } from './components/timelineFBX.js';
+import { BVH_Player } from './motion_player/bvh_player.js';
+import { NPY_Player } from './motion_player/npy_player.js';
+import { FBX_Player } from './motion_player/fbx_player.js';
 
 let camera;
 let renderer;
@@ -31,40 +31,40 @@ class App
     loop.updatables.push(orbitControls);
 
         
-    this.bvhPlayer = new BVHPlayer();
-    this.fbxPlayer = new FBXPlayer();
-    this.numpyPlayer = new NumpyPlayer();
+    this.bvh_loader = new BVH_loader();
+    this.fbx_loader = new FBX_Loader();
+    this.npy_loader = new NPY_loader();
     const resizer = new Resizer(container, camera, renderer);
 
   }
 
   async initialize()
   {
-    // await this.bvhPlayer.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
-    // scene.add(this.bvhPlayer.bvhObject);
+    await this.bvh_loader.load('http://127.0.0.1:8000/data/bvh/Combo_Punch.bvh')
+    scene.add(this.bvh_loader.bvh_object);
     
-    // const timeline = new Timeline(this.bvhPlayer);
-    // loop.updatables.push(timeline.timelineObject);
+    const bvh_player = new BVH_Player(this.bvh_loader);
+    loop.updatables.push(bvh_player.bvh_player_object);
     
-    
-    // ==============================================================================================
-    
-    // await this.fbxPlayer.loadFBX('http://127.0.0.1:8000/data/fbx/test_2.fbx');
-    // scene.add(this.fbxPlayer.fbxObject);
-    
-    // const timelineFBX = new TimelineFBX(this.fbxPlayer);
-    // loop.updatables.push(timelineFBX.fbxTimelineObject);
     
     // ==============================================================================================
     
-    await this.numpyPlayer.load('//127.0.0.1:8000/data/numpy/test.npy');
-    scene.add(this.numpyPlayer.npyObject);
+    // await this.fbx_loader.loadFBX('http://127.0.0.1:8000/data/fbx/test.fbx');
+    // scene.add(this.fbx_loader.fbx_object);
+    
+    // const fbx_player = new FBX_Player(this.fbx_loader);
+    // loop.updatables.push(fbx_player.fbx_player_object);
+    
+    // ==============================================================================================
+    
+    // await this.npy_loader.load('//127.0.0.1:8000/data/numpy_groundtruth/Combo_Punch.npy');
+    // scene.add(this.npy_loader.npy_object);
 
-    this.numpyPlayer.createSpheres();
-    this.numpyPlayer.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/test_skeleton.json");
+    // this.npy_loader.createSpheres();
+    // this.npy_loader.parseHierarchyFileBVH("//127.0.0.1:8000/data/json/Combo_Punch_skeleton_groundtruth.json");
     
-    const timelineNumpy = new NumpyTimeline(this.numpyPlayer);
-    loop.updatables.push(timelineNumpy.npyTimelineObject);
+    // const npy_player = new NPY_Player(this.npy_loader);
+    // loop.updatables.push(npy_player.npy_player_object);
 
   }
   
@@ -79,73 +79,108 @@ class App
     loop.stop();
   }
 
-  upload_file()
-  { 
-    document.getElementById("upload-btn").addEventListener("click", async () => 
+  upload_files()
+  {
+    document.getElementById("client_uploads_btn").addEventListener("click", async () => 
     {
-      const input = document.getElementById("bvh-upload");
-      const upload_status = document.getElementById("process-status");
-      const file = input.files[0];
-      if (!file) 
+      const input = document.getElementById("upload_files");
+      const status = document.getElementById("client_uploads_status");
+      const files = input.files;
+      if (files.length === 0) 
       {
-        alert("Bitte eine .bvh-Datei auswählen.");
+        alert("❌ Please choose one or more motion capture files.");
         return;
       }
-  
+
       const formData = new FormData();
-      formData.append("file", file);
-  
+      for (const file of files) 
+      {
+        formData.append("files", file);
+      }
+      
       try 
       {
-        const response = await fetch("http://localhost:8000/motion/upload_bvh_numpy", {
+      const serverResponse = await fetch("http://localhost:8000/motion/uploads", {
         method: "POST",
         body: formData,
       });
-  
-      if (!response.ok) 
-      {
-        const error = await response.json();
-        throw new Error(error.detail || "Unbekannter Fehler");
-      }
-  
-        const result = await response.json();
-        upload_status.textContent =`✅ Hochgeladen & gespeichert als: ${result.filename}.npy`;
+
+      
+      if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message} ${apiResponse.not_supported_files && '❌ ' + apiResponse.not_supported_files}`;
       } 
       catch (error) 
       {
-        upload_status.textContent = `❌ Fehler: ${error.message}`;
+        status.textContent = `❌ error: ${error.message}`;
       }
+
     });
   }
 
-  process_csv2numpy()
+  convert_bvh_to_npy() 
   {
-    document.getElementById("process-btn").addEventListener("click", async () => 
+    document.getElementById("process_bvh_files_btn").addEventListener("click", async () => 
     {
-      const input = document.getElementById("csv-upload");
-      const upload_status = document.getElementById("upload-status");
+      const status = document.getElementById("process_bvh_files_status");
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
+  process_csv_files()
+  {
+    document.getElementById("process_csv_files_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("process_csv_files_status");
 
       try 
       {
-        const response = await fetch("http://localhost:8000/motion/process_csv2numpy", {
-          method: "POST",
+        const serverResponse = await fetch("http://localhost:8000/motion/process_csv_files", {
+          method: "POST"
         });
-  
-        if (!response.ok) 
+
+        if (!serverResponse.ok) 
         {
-          const error = await response.json();
-          throw new Error(error.detail || "Unbekannter Fehler");
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
         }
-  
-        upload_status.textContent = `✅ Finshed: CSV zu Numpy konvertiert!`;
-      } 
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+
+      }
       catch (error) 
       {
-        upload_status.textContent = `❌ Fehler: ${error.message}`;
+        status.textContent = `❌${error.message}`;
       }
+
     });
   }
-
 }
 
 

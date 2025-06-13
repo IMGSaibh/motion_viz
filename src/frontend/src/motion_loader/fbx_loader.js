@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { FBXLoader } from '../../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
-export class FBXPlayer 
+export class FBX_Loader 
 {
   constructor() 
   {
     this.loader = new FBXLoader();
-    this.fbxObject = new THREE.Group();
+    this.fbx_object = new THREE.Group();
     this.mixer = null;
     this.clipAction = null;
     this.skeletonHelper = null;
@@ -22,7 +22,7 @@ export class FBXPlayer
     {
       this.loader.load(url, (result) => 
       {
-        this.fbxObject.add(result);
+        this.fbx_object.add(result);
 
 
         this.mixer = new THREE.AnimationMixer(result);
@@ -32,10 +32,10 @@ export class FBXPlayer
         this.keyframeCount = track.times.length;
 
         this.skeletonHelper = new THREE.SkeletonHelper(result);
-        this.fbxObject.add(this.skeletonHelper);
+        this.fbx_object.add(this.skeletonHelper);
 
         // terminate Promise and return this.fbxObject
-        resolve(this.fbxObject);
+        resolve(this.fbx_object);
       }, undefined, (error) => reject(error));
     });
   }
