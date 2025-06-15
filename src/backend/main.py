@@ -17,10 +17,9 @@ app.add_middleware(
 
 app.include_router(motion.router, prefix="/motion")
 
-# http://localhost:8000/data/bvh/test.bvh
+# reachable e.g. http://localhost:8000/data/bvh/myFile.bvh
 app.mount("/data", StaticFiles(directory="data"), name="data")
 app.mount("/src", StaticFiles(directory="src/frontend/public"), name="favicon")
-
 
 favicon_path = 'src/frontend/public/human.ico'
 @app.get('/favicon.ico', include_in_schema=False)

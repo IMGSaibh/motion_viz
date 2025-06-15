@@ -41,11 +41,6 @@ class BVHParser:
                 parent = self.bvh_tree.joint_parent(joint.name)
                 parent_name = parent.name if parent else None
 
-                # --- Joint Hierarchy
-                if parent:
-                    self.joint_hierarchy.append([self.joint_index_map[joint.name], self.joint_index_map[parent.name]])
-
-
                 # --- Initiale Position
                 if parent is None:
                     # paretnt: postion and rotation comes from the channel values
@@ -70,6 +65,14 @@ class BVHParser:
         return self.npyDataset
     
     def export_skeleton_groundtruth(self, output_path: Path):
+        for joint in self.joint_list:
+            parent = self.bvh_tree.joint_parent(joint.name)
+            if parent:
+                self.joint_hierarchy.append([
+                    self.joint_index_map[joint.name],
+                    self.joint_index_map[parent.name]
+                ])
+
         skeleton = {
             "joints": self.joint_names,
             "hierarchy": self.joint_hierarchy

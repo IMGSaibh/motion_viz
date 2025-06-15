@@ -227,8 +227,8 @@ class App
         const skeletonPath = fileUrl
         .replace("/numpy_groundtruth/", "/json/")
         .replace(".npy", "_skeleton_groundtruth.json");
-        // await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        await this.npy_loader.parse_hierarchy_file_csv(skeletonPath);
+        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
+        // await this.npy_loader.parse_hierarchy_file_csv(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);
@@ -293,7 +293,7 @@ class App
 
         if (groupObject) 
         {
-          console.log("Anzahl der Kinder:", groupObject.children.length);
+          console.log("scene.children: ", groupObject.children.length);
         } 
         else 
         {

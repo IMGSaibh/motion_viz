@@ -24,7 +24,7 @@ async def upload(files: List[UploadFile] = File(...)):
     not_saved_files = []
 
     for file in files:
-        ext = Path(file.filename).suffix.lower()
+        ext = Path(str(file.filename)).suffix.lower()
         target_dir = target_dirs.get(ext)
 
         if not target_dir:
@@ -33,7 +33,7 @@ async def upload(files: List[UploadFile] = File(...)):
             continue
 
         # rename file if it already exists
-        target_path = target_dir / file.filename
+        target_path = Path.joinpath(target_dir, str(file.filename))
         counter = 1
         while target_path.exists():
             target_path = target_dir / f"{target_path.stem}_{counter}{target_path.suffix}"
@@ -86,8 +86,8 @@ async def convert_bvh_to_npy():
     }
 
 
-@router.post("/process_csv_files")
-async def process_csv_files():
+@router.post("/convert_csv_to_npy")
+async def convert_csv_to_npy():
 
     workspacefolder = Path.cwd()
     csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
@@ -119,3 +119,21 @@ async def process_csv_files():
         "warning": "",
     }
 
+
+@router.post("/list_files")
+async def list_motion_files():
+
+    # make sure that directories exists
+    bvh_dir = Path.joinpath(workspacefolder, "data/bvh/")
+    fbx_dir = Path.joinpath(workspacefolder, "data/fbx/")
+    npy_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth/")
+
+    bvh_dir.mkdir(parents=True, exist_ok=True)
+    fbx_dir.mkdir(parents=True, exist_ok=True)
+    npy_dir.mkdir(parents=True, exist_ok=True)
+
+    return {
+        "bvh": [f.name for f in bvh_dir.glob("*.bvh")],
+        "fbx": [f.name for f in fbx_dir.glob("*.fbx")],
+        "npy": [f.name for f in npy_dir.glob("*.npy")]
+    }
