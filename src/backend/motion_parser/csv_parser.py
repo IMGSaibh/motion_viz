@@ -12,7 +12,7 @@ class CSVParser:
         self.joint_names = []
 
     def csv_to_numpy(self) -> np.ndarray:
-        dataframe = pd.read_csv(self.file_path)
+        dataframe = pd.read_csv(self.file_path, delimiter=',')
 
         coord_cols = [col for col in dataframe.columns if re.match(r'.*[XYZ]$', col)]
         

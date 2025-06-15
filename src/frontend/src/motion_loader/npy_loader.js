@@ -56,13 +56,20 @@ export class NPY_loader
     }
   }
 
-  async parseHierarchyFileBVH(url) 
+  async parse_hierarchy_file_bvh(url) 
   {
     const response = await fetch(url);
     const skeleton = await response.json();
     this.jointNames = skeleton.joints;
-    this.createSkeletonLines(skeleton.hierarchy);
-    // this.createSkeletonLinesCSV_KinectV1(skeleton.joints ,skeleton.hierarchy);
+    this.create_skeleton_bones_bvh(skeleton.hierarchy);
+  }
+
+  async parse_hierarchy_file_csv(url) 
+  {
+    const response = await fetch(url);
+    const skeleton = await response.json();
+    this.jointNames = skeleton.joints;
+    this.create_skeleton_lines_csv_kinect_v1(skeleton.joints ,skeleton.hierarchy);
   }
 
   setJointPositions(frameIdx) 
@@ -89,7 +96,7 @@ export class NPY_loader
 
   }
 
-  createSkeletonLines(hierarchy) 
+  create_skeleton_bones_bvh(hierarchy) 
   {
     this.bones = [];
     // TODO: improve performance
@@ -105,7 +112,7 @@ export class NPY_loader
     }
   }
 
-  createSkeletonLinesCSV_KinectV1(joints, hierarchy) 
+  create_skeleton_lines_csv_kinect_v1(joints, hierarchy) 
   {
     this.bones = [];
 
