@@ -1,6 +1,6 @@
 import { Color, GridHelper, Scene } from 'three';
 import { createLights } from './lights.js';
-import { createThickAxis } from './coordsystem.js';
+import { createMetricAxis } from './coordsystem.js';
 
 function createScene() {
   const scene = new Scene();
@@ -8,11 +8,11 @@ function createScene() {
   const gridHelper = new GridHelper(3000, 60);
   scene.add(gridHelper, light);
 
-  const xAxis = createThickAxis(0xff0000, [0,0,0], [50,0,0], 3);
-  const yAxis = createThickAxis(0x00ff00, [0,0,0], [0,50,0], 3);
-  const zAxis = createThickAxis(0x0000ff, [0,0,0], [0,0,50], 3);
-  scene.add(xAxis, yAxis, zAxis);  
-  
+  // x-axis from -5 - 5 meters
+  scene.add(createMetricAxis({ from: -15, to: 15, color: 0xff0000, axis: 'x',linewidth: 2 }));
+  scene.add(createMetricAxis({ from: -5, to: 15, color: 0x00ff00, axis: 'y',linewidth: 2 }));
+  scene.add(createMetricAxis({ from: -15, to: 15, color: 0x0000ff, axis: 'z',linewidth: 2 }));
+
   scene.background = new Color('white');
   return scene;
 }

@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "npyjs": "^0.7.0",
-    "three": "^0.176.0"
+    "three": "^0.176.0",
+    "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^3.0.0",

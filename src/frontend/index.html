@@ -6,21 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/human.icon" href="/human.ico">
     <script type="module" src="/src/main.js"></script>
-    <!-- <link rel="stylesheet" href="src/frontend/src/custom.css" /> is included via FastAPI in file /src/main.jsx -->
+    <!-- <link rel="stylesheet" href="src/frontend/src/custom.css" /> is included via FastAPI in file /src/main.js -->
   </head>
   <body>
     <div id="ui-overlay">
-      <input type="file" id="upload_files" multiple />
+      
+      <input type="file" id="upload_files" multiple/>
       <button id="client_uploads_btn">Upload Files</button>
       <div id="client_uploads_status"></div>
 
       <button id="process_bvh_files_btn">Convert BVH to NPY</button>
       <div id="process_bvh_files_status"></div>
 
-      <button id="process_csv_files_btn">Convert CSV to NPY</button>
-      <div id="process_csv_files_status"></div>
+      <button id="convert_csv_to_npy_btn">Convert CSV to NPY</button>
+      <div id="convert_csv_to_npy_status"></div>
 
-    
+      <div id="file_selector">
+        <select id="file_dropdown">
+          <option value="">Choose a motion file</option>
+        </select>
+        <div id="file_selector_status"></div>
+      </div>
+
+
     </div>
 
     <!-- Three JS <canvas> is inserted here -->
