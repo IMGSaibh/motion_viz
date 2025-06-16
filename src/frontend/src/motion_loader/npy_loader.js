@@ -49,7 +49,7 @@ export class NPY_loader
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(1.2, 16, 16);
+      const geom = new THREE.SphereGeometry(0.02, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npy_object.add(sphere);
       this.joints.push(sphere);
@@ -99,10 +99,8 @@ export class NPY_loader
   create_skeleton_bones_bvh(hierarchy) 
   {
     this.bones = [];
-    // TODO: improve performance
     for (const [childIdx, parentIdx] of hierarchy) 
     {
-      // const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
       const geometry = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(), new THREE.Vector3()
       ]);

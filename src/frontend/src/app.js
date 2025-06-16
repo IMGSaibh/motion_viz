@@ -148,6 +148,68 @@ class App
     });
   }
 
+  convert_csv_c3d_to_npy()
+  {
+    document.getElementById("convert_csv_c3d_to_npy_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_csv_c3d_to_npy_status");
+
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_c3d_to_npy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
+  convert_csv_segmentbased_to_npy()
+  {
+    document.getElementById("convert_csv_sgementbased_to_npy_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_csv_sgementbased_to_npy_status");
+
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_segmentbased_to_npy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok)
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
   async setup_file_dropdown() 
   {
     const dropdown = document.getElementById("file_dropdown");
@@ -227,8 +289,8 @@ class App
         const skeletonPath = fileUrl
         .replace("/numpy_groundtruth/", "/json/")
         .replace(".npy", "_skeleton_groundtruth.json");
-        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        // await this.npy_loader.parse_hierarchy_file_csv(skeletonPath);
+        // await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
+        await this.npy_loader.parse_hierarchy_file_csv(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);
