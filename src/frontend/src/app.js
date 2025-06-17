@@ -117,19 +117,81 @@ class App
     });
   }
 
-  convert_csv_to_npy()
+  convert_csv_kinect_v1_to_npy()
   {
-    document.getElementById("convert_csv_to_npy_btn").addEventListener("click", async () => 
+    document.getElementById("convert_csv_kinectv1_to_npy_btn").addEventListener("click", async () => 
     {
-      const status = document.getElementById("convert_csv_to_npy_status");
+      const status = document.getElementById("convert_csv_kinectv1_to_npy_status");
 
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_to_npy", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_kinectv1_to_npy", {
           method: "POST"
         });
 
         if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
+  convert_csv_c3d_to_npy()
+  {
+    document.getElementById("convert_csv_c3d_to_npy_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_csv_c3d_to_npy_status");
+
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_c3d_to_npy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
+  convert_csv_segmentbased_to_npy()
+  {
+    document.getElementById("convert_csv_sgementbased_to_npy_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_csv_sgementbased_to_npy_status");
+
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_segmentbased_to_npy", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok)
         {
           throw new Error(`${serverResponse.statusText}` || "unknown error");
         }
@@ -193,7 +255,7 @@ class App
   }
 
 
-  async load_motionfile_and_player(filename) 
+  async load_motionfile_and_player(filename)
   {
     const file_extension = filename.split('.').pop().toLowerCase();
     const folder = this.get_folder_by_extension(file_extension);
@@ -227,8 +289,8 @@ class App
         const skeletonPath = fileUrl
         .replace("/numpy_groundtruth/", "/json/")
         .replace(".npy", "_skeleton_groundtruth.json");
-        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        // await this.npy_loader.parse_hierarchy_file_csv(skeletonPath);
+        // await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
+        await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);

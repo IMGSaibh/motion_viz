@@ -6,6 +6,7 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* ================ Three JS Scene ============= */
 #scene-container
 {
     /* tell our scene container to take up the full page */
@@ -14,8 +15,6 @@ html, body, #root {
     height: 100%;
 }
 
-
-
 canvas {
   display: block;
   position: absolute;
@@ -23,6 +22,8 @@ canvas {
   left: 0;
   z-index: 0;
 }
+
+/* ================ ui-overlay ============= */
 
 #ui-overlay {
   position: absolute;
@@ -36,14 +37,15 @@ canvas {
   font-family: sans-serif;
 }
 
+#file_selector{
+  margin-top: 30px;
+}
+
 #ui-overlay button,
 #ui-overlay input {
   margin-top: 5px;
   display: block;
 }
-
-
-
 
 #timeline-container {
   position: absolute;
