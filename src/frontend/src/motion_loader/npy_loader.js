@@ -64,7 +64,7 @@ export class NPY_loader
     this.create_skeleton_bones_bvh(skeleton.hierarchy);
   }
 
-  async parse_hierarchy_file_csv(url) 
+  async parse_hierarchy_file_csv_kinectv1(url) 
   {
     const response = await fetch(url);
     const skeleton = await response.json();
