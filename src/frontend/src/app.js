@@ -265,7 +265,9 @@ class App
       case 'bvh':
         this.bvh_loader = new BVH_loader();
         await this.bvh_loader.load(fileUrl);
+        console.log(this.bvh_loader.bvh_object)
         scene.add(this.bvh_loader.bvh_object);
+        
 
         currentPlayer = new BVH_Player(this.bvh_loader);
         loop.updatables.push(currentPlayer.bvh_player_object);
@@ -289,8 +291,8 @@ class App
         const skeletonPath = fileUrl
         .replace("/numpy_groundtruth/", "/json/")
         .replace(".npy", "_skeleton_groundtruth.json");
-        // await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
+        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
+        // await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);

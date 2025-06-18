@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from typing import List, Any
+from scipy.spatial.transform import Rotation as R
 
 class Utils:
 
@@ -32,8 +33,9 @@ class Utils:
             [0, 0, 1]
         ])
 
-        matrices = {"X": rx, "Y": ry, "Z": rz}
-        R = np.identity(3)
-        for axis in order:
-            R = R @ matrices[axis.upper()]
-        return R
+        # matrices = {"X": rx, "Y": ry, "Z": rz}
+        # R = np.identity(3)
+        # for axis in order:
+        #     R = R @ matrices[axis.upper()]
+        # return R
+        return R.from_euler(order.lower(), [x, y, z], degrees=True).as_matrix()

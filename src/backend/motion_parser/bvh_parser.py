@@ -54,13 +54,20 @@ class BVHParser:
                     parent_rot = joint_world_rotations[parent_name]
 
                     rotation_values = self.bvh_tree.frame_joint_channels(frame_idx, joint.name, joint_rotation_channels)
+                    # rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
+                    # local_rot = Utils.rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
+
                     rotation_order_str = ''.join(first_char[0].upper() for first_char in joint_rotation_channels)
-                    local_rot = Utils.rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
+                    rot_mat = Utils.rotation_matrix_xyz(*rotation_values, order=rotation_order_str)
 
-                    joint_world_rotations[joint.name] = parent_rot @ local_rot
+                    joint_world_rotations[joint.name] = parent_rot @ rot_mat
                     joint_world_positions[joint.name] = parent_pos + parent_rot @ offset
-
+                    
                 self.npyDataset[frame_idx, self.joint_index_map[joint.name]] = joint_world_positions[joint.name]
+        
+        # min_y = self.npyDataset[:, :, 1].min()
+        # self.npyDataset[:, :, 1] -= min_y
+        # self.npyDataset[:, :, 2] *= -1
 
         return self.npyDataset
     
