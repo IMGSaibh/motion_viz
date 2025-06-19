@@ -21,7 +21,7 @@ function createMetricAxis({ from = -5, to = 5, color = 0xff0000, axis = 'x', tic
     color,
     linewidth, // in pixels
     dashed: false,
-    resolution: new THREE.Vector2(window.innerWidth, window.innerHeight), // important!
+    resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
   });
 
   const thickLine = new Line2(geometry, material);
@@ -86,8 +86,8 @@ function createMetricAxis({ from = -5, to = 5, color = 0xff0000, axis = 'x', tic
     axisLabel.anchorX = 'center';
     axisLabel.anchorY = 'middle';
 
-    // Position leicht versetzt hinter dem Endpunkt
-    const labelOffset = 0.5; // Abstand hinter dem letzten Tick
+    // slightly position gap beyond end point
+    const labelOffset = 0.5; // space after last tick
     axisLabel.position.copy(end);
     if (axis === 'x') {
       axisLabel.position.x += labelOffset;

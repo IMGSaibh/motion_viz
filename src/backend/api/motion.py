@@ -15,7 +15,6 @@ async def upload(files: List[UploadFile] = File(...)):
     target_dirs = {
         ".bvh": Path("data/bvh"),
         ".csv": Path("data/csv"),
-        ".npy": Path("data/numpy"),
         ".fbx": Path("data/fbx"),
         ".json": Path("data/json"),
     }
@@ -56,8 +55,8 @@ async def upload(files: List[UploadFile] = File(...)):
 async def convert_bvh_to_npy():
     workspacefolder = Path.cwd()
     bvh_dir_path = Path.joinpath(workspacefolder, "data/bvh/")
-    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
-    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    numpy_converted_dir = Path.joinpath(workspacefolder, "data/numpy_converted")
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
     bvh_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
     bvh_files = list(bvh_dir_path.glob("*.bvh"))
@@ -75,11 +74,11 @@ async def convert_bvh_to_npy():
         bvh_parser = BVHParser(bvh_data)
 
         dataset = bvh_parser.bvh_to_numpy()
-        save_npy_path = Path.joinpath(numpy_groundtruth_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
+        save_npy_path = Path.joinpath(numpy_converted_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
         np.save(save_npy_path, dataset)
 
 
-        save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton_groundtruth.json")
+        save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton_converted.json")
         bvh_parser.export_skeleton_groundtruth(save_json_skeleton_path)
 
     return {
@@ -93,8 +92,8 @@ async def convert_csv_kinectv1_to_npy():
 
     workspacefolder = Path.cwd()
     csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
-    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    numpy_converted_dir = Path.joinpath(workspacefolder, "data/numpy_converted")
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
     csv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
 
@@ -110,10 +109,10 @@ async def convert_csv_kinectv1_to_npy():
         csv_parser = CSVParser(csv_file)
         dataset = csv_parser.csv_to_numpy()
 
-        save_npy_path =Path.joinpath(numpy_groundtruth_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
+        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
         # TODO: it is kinect_v1_hierarchy and it needs still ordering correspond to the joints 
-        save_json_skeleton_path = Path.joinpath(csv_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_groundtruth.json")
+        save_json_skeleton_path = Path.joinpath(csv_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
         csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
     
     return {
@@ -127,8 +126,8 @@ async def convert_csv_c3d_to_npy():
 
     workspacefolder = Path.cwd()
     csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
-    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    numpy_converted_dir = Path.joinpath(workspacefolder, "data/numpy_converted")
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
     csv_c3d_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
 
@@ -144,9 +143,9 @@ async def convert_csv_c3d_to_npy():
         csv_parser = CSV_C3D_Parser(csv_file)
         dataset = csv_parser.csv_to_numpy()
 
-        save_npy_path =Path.joinpath(numpy_groundtruth_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
+        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
-        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_groundtruth.json")
+        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
         csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
     
     return {
@@ -160,8 +159,8 @@ async def convert_csv_segmentbased_to_npy():
 
     workspacefolder = Path.cwd()
     csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_groundtruth_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth")
-    numpy_groundtruth_dir.mkdir(parents=True, exist_ok=True)
+    numpy_converted_dir = Path.joinpath(workspacefolder, "data/numpy_converted")
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
     csv_c3d_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
 
 
@@ -177,9 +176,9 @@ async def convert_csv_segmentbased_to_npy():
         csv_parser = SegmentCSVParser(csv_file)
         dataset = csv_parser.csv_segmentbased_to_numpy()
 
-        save_npy_path =Path.joinpath(numpy_groundtruth_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
+        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
-        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_groundtruth.json")
+        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
         csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
     
     return {
@@ -194,7 +193,7 @@ async def list_motion_files():
     # make sure that directories exists
     bvh_dir = Path.joinpath(workspacefolder, "data/bvh/")
     fbx_dir = Path.joinpath(workspacefolder, "data/fbx/")
-    npy_dir = Path.joinpath(workspacefolder, "data/numpy_groundtruth/")
+    npy_dir = Path.joinpath(workspacefolder, "data/numpy_converted/")
 
     bvh_dir.mkdir(parents=True, exist_ok=True)
     fbx_dir.mkdir(parents=True, exist_ok=True)
