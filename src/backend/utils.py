@@ -33,9 +33,17 @@ class Utils:
             [0, 0, 1]
         ])
 
-        # matrices = {"X": rx, "Y": ry, "Z": rz}
+        matrices = {"X": rx, "Y": ry, "Z": rz}
         # R = np.identity(3)
         # for axis in order:
         #     R = R @ matrices[axis.upper()]
         # return R
-        return R.from_euler(order.lower(), [x, y, z], degrees=True).as_matrix()
+
+        # Eingehende Werte werden einem Dict zugeordnet
+        value_dict = dict(zip("XYZ", [x, y, z]))
+
+        # Extrahiere die Werte gemäß der Rotationsreihenfolge
+        ordered_values = [value_dict[axis.upper()] for axis in order]
+
+        # scipy nutzt Kleinschreibung im Order-String
+        return R.from_euler(order.lower(), ordered_values, degrees=True).as_matrix()

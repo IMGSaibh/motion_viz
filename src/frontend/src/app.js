@@ -90,9 +90,10 @@ class App
 
   convert_bvh_to_npy() 
   {
-    document.getElementById("process_bvh_files_btn").addEventListener("click", async () => 
+    document.getElementById("convert_bvh_to_npy_btn").addEventListener("click", async () => 
     {
-      const status = document.getElementById("process_bvh_files_status");
+      const status = document.getElementById("convert_bvh_to_npy_status");
+      status.textContent = "";
       try 
       {
         const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", {
@@ -212,48 +213,59 @@ class App
 
   async setup_file_dropdown() 
   {
+    const file_selector = document.getElementById("file_selector");
     const dropdown = document.getElementById("file_dropdown");
     const status = document.getElementById("file_selector_status");
-
+    
     try 
     {
-      const response = await fetch("http://localhost:8000/motion/list_files", {
-        method: "POST"
-      });
-
-      const files = await response.json();
-
-      for (const [type, list] of Object.entries(files)) 
-      {
-        if (!Array.isArray(list)) continue;
-
-        list.forEach(filename => {
-          const option = document.createElement("option");
-          option.value = filename;
-          option.dataset.type = type;
-          option.textContent = `${filename} (${type})`;
-          dropdown.appendChild(option);
+      file_selector.addEventListener("mousedown", async () => {
+        
+        const response = await fetch("http://localhost:8000/motion/list_files", {
+          method: "POST"
         });
-      }
+  
+        const files = await response.json();
+        dropdown.innerHTML = '<option disabled selected>-- Datei auswählen --</option>';
+
+  
+        for (const [type, list] of Object.entries(files)) 
+        {
+          if (!Array.isArray(list)) continue;
+
+          list.forEach(filename => {
+            const option = document.createElement("option");
+            option.value = filename;
+            option.dataset.type = type;
+            option.textContent = `${filename} (${type})`;
+            dropdown.appendChild(option);
+          });
+        }
+        
+
+      });
 
       // directly start player when user choosed motion file
       dropdown.addEventListener("change", async () => {
-      const selected = dropdown.selectedOptions[0];
-      const filename = selected.value;
-      const type = selected.dataset.type;
+        const selected = dropdown.selectedOptions[0];
+        const filename = selected.value;
+        const type = selected.dataset.type;
 
-      if (!filename || !type) return;
+        if (!filename || !type) return;
 
         await this.load_motionfile_and_player(filename);
+      
+      
       });
 
     } 
     catch (error) 
     {
+      
+      console.log("file selector changed")
       status.textContent = `❌${error.message}`;
     }
   }
-
 
   async load_motionfile_and_player(filename)
   {
@@ -265,7 +277,6 @@ class App
       case 'bvh':
         this.bvh_loader = new BVH_loader();
         await this.bvh_loader.load(fileUrl);
-        console.log(this.bvh_loader.bvh_object)
         scene.add(this.bvh_loader.bvh_object);
         
 
@@ -289,8 +300,8 @@ class App
         this.npy_loader.createSpheres();
 
         const skeletonPath = fileUrl
-        .replace("/numpy_groundtruth/", "/json/")
-        .replace(".npy", "_skeleton_groundtruth.json");
+        .replace("/numpy_converted/", "/json/")
+        .replace(".npy", "_skeleton_converted.json");
         await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
         // await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
 
@@ -300,14 +311,13 @@ class App
     }
   }
 
-
   get_folder_by_extension(ext) 
   {
     switch (ext) 
     {
       case 'bvh': return 'bvh';
       case 'fbx': return 'fbx';
-      case 'npy': return 'numpy_groundtruth';
+      case 'npy': return 'numpy_converted';
       default: return '';
     }
 }
@@ -319,6 +329,9 @@ class App
     {
       if (e.code === 'KeyR')
       {
+        this.label = document.getElementById('frame-label');
+        this.slider = document.getElementById('frame-slider');
+
         if (currentPlayer) 
         {
           // remove all player from loop
@@ -335,6 +348,8 @@ class App
           // remove player from Szene
           scene.remove(playerObject);
           currentPlayer = null;
+          this.slider.value = 0;
+          this.label.textContent = `Frame: 0 / 0`;
         }
     
         // remove loader from scene
@@ -351,17 +366,22 @@ class App
     {
       if(e.code == "KeyP")
       {
-        console.log("scene children ", scene.children.length)
-        console.log("loop updates", loop.updatables.length)
-        const groupObject = scene.children.find(child => child.type === "Group");
+        for (let index = 0; index < scene.children.length; index++) 
+        {
+          const element = scene.children[index];
+          console.log(element.type);
+          
+        }
+        console.log("=================================================")
+        console.log("loop.updatables.length ", loop.updatables.length);
+        for (let index = 0; index < loop.updatables.length; index++) 
+        {
+          const element = loop.updatables[index];
+          if (!element.object) {
+            console.log(element);
+          }
 
-        if (groupObject) 
-        {
-          console.log("scene.children: ", groupObject.children.length);
-        } 
-        else 
-        {
-          console.log("Keine Group in der Szene gefunden.");
+          
         }
 
       }

@@ -85,10 +85,7 @@ export class FBX_Player
     this.isPlaying = !this.isPlaying;
     if (this.currentKeyFrame >= this.keyframeCount) 
     {
-      this.currentKeyFrame = 0;
-      this.slider.value = 0;
-      this.fbx_loader_object.mixer.setTime(0);
-      this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.keyframeCount}`;
+      this.stop();
     }
   }
 
