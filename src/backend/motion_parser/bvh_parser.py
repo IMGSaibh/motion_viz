@@ -60,7 +60,7 @@ class BVHParser:
                     joint_world_rotations[joint.name] = parent_rot @ local_rot
                     joint_world_positions[joint.name] = parent_pos + parent_rot @ offset
                     
-            self.npyDataset[frame_idx, self.joint_index_map[joint.name]] = joint_world_positions[joint.name]
+                self.npyDataset[frame_idx, self.joint_index_map[joint.name]] = joint_world_positions[joint.name]
         return self.npyDataset
     
     def export_skeleton_groundtruth(self, output_path: Path):

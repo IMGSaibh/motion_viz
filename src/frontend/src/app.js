@@ -90,9 +90,10 @@ class App
 
   convert_bvh_to_npy() 
   {
-    document.getElementById("process_bvh_files_btn").addEventListener("click", async () => 
+    document.getElementById("convert_bvh_to_npy_btn").addEventListener("click", async () => 
     {
-      const status = document.getElementById("process_bvh_files_status");
+      const status = document.getElementById("convert_bvh_to_npy_status");
+      status.textContent = "";
       try 
       {
         const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", {
@@ -276,7 +277,6 @@ class App
       case 'bvh':
         this.bvh_loader = new BVH_loader();
         await this.bvh_loader.load(fileUrl);
-        console.log(this.bvh_loader.bvh_object)
         scene.add(this.bvh_loader.bvh_object);
         
 
