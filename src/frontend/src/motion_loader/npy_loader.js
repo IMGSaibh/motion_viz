@@ -43,7 +43,7 @@ export class NPY_loader
     });
   }
 
-  createSpheres() 
+  createSpheres(url) 
   {
     const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
@@ -54,6 +54,9 @@ export class NPY_loader
       this.npy_object.add(sphere);
       this.joints.push(sphere);
     }
+
+    this.load_fbx_for_bones(url)
+
   }
 
   async parse_hierarchy_file_bvh(url) 
@@ -84,16 +87,16 @@ export class NPY_loader
     }
 
     // Update Skeleton Bones
-    if (this.bones) {
-      for (const bone of this.bones) {
+    if (this.bones) 
+    {
+      for (const bone of this.bones) 
+      {
         const start = this.joints[bone.parentIdx].position;
         const end = this.joints[bone.childIdx].position;
         bone.line.geometry.setFromPoints([start.clone(), end.clone()]);
         bone.line.geometry.verticesNeedUpdate = true;
       }
     }
-
-
   }
 
   create_skeleton_bones_bvh(hierarchy) 
@@ -132,6 +135,18 @@ export class NPY_loader
       this.npy_object.add(line);
       this.bones.push({ line, parentIdx, childIdx });
     }
+  }
+
+  load_fbx_for_bones(url)
+  {
+    const loader = new FBXLoader();
+    loader.load(url, (fbx) => {
+      fbx.scale.set(0.1, 0.1, 0.1);
+      this.npy_object.add(fbx);
+    }, undefined, (error) => {
+      console.error('Fehler beim Laden der FBX-Datei:', error);
+    });
+
   }
 
 }

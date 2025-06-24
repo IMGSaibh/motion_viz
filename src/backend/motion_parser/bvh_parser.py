@@ -27,7 +27,6 @@ class BvhParser:
     def save_npy(self, out_path: str):
         arr = self.compute_global_positions()
         np.save(out_path, arr)
-        print(f"Saved global positions array with shape {arr.shape} to {out_path}")
 
 
 
