@@ -49,7 +49,7 @@ export class NPY_loader
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(0.02, 16, 16);
+      const geom = new THREE.SphereGeometry(2.02, 16, 16);
       const sphere = new THREE.Mesh(geom, material);
       this.npy_object.add(sphere);
       this.joints.push(sphere);
