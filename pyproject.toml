@@ -13,11 +13,10 @@ dependencies = [
     "uvicorn[standard]>=0.29.0",
     "numpy>=1.26.0",
     "python-multipart (>=0.0.20,<0.0.21)",
-    "bvhtoolbox (>=0.1.3,<0.2.0)",
     "setuptools (>=80.9.0,<81.0.0)",
-    "bvh (>=0.3,<0.4)",
     "scipy (>=1.15.3,<2.0.0)",
     "pandas (>=2.3.0,<3.0.0)",
+    "upc-pymotion (>=0.2.3,<0.3.0)",
 ]
 
 [project.optional-dependencies]

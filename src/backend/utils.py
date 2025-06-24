@@ -14,7 +14,7 @@ class Utils:
             return -1
         
     @staticmethod
-    def rotation_matrix_xyz(x, y, z, order):
+    def rotation_matrices(x, y, z, order):
         rx = np.array([
             [1, 0, 0],
             [0, math.cos(math.radians(x)), -math.sin(math.radians(x))],

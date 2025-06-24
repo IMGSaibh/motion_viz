@@ -3,7 +3,7 @@ from typing import List
 from pathlib import Path
 from fastapi import UploadFile, File, APIRouter
 from backend.motion_parser.csv_parser import CSVParser
-from backend.motion_parser.bvh_parser import BVHParser
+from backend.motion_parser.bvh_parser import BvhParser 
 from backend.motion_parser.csv_c3d_parser import CSV_C3D_Parser
 from backend.motion_parser.csv_segmentbased_parser import SegmentCSVParser
 
@@ -68,15 +68,9 @@ async def convert_bvh_to_npy():
         }
 
     for bvh_file in bvh_files:
-        with open(bvh_file, "r") as file:
-            bvh_data = file.read()
-
-        bvh_parser = BVHParser(bvh_data)
-
-        dataset = bvh_parser.bvh_to_numpy()
+        bvh_parser = BvhParser(bvh_file)
         save_npy_path = Path.joinpath(numpy_converted_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
-        np.save(save_npy_path, dataset)
-
+        bvh_parser.save_npy(save_npy_path)
 
         save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton_converted.json")
         bvh_parser.export_skeleton_groundtruth(save_json_skeleton_path)
