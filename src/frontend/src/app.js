@@ -294,22 +294,16 @@ class App
         break;
 
       case 'npy':
-        this.fbx_loader = new FBX_Loader();
-        await this.fbx_loader.loadFBXModel('../public/bones.fbx');
-        console.log(this.fbx_loader.fbx_object);
-        this.fbx_loader.fbx_object.scale.set(0.005, 0.005, 0.005);
-        scene.add(this.fbx_loader.fbx_object);
-
         this.npy_loader = new NPY_loader();
         await this.npy_loader.load(fileUrl);
         scene.add(this.npy_loader.npy_object);
-        this.npy_loader.createSpheres();
+        this.npy_loader.create_spheres_for_joints();
 
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")
         .replace(".npy", "_skeleton_converted.json");
-        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        // await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
+        // await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
+        await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);
