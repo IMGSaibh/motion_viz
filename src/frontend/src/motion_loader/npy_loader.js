@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import npyjs from 'npyjs';
+import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+
+
 
 export class NPY_loader 
 {
@@ -15,6 +20,13 @@ export class NPY_loader
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
+    this.fbxBones = new THREE.Group();
+    this.boneMaterial = new LineMaterial({
+      color: 0xff0000,
+      linewidth: 1,   // pixel
+      opacity: 1.0,
+      // additional shader-uniforms possible like dashed, dashSize, gapSize, etc.
+    });
   }
 
   async load(url) 
@@ -32,7 +44,6 @@ export class NPY_loader
         const [frameCount, jointCount, _] = parsed.shape;
         this.frameCount = frameCount;
         this.jointCount = jointCount;
-        this.boneMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         
         resolve(this.npy_object);
 
@@ -43,7 +54,7 @@ export class NPY_loader
     });
   }
 
-  createSpheres(url) 
+  createSpheres() 
   {
     const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
@@ -54,9 +65,6 @@ export class NPY_loader
       this.npy_object.add(sphere);
       this.joints.push(sphere);
     }
-
-    this.load_fbx_for_bones(url)
-
   }
 
   async parse_hierarchy_file_bvh(url) 
@@ -64,7 +72,7 @@ export class NPY_loader
     const response = await fetch(url);
     const skeleton = await response.json();
     this.jointNames = skeleton.joints;
-    this.create_skeleton_bones_bvh(skeleton.hierarchy);
+    this.create_skeleton_bones_bvh(skeleton.hierarchy)
   }
 
   async parse_hierarchy_file_csv_kinectv1(url) 
@@ -99,23 +107,8 @@ export class NPY_loader
     }
   }
 
-  create_skeleton_bones_bvh(hierarchy) 
-  {
-    this.bones = [];
-    for (const [childIdx, parentIdx] of hierarchy) 
-    {
-      const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(), new THREE.Vector3()
-      ]);
-      const line = new THREE.Line(geometry, this.boneMaterial);
-      this.npy_object.add(line);
-      this.bones.push({ line, childIdx, parentIdx });
-    }
-  }
-
   create_skeleton_lines_csv_kinect_v1(joints, hierarchy) 
   {
-    this.bones = [];
 
     for (const [parentName, childName] of hierarchy) 
     {
@@ -137,16 +130,34 @@ export class NPY_loader
     }
   }
 
-  load_fbx_for_bones(url)
+  create_skeleton_bones_bvh(hierarchy, renderer = null) 
   {
-    const loader = new FBXLoader();
-    loader.load(url, (fbx) => {
-      fbx.scale.set(0.1, 0.1, 0.1);
-      this.npy_object.add(fbx);
-    }, undefined, (error) => {
-      console.error('Fehler beim Laden der FBX-Datei:', error);
-    });
+    // TODO: set resolution and pass render to this function 
+    if (renderer) 
+    {
+      const { width, height } = renderer.getSize(new THREE.Vector2());
+      this.boneMaterial.resolution.set(width, height);
+    }
 
+    for (const [childIdx, parentIdx] of hierarchy) {
+      // init 2 points with each XYZ
+      const positions = [0, 0, 0, 0, 0, 0]; 
+
+      const geometry = new LineGeometry();
+      geometry.setPositions(positions);
+
+      const line = new Line2(geometry, this.boneMaterial);
+      line.computeLineDistances(); // for correct dash / clipping
+
+      this.npy_object.add(line);
+      this.bones.push({ line, childIdx, parentIdx });
+    }
+
+    return this.bones;
   }
 
+
 }
+
+
+

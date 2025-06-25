@@ -2,7 +2,7 @@
   "systemname": "BVH General",
   "abbrev":"bvh",
   "format": "bvh",
-  "scale": 100,
+  "scale": 0.5,
   "fps": 30.0,
   "positions": "none",
   "rotations": "absolute",

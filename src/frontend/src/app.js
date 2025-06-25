@@ -286,7 +286,7 @@ class App
 
       case 'fbx':
         this.fbx_loader = new FBX_Loader();
-        await this.fbx_loader.loadFBX(fileUrl);
+        await this.fbx_loader.loadFBXAnimation(fileUrl);
         scene.add(this.fbx_loader.fbx_object);
 
         currentPlayer = new FBX_Player(this.fbx_loader);
@@ -294,10 +294,16 @@ class App
         break;
 
       case 'npy':
+        this.fbx_loader = new FBX_Loader();
+        await this.fbx_loader.loadFBXModel('../public/bones.fbx');
+        console.log(this.fbx_loader.fbx_object);
+        this.fbx_loader.fbx_object.scale.set(0.005, 0.005, 0.005);
+        scene.add(this.fbx_loader.fbx_object);
+
         this.npy_loader = new NPY_loader();
         await this.npy_loader.load(fileUrl);
         scene.add(this.npy_loader.npy_object);
-        this.npy_loader.createSpheres('bones.fbx');
+        this.npy_loader.createSpheres();
 
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")

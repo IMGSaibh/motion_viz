@@ -16,7 +16,7 @@ export class FBX_Loader
     this.duration = 0;
   }
 
-  async loadFBX(url) 
+  async loadFBXAnimation(url) 
   {
     return new Promise((resolve, reject) => 
     {
@@ -39,4 +39,18 @@ export class FBX_Loader
       }, undefined, (error) => reject(error));
     });
   }
+
+  async loadFBXModel(url) 
+  {
+    return new Promise((resolve, reject) => 
+    {
+      this.loader.load(url, (result) => 
+      {
+        this.fbx_object.add(result);
+        // terminate Promise and return this.fbxObject
+        resolve(this.fbx_object);
+      }, undefined, (error) => reject(error));
+    });
+  }
+
 }
