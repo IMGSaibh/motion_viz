@@ -73,7 +73,7 @@ async def convert_bvh_to_npy():
         bvh_parser.save_npy(save_npy_path)
 
         save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton_converted.json")
-        bvh_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+        bvh_parser.export_skeleton_converted(save_json_skeleton_path)
 
     return {
         "message": ".bvh-files converted",
@@ -105,9 +105,9 @@ async def convert_csv_kinectv1_to_npy():
 
         save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
-        # TODO: it is kinect_v1_hierarchy and it needs still ordering correspond to the joints 
+
         save_json_skeleton_path = Path.joinpath(csv_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
-        csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+        csv_parser.export_skeleton_converted(save_json_skeleton_path)
     
     return {
         "message": ".csv-files converted",
@@ -140,7 +140,7 @@ async def convert_csv_c3d_to_npy():
         save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
         save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
-        csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+        csv_parser.export_skeleton_converted(save_json_skeleton_path)
     
     return {
         "message": ".csv-files converted",
@@ -173,7 +173,7 @@ async def convert_csv_segmentbased_to_npy():
         save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
         np.save(save_npy_path, dataset)
         save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton_converted.json")
-        csv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+        csv_parser.export_skeleton_converted(save_json_skeleton_path)
     
     return {
         "message": ".csv-files converted",

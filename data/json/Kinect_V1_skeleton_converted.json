@@ -23,80 +23,80 @@
   ],
   "hierarchy": [
     [
-      "HipCenter",
-      "Spine"
+      9,
+      17
     ],
     [
-      "Spine",
-      "ShoulderCenter"
+      17,
+      14
     ],
     [
-      "ShoulderCenter",
-      "Head"
+      14,
+      8
     ],
     [
-      "ShoulderCenter",
-      "ShoulderLeft"
+      14,
+      15
     ],
     [
-      "ShoulderLeft",
-      "ElbowLeft"
+      15,
+      2
     ],
     [
-      "ElbowLeft",
-      "WristLeft"
+      2,
+      18
     ],
     [
-      "WristLeft",
-      "HandLeft"
+      18,
+      6
     ],
     [
-      "ShoulderCenter",
-      "ShoulderRight"
+      14,
+      16
     ],
     [
-      "ShoulderRight",
-      "ElbowRight"
+      16,
+      3
     ],
     [
-      "ElbowRight",
-      "WristRight"
+      3,
+      19
     ],
     [
-      "WristRight",
-      "HandRight"
+      19,
+      7
     ],
     [
-      "HipCenter",
-      "HipLeft"
+      9,
+      10
     ],
     [
-      "HipLeft",
-      "KneeLeft"
+      10,
+      12
     ],
     [
-      "KneeLeft",
-      "AnkleLeft"
+      12,
+      0
     ],
     [
-      "AnkleLeft",
-      "FootLeft"
+      0,
+      4
     ],
     [
-      "HipCenter",
-      "HipRight"
+      9,
+      11
     ],
     [
-      "HipRight",
-      "KneeRight"
+      11,
+      13
     ],
     [
-      "KneeRight",
-      "AnkleRight"
+      13,
+      1
     ],
     [
-      "AnkleRight",
-      "FootRight"
+      1,
+      5
     ]
   ]
 }

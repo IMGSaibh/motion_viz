@@ -118,10 +118,10 @@ export class NPY_loader
       for (const bone of this.bones) 
       {
 
-        if (bone.parentName === "Head") 
-        {
-          console.log(this.head)
-        }
+        // if (bone.parentName === "Head") 
+        // {
+        //   console.log(this.head)
+        // }
 
         const start = this.spheres_for_joints[bone.parentIdx].position;
         const end = this.spheres_for_joints[bone.childIdx].position;
@@ -131,48 +131,11 @@ export class NPY_loader
     }
   }
 
-  async parse_hierarchy_file_bvh(url) 
+  async create_skeleton(url, renderer = null) 
   {
     const response = await fetch(url);
     const skeleton = await response.json();
-    this.create_skeleton_bones_bvh(skeleton.hierarchy)
-  }
 
-  async parse_hierarchy_file_csv_kinectv1(url) 
-  {
-    const response = await fetch(url);
-    const skeleton = await response.json();
-    // this.create_skeleton_lines_csv_kinect_v1(skeleton.joints ,skeleton.hierarchy);
-    this.create_skeleton_lines_csv_kinect_v1(skeleton.hierarchy);
-  }
-
-
-
-  // create_skeleton_lines_csv_kinect_v1(joints, hierarchy) 
-  // {
-
-  //   for (const [parentName, childName] of hierarchy) 
-  //   {
-  //     const parentIdx = joints.indexOf(parentName);
-  //     const childIdx = joints.indexOf(childName);
-
-  //     if (parentIdx === -1 || childIdx === -1) 
-  //     {
-  //       console.warn(`Invalid joint name in hierarchy: ${parentName} -> ${childName}`);
-  //       continue;
-  //     }
-
-  //     const geometry = new THREE.BufferGeometry().setFromPoints([
-  //       new THREE.Vector3(), new THREE.Vector3()
-  //     ]);
-  //     const line = new THREE.Line(geometry, this.boneMaterial);
-  //     this.npy_object.add(line);
-  //     this.bones.push({ line, parentIdx, childIdx });
-  //   }
-  // }
-
-  create_skeleton_lines_csv_kinect_v1(hierarchy, renderer = null) 
-  {
     // TODO: set resolution and pass render to this function 
     if (renderer) 
     {
@@ -180,7 +143,7 @@ export class NPY_loader
       this.boneMaterial.resolution.set(width, height);
     }
 
-    for (const [childIdx, parentIdx] of hierarchy) {
+    for (const [childIdx, parentIdx] of skeleton.hierarchy) {
       // initialize 2 points with each XYZ
       const positions = [0, 0, 0, 0, 0, 0]; 
 
@@ -193,37 +156,7 @@ export class NPY_loader
       this.npy_object.add(line);
       this.bones.push({ line, childIdx, parentIdx });
     }
-
-    return this.bones;
   }
-
-  create_skeleton_bones_bvh(hierarchy, renderer = null) 
-  {
-    // TODO: set resolution and pass render to this function 
-    if (renderer) 
-    {
-      const { width, height } = renderer.getSize(new THREE.Vector2());
-      this.boneMaterial.resolution.set(width, height);
-    }
-
-    for (const [childIdx, parentIdx] of hierarchy) {
-      // initialize 2 points with each XYZ
-      const positions = [0, 0, 0, 0, 0, 0]; 
-
-      const geometry = new LineGeometry();
-      geometry.setPositions(positions);
-
-      const line = new Line2(geometry, this.boneMaterial);
-      line.computeLineDistances(); // for correct dash / clipping
-
-      this.npy_object.add(line);
-      this.bones.push({ line, childIdx, parentIdx });
-    }
-
-    return this.bones;
-  }
-
-
 }
 
 

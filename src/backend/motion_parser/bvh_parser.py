@@ -8,9 +8,9 @@ from backend.json_loader import JsonLoader
 
 
 class BvhParser:
-    def __init__(self, bvh_path: str):
+    def __init__(self, bvh_path: Path):
         self.bvh = BVH()
-        self.bvh.load(bvh_path)
+        self.bvh.load(str(bvh_path))
         self.joint_names = self.bvh.data["names"]
         self.n_joints = len(self.joint_names)
         self._prepare_data()
@@ -34,23 +34,23 @@ class BvhParser:
         # global_positions shape: (frames, joints, 3)
         return global_positions
 
-    def save_npy(self, out_path: str):
+    def save_npy(self, out_path: Path):
         arr = self.compute_global_positions()
         np.save(out_path, arr)
 
 
 
 
-    def export_skeleton_groundtruth(self, output_path: Path):
+    def export_skeleton_converted(self, output_path: Path):
         joint_hierarchy = []
 
         for joint_idx, parent_idx in enumerate(self.parents):
             if parent_idx != -1:
-                joint_hierarchy.append([int(joint_idx), int(parent_idx)])  # wichtig: int
+                joint_hierarchy.append([int(joint_idx), int(parent_idx)])
 
         skeleton = {
-            "joints": list(self.joint_names),         # sicherstellen, dass es keine np.array ist
-            "hierarchy": joint_hierarchy              # reine Python-Liste von Listen
+            "joints": list(self.joint_names),
+            "hierarchy": joint_hierarchy
         }
 
         with open(output_path, "w") as f:

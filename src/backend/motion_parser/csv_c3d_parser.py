@@ -50,7 +50,7 @@ class CSV_C3D_Parser:
         return dataset
     
 
-    def export_skeleton_groundtruth(self, output_path: Path):
+    def export_skeleton_converted(self, output_path: Path):
 
         KINECT_V1_HIERARCHY = [
             ("LFHD", "RFHD"),    # Head left–right

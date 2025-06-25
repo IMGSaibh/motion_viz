@@ -42,7 +42,7 @@ class SegmentCSVParser:
         return dataset
 
 
-    def export_skeleton_groundtruth(self, output_path: Path):
+    def export_skeleton_converted(self, output_path: Path):
         SEGMENT_BASED_HIERARCHY = [
             ("root", "R femur"),
             ("root", "L femur"),
