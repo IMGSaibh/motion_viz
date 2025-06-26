@@ -33,9 +33,9 @@ class CSVParser:
             dataset[:, i, :] = np.stack([x, y, z], axis=-1)
 
         return dataset
-    
-    def export_skeleton_groundtruth(self, output_path: Path):
-        # kinect skeleton hierarchy (V1)
+
+    def export_skeleton_converted(self, output_path: Path):
+        # Kinect-V1-Hierarchie
         KINECT_V1_BASED_HIERARCHY = [
             ("HipCenter", "Spine"),
             ("Spine", "ShoulderCenter"),
@@ -58,17 +58,19 @@ class CSVParser:
             ("AnkleRight", "FootRight")
         ]
 
+        # Mapping: Name → Index
+        name_to_idx = {name: idx for idx, name in enumerate(self.joint_names)}
 
-        # export only joints that are present in the CSV file
-        valid_hierarchy = [
-            [a, b] for a, b in KINECT_V1_BASED_HIERARCHY
-            if a in self.joint_names and b in self.joint_names
+        joint_hierarchy = [
+            [name_to_idx[a], name_to_idx[b]]
+            for a, b in KINECT_V1_BASED_HIERARCHY
+            if a in name_to_idx and b in name_to_idx
         ]
 
-        skeleton_data = {
+        skeleton = {
             "joints": self.joint_names,
-            "hierarchy": valid_hierarchy
+            "hierarchy": joint_hierarchy
         }
 
-        with open(output_path, "w") as f:
-            json.dump(skeleton_data, f, indent=2)
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(skeleton, f, indent=2)

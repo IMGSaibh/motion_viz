@@ -92,11 +92,11 @@ export class NPY_Player
   gotoFrame(frameIndex) 
   {
     this.frameIdx = Math.max(0, Math.min(frameIndex, this.frameCount));
-    // avoid index mismatch in setJointPositions()
+    // avoid index mismatch in set_sphere_for_joint_positions()
     // last frameIdx leads last undefined joint positions 
     if (this.frameIdx < this.frameCount) 
     {
-      this.npy_loader_object.setJointPositions(this.frameIdx);
+      this.npy_loader_object.update_joint_positions(this.frameIdx);
     }
   }
 }

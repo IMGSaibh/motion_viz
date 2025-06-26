@@ -1,13 +1,13 @@
 
+import { Loop } from './system/loop.js';
+import { Resizer } from './system/resizer.js';
+import { createScene } from './components/scene.js';
 import { createCamera } from './components/camera.js';
+import { createRenderer } from './system/renderer.js';
 import { createOrbitControls } from './components/orbitcontrol.js';
 import { BVH_loader } from './motion_loader/bvh_loader.js';
 import { FBX_Loader } from './motion_loader/fbx_loader.js';
 import { NPY_loader } from './motion_loader/npy_loader.js';
-import { createScene } from './components/scene.js';
-import { createRenderer } from './system/renderer.js';
-import { Resizer } from './system/resizer.js';
-import { Loop } from './system/loop.js';
 import { BVH_Player } from './motion_player/bvh_player.js';
 import { NPY_Player } from './motion_player/npy_player.js';
 import { FBX_Player } from './motion_player/fbx_player.js';
@@ -286,7 +286,7 @@ class App
 
       case 'fbx':
         this.fbx_loader = new FBX_Loader();
-        await this.fbx_loader.loadFBX(fileUrl);
+        await this.fbx_loader.loadFBXAnimation(fileUrl);
         scene.add(this.fbx_loader.fbx_object);
 
         currentPlayer = new FBX_Player(this.fbx_loader);
@@ -297,13 +297,12 @@ class App
         this.npy_loader = new NPY_loader();
         await this.npy_loader.load(fileUrl);
         scene.add(this.npy_loader.npy_object);
-        this.npy_loader.createSpheres();
+        this.npy_loader.create_spheres_for_joints();
 
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")
         .replace(".npy", "_skeleton_converted.json");
-        await this.npy_loader.parse_hierarchy_file_bvh(skeletonPath);
-        // await this.npy_loader.parse_hierarchy_file_csv_kinectv1(skeletonPath);
+        await this.npy_loader.create_skeleton(skeletonPath);
 
         currentPlayer = new NPY_Player(this.npy_loader);
         loop.updatables.push(currentPlayer.npy_player_object);
