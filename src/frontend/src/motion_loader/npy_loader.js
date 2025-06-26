@@ -66,8 +66,7 @@ export class NPY_loader
 
         await this.fbx_loader.loadFBXModel('../public/bones.fbx');
         this.fbx_bones = this.fbx_loader.fbx_object.children[0]; 
-        this.fbx_bones.scale.set(0.002, 0.002, 0.002);
-        this.npy_object.add(this.fbx_bones)
+        const scaleFactor = 0.2;
         
         this.head             = this.fbx_bones.children.find(c => c.name === 'head');
         this.right_upper_arm  = this.fbx_bones.children.find(c => c.name === 'right_upper_arm');
@@ -79,6 +78,29 @@ export class NPY_loader
         this.left_upper_leg   = this.fbx_bones.children.find(c => c.name === 'left_upper_leg');
         this.right_upper_leg  = this.fbx_bones.children.find(c => c.name === 'right_upper_leg');
         this.right_under_leg  = this.fbx_bones.children.find(c => c.name === 'right_under_leg');
+        
+        this.head.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.right_upper_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.right_under_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.left_upper_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.left_under_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.chest.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.left_under_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.left_upper_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.right_upper_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        this.right_under_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        
+
+        this.npy_object.add(this.head);
+        this.npy_object.add(this.right_upper_arm);
+        this.npy_object.add(this.right_under_arm);
+        this.npy_object.add(this.left_upper_arm);
+        this.npy_object.add(this.left_under_arm);
+        this.npy_object.add(this.chest);
+        this.npy_object.add(this.left_under_leg);
+        this.npy_object.add(this.left_upper_leg);
+        this.npy_object.add(this.right_upper_leg);
+        this.npy_object.add(this.right_under_leg);
       
       } 
       catch (e) 
@@ -124,17 +146,20 @@ export class NPY_loader
         bone.line.geometry.setFromPoints([start.clone(), end.clone()]);
         bone.line.geometry.verticesNeedUpdate = true;
 
+        const direction = new THREE.Vector3().subVectors(end, start).normalize();
+        const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+
         if (bone.childJoint === "Head") 
         {
           console.log(bone.childJoint)
-          const direction = new THREE.Vector3().subVectors(end, start).normalize();
-          const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
           this.head.position.copy(midpoint);
-          console.log(midpoint)
 
           // turn head in direction of bone
-          // this.head.lookAt(end); 
-          
+          // this.head.lookAt(end);
+        }
+        else if(bone.childJoint === "Head")
+        {
+            
         }
       }
     }
