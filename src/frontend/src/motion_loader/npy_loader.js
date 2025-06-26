@@ -23,7 +23,7 @@ export class NPY_loader
     this.fps = 60;
     this.boneMaterial = new LineMaterial({
       color: 0xff0000,
-      linewidth: 1,   // pixel
+      linewidth: 5,   // pixel
       opacity: 1.0,
       // additional shader-uniforms possible like dashed, dashSize, gapSize, etc.
     });
@@ -66,7 +66,7 @@ export class NPY_loader
 
         await this.fbx_loader.loadFBXModel('../public/bones.fbx');
         this.fbx_bones = this.fbx_loader.fbx_object.children[0]; 
-        this.fbx_bones.scale.set(0.0002, 0.0002, 0.0002);
+        this.fbx_bones.scale.set(0.002, 0.002, 0.002);
         this.npy_object.add(this.fbx_bones)
         
         this.head             = this.fbx_bones.children.find(c => c.name === 'head');
@@ -101,7 +101,7 @@ export class NPY_loader
     }
   }
 
-  set_sphere_for_joint_positions(frameIdx) 
+  update_joint_positions(frameIdx) 
   {
     const base = frameIdx * this.jointCount * 3;
     for (let i = 0; i < this.jointCount; i++) 
@@ -117,16 +117,25 @@ export class NPY_loader
     {
       for (const bone of this.bones) 
       {
-
-        // if (bone.parentName === "Head") 
-        // {
-        //   console.log(this.head)
-        // }
-
+        
+        
         const start = this.spheres_for_joints[bone.parentIdx].position;
         const end = this.spheres_for_joints[bone.childIdx].position;
         bone.line.geometry.setFromPoints([start.clone(), end.clone()]);
         bone.line.geometry.verticesNeedUpdate = true;
+
+        if (bone.childJoint === "Head") 
+        {
+          console.log(bone.childJoint)
+          const direction = new THREE.Vector3().subVectors(end, start).normalize();
+          const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+          this.head.position.copy(midpoint);
+          console.log(midpoint)
+
+          // turn head in direction of bone
+          // this.head.lookAt(end); 
+          
+        }
       }
     }
   }
@@ -153,8 +162,11 @@ export class NPY_loader
       const line = new Line2(geometry, this.boneMaterial);
       line.computeLineDistances(); // for correct dash / clipping
 
+      const childJoint  = skeleton.joints[childIdx];
+      const parentJoint = skeleton.joints[parentIdx];
+
       this.npy_object.add(line);
-      this.bones.push({ line, childIdx, parentIdx });
+      this.bones.push({ line, childIdx, parentIdx, parentJoint, childJoint });
     }
   }
 }
