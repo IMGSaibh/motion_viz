@@ -8,6 +8,7 @@ function main()
 		
 	app.upload_files();
 	
+	app.convert_pv_style();
 	app.convert_bvh_to_npy();
 	app.convert_csv_kinect_v1_to_npy();
 	app.convert_csv_c3d_to_npy();
