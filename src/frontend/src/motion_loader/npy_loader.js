@@ -1,10 +1,5 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
-import { FBX_Loader } from './fbx_loader.js';
-import { Line2 } from 'three/examples/jsm/lines/Line2.js';
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
-import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 
 export class NPY_loader 
@@ -12,7 +7,6 @@ export class NPY_loader
   constructor() 
   {
     this.npy_motion = new THREE.Group();
-    this.fbx_loader = new FBX_Loader();
 
     this.numpy_data = null;
     this.currentFrame = 0;
@@ -23,71 +17,7 @@ export class NPY_loader
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-
-
-    this.joint_size = 1.2;
-    this.fbx_bones = [];
-    this.boneMaterial = new LineMaterial({
-      color: 0xff0000,
-      linewidth: 5,   // pixel
-      opacity: 1.0,
-      // additional shader-uniforms possible like dashed, dashSize, gapSize, etc.
-    });
-
-
-    // geometries
-    this.head             = {};
-    this.right_upper_arm  = {};
-    this.right_under_arm  = {};
-    this.left_upper_arm   = {};
-    this.left_under_arm   = {};
-    this.chest            = {};
-    this.left_under_leg   = {};
-    this.left_upper_leg   = {};
-    this.right_upper_leg  = {};
-    this.right_under_leg  = {}; 
-
-
-  }
-
-  async load_bones_mixamo_fbx() 
-  {
-      await this.fbx_loader.loadFBXModel('../public/bones.fbx');
-      let fbx_bones = this.fbx_loader.fbx_object.children[0]; 
-      const scaleFactor = 0.2;
-      this.head             = fbx_bones.children.find(c => c.name === 'head');
-      this.right_upper_arm  = fbx_bones.children.find(c => c.name === 'right_upper_arm');
-      this.right_under_arm  = fbx_bones.children.find(c => c.name === 'right_under_arm');
-      this.left_upper_arm   = fbx_bones.children.find(c => c.name === 'left_upper_arm');
-      this.left_under_arm   = fbx_bones.children.find(c => c.name === 'left_under_arm');
-      this.chest            = fbx_bones.children.find(c => c.name === 'chest');
-      this.left_under_leg   = fbx_bones.children.find(c => c.name === 'left_under_leg');
-      this.left_upper_leg   = fbx_bones.children.find(c => c.name === 'left_upper_leg');
-      this.right_upper_leg  = fbx_bones.children.find(c => c.name === 'right_upper_leg');
-      this.right_under_leg  = fbx_bones.children.find(c => c.name === 'right_under_leg');
-      
-
-      this.head.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.right_upper_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.right_under_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.left_upper_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.left_under_arm.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.chest.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.left_under_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.left_upper_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.right_upper_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      this.right_under_leg.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-      // this.npy_object.add(this.head);
-      // this.npy_object.add(this.right_upper_arm);
-      // this.npy_object.add(this.right_under_arm);
-      // this.npy_object.add(this.left_upper_arm);
-      // this.npy_object.add(this.left_under_arm);
-      // this.npy_object.add(this.chest);
-      // this.npy_object.add(this.left_under_leg);
-      // this.npy_object.add(this.left_upper_leg);
-      // this.npy_object.add(this.right_upper_leg);
-      // this.npy_object.add(this.right_under_leg);
+    this.joint_size = 1.0;
   }
 
   async load_npy_motion(fileUrl) 
@@ -108,19 +38,13 @@ export class NPY_loader
   async create_skeleton(skeletonPath, renderer = null) 
   {
     const response = await fetch(skeletonPath);
-    const skeleton = await response.json();
-    const fbxModel = await this.fbx_loader.loadFBXModel('/bone.fbx');
-    let bone = fbxModel.getObjectByName('Bone') ?? fbxModel;
-
-    this.fbx_bones.push(clone(bone));
-    this.fbx_bones.push(clone(bone));
-    
-    this.create_joints();
-    this.create_bones(skeleton, bone);
+    const skeleton_json = await response.json();
+    this._create_joints();
+    this._create_bones(skeleton_json);
     
   }
 
-  create_joints() 
+  _create_joints() 
   {
     const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
@@ -133,47 +57,41 @@ export class NPY_loader
     }
   }
 
-  create_bones(skeleton, bone = null, renderer = null)
+  _create_bones(skeleton, renderer = null)
   {
-    // TODO: set resolution and pass render to this function 
-    if (renderer) 
-    {
-      const { width, height } = renderer.getSize(new THREE.Vector2());
-      this.boneMaterial.resolution.set(width, height);
-    }
+    const boneGeometry  = new THREE.CylinderGeometry(
+      1.8,          // radiusTop
+      0.8,          // radiusBottom
+      1,            // height
+      8             // radialSegments
+    );
+
+    const boneMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      wireframe: true
+    });
 
     for (const [childIdx, parentIdx] of skeleton.hierarchy) 
     {
-      // initialize 2 points with each XYZ
-      const positions = [0, 0, 0, 0, 0, 0]; 
-
-      const geometry = new LineGeometry();
-      geometry.setPositions(positions);
-
-      const line = new Line2(geometry, this.boneMaterial);
-      line.computeLineDistances(); // for correct dash / clipping
-
       const childJoint  = skeleton.joints[childIdx];
       const parentJoint = skeleton.joints[parentIdx];
+      
+      const bone_copy = new THREE.Mesh(boneGeometry, boneMaterial);      
+      bone_copy.matrixAutoUpdate = false;
+      this.npy_motion.add(bone_copy);
 
-      this.npy_motion.add(line);
-      this.npy_skeleton.push({ line, childIdx, parentIdx, parentJoint, childJoint });
+      this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone_copy });
       
     }
-
-    if(bone)
-    {
-      
-    }
-    else
-    {
-
-    }
-
   }
 
   update_skeleton(frameIdx) 
   {
+
+    const y_axis = new THREE.Vector3(0, 1, 0);
+    const direction = new THREE.Vector3();
+    const middle_point = new THREE.Vector3();
+
     const base = frameIdx * this.jointCount * 3;
     for (let i = 0; i < this.jointCount; i++) 
     {
@@ -183,28 +101,25 @@ export class NPY_loader
       this.joints[i].position.set(x, y, z);
     }
 
-    for (const bone of this.npy_skeleton) 
+    for (const elem of this.npy_skeleton) 
     {
-      const start = this.joints[bone.parentIdx].position;
-      const end = this.joints[bone.childIdx].position;
-      bone.line.geometry.setFromPoints([start.clone(), end.clone()]);
-      bone.line.geometry.verticesNeedUpdate = true;
+      const start = this.joints[elem.parentIdx].position;
+      const end = this.joints[elem.childIdx].position;
+      
+      // cylinder direction parent → child
+      direction.subVectors(end, start);          
+      const len = direction.length();
+      direction.normalize();
 
-      const direction = new THREE.Vector3().subVectors(end, start).normalize();
-      const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+      middle_point.addVectors(start, end).multiplyScalar(0.5);
 
-      if (bone.childJoint === "Head") 
-      {
-        // console.log(bone.childJoint)
-        // this.head.position.copy(midpoint);
+      elem.bone_copy.position.copy(middle_point);
+      elem.bone_copy.quaternion.setFromUnitVectors(y_axis, direction);
 
-        // turn head in direction of bone
-        // this.head.lookAt(end);
-      }
-      else if(bone.childJoint === "Head")
-      {
-          
-      }
+      // only scale height
+      elem.bone_copy.scale.set(1, len, 1);                
+      elem.bone_copy.updateMatrix();
+
     }
   }
 
