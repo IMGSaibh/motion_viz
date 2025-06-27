@@ -16,7 +16,7 @@ export class FBX_Loader
     this.duration = 0;
   }
 
-  async loadFBXAnimation(url) 
+  async load_fbx_animation(url) 
   {
     return new Promise((resolve, reject) => 
     {
