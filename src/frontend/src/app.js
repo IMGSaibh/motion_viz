@@ -11,12 +11,12 @@ import { NPY_loader } from './motion_loader/npy_loader.js';
 import { BVH_Player } from './motion_player/bvh_player.js';
 import { NPY_Player } from './motion_player/npy_player.js';
 import { FBX_Player } from './motion_player/fbx_player.js';
+import Utils from './utils.js';
 
 let camera;
 let renderer;
 let scene;
 let loop;
-let currentPlayer = null;
 
 class App
 {
@@ -31,6 +31,9 @@ class App
     const orbitControls = createOrbitControls(camera, renderer);
     loop.updatables.push(orbitControls);
     const resizer = new Resizer(container, camera, renderer);
+
+    this.currentLoader = null;
+    this.currentPlayer = null;
 
   }
   
@@ -275,36 +278,26 @@ class App
 
     switch (file_extension) {
       case 'bvh':
-        this.bvh_loader = new BVH_loader();
-        await this.bvh_loader.load(fileUrl);
-        scene.add(this.bvh_loader.bvh_object);
-        
-
-        currentPlayer = new BVH_Player(this.bvh_loader);
-        loop.updatables.push(currentPlayer.bvh_player_object);
+        this.currentLoader = new BVH_loader(scene);
+        await this.currentLoader.load_bvh_motion(fileUrl);
+        this.currentPlayer = new BVH_Player(this.currentLoader, loop);
         break;
 
       case 'fbx':
-        this.fbx_loader = new FBX_Loader();
-        await this.fbx_loader.load_fbx_animation(fileUrl);
-        scene.add(this.fbx_loader.fbx_object);
-
-        currentPlayer = new FBX_Player(this.fbx_loader);
-        loop.updatables.push(currentPlayer.fbx_player_object);
+        this.currentLoader = new FBX_Loader(scene);
+        await this.currentLoader.load_fbx_animation(fileUrl);
+        this.currentPlayer = new FBX_Player(this.currentLoader, loop);
         break;
 
       case 'npy':
-        this.npy_loader = new NPY_loader();
-        const npy_motion = await this.npy_loader.load_npy_motion(fileUrl);
-        scene.add(npy_motion);
+        this.currentLoader = new NPY_loader(scene);
+        await this.currentLoader.load_npy_animation(fileUrl);
 
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")
         .replace(".npy", "_skeleton_converted.json");
-        await this.npy_loader.create_skeleton(skeletonPath);
-
-        currentPlayer = new NPY_Player(this.npy_loader);
-        loop.updatables.push(currentPlayer.npy_player_object);
+        await this.currentLoader.create_skeleton(skeletonPath);
+        this.currentPlayer = new NPY_Player(this.currentLoader, loop);
         break;
     }
   }
@@ -322,40 +315,26 @@ class App
 
   cleanup_scene() 
   {
-
     window.addEventListener('keydown', (e) => 
     {
       if (e.code === 'KeyR')
       {
-        this.label = document.getElementById('frame-label');
-        this.slider = document.getElementById('frame-slider');
-
-        if (currentPlayer) 
+        if (this.currentPlayer) 
         {
-          // remove all player from loop
-          const playerObject =  currentPlayer.bvh_player_object ||
-                                currentPlayer.fbx_player_object ||
-                                currentPlayer.npy_player_object;
+          this.currentLoader.dispose();
+          this.currentPlayer.dispose();
+
+          this.currentPlayer = null;
+          this.currentLoader = null;
           
-          const index = loop.updatables.indexOf(playerObject);
-          if (index !== -1) 
-          {
-            loop.updatables.splice(index, 1);
-          }
-    
-          // remove player from Szene
-          scene.remove(playerObject);
-          currentPlayer = null;
+          this.label = document.getElementById('frame-label');
+          this.slider = document.getElementById('frame-slider');
           this.slider.value = 0;
           this.label.textContent = `Frame: 0 / 0`;
         }
-    
-        // remove loader from scene
-        if (this.bvh_loader?.bvh_object) scene.remove(this.bvh_loader.bvh_object);
-        if (this.fbx_loader?.fbx_object) scene.remove(this.fbx_loader.fbx_object);
-        if (this.npy_loader?.npy_object) scene.remove(this.npy_loader.npy_object);
       }
     });
+
   }
 
   print_updateables()
@@ -368,25 +347,23 @@ class App
         {
           const element = scene.children[index];
           console.log(element.type);
-          
         }
-        console.log("=================================================")
+
         console.log("loop.updatables.length ", loop.updatables.length);
         for (let index = 0; index < loop.updatables.length; index++) 
         {
           const element = loop.updatables[index];
-          if (!element.object) {
+          if (!element.object) 
+          {
             console.log(element);
           }
-
           
         }
-
+          console.log("loop.updatables ", loop.updatables)
+          console.log("=================================================")
       }
-
     });
   }
-
 }
 
 

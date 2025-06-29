@@ -1,6 +1,6 @@
 export class NPY_Player 
 {
-  constructor(npy_loader_object) 
+  constructor(npy_loader_object, loop) 
   {
     this.npy_player_object = {};
     this.npy_loader_object = npy_loader_object;
@@ -25,6 +25,9 @@ export class NPY_Player
     this._onFrameChange = null;
     this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.frameCount}`;
+
+    this.loop = loop;
+    this.loop.updatables.push(this.npy_player_object);
 
     window.addEventListener('keydown', (e) => 
     {
@@ -98,5 +101,15 @@ export class NPY_Player
     {
       this.npy_loader_object.update_skeleton(this.frameIdx);
     }
+  }
+
+  dispose() 
+  {
+    const index = this.loop.updatables.indexOf(this.npy_player_object);
+    if (index !== -1) 
+    {
+      this.loop.updatables.splice(index, 1);
+    }
+    this.npy_player_object = null;
   }
 }
