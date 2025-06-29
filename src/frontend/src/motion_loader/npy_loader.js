@@ -1,174 +1,128 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
-import { FBX_Loader } from './fbx_loader.js';
-import { Line2 } from 'three/examples/jsm/lines/Line2.js';
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
-
 
 
 export class NPY_loader 
 {
   constructor() 
   {
-    this.npy_object = new THREE.Group();
-    this.motionArray = null;
+    this.npy_motion = new THREE.Group();
+
+    this.numpy_data = null;
     this.currentFrame = 0;
     this.frameCount = 0;
     this.jointCount = 0;
-    this.spheres_for_joints = [];
-    this.bones = [];
+    this.joints = [];
+    this.npy_skeleton = [];
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.boneMaterial = new LineMaterial({
-      color: 0xff0000,
-      linewidth: 5,   // pixel
-      opacity: 1.0,
-      // additional shader-uniforms possible like dashed, dashSize, gapSize, etc.
-    });
-
-    this.fbx_loader = new FBX_Loader();
-    this.fbx_bones = [];
-
-    this.head             = {};
-    this.right_upper_arm  = {};
-    this.right_under_arm  = {};
-    this.left_upper_arm   = {};
-    this.left_under_arm   = {};
-    this.chest            = {};
-    this.left_under_leg   = {};
-    this.left_upper_leg   = {};
-    this.right_upper_leg  = {};
-    this.right_under_leg  = {}; 
-
-
+    this.joint_size = 1.0;
   }
 
-  async load(url) 
+  async load_npy_motion(fileUrl) 
   {
-    return new Promise(async (resolve, reject) => 
-    {
-      try 
-      {
-        const loader = new npyjs();
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        const parsed = loader.parse(arrayBuffer);
+    const loader = new npyjs();
+    const response = await fetch(fileUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const parsed_npy = loader.parse(arrayBuffer);
 
-        this.motionArray = parsed.data;
-        const [frameCount, jointCount, _] = parsed.shape;
-        this.frameCount = frameCount;
-        this.jointCount = jointCount;
-        
-        
-        resolve(this.npy_object);
+    this.numpy_data = parsed_npy.data;
+    const [frameCount, jointCount, _] = parsed_npy.shape;
+    this.frameCount = frameCount;
+    this.jointCount = jointCount;
 
-        await this.fbx_loader.loadFBXModel('../public/bones.fbx');
-        this.fbx_bones = this.fbx_loader.fbx_object.children[0]; 
-        this.fbx_bones.scale.set(0.002, 0.002, 0.002);
-        this.npy_object.add(this.fbx_bones)
-        
-        this.head             = this.fbx_bones.children.find(c => c.name === 'head');
-        this.right_upper_arm  = this.fbx_bones.children.find(c => c.name === 'right_upper_arm');
-        this.right_under_arm  = this.fbx_bones.children.find(c => c.name === 'right_under_arm');
-        this.left_upper_arm   = this.fbx_bones.children.find(c => c.name === 'left_upper_arm');
-        this.left_under_arm   = this.fbx_bones.children.find(c => c.name === 'left_under_arm');
-        this.chest            = this.fbx_bones.children.find(c => c.name === 'chest');
-        this.left_under_leg   = this.fbx_bones.children.find(c => c.name === 'left_under_leg');
-        this.left_upper_leg   = this.fbx_bones.children.find(c => c.name === 'left_upper_leg');
-        this.right_upper_leg  = this.fbx_bones.children.find(c => c.name === 'right_upper_leg');
-        this.right_under_leg  = this.fbx_bones.children.find(c => c.name === 'right_under_leg');
-      
-      } 
-      catch (e) 
-      {
-        reject(e);
-      }
-    });
+    return this.npy_motion;
   }
 
-  create_spheres_for_joints() 
+  async create_skeleton(skeletonPath, renderer = null) 
+  {
+    const response = await fetch(skeletonPath);
+    const skeleton_json = await response.json();
+    this._create_joints();
+    this._create_bones(skeleton_json);
+    
+  }
+
+  _create_joints() 
   {
     const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const geom = new THREE.SphereGeometry(0.02, 16, 16);
+      const geom = new THREE.SphereGeometry(this.joint_size, 8, 8);
       const sphere = new THREE.Mesh(geom, material);
-      this.npy_object.add(sphere);
-      this.spheres_for_joints.push(sphere);
+      this.npy_motion.add(sphere);
+      this.joints.push(sphere);
     }
   }
 
-  update_joint_positions(frameIdx) 
+  _create_bones(skeleton, renderer = null)
   {
+    const boneGeometry  = new THREE.CylinderGeometry(
+      1.8,          // radiusTop
+      0.8,          // radiusBottom
+      1,            // height
+      8             // radialSegments
+    );
+
+    const boneMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      wireframe: true
+    });
+
+    for (const [childIdx, parentIdx] of skeleton.hierarchy) 
+    {
+      const childJoint  = skeleton.joints[childIdx];
+      const parentJoint = skeleton.joints[parentIdx];
+      
+      const bone_copy = new THREE.Mesh(boneGeometry, boneMaterial);      
+      bone_copy.matrixAutoUpdate = false;
+      this.npy_motion.add(bone_copy);
+
+      this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone_copy });
+      
+    }
+  }
+
+  update_skeleton(frameIdx) 
+  {
+
+    const y_axis = new THREE.Vector3(0, 1, 0);
+    const direction = new THREE.Vector3();
+    const middle_point = new THREE.Vector3();
+
     const base = frameIdx * this.jointCount * 3;
     for (let i = 0; i < this.jointCount; i++) 
     {
-      const x = this.motionArray[base + i * 3 + 0];
-      const y = this.motionArray[base + i * 3 + 1];
-      const z = this.motionArray[base + i * 3 + 2];
-      this.spheres_for_joints[i].position.set(x, y, z);
+      const x = this.numpy_data[base + i * 3 + 0];
+      const y = this.numpy_data[base + i * 3 + 1];
+      const z = this.numpy_data[base + i * 3 + 2];
+      this.joints[i].position.set(x, y, z);
     }
 
-    // Update Skeleton Bones
-    if (this.bones) 
+    for (const elem of this.npy_skeleton) 
     {
-      for (const bone of this.bones) 
-      {
-        
-        
-        const start = this.spheres_for_joints[bone.parentIdx].position;
-        const end = this.spheres_for_joints[bone.childIdx].position;
-        bone.line.geometry.setFromPoints([start.clone(), end.clone()]);
-        bone.line.geometry.verticesNeedUpdate = true;
+      const start = this.joints[elem.parentIdx].position;
+      const end = this.joints[elem.childIdx].position;
+      
+      // cylinder direction parent → child
+      direction.subVectors(end, start);          
+      const len = direction.length();
+      direction.normalize();
 
-        if (bone.childJoint === "Head") 
-        {
-          console.log(bone.childJoint)
-          const direction = new THREE.Vector3().subVectors(end, start).normalize();
-          const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
-          this.head.position.copy(midpoint);
-          console.log(midpoint)
+      middle_point.addVectors(start, end).multiplyScalar(0.5);
 
-          // turn head in direction of bone
-          // this.head.lookAt(end); 
-          
-        }
-      }
+      elem.bone_copy.position.copy(middle_point);
+      elem.bone_copy.quaternion.setFromUnitVectors(y_axis, direction);
+
+      // only scale height
+      elem.bone_copy.scale.set(1, len, 1);                
+      elem.bone_copy.updateMatrix();
+
     }
   }
 
-  async create_skeleton(url, renderer = null) 
-  {
-    const response = await fetch(url);
-    const skeleton = await response.json();
-
-    // TODO: set resolution and pass render to this function 
-    if (renderer) 
-    {
-      const { width, height } = renderer.getSize(new THREE.Vector2());
-      this.boneMaterial.resolution.set(width, height);
-    }
-
-    for (const [childIdx, parentIdx] of skeleton.hierarchy) {
-      // initialize 2 points with each XYZ
-      const positions = [0, 0, 0, 0, 0, 0]; 
-
-      const geometry = new LineGeometry();
-      geometry.setPositions(positions);
-
-      const line = new Line2(geometry, this.boneMaterial);
-      line.computeLineDistances(); // for correct dash / clipping
-
-      const childJoint  = skeleton.joints[childIdx];
-      const parentJoint = skeleton.joints[parentIdx];
-
-      this.npy_object.add(line);
-      this.bones.push({ line, childIdx, parentIdx, parentJoint, childJoint });
-    }
-  }
 }
 
 

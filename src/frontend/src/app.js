@@ -286,7 +286,7 @@ class App
 
       case 'fbx':
         this.fbx_loader = new FBX_Loader();
-        await this.fbx_loader.loadFBXAnimation(fileUrl);
+        await this.fbx_loader.load_fbx_animation(fileUrl);
         scene.add(this.fbx_loader.fbx_object);
 
         currentPlayer = new FBX_Player(this.fbx_loader);
@@ -295,9 +295,8 @@ class App
 
       case 'npy':
         this.npy_loader = new NPY_loader();
-        await this.npy_loader.load(fileUrl);
-        scene.add(this.npy_loader.npy_object);
-        this.npy_loader.create_spheres_for_joints();
+        const npy_motion = await this.npy_loader.load_npy_motion(fileUrl);
+        scene.add(npy_motion);
 
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")

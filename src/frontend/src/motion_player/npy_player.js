@@ -96,7 +96,7 @@ export class NPY_Player
     // last frameIdx leads last undefined joint positions 
     if (this.frameIdx < this.frameCount) 
     {
-      this.npy_loader_object.update_joint_positions(this.frameIdx);
+      this.npy_loader_object.update_skeleton(this.frameIdx);
     }
   }
 }
