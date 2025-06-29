@@ -11,22 +11,20 @@ export class ThumbnailGenerator
         this.loop = loop;
     }
 
-    async loadAndPrepare() {
-      // A · Haupt‑Player für Animation
-      const mainRenderer = new THREE.WebGLRenderer({ antialias: true });
-      document.body.appendChild(mainRenderer.domElement);
-    
+    async loadAndPrepare() 
+    {
+ 
       const player = new NPY_Player(this.npy_loader_object, this.loop);
-      player.play_pause();                          
+      player.play_pause();     
 
-      // B · Versteckte Mini‑Renderer für Thumbnails
+      // hidden mini‑renderer for thumbnails
       const thumbRenderer = new THREE.WebGLRenderer({
-        preserveDrawingBuffer: true,          // <— wichtig für .toBlob()
+        preserveDrawingBuffer: true,          // important for toBlob()
         alpha: false,
       });
 
-      thumbRenderer.setSize(640, 480);         // Thumbnail‑Größe
-      thumbRenderer.domElement.style.display = 'none';  // unsichtbar
+      thumbRenderer.setSize(640, 480);         // thumbnail‑size 
+      thumbRenderer.domElement.style.display = 'none';  // invisible
       document.body.appendChild(thumbRenderer.domElement);
     
       await generateThumbnails({
@@ -34,7 +32,7 @@ export class ThumbnailGenerator
         scene : this.scene,
         camera : this.camera,
         player: player,
-        every: 1,              // nur jeden 5. Frame speichern
+        every: 1,              // save every 5th frame
       });
     }
 
@@ -42,21 +40,25 @@ export class ThumbnailGenerator
 
 
 
-async function generateThumbnails({ renderer, scene, camera, player, every }) {
-  const total = player.frameCount;
+async function generateThumbnails({ renderer, scene, camera, player, every }) 
+{
+  // we add one cause slider starts from 0 and this avoid index error when we load preview images 
+  const total = player.frameCount + 1;
 
-  for (let f = 0; f < total; f += every) {
-    player.gotoFrame(f);             // Pose auf gewünschten Frame setzen
-    renderer.render(scene, camera);  // Off‑screen rendern
+  for (let frameIndex = 0; frameIndex < total; frameIndex += every) 
+  {
+    player.gotoFrame(frameIndex);             // set pose to frame
+    renderer.render(scene, camera);           // off‑screen rendern
 
     const blob = await new Promise(res =>
       renderer.domElement.toBlob(res, 'image/jpeg', 0.8)
     );
 
-    // ➜ an FastAPI schicken; Dateiname ins Header legen
-    await fetch('http://localhost:8000/motion/thumbnails', {
+    // send to FastAPI backend and add file name to header
+    await fetch('http://localhost:8000/motion/thumbnails', 
+    {
       method: 'POST',
-      headers: { 'X-File-Name': `frame_${f.toString().padStart(4, '0')}.jpg` },
+      headers: { 'X-File-Name': `frame_${frameIndex.toString().padStart(4, '0')}.jpg` },
       body: blob,
     });
   }

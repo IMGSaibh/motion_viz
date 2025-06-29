@@ -17,4 +17,14 @@ export default class Utils
   {
     return !!obj && !!scene && !!scene.getObjectByProperty('uuid', obj.uuid);
   }
+
+  static log_camera_position(camera, label = 'Camera') 
+  {
+    if (!camera || !camera.position) return;
+
+    const { x, y, z } = camera.position;
+    console.log(camera.rotation.x, camera.rotation.y, camera.rotation.z);
+    console.log(`${label} position → x: ${x.toFixed(2)}, y: ${y.toFixed(2)}, z: ${z.toFixed(2)}`);
+    console.log(`${label} rotation → x: ${camera.rotation.x.toFixed(2)}, y: ${camera.rotation.y.toFixed(2)}, z: ${camera.rotation.z.toFixed(2)}`);
+}
 }

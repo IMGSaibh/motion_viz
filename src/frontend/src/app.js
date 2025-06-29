@@ -374,6 +374,8 @@ class App
         }
           console.log("loop.updatables ", loop.updatables)
           console.log("=================================================")
+      
+        Utils.log_camera_position(camera);
       }
     });
   }
