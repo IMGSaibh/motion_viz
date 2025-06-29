@@ -20,6 +20,8 @@ app.include_router(motion.router, prefix="/motion")
 # reachable e.g. http://localhost:8000/data/bvh/myFile.bvh
 app.mount("/data", StaticFiles(directory="data"), name="data")
 app.mount("/src", StaticFiles(directory="src/frontend/public"), name="favicon")
+app.mount("/thumbnails", StaticFiles(directory="data/thumbnails"), name="thumbnails")
+
 
 favicon_path = 'src/frontend/public/human.ico'
 @app.get('/favicon.ico', include_in_schema=False)

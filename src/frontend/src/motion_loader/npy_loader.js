@@ -67,10 +67,12 @@ export class NPY_loader
       8             // radialSegments
     );
 
-    const boneMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
-      wireframe: false
-    });
+    // const boneMaterial = new THREE.MeshBasicMaterial({
+    //   color: 0xff0000,
+    //   wireframe: false
+    // });
+
+    const boneMaterial = new THREE.MeshNormalMaterial();
 
     for (const [childIdx, parentIdx] of skeleton.hierarchy) 
     {

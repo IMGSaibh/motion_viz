@@ -46,6 +46,17 @@
     <div id="timeline-container">
       <div id="frame-label">Frame: 0 / 0</div>
       <input type="range" id="frame-slider" min="0" max="100" value="0" />
-  </div>
+      <div id="preview-popup" style="
+        display: none;
+        position: absolute;
+        top: -110px;
+        width: 160px;
+        height: 90px;
+        background: black;
+        border: 1px solid #ccc;
+        pointer-events: none;
+      ">
+      <img id="preview-img" src="" style="width: 100%; height: 100%;" />
+    </div>
   </body>
 </html>
