@@ -1,6 +1,6 @@
 export class FBX_Player 
 {
-  constructor(fbx_loader_object) 
+  constructor(fbx_loader_object, loop) 
   {
     this.fbx_player_object = {};
     this.fbx_loader_object = fbx_loader_object;
@@ -18,6 +18,8 @@ export class FBX_Player
     this.isPlaying = false;
     this.currentKeyFrame = 0;
     this.elapsedTime = 0;
+    this.loop = loop;
+    this.loop.updatables.push(this.fbx_player_object);
     
     this.container.appendChild(this.slider);
     this.label.textContent = `Keyframe: 0 / ${this.keyframeCount}`;
@@ -127,5 +129,13 @@ stop()
   }
 
 
+  dispose()
+  {
+    const index = this.loop.updatables.indexOf(this.fbx_player_object);
+    if (index !== -1) 
+    {
+      this.loop.updatables.splice(index, 1);
+    }
+  }
 
 } 

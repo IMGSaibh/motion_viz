@@ -1,6 +1,6 @@
 export class BVH_Player 
 {
-  constructor(bvh_loader_object) 
+  constructor(bvh_loader_object, loop) 
   {
     this.bvh_player_object = {};
     this.bvh_loader_object = bvh_loader_object;
@@ -13,8 +13,12 @@ export class BVH_Player
     this.slider.step = 1;
     this.slider.value = 0;
     this.currentTime = 0;
+    this.isPlaying = false;
     this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.bvh_loader_object.frameCount}`;
+    this.loop = loop;
+    this.loop.updatables.push(this.bvh_player_object);
+
     
     window.addEventListener('keydown', (e) => 
     {
@@ -36,20 +40,23 @@ export class BVH_Player
 
     this.bvh_player_object.tick = (delta) =>
     {
-      if (this.bvh_loader_object.isPlaying) this.update(delta);
+      if (this.isPlaying) this.update(delta);
     }
   }
 
   update(delta) 
   {
-    if (!this.bvh_loader_object.isPlaying) return;
-    else if (this.getCurrentFrame() == this.bvh_loader_object.frameCount) 
-    {
-      this.bvh_loader_object.isPlaying = false;
-    }
     this.bvh_loader_object.clipAction.play();
     this.bvh_loader_object.mixer.update(delta);
     this.currentTime = this.bvh_loader_object.mixer.time;
+
+    if (!this.isPlaying) return;
+    else if (this.getCurrentFrame() >= this.bvh_loader_object.frameCount) 
+    {
+      this.isPlaying = false;
+    }
+
+
     this.slider.value = this.getCurrentFrame();
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
 
@@ -59,9 +66,8 @@ export class BVH_Player
   play_pause() 
   {
     // toggle play/pause
-    this.bvh_loader_object.isPlaying = !this.bvh_loader_object.isPlaying;
-
-    if(this.getCurrentFrame() == this.bvh_loader_object.frameCount)
+    this.isPlaying = !this.isPlaying;
+    if(this.getCurrentFrame() >= this.bvh_loader_object.frameCount)
     {
       this.bvh_loader_object.mixer.setTime(0);
       this.slider.value = 0;
@@ -74,7 +80,7 @@ export class BVH_Player
   {
     this.currentTime = 0;
     this.slider.value = 0;
-    this.bvh_loader_object.isPlaying = false;
+    this.isPlaying = false;
     this.bvh_loader_object.mixer.time = 0;
     this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
   }
@@ -83,6 +89,20 @@ export class BVH_Player
   {
     return Math.floor(this.bvh_loader_object.mixer.time * this.bvh_loader_object.fps);
   }
+
+  dispose() 
+  {
+    const index = this.loop.updatables.indexOf(this.bvh_player_object);
+    if (index !== -1) 
+    {
+      this.loop.updatables.splice(index, 1);
+    }
+    this.mixer?.stopAllAction();
+    this.mixer?.uncacheRoot(this.rootBone);
+    this.mixer = null;
+    this.bvh_player_object = null;
+  }
+
 
 }
 

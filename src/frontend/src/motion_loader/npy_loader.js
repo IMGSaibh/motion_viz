@@ -4,7 +4,7 @@ import * as THREE from 'three';
 
 export class NPY_loader 
 {
-  constructor() 
+  constructor(scene) 
   {
     this.npy_motion = new THREE.Group();
 
@@ -18,9 +18,11 @@ export class NPY_loader
     this.speed = 1.0;
     this.fps = 60;
     this.joint_size = 1.0;
+    this.scene = scene;
+
   }
 
-  async load_npy_motion(fileUrl) 
+  async load_npy_animation(fileUrl) 
   {
     const loader = new npyjs();
     const response = await fetch(fileUrl);
@@ -31,8 +33,7 @@ export class NPY_loader
     const [frameCount, jointCount, _] = parsed_npy.shape;
     this.frameCount = frameCount;
     this.jointCount = jointCount;
-
-    return this.npy_motion;
+    this.scene.add(this.npy_motion);
   }
 
   async create_skeleton(skeletonPath, renderer = null) 
@@ -68,7 +69,7 @@ export class NPY_loader
 
     const boneMaterial = new THREE.MeshBasicMaterial({
       color: 0xff0000,
-      wireframe: true
+      wireframe: false
     });
 
     for (const [childIdx, parentIdx] of skeleton.hierarchy) 
@@ -76,11 +77,11 @@ export class NPY_loader
       const childJoint  = skeleton.joints[childIdx];
       const parentJoint = skeleton.joints[parentIdx];
       
-      const bone_copy = new THREE.Mesh(boneGeometry, boneMaterial);      
-      bone_copy.matrixAutoUpdate = false;
-      this.npy_motion.add(bone_copy);
+      const bone = new THREE.Mesh(boneGeometry, boneMaterial);      
+      bone.matrixAutoUpdate = false;
+      this.npy_motion.add(bone);
 
-      this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone_copy });
+      this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone });
       
     }
   }
@@ -108,19 +109,45 @@ export class NPY_loader
       
       // cylinder direction parent → child
       direction.subVectors(end, start);          
-      const len = direction.length();
+      const length = direction.length();
       direction.normalize();
 
       middle_point.addVectors(start, end).multiplyScalar(0.5);
 
-      elem.bone_copy.position.copy(middle_point);
-      elem.bone_copy.quaternion.setFromUnitVectors(y_axis, direction);
+      elem.bone.position.copy(middle_point);
+      elem.bone.quaternion.setFromUnitVectors(y_axis, direction);
 
       // only scale height
-      elem.bone_copy.scale.set(1, len, 1);                
-      elem.bone_copy.updateMatrix();
+      elem.bone.scale.set(1, length, 1);                
+      elem.bone.updateMatrix();
 
     }
+  }
+
+  dispose() 
+  {
+    if (!this.npy_motion) return;
+
+    // free gpu‑ressources
+    this.npy_motion.traverse(obj => 
+    {
+      if (obj.isMesh) 
+      {
+        obj.geometry.dispose();
+        if (Array.isArray(obj.material)) 
+        {
+          obj.material.forEach(m => m.dispose());
+        } 
+        else
+        {
+          obj.material.dispose();
+        }
+      }
+    });
+
+    this.npy_motion.clear();
+    this.scene.remove(this.npy_motion);
+    this.npy_motion = null;
   }
 
 }
