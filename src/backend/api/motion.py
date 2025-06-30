@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List
 from pathlib import Path
-from fastapi import UploadFile, File, APIRouter
+from fastapi import UploadFile, File, APIRouter, Request
 from backend.motion_parser.csv_parser import CSVParser
 from backend.motion_parser.bvh_parser import BvhParser 
 from backend.motion_parser.csv_c3d_parser import CSV_C3D_Parser
@@ -198,3 +198,14 @@ async def list_motion_files():
         "fbx": [f.name for f in fbx_dir.glob("*.fbx")],
         "npy": [f.name for f in npy_dir.glob("*.npy")]
     }
+
+@router.post("/thumbnails")
+async def upload_thumb(request: Request):
+
+    thumbnails_dir = Path.joinpath(workspacefolder, "data/thumbnails/")
+    thumbnails_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = request.headers.get("X-File-Name", "thumb.jpg")
+    data = await request.body()
+    (thumbnails_dir / filename).write_bytes(data)
+    return {"ok": True}

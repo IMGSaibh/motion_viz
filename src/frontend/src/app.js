@@ -12,6 +12,7 @@ import { BVH_Player } from './motion_player/bvh_player.js';
 import { NPY_Player } from './motion_player/npy_player.js';
 import { FBX_Player } from './motion_player/fbx_player.js';
 import Utils from './utils.js';
+import {ThumbnailGenerator} from './thumbnail_generator.js';
 
 let camera;
 let renderer;
@@ -69,7 +70,8 @@ class App
       
       try 
       {
-      const serverResponse = await fetch("http://localhost:8000/motion/uploads", {
+      const serverResponse = await fetch("http://localhost:8000/motion/uploads", 
+      {
         method: "POST",
         body: formData,
       });
@@ -99,7 +101,8 @@ class App
       status.textContent = "";
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", 
+        {
           method: "POST"
         });
 
@@ -129,7 +132,8 @@ class App
 
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_kinectv1_to_npy", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_kinectv1_to_npy", 
+        {
           method: "POST"
         });
 
@@ -160,7 +164,8 @@ class App
 
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_c3d_to_npy", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_c3d_to_npy", 
+        {
           method: "POST"
         });
 
@@ -191,7 +196,8 @@ class App
 
       try 
       {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_segmentbased_to_npy", {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_segmentbased_to_npy", 
+        {
           method: "POST"
         });
 
@@ -293,11 +299,18 @@ class App
         this.currentLoader = new NPY_loader(scene);
         await this.currentLoader.load_npy_animation(fileUrl);
 
+        
         const skeletonPath = fileUrl
         .replace("/numpy_converted/", "/json/")
         .replace(".npy", "_skeleton_converted.json");
         await this.currentLoader.create_skeleton(skeletonPath);
+
+        // const thumbnailGenerator = new ThumbnailGenerator(scene, camera, this.currentLoader, loop);
+        // await thumbnailGenerator.loadAndPrepare();
+        
         this.currentPlayer = new NPY_Player(this.currentLoader, loop);
+
+
         break;
     }
   }
@@ -361,9 +374,43 @@ class App
         }
           console.log("loop.updatables ", loop.updatables)
           console.log("=================================================")
+      
+        Utils.log_camera_position(camera);
       }
     });
   }
+
+
+   slider_preview_frame()
+  {
+    const slider = document.getElementById("frame-slider");
+    const preview = document.getElementById("preview-popup");
+    const previewImg = document.getElementById("preview-img");
+
+    slider.addEventListener("mousemove", (e) => 
+    {
+      const rect = slider.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      const frameIndex = Math.round(percent * (slider.max - slider.min));
+
+      // preview window position 
+      preview.style.left = `${e.clientX - rect.left + 60}px`;
+      preview.style.display = "block";
+
+      // Base-URL deines Backends
+      const base_url = "http://localhost:8000"; // FastAPI runs at 8000
+      previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
+    });
+
+    slider.addEventListener("mouseleave", () => 
+    {
+      preview.style.display = "none";
+    });
+
+  }
+
+
+
 }
 
 
