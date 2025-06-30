@@ -393,15 +393,13 @@ class App
       const percent = (e.clientX - rect.left) / rect.width;
       const frameIndex = Math.round(percent * (slider.max - slider.min));
 
-      // Position des Vorschau-Popups
-      preview.style.left = `${e.clientX - rect.left - 80}px`; // -80 = Hälfte der Vorschau-Breite
+      // preview window position 
+      preview.style.left = `${e.clientX - rect.left + 60}px`;
       preview.style.display = "block";
 
       // Base-URL deines Backends
-      const base_url = "http://localhost:8000"; // FastAPI läuft auf 8000
-
+      const base_url = "http://localhost:8000"; // FastAPI runs at 8000
       previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
-
     });
 
     slider.addEventListener("mouseleave", () => 
