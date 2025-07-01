@@ -4,14 +4,16 @@ import numpy as np
 from pymotion.io.bvh import BVH
 from pymotion.ops.skeleton import fk
 import backend.api.pv as pv
-import backend.api.pv_utils as pv_utils
+# import backend.api.pv_utils as pv_utils
+from backend.json_loader import JsonLoader
 
 class PVParser:
     def __init__(self, file_path: str):
-        directory = Path(file_path).parent
-        json_desc = directory / "json_descs" / "mvnx.json"
+        workspacefolder = Path.cwd()
+        mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/descriptor_files/mvnx.json")
+        # json_desc = JsonLoader(mvnx_descriptor_file)
 
-        reader = pv.MotionDataReader(file_path, json_desc)
+        reader = pv.MotionDataReader(file_path, mvnx_descriptor_file)
 
         self.positions = reader.positions * 100
         self.r_hierarchy = reader.generateJointHierarchyArray()

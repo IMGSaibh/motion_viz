@@ -1,6 +1,6 @@
 import pprint
 import numpy as np
-import backend.api.pv_utils as pv_utils
+import backend.api.pv_utils as utils
 import scipy.io
 import pyquaternion
 import pandas
@@ -269,7 +269,7 @@ class DataReader:
 class DataReaderMMM(DataReader):
     def __init__(self, filename, desc):
         # TODO make available for all XML Trees. e.g. parse tag names in json desc
-        super().__init__(filename, MocapDataXMLDesc(desc))
+        super().__init__(filename, MocapDataDesc(desc))
 
         self.mmm_decls = {}
         with open("mmm_hier.json", "r") as mmm_hier_file:

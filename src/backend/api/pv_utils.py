@@ -509,15 +509,13 @@ def globrot_locrot_frame(gr_frame, j_dict):
     lr_frame = gr_inv[:, [3, 0, 1, 2]]
     return lr_frame
 
-
-def convert_to_quatrots(rots, rot_rep):
     
     framecount = rots.shape[0]
     jointcount = rots.shape[1]
 
     print("Converting rotations to Quaternion for {} frames.".format(framecount))
 
-    ret_ = np.array([utils.E2Q(r, self.desc.rot_order) for r in rrots])
+    ret_ = np.array([E2Q(r, self.desc.rot_order) for r in rrots])
 
     ret = []
     for frame in rots:
