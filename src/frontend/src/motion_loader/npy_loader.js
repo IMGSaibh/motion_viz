@@ -17,7 +17,7 @@ export class NPY_loader
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.joint_size = 1.0;
+    this.joint_size = 1.2;
     this.scene = scene;
 
   }
@@ -61,8 +61,8 @@ export class NPY_loader
   _create_bones(skeleton, renderer = null)
   {
     const boneGeometry  = new THREE.CylinderGeometry(
-      1.8,          // radiusTop
-      0.8,          // radiusBottom
+      2.03,          // radiusTop
+      2.03,          // radiusBottom
       1,            // height
       8             // radialSegments
     );
