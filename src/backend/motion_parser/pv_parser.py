@@ -3,15 +3,15 @@ from pathlib import Path
 import numpy as np
 from pymotion.io.bvh import BVH
 from pymotion.ops.skeleton import fk
-import backend.api.pv as pv
-import backend.api.pv_utils as pv_utils
+
+from mocap_loader import MotionDataReader
 
 class PVParser:
     def __init__(self, file_path: str):
         directory = Path(file_path).parent
         json_desc = directory / "json_descs" / "mvnx.json"
 
-        reader = pv.MotionDataReader(
+        reader = MotionDataReader(
             file_path, json_desc)
 
         self.positions = reader.positions * 100
@@ -21,7 +21,8 @@ class PVParser:
 
     def save_npy(self, out_path: str):
         arr = self.positions
-        np.save(out_path, arr)
+        a = np.ascontiguousarray(arr)
+        np.save(out_path, a)
         print(f"Saved global positions array with shape {arr.shape} to {out_path}")
 
 
