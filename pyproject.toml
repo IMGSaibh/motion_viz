@@ -17,6 +17,15 @@ dependencies = [
     "scipy (>=1.15.3,<2.0.0)",
     "pandas (>=2.3.0,<3.0.0)",
     "upc-pymotion (>=0.2.3,<0.3.0)",
+    "pyquaternion (>=0.9.9,<0.10.0)",
+    "bvhtoolbox (>=0.1.3,<0.2.0)",
+    "cdflib (>=1.3.4,<2.0.0)",
+    "mvnx @ git+https://github.com/edscher/mvnx.git",
+    "ezc3d (>=1.5.19,<2.0.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "h5py (>=3.14.0,<4.0.0)",
+    "mat73 (>=0.65,<0.66)",
+    "mocap-loader @ git+https://github.com/edscher/mocap_loader",
 ]
 
 [project.optional-dependencies]

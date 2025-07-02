@@ -2,6 +2,7 @@ import numpy as np
 from typing import List
 from pathlib import Path
 from fastapi import UploadFile, File, APIRouter, Request
+from backend.motion_parser.pv_parser import PVParser
 from backend.motion_parser.csv_parser import CSVParser
 from backend.motion_parser.bvh_parser import BvhParser 
 from backend.motion_parser.csv_c3d_parser import CSV_C3D_Parser
@@ -50,6 +51,34 @@ async def upload(files: List[UploadFile] = File(...)):
         "not_supported_files": ", ".join(not_saved_files)
     }
 
+@router.post("/convert_pv_style")
+async def convert_pv_style():
+    workspacefolder = Path.cwd()
+    mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
+    numpy_converted_dir = Path.joinpath(workspacefolder, "data/numpy_converted")
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
+    pv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
+
+    mvnx_files = list(mvnx_dir_path.glob("*.mvnx")) 
+
+    if not mvnx_files:
+        return {
+            "warning": "Found no pv-compatible files.",
+            "message": "",
+        }
+
+    for mvnx_file in mvnx_files:
+        pv_parser = PVParser(mvnx_file)
+        save_npy_path = Path.joinpath(numpy_converted_dir, f"{mvnx_file.name[:-4]}")  # Remove file extension
+        pv_parser.save_npy(save_npy_path)
+
+        save_json_skeleton_path = Path.joinpath(pv_json_skeleton_dir, f"{mvnx_file.name[:-4]}_skeleton_converted.json")
+        pv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+
+    return {
+        "message": "pv-compatible files converted",
+        "warning": "",
+    }
 
 @router.post("/convert_bvh_to_npy")
 async def convert_bvh_to_npy():
@@ -68,6 +97,8 @@ async def convert_bvh_to_npy():
         }
 
     for bvh_file in bvh_files:
+        print(f"processing {bvh_file}")
+        print("==========================================================================================================================")
         bvh_parser = BvhParser(bvh_file)
         save_npy_path = Path.joinpath(numpy_converted_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
         bvh_parser.save_npy(save_npy_path)

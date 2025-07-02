@@ -28,10 +28,6 @@ class JsonLoader:
             self._data = json.load(f)
 
     def _traverse(self, dotted_key: str) -> tuple[Any, bool]:
-        """
-        Läuft rekursiv durch verschachtelte Strukturen.
-        Gibt (value, found_flag) zurück.
-        """
         current: Any = self._data
         parts: List[str] = dotted_key.split(".")
         for part in parts:

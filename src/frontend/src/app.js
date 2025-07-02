@@ -93,6 +93,36 @@ class App
     });
   }
 
+  convert_pv_style() 
+  {
+    document.getElementById("convert_pv_style_btn").addEventListener("click", async () => 
+    {
+      const status = document.getElementById("convert_pv_style_status");
+      status.textContent = "";
+      try 
+      {
+        const serverResponse = await fetch("http://localhost:8000/motion/convert_pv_style", {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+      }
+      catch (error) 
+      {
+        status.textContent = `❌${error.message}`;
+      }
+
+    });
+  }
+
   convert_bvh_to_npy() 
   {
     document.getElementById("convert_bvh_to_npy_btn").addEventListener("click", async () => 
