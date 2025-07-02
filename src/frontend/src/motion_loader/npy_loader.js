@@ -1,5 +1,7 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
+import { JointAxesVisualizer } from '../components/JointOrientation.js';
+
 
 
 export class NPY_loader 
@@ -19,6 +21,8 @@ export class NPY_loader
     this.fps = 60;
     this.joint_size = 1.2;
     this.scene = scene;
+    this.vis = null;
+
 
   }
 
@@ -56,6 +60,7 @@ export class NPY_loader
       this.npy_motion.add(sphere);
       this.joints.push(sphere);
     }
+    this.vis = new JointAxesVisualizer(this.scene, this.jointCount, { axesSize: 0.1 });
   }
 
   _create_bones(skeleton, renderer = null)
@@ -102,7 +107,10 @@ export class NPY_loader
       const y = this.numpy_data[base + i * 3 + 1];
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
+      this.vis.update(joints[i]);  // joints = [{ position:[x,y,z], quaternion:[x,y,z,w] }, …]
     }
+
+
 
     for (const elem of this.npy_skeleton) 
     {

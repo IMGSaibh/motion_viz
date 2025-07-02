@@ -351,6 +351,7 @@ class App
     {
       case 'bvh': return 'bvh';
       case 'fbx': return 'fbx';
+      case 'mvnx': return 'mvnx';
       case 'npy': return 'numpy_converted';
       default: return '';
     }
@@ -427,7 +428,6 @@ class App
       preview.style.left = `${e.clientX - rect.left + 60}px`;
       preview.style.display = "block";
 
-      // Base-URL deines Backends
       const base_url = "http://localhost:8000"; // FastAPI runs at 8000
       previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
     });

@@ -216,9 +216,10 @@ async def convert_csv_segmentbased_to_npy():
 async def list_motion_files():
 
     # make sure that directories exists
-    bvh_dir = Path.joinpath(workspacefolder, "data/bvh/")
-    fbx_dir = Path.joinpath(workspacefolder, "data/fbx/")
-    npy_dir = Path.joinpath(workspacefolder, "data/numpy_converted/")
+    bvh_dir     = Path.joinpath(workspacefolder, "data/bvh/")
+    fbx_dir     = Path.joinpath(workspacefolder, "data/fbx/")
+    mvnx_dir    = Path.joinpath(workspacefolder, "data/mvnx/")
+    npy_dir     = Path.joinpath(workspacefolder, "data/numpy_converted/")
 
     bvh_dir.mkdir(parents=True, exist_ok=True)
     fbx_dir.mkdir(parents=True, exist_ok=True)
@@ -227,6 +228,7 @@ async def list_motion_files():
     return {
         "bvh": [f.name for f in bvh_dir.glob("*.bvh")],
         "fbx": [f.name for f in fbx_dir.glob("*.fbx")],
+        "mvnx":[f.name for f in mvnx_dir.glob("*.mvnx")],
         "npy": [f.name for f in npy_dir.glob("*.npy")]
     }
 
