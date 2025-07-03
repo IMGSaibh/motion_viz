@@ -19,9 +19,10 @@ export class NPY_loader
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.joint_size = 1.2;
+    this.joint_size = 0.2;
     this.scene = scene;
     this.vis = null;
+    this.jointAxisOrientation = [];
 
 
   }
@@ -60,14 +61,15 @@ export class NPY_loader
       this.npy_motion.add(sphere);
       this.joints.push(sphere);
     }
-    this.vis = new JointAxesVisualizer(this.scene, this.jointCount, { axesSize: 0.1 });
+
+    this.vis = new JointAxesVisualizer(this.scene, this.jointCount, { axesSize: 10.4 });
   }
 
   _create_bones(skeleton, renderer = null)
   {
     const boneGeometry  = new THREE.CylinderGeometry(
-      2.03,          // radiusTop
-      2.03,          // radiusBottom
+      1.0,          // radiusTop
+      1.0,          // radiusBottom
       1,            // height
       8             // radialSegments
     );
@@ -107,9 +109,9 @@ export class NPY_loader
       const y = this.numpy_data[base + i * 3 + 1];
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
-      this.vis.update(joints[i]);  // joints = [{ position:[x,y,z], quaternion:[x,y,z,w] }, …]
+      this.jointAxisOrientation.push({ position: [x, y, z] });
     }
-
+    
 
 
     for (const elem of this.npy_skeleton) 
@@ -131,7 +133,13 @@ export class NPY_loader
       elem.bone.scale.set(1, length, 1);                
       elem.bone.updateMatrix();
 
+      const quat = new THREE.Quaternion().setFromUnitVectors(y_axis, direction);
+
+      this.jointAxisOrientation[elem.childIdx].quaternion = [quat.x, quat.y, quat.z, quat.w];
     }
+
+    this.vis.update(this.jointAxisOrientation);  // joints = [{ position:[x,y,z], quaternion:[x,y,z,w] }, …]
+
   }
 
   dispose() 
