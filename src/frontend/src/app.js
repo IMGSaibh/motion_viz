@@ -412,32 +412,33 @@ class App
   }
 
 
-   slider_preview_frame()
-  {
-    const slider = document.getElementById("frame-slider");
-    const preview = document.getElementById("preview-popup");
-    const previewImg = document.getElementById("preview-img");
+  // TODO: implement slider preview when needed. Just uncomment the code below.
+  // slider_preview_frame()
+  // {
+  //   const slider = document.getElementById("frame-slider");
+  //   const preview = document.getElementById("preview-popup");
+  //   const previewImg = document.getElementById("preview-img");
 
-    slider.addEventListener("mousemove", (e) => 
-    {
-      const rect = slider.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      const frameIndex = Math.round(percent * (slider.max - slider.min));
+  //   slider.addEventListener("mousemove", (e) => 
+  //   {
+  //     const rect = slider.getBoundingClientRect();
+  //     const percent = (e.clientX - rect.left) / rect.width;
+  //     const frameIndex = Math.round(percent * (slider.max - slider.min));
 
-      // preview window position 
-      preview.style.left = `${e.clientX - rect.left + 60}px`;
-      preview.style.display = "block";
+  //     // preview window position 
+  //     preview.style.left = `${e.clientX - rect.left + 60}px`;
+  //     preview.style.display = "block";
 
-      const base_url = "http://localhost:8000"; // FastAPI runs at 8000
-      previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
-    });
+  //     const base_url = "http://localhost:8000"; // FastAPI runs at 8000
+  //     previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
+  //   });
 
-    slider.addEventListener("mouseleave", () => 
-    {
-      preview.style.display = "none";
-    });
+  //   slider.addEventListener("mouseleave", () => 
+  //   {
+  //     preview.style.display = "none";
+  //   });
 
-  }
+  // }
 
 
 

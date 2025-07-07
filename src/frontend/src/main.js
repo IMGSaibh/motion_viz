@@ -16,7 +16,7 @@ function main()
 	
 	app.setup_file_dropdown();
 
-	app.slider_preview_frame();
+	// app.slider_preview_frame();
 	
 	app.cleanup_scene();
 	app.print_updateables();
