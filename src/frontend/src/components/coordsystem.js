@@ -41,13 +41,18 @@ function createMetricAxis({ from = -5, to = 5, color = 0xff0000, axis = 'x', tic
     tickEnd[axis] = i;
 
     // tick perpendicular to the axis
-    if (axis === 'x') {
+    if (axis === 'x') 
+    {
       tickStart.y = -tickSize;
       tickEnd.y = tickSize;
-    } else if (axis === 'y') {
+    } 
+    else if (axis === 'y') 
+    {
       tickStart.x = -tickSize;
       tickEnd.x = tickSize;
-    } else if (axis === 'z') {
+    } 
+    else if (axis === 'z') 
+    {
       tickStart.y = -tickSize;
       tickEnd.y = tickSize;
     }
@@ -65,12 +70,20 @@ function createMetricAxis({ from = -5, to = 5, color = 0xff0000, axis = 'x', tic
     label.anchorY = 'top';
     label.position.copy(tickStart);
 
-    if (axis === 'x') {
+    if (axis === 'x') 
+    {
       label.position.y = -tickSize * 3;
-    } else if (axis === 'y') {
+      group.name ="Origin_Axis_X";
+    } 
+    else if (axis === 'y')
+    {
       label.position.x = -tickSize * 3;
-    } else if (axis === 'z') {
+      group.name ="Origin_Axis_Y";
+    } 
+    else if (axis === 'z') 
+    {
       label.position.y = -tickSize * 3;
+      group.name ="Origin_Axis_Z";
     }
 
     label.sync();

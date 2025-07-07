@@ -6,6 +6,7 @@ function createScene() {
   const scene = new Scene();
   const light = createLights();
   const gridHelper = new GridHelper(3000, 60);
+  gridHelper.name = "Grid";
   scene.add(gridHelper, light);
 
   // x-axis from -5 - 5 meters

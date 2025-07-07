@@ -390,7 +390,7 @@ class App
         for (let index = 0; index < scene.children.length; index++) 
         {
           const element = scene.children[index];
-          console.log(element.type);
+          console.log(`Object type: ${element.type} | Name: ${element.name}`);
         }
 
         console.log("loop.updatables.length ", loop.updatables.length);
@@ -404,9 +404,9 @@ class App
           
         }
           console.log("loop.updatables ", loop.updatables)
+          Utils.log_camera_position(camera);
           console.log("=================================================")
       
-        Utils.log_camera_position(camera);
       }
     });
   }

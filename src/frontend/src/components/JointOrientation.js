@@ -32,7 +32,7 @@ export class JointAxesVisualizer {
     /** @type {THREE.Object3D[]} */
     this.jointGroups = [];
 
-    this.#createAxesHelpers();
+    this.createAxesHelpers();
   }
 
   /**
@@ -92,7 +92,7 @@ export class JointAxesVisualizer {
     this.jointGroups.length = 0;
   }
 
-  #createAxesHelpers() 
+  createAxesHelpers() 
   {
     for (let i = 0; i < this.jointCount; i++) 
     {
