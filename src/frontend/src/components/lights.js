@@ -5,6 +5,7 @@ function createLights()
     // Create a directional light
     const light = new DirectionalLight('white', 8);
     light.position.set(10, 10, 10);
+    light.name = "Light";
 
     return light;
 }

@@ -1,5 +1,7 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
+import { JointAxesVisualizer } from '../components/JointOrientation.js';
+
 
 
 export class NPY_loader 
@@ -7,6 +9,7 @@ export class NPY_loader
   constructor(scene) 
   {
     this.npy_motion = new THREE.Group();
+    this.npy_motion.name = "npy_motion";
 
     this.numpy_data = null;
     this.currentFrame = 0;
@@ -17,8 +20,11 @@ export class NPY_loader
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.joint_size = 1.2;
+    this.joint_size = 0.2;
     this.scene = scene;
+    this.jointAxisVisualizer = null;
+    this.jointAxisOrientations = [];
+
 
   }
 
@@ -33,6 +39,12 @@ export class NPY_loader
     const [frameCount, jointCount, _] = parsed_npy.shape;
     this.frameCount = frameCount;
     this.jointCount = jointCount;
+
+    // // TODO: uncomment to use this
+    // this.jointAxisOrientations = Array.from({ length: this.jointCount }, () => ({
+    //   position:   [0, 0, 0],      
+    //   quaternion: [0, 0, 0, 1]    
+    // }));
     this.scene.add(this.npy_motion);
   }
 
@@ -56,13 +68,15 @@ export class NPY_loader
       this.npy_motion.add(sphere);
       this.joints.push(sphere);
     }
+
+    this.jointAxisVisualizer = new JointAxesVisualizer(this.scene, this.jointCount, { axesSize: 10.4 });
   }
 
   _create_bones(skeleton, renderer = null)
   {
     const boneGeometry  = new THREE.CylinderGeometry(
-      2.03,          // radiusTop
-      2.03,          // radiusBottom
+      1.0,          // radiusTop
+      1.0,          // radiusBottom
       1,            // height
       8             // radialSegments
     );
@@ -102,7 +116,16 @@ export class NPY_loader
       const y = this.numpy_data[base + i * 3 + 1];
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
+
+      // jointAxisPoint is a reference to the position of the joint axis orientation
+      // // TODO: uncomment to use this
+      // const jointAxisPoint = this.jointAxisOrientations[i].position;
+      // jointAxisPoint[0] = x;
+      // jointAxisPoint[1] = y;
+      // jointAxisPoint[2] = z;
     }
+    
+
 
     for (const elem of this.npy_skeleton) 
     {
@@ -123,7 +146,20 @@ export class NPY_loader
       elem.bone.scale.set(1, length, 1);                
       elem.bone.updateMatrix();
 
+      // jointAxisPoint is a reference to the quaternion of the joint axis orientation
+      // // TODO: uncomment to use this
+      // const quat = new THREE.Quaternion().setFromUnitVectors(y_axis, direction);
+      // const q = this.jointAxisOrientations[elem.childIdx].quaternion;
+      // q[0] = quat.x;
+      // q[1] = quat.y;
+      // q[2] = quat.z;
+      // q[3] = quat.w;
+
     }
+
+    // // TODO: uncomment to use this
+    // this.jointAxisVisualizer.update(this.jointAxisOrientations); 
+
   }
 
   dispose() 
@@ -150,6 +186,9 @@ export class NPY_loader
     this.npy_motion.clear();
     this.scene.remove(this.npy_motion);
     this.npy_motion = null;
+
+    // // TODO: uncomment to use this
+    // this.jointAxisVisualizer.dispose();
   }
 
 }

@@ -9,7 +9,6 @@ class PVParser:
     def __init__(self, file_path: str):
         workspacefolder = Path.cwd()
         mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/descriptor_files/mvnx.json")
-        # json_desc = JsonLoader(mvnx_descriptor_file)
 
         reader = MotionDataReader(file_path, mvnx_descriptor_file)
 
