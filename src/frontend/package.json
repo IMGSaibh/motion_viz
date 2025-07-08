@@ -10,10 +10,14 @@
   "dependencies": {
     "npyjs": "^0.7.0",
     "three": "^0.176.0",
-    "troika-three-text": "^0.52.4"
+    "three-text-geometry": "^0.2.0"
   },
   "devDependencies": {
+    "@types/node": "^24.0.10",
+    "@types/three": "^0.178.0",
     "@vitejs/plugin-react": "^3.0.0",
-    "vite": "^4.0.0"
+    "typescript": "^5.8.3",
+    "vite": "^4.0.0",
+    "vite-plugin-checker": "^0.9.3"
   }
 }
