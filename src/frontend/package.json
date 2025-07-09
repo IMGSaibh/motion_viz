@@ -13,7 +13,11 @@
     "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
+    "@types/node": "^24.0.10",
+    "@types/three": "^0.178.0",
     "@vitejs/plugin-react": "^3.0.0",
-    "vite": "^4.0.0"
+    "typescript": "^5.8.3",
+    "vite": "^4.0.0",
+    "vite-plugin-checker": "^0.9.3"
   }
 }

@@ -64,3 +64,15 @@ poetry install
 }
 
 ```
+
+### Commands
+
+start server
+``` bash
+npm run dev
+```
+
+start tTyp‑checker parallel 
+``` bash
+npm run type-check -- --watch
+```
