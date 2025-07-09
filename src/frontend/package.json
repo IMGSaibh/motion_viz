@@ -10,7 +10,7 @@
   "dependencies": {
     "npyjs": "^0.7.0",
     "three": "^0.176.0",
-    "three-text-geometry": "^0.2.0"
+    "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",
