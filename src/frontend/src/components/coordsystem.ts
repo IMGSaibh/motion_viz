@@ -3,7 +3,6 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import TextGeometry, { BMFont } from 'three-text-geometry';
-
 /**
  * Helper to build an MSDF text mesh via three-text-geometry.
  * Supply the parsed BMFont JSON data and its matching texture.
@@ -44,9 +43,9 @@ export interface MetricAxisOptions {
   /** Line width in pixels */
   linewidth?: number;
   /** Parsed BMFont definition (JSON parsed to object) */
-  font: BMFont;
+  // font: BMFont;
   /** Texture belonging to the BMFont (MSDF/SDF atlas) */
-  texture: THREE.Texture;
+  // texture: THREE.Texture;
 }
 
 /**
@@ -60,12 +59,19 @@ export function createMetricAxis({
   color = 0xff0000,
   axis = 'x',
   tickSize = 0.1,
-  linewidth = 3,
-  font,
-  texture,
+  linewidth = 3
+  // font,
+  // texture,
 }: MetricAxisOptions): THREE.Group {
   const group = new THREE.Group();
+    // 1. Font‑JSON und Texture laden
 
+  const loader = new THREE.TextureLoader();
+  
+  const [font, texture] = await Promise.all([
+    fetch('/fonts/roboto-msdf.json').then(r => r.json()) as Promise<BMFont>,
+    loader.loadAsync('/fonts/roboto-msdf.png') as Promise<THREE.Texture>
+  ])
   // ---------------------------------------------------------------------
   // main axis (Line2)
   // ---------------------------------------------------------------------
@@ -122,11 +128,16 @@ export function createMetricAxis({
     const labelMesh = createTextLabel(`${i}m`, 0.3, color, font, texture);
     labelMesh.position.copy(tickStart);
 
-    if (axis === 'x') {
+    if (axis === 'x') 
+    {
       labelMesh.position.y = -tickSize * 3;
-    } else if (axis === 'y') {
+    } 
+    else if (axis === 'y')
+    {
       labelMesh.position.x = -tickSize * 3;
-    } else {
+    } 
+    else 
+    {
       labelMesh.position.y = -tickSize * 3;
     }
 
