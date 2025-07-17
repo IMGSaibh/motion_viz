@@ -70,7 +70,7 @@ export default class Utils
     });
   }
 
-  static generic_inputbutton_fastAPI_with(btn_element: string, status_element: string, input_element: string, fastAPI_url: string)
+  static generic_inputbutton_fastAPI_inputelement(btn_element: string, status_element: string, input_element: string, fastAPI_url: string)
   {
     document.getElementById(btn_element)!.addEventListener("click", async () => 
     {

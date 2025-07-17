@@ -59,7 +59,7 @@ class App
 
   upload_files()
   {
-    Utils.generic_inputbutton_fastAPI_with("upload_files_btn", 
+    Utils.generic_inputbutton_fastAPI_inputelement("upload_files_btn", 
       "client_uploads_status", 
       "upload_files", 
       "http://localhost:8000/motion/uploads");
