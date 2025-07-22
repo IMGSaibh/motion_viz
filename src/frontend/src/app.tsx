@@ -25,6 +25,9 @@ class App
   scene: Scene;
   camera: PerspectiveCamera;
   renderer: WebGLRenderer;
+  // Z.B. in App.tsx oder irgendwo global
+  previewRenderer: WebGLRenderer; 
+
   loop: Loop;
   currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
   currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
@@ -43,6 +46,10 @@ class App
 
     this.currentLoader = null;
     this.currentPlayer = null;
+
+    this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
+    this.previewRenderer.setSize(260, 190, false);
+
 
   }
   
@@ -224,6 +231,10 @@ class App
           const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
           slider!.value = '0';
           label!.textContent = `Frame: 0 / 0`;
+          if (this.previewRenderer) 
+          {
+            this.previewRenderer.dispose();
+          }
         }
       }
     });
@@ -274,18 +285,37 @@ class App
       return;
     }
 
-    slider.addEventListener("mousemove", (e) => 
+    // slider.addEventListener("mousemove", (e) => 
+    // {
+    //   const rect = slider.getBoundingClientRect();
+    //   const percent = (e.clientX - rect.left) / rect.width;
+    //   const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
+
+    //   // preview window position 
+    //   preview.style.left = `${e.clientX - rect.left + 60}px`;
+    //   preview.style.display = "block";
+
+    //   const base_url = "http://localhost:8000"; // FastAPI runs at 8000
+    //   previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
+    // });
+
+
+    slider.addEventListener("mousemove", async (e) => 
     {
       const rect = slider.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
       const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
 
-      // preview window position 
       preview.style.left = `${e.clientX - rect.left + 60}px`;
       preview.style.display = "block";
-
-      const base_url = "http://localhost:8000"; // FastAPI runs at 8000
-      previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
+      if (this.currentPlayer instanceof NPY_Player) 
+      {
+        const thumbDataUrl = await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
+        if (thumbDataUrl) 
+        {
+          previewImg.src = thumbDataUrl;
+        }
+      }
     });
 
     slider.addEventListener("mouseleave", () => 
