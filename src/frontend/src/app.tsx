@@ -192,8 +192,8 @@ class App
 
         
         const skeletonPath = fileUrl
-        .replace("/numpy_converted/", "/json/")
-        .replace(".npy", "_skeleton_converted.json");
+        .replace("/npy/", "/json/")
+        .replace(".npy", "_skeleton.json");
         await this.currentLoader.create_skeleton(skeletonPath);
 
         // const thumbnailGenerator = new ThumbnailGenerator(scene, camera, this.currentLoader, loop);
