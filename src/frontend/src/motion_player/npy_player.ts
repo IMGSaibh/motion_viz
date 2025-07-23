@@ -1,6 +1,6 @@
 import { NPY_loader } from '@/motion_loader/npy_loader';
 import { Loop, Updatable } from '@/system/loop';
-
+import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class NPY_Player 
 {
@@ -145,4 +145,31 @@ export class NPY_Player
       this.loop.updatables.splice(index, 1);
     }
   }
+
+  async renderThumbnail(
+    frameIndex: number,
+    scene: Scene,
+    camera: PerspectiveCamera,
+    width: number = 260,
+    height: number = 190,
+    renderer: WebGLRenderer
+  ): Promise<string> 
+  {
+    renderer.setSize(width, height, false);
+
+    // save frame
+    const previousFrame = this.frameIdx;
+    this.gotoFrame(frameIndex);
+
+    renderer.render(scene, camera);
+
+    const dataUrl = renderer.domElement.toDataURL();
+
+    this.gotoFrame(previousFrame);
+
+    return dataUrl;
+
+
+  }
+
 }

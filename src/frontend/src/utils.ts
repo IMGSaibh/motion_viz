@@ -29,6 +29,98 @@ export default class Utils
     console.log(`${label} rotation → x: ${camera.rotation.x.toFixed(2)}, y: ${camera.rotation.y.toFixed(2)}, z: ${camera.rotation.z.toFixed(2)}`);
   }
 
+  static generic_button_fastAPI(btn_element: string, status_element: string, fastAPI_url: string) 
+  {
+    document.getElementById(btn_element)!.addEventListener("click", async () => 
+    {
+      const status = document.getElementById(status_element)  as HTMLDivElement | null;
+      if (!status)
+        return;
+
+      status.textContent = "";
+      try 
+      {
+        const serverResponse = await fetch(fastAPI_url, 
+        {
+          method: "POST"
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+      }
+      catch (error) 
+      {
+        if (error instanceof Error) 
+        {
+          status.textContent = `❌ error: ${error.message}`;
+        } 
+        else 
+        {
+          status.textContent = '❌ Unknown error';
+        }
+      }
+
+    });
+  }
+
+  static generic_inputbutton_fastAPI_inputelement(btn_element: string, status_element: string, input_element: string, fastAPI_url: string)
+  {
+    document.getElementById(btn_element)!.addEventListener("click", async () => 
+    {
+      const input = document.getElementById(input_element) as HTMLInputElement | null;
+      const status = document.getElementById(status_element) as HTMLDivElement | null;
+      if (!input || !input.files || !status) 
+      {
+        alert("❌ Please choose one or more motion capture files.");
+        return;
+      }
+      const files = input.files;
+
+      const formData = new FormData();
+      for (const file of files) 
+      {
+        formData.append("files", file);
+      }
+      
+      try 
+      {
+        const serverResponse = await fetch(fastAPI_url, 
+        {
+          method: "POST",
+          body: formData,
+        });
+
+      
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = `✅ ${apiResponse.message} ${apiResponse.not_supported_files && '❌ ' + apiResponse.not_supported_files}`;
+      } 
+      catch (error) 
+      {
+        if (error instanceof Error) 
+        {
+          status.textContent = `❌ error: ${error.message}`;
+        } 
+        else 
+        {
+          status.textContent = '❌ Unknown error';
+        }
+      }
+    });
+  }
+
+
   // Pro tipp
   // function getById<T extends HTMLElement>(id: string): T {
   //   const el = document.getElementById(id);

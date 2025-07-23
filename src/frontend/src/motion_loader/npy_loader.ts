@@ -25,8 +25,8 @@ export class NPY_loader
   fps: number;
   joint_size: number;
   scene: THREE.Scene;
-  joint_coordsystem_local: JointCoordsystemLocal | null;
-  joint_orientations: any[];
+  // joint_coordsystem_local: JointCoordsystemLocal | null;
+  // joint_orientations: any[];
 
   constructor(scene: THREE.Scene) 
   {
@@ -44,8 +44,8 @@ export class NPY_loader
     this.fps = 60;
     this.joint_size = 0.2;
     this.scene = scene;
-    this.joint_coordsystem_local = null;
-    this.joint_orientations = [];
+    // this.joint_coordsystem_local = null;
+    // this.joint_orientations = [];
 
 
   }
@@ -63,10 +63,10 @@ export class NPY_loader
     this.jointCount = jointCount;
 
     // // TODO: uncomment to use this
-    this.joint_orientations = Array.from({ length: this.jointCount }, () => ({
-      position:   [0, 0, 0],      
-      quaternion: [0, 0, 0, 1]    
-    }));
+    // this.joint_orientations = Array.from({ length: this.jointCount }, () => ({
+    //   position:   [0, 0, 0],      
+    //   quaternion: [0, 0, 0, 1]    
+    // }));
     this.scene.add(this.npy_motion);
   }
 
@@ -91,7 +91,7 @@ export class NPY_loader
       this.joints.push(sphere);
     }
 
-    this.joint_coordsystem_local = new JointCoordsystemLocal(this.scene, this.jointCount, { axesSize: 10 });
+    // this.joint_coordsystem_local = new JointCoordsystemLocal(this.scene, this.jointCount, { axesSize: 10 });
   }
 
   _create_bones(skeleton: SkeletonData, renderer: THREE.WebGLRenderer | null = null)
@@ -139,12 +139,12 @@ export class NPY_loader
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
 
-      // jointAxisPoint is a reference to the position of the joint axis orientation
-      // TODO: uncomment to use this
-      const jointAxisPoint = this.joint_orientations[i].position;
-      jointAxisPoint[0] = x;
-      jointAxisPoint[1] = y;
-      jointAxisPoint[2] = z;
+      // // jointAxisPoint is a reference to the position of the joint axis orientation
+      // // TODO: uncomment to use this
+      // const jointAxisPoint = this.joint_orientations[i].position;
+      // jointAxisPoint[0] = x;
+      // jointAxisPoint[1] = y;
+      // jointAxisPoint[2] = z;
     }
     
 
@@ -168,19 +168,19 @@ export class NPY_loader
       elem.bone.scale.set(1, length, 1);                
       elem.bone.updateMatrix();
 
-      // jointAxisPoint is a reference to the quaternion of the joint axis orientation
-      // TODO: uncomment to use this
-      const quat = new THREE.Quaternion().setFromUnitVectors(y_axis, direction);
-      const q = this.joint_orientations[elem.childIdx].quaternion;
-      q[0] = quat.x;
-      q[1] = quat.y;
-      q[2] = quat.z;
-      q[3] = quat.w;
+      // // jointAxisPoint is a reference to the quaternion of the joint axis orientation
+      // // TODO: uncomment to use this
+      // const quat = new THREE.Quaternion().setFromUnitVectors(y_axis, direction);
+      // const q = this.joint_orientations[elem.childIdx].quaternion;
+      // q[0] = quat.x;
+      // q[1] = quat.y;
+      // q[2] = quat.z;
+      // q[3] = quat.w;
 
     }
 
     // // TODO: uncomment to use this
-    this.joint_coordsystem_local!.update(this.joint_orientations); 
+    // this.joint_coordsystem_local!.update(this.joint_orientations); 
 
   }
 
@@ -209,7 +209,7 @@ export class NPY_loader
     this.scene.remove(this.npy_motion);
 
     // // TODO: uncomment to use this
-    this.joint_coordsystem_local!.dispose();
+    // this.joint_coordsystem_local!.dispose();
   }
 
 }

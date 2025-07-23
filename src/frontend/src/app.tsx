@@ -1,4 +1,9 @@
-import * as THREE from 'three';
+import {
+  PerspectiveCamera, 
+  WebGLRenderer,
+  Scene
+} from 'three'
+
 import { Loop } from '@/system/loop';
 import { Resizer } from '@/system/resizer';
 import { createScene } from '@/components/scene';
@@ -15,16 +20,13 @@ import { FBX_Player } from '@/motion_player/fbx_player';
 import Utils from '@/utils';
 import {ThumbnailGenerator} from '@/thumbnail_generator';
 
-let camera: THREE.PerspectiveCamera;
-let renderer: THREE.WebGLRenderer;
-let scene: THREE.Scene;
-let loop: Loop;
-
 class App
 {
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  renderer: THREE.WebGLRenderer;
+  scene: Scene;
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
+  previewRenderer: WebGLRenderer; 
+
   loop: Loop;
   currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
   currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
@@ -44,6 +46,10 @@ class App
     this.currentLoader = null;
     this.currentPlayer = null;
 
+    this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
+    this.previewRenderer.setSize(260, 190, false);
+
+
   }
   
   // use start and stop for animation and frame stream
@@ -59,267 +65,47 @@ class App
 
   upload_files()
   {
-    document.getElementById("client_uploads_btn")!.addEventListener("click", async () => 
-    {
-      const input = document.getElementById("upload_files") as HTMLInputElement | null;
-      const status = document.getElementById("client_uploads_status") as HTMLDivElement | null;
-      if (!input || !input.files || !status) 
-      {
-        alert("❌ Please choose one or more motion capture files.");
-        return;
-      }
-      const files = input.files;
-
-      const formData = new FormData();
-      for (const file of files) 
-      {
-        formData.append("files", file);
-      }
-      
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/uploads", 
-        {
-          method: "POST",
-          body: formData,
-        });
-
-      
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = `✅ ${apiResponse.message} ${apiResponse.not_supported_files && '❌ ' + apiResponse.not_supported_files}`;
-      } 
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }
-      }
-    });
+    Utils.generic_inputbutton_fastAPI_inputelement("upload_files_btn", 
+      "client_uploads_status", 
+      "upload_files", 
+      "http://localhost:8000/motion/uploads");
   }
 
   convert_pv_style() 
   {
-    document.getElementById("convert_pv_style_btn")!.addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_pv_style_status") as HTMLDivElement | null;
-      if (!status)
-        return; 
-
-      status.textContent = "";
-      
-      
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_pv_style", 
-        {
-          method: "POST"
-        });
-
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = apiResponse.warning
-          ? `⚠️ ${apiResponse.warning}`
-          : `✅ ${apiResponse.message}`;
-      }
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }
-      }
-
-    });
+    Utils.generic_button_fastAPI("convert_pv_style_btn", 
+      "convert_pv_style_status", 
+      "http://localhost:8000/motion/convert_pv_style");
   }
 
   convert_bvh_to_npy() 
   {
-    document.getElementById("convert_bvh_to_npy_btn")!.addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_bvh_to_npy_status")  as HTMLDivElement | null;
-      if (!status)
-        return;
 
-      status.textContent = "";
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_bvh_to_npy", 
-        {
-          method: "POST"
-        });
-
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = apiResponse.warning
-          ? `⚠️ ${apiResponse.warning}`
-          : `✅ ${apiResponse.message}`;
-      }
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }
-      }
-
-    });
+    Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
+      "convert_bvh_to_npy_status", 
+      "http://localhost:8000/motion/convert_bvh_to_npy");
   }
 
   convert_csv_kinect_v1_to_npy()
   {
-    document.getElementById("convert_csv_kinectv1_to_npy_btn")!.addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_csv_kinectv1_to_npy_status") as HTMLDivElement | null;
-      if (!status)
-        return;
-
-      status.textContent = "";
-      
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_kinectv1_to_npy", 
-        {
-          method: "POST"
-        });
-
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = apiResponse.warning
-          ? `⚠️ ${apiResponse.warning}`
-          : `✅ ${apiResponse.message}`;
-
-      }
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }      
-      }
-
-    });
+    Utils.generic_button_fastAPI("convert_csv_kinectv1_to_npy_btn", 
+      "convert_csv_kinectv1_to_npy_status",
+      "http://localhost:8000/motion/convert_csv_kinectv1_to_npy");
   }
 
   convert_csv_c3d_to_npy()
   {
-    document.getElementById("convert_csv_c3d_to_npy_btn")!.addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_csv_c3d_to_npy_status") as HTMLDivElement | null;
-      if (!status)
-        return;
-      
-      status.textContent = "";
+    Utils.generic_button_fastAPI("convert_csv_c3d_to_npy_btn", 
+      "convert_csv_c3d_to_npy_status",
+      "http://localhost:8000/motion/convert_csv_c3d_to_npy");
 
-
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_c3d_to_npy", 
-        {
-          method: "POST"
-        });
-
-        if (!serverResponse.ok) 
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = apiResponse.warning
-          ? `⚠️ ${apiResponse.warning}`
-          : `✅ ${apiResponse.message}`;
-
-      }
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }
-      }
-
-    });
   }
 
   convert_csv_segmentbased_to_npy()
   {
-    document.getElementById("convert_csv_sgementbased_to_npy_btn")!.addEventListener("click", async () => 
-    {
-      const status = document.getElementById("convert_csv_sgementbased_to_npy_status") as HTMLDivElement | null;
-      if (!status)
-        return; 
-      
-      status.textContent = "";
-
-
-      try 
-      {
-        const serverResponse = await fetch("http://localhost:8000/motion/convert_csv_segmentbased_to_npy", 
-        {
-          method: "POST"
-        });
-
-        if (!serverResponse.ok)
-        {
-          throw new Error(`${serverResponse.statusText}` || "unknown error");
-        }
-        
-        const apiResponse = await serverResponse.json();
-        status.textContent = apiResponse.warning
-          ? `⚠️ ${apiResponse.warning}`
-          : `✅ ${apiResponse.message}`;
-
-      }
-      catch (error) 
-      {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        }      
-      }
-
-    });
+    Utils.generic_button_fastAPI("convert_csv_sgementbased_to_npy_btn", 
+      "convert_csv_sgementbased_to_npy_status",
+      "http://localhost:8000/motion/convert_csv_segmentbased_to_npy");
   }
 
   async setup_file_dropdown() 
@@ -391,8 +177,7 @@ class App
   async load_motionfile_and_player(filename: string)
   {
     const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
-    const folder = this.get_folder_by_extension(file_extension);
-    const fileUrl = `http://localhost:8000/data/${folder}/${filename}`;
+    const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
 
     switch (file_extension) {
       case 'bvh':
@@ -413,8 +198,8 @@ class App
 
         
         const skeletonPath = fileUrl
-        .replace("/numpy_converted/", "/json/")
-        .replace(".npy", "_skeleton_converted.json");
+        .replace("/npy/", "/json/")
+        .replace(".npy", "_skeleton.json");
         await this.currentLoader.create_skeleton(skeletonPath);
 
         // const thumbnailGenerator = new ThumbnailGenerator(scene, camera, this.currentLoader, loop);
@@ -426,18 +211,6 @@ class App
         break;
     }
   }
-
-  get_folder_by_extension(ext: string): string
-  {
-    switch (ext) 
-    {
-      case 'bvh': return 'bvh';
-      case 'fbx': return 'fbx';
-      case 'mvnx': return 'mvnx';
-      case 'npy': return 'numpy_converted';
-      default: return '';
-    }
-}
 
   cleanup_scene() 
   {
@@ -457,6 +230,10 @@ class App
           const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
           slider!.value = '0';
           label!.textContent = `Frame: 0 / 0`;
+          if (this.previewRenderer) 
+          {
+            this.previewRenderer.dispose();
+          }
         }
       }
     });
@@ -494,33 +271,57 @@ class App
   }
 
 
-  // TODO: implement slider preview when needed. Just uncomment the code below.
-  // slider_preview_frame()
-  // {
-  //   const slider = document.getElementById("frame-slider");
-  //   const preview = document.getElementById("preview-popup");
-  //   const previewImg = document.getElementById("preview-img");
+  slider_preview_frame()
+  {
+    const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
+    const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
+    const previewImg = document.getElementById("preview-img") as HTMLImageElement | null;
 
-  //   slider.addEventListener("mousemove", (e) => 
-  //   {
-  //     const rect = slider.getBoundingClientRect();
-  //     const percent = (e.clientX - rect.left) / rect.width;
-  //     const frameIndex = Math.round(percent * (slider.max - slider.min));
+    if (!slider || !preview || !previewImg) 
+    {
+      console.error("Slider or preview elements not found.");
+      return;
+    }
 
-  //     // preview window position 
-  //     preview.style.left = `${e.clientX - rect.left + 60}px`;
-  //     preview.style.display = "block";
+    // slider.addEventListener("mousemove", (e) => 
+    // {
+    //   const rect = slider.getBoundingClientRect();
+    //   const percent = (e.clientX - rect.left) / rect.width;
+    //   const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
 
-  //     const base_url = "http://localhost:8000"; // FastAPI runs at 8000
-  //     previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
-  //   });
+    //   // preview window position 
+    //   preview.style.left = `${e.clientX - rect.left + 60}px`;
+    //   preview.style.display = "block";
 
-  //   slider.addEventListener("mouseleave", () => 
-  //   {
-  //     preview.style.display = "none";
-  //   });
+    //   const base_url = "http://localhost:8000"; // FastAPI runs at 8000
+    //   previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
+    // });
 
-  // }
+
+    slider.addEventListener("mousemove", async (e) => 
+    {
+      const rect = slider.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
+
+      preview.style.left = `${e.clientX - rect.left + 60}px`;
+      preview.style.display = "block";
+      if (this.currentPlayer instanceof NPY_Player) 
+      {
+        const thumbDataUrl = await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
+        if (thumbDataUrl) 
+        {
+          previewImg.src = thumbDataUrl;
+        }
+      }
+    });
+
+    slider.addEventListener("mouseleave", () => 
+    {
+      preview.style.display = "none";
+    });
+
+  }
 
 
 

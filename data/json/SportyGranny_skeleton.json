@@ -6,22 +6,38 @@
     "LeftLeg",
     "LeftFoot",
     "LeftToeBase",
-    "LFootTongue",
     "LeftPantLeg",
+    "Left_Butt",
     "RightUpLeg",
     "RightLeg",
     "RightFoot",
     "RightToeBase",
-    "RFootTongue",
     "RightPantLeg",
+    "Right_Butt",
     "Spine",
     "Spine1",
     "Spine2",
     "Neck",
     "Head",
-    "HairB",
-    "HairA",
-    "Hat",
+    "Visor",
+    "HairMidA",
+    "HairMidB",
+    "HairMidC",
+    "HairMidD",
+    "HairMidE",
+    "HairMidF",
+    "HairLeftA",
+    "HairLeftB",
+    "HairLeftC",
+    "HairLeftD",
+    "HairLeftE",
+    "HairLeftF",
+    "HairRightA",
+    "HairRightB",
+    "HairRightC",
+    "HairRightD",
+    "HairRightE",
+    "HairRightF",
     "LeftShoulder",
     "LeftArm",
     "LeftForeArm",
@@ -41,7 +57,7 @@
     "LeftHandPinky1",
     "LeftHandPinky2",
     "LeftHandPinky3",
-    "LSleeve",
+    "LeftSleeve",
     "RightShoulder",
     "RightArm",
     "RightForeArm",
@@ -61,19 +77,17 @@
     "RightHandPinky1",
     "RightHandPinky2",
     "RightHandPinky3",
-    "RSleeve",
-    "Backpack",
+    "RightSleeve",
     "Hood",
     "Hood1",
-    "LHoodieString",
-    "LHoodieString1",
-    "LHoodieString2",
-    "RHoodieString",
-    "RHoodieString1",
-    "RHoodieString2",
-    "LBackpack_Strap",
-    "RBackpack_Strap",
-    "BoyFacialAnim_Joint"
+    "Hood2",
+    "Left_Breast",
+    "Right_Breast",
+    "Whistle",
+    "Whistle1",
+    "Whistle2",
+    "Belly",
+    "FitGrandmaFacialAnim_Joint"
   ],
   "hierarchy": [
     [
@@ -102,11 +116,11 @@
     ],
     [
       6,
-      4
+      3
     ],
     [
       7,
-      3
+      2
     ],
     [
       8,
@@ -126,11 +140,11 @@
     ],
     [
       12,
-      10
+      9
     ],
     [
       13,
-      9
+      8
     ],
     [
       14,
@@ -166,71 +180,71 @@
     ],
     [
       22,
-      16
+      18
     ],
     [
       23,
-      22
+      18
     ],
     [
       24,
-      23
+      18
     ],
     [
       25,
-      24
+      18
     ],
     [
       26,
-      25
+      18
     ],
     [
       27,
-      26
+      18
     ],
     [
       28,
-      27
+      18
     ],
     [
       29,
-      25
+      18
     ],
     [
       30,
-      29
+      18
     ],
     [
       31,
-      30
+      18
     ],
     [
       32,
-      25
+      18
     ],
     [
       33,
-      32
+      18
     ],
     [
       34,
-      33
+      18
     ],
     [
       35,
-      25
+      18
     ],
     [
       36,
-      35
+      18
     ],
     [
       37,
-      36
+      18
     ],
     [
       38,
-      25
+      16
     ],
     [
       39,
@@ -242,11 +256,11 @@
     ],
     [
       41,
-      24
+      40
     ],
     [
       42,
-      16
+      41
     ],
     [
       43,
@@ -258,7 +272,7 @@
     ],
     [
       45,
-      44
+      41
     ],
     [
       46,
@@ -270,11 +284,11 @@
     ],
     [
       48,
-      47
+      41
     ],
     [
       49,
-      45
+      48
     ],
     [
       50,
@@ -282,11 +296,11 @@
     ],
     [
       51,
-      50
+      41
     ],
     [
       52,
-      45
+      51
     ],
     [
       53,
@@ -294,11 +308,11 @@
     ],
     [
       54,
-      53
+      41
     ],
     [
       55,
-      45
+      54
     ],
     [
       56,
@@ -306,11 +320,11 @@
     ],
     [
       57,
-      56
+      40
     ],
     [
       58,
-      45
+      16
     ],
     [
       59,
@@ -322,15 +336,15 @@
     ],
     [
       61,
-      44
+      60
     ],
     [
       62,
-      16
+      61
     ],
     [
       63,
-      16
+      62
     ],
     [
       64,
@@ -338,7 +352,7 @@
     ],
     [
       65,
-      16
+      61
     ],
     [
       66,
@@ -350,7 +364,7 @@
     ],
     [
       68,
-      16
+      61
     ],
     [
       69,
@@ -362,14 +376,70 @@
     ],
     [
       71,
-      15
+      61
     ],
     [
       72,
-      15
+      71
     ],
     [
       73,
+      72
+    ],
+    [
+      74,
+      61
+    ],
+    [
+      75,
+      74
+    ],
+    [
+      76,
+      75
+    ],
+    [
+      77,
+      60
+    ],
+    [
+      78,
+      16
+    ],
+    [
+      79,
+      78
+    ],
+    [
+      80,
+      79
+    ],
+    [
+      81,
+      16
+    ],
+    [
+      82,
+      16
+    ],
+    [
+      83,
+      16
+    ],
+    [
+      84,
+      83
+    ],
+    [
+      85,
+      84
+    ],
+    [
+      86,
+      14
+    ],
+    [
+      87,
       0
     ]
   ]

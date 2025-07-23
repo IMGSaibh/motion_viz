@@ -65,7 +65,7 @@ export class BVH_Player
         const targetValue = parseFloat((e.target as HTMLInputElement).value);
         // this.currentTime = parseFloat(e.target.value);
         this.currentTime = targetValue; 
-        this.bvh_loader_object.mixer.setTime(this.currentTime / this.bvh_loader_object.fps);
+        this.bvh_loader_object.mixer!.setTime(this.currentTime / this.bvh_loader_object.fps);
         this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
       }
     });
@@ -125,6 +125,7 @@ export class BVH_Player
 
   getCurrentFrame() 
   {
+    if (!this.bvh_loader_object.mixer) return 0;
     return Math.floor(this.bvh_loader_object.mixer!.time * this.bvh_loader_object.fps);
   }
 

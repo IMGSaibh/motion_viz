@@ -4,7 +4,8 @@ import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { Text } from 'troika-three-text';
 
-export interface MetricAxisOptions {
+export interface MetricAxisOptions 
+{
   from?: number;
   to?: number;
   color?: THREE.ColorRepresentation;
