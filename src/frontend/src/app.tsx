@@ -25,7 +25,6 @@ class App
   scene: Scene;
   camera: PerspectiveCamera;
   renderer: WebGLRenderer;
-  // Z.B. in App.tsx oder irgendwo global
   previewRenderer: WebGLRenderer; 
 
   loop: Loop;
@@ -272,7 +271,6 @@ class App
   }
 
 
-  // TODO: implement slider preview when needed. Just uncomment the code below.
   slider_preview_frame()
   {
     const slider = document.getElementById("frame-slider") as HTMLInputElement | null;

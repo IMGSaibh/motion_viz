@@ -146,7 +146,6 @@ export class NPY_Player
     }
   }
 
-  // Für das Preview: du brauchst Zugriff auf Szene & Kamera
   async renderThumbnail(
     frameIndex: number,
     scene: Scene,
@@ -158,7 +157,7 @@ export class NPY_Player
   {
     renderer.setSize(width, height, false);
 
-    // Frame sichern und zu gewünschtem springen
+    // save frame
     const previousFrame = this.frameIdx;
     this.gotoFrame(frameIndex);
 
