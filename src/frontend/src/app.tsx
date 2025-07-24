@@ -104,7 +104,6 @@ class App
 
   }
 
-
   convert_pv_style() 
   {
     Utils.generic_button_fastAPI("convert_pv_style_btn", 
@@ -118,28 +117,6 @@ class App
     Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
       "convert_bvh_to_npy_status", 
       "http://localhost:8000/motion/convert_bvh_to_npy");
-  }
-
-  convert_csv_kinect_v1_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_kinectv1_to_npy_btn", 
-      "convert_csv_kinectv1_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_kinectv1_to_npy");
-  }
-
-  convert_csv_c3d_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_c3d_to_npy_btn", 
-      "convert_csv_c3d_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_c3d_to_npy");
-
-  }
-
-  convert_csv_segmentbased_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_sgementbased_to_npy_btn", 
-      "convert_csv_sgementbased_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_segmentbased_to_npy");
   }
 
   async setup_file_dropdown() 

@@ -7,7 +7,7 @@ function main()
 	const container = document.querySelector<HTMLDivElement>('#scene-container');
 	if (!container) 
 	{
- 		 throw new Error('Element #scene-container not found');
+ 		 throw new Error('Element: #scene-container not found');
 	}
 	const app = new App(container);
 		
@@ -16,10 +16,6 @@ function main()
 
 	app.convert_pv_style();
 	app.convert_bvh_to_npy();
-	// app.convert_csv_kinect_v1_to_npy();
-	// app.convert_csv_c3d_to_npy();
-	// app.convert_csv_segmentbased_to_npy();
-	
 	app.setup_file_dropdown();
 	app.slider_preview_frame();
 	
