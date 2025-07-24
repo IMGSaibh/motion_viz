@@ -47,6 +47,10 @@ canvas {
   display: block;
 }
 
+/* 
+=================== slider =================
+*/
+
 #timeline-container {
   position: absolute;
   bottom: 20px;
@@ -73,8 +77,10 @@ canvas {
 }
 
 
+
+
 /* 
-=================== Motion Conig Dropdown =================
+=================== Motion config dropdown =================
 */
 
 
