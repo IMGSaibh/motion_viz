@@ -1,7 +1,9 @@
 import numpy as np
-from typing import List
+from pydantic import BaseModel
+from typing import List, Optional
 from pathlib import Path
 from fastapi import UploadFile, File, APIRouter, Request
+from backend.json_loader import JsonLoader
 from backend.motion_parser.pv_parser import PVParser
 from backend.motion_parser.csv_parser import CSVParser
 from backend.motion_parser.bvh_parser import BvhParser 
@@ -10,6 +12,20 @@ from backend.motion_parser.csv_segmentbased_parser import SegmentCSVParser
 
 router = APIRouter()
 workspacefolder = Path.cwd()
+
+class MotionConfig(BaseModel):
+    format: str
+    abbrev: Optional[str] = ""
+    scale: float = 1
+    positions: str = ""
+    rotations: str = ""
+    systemname: Optional[str] = ""
+    fps: int = 30
+    jointcount: int = 30
+    coloffset: int = 0
+    colgap: int = 0
+    dimsize: int = 3
+
 
 @router.post("/uploads")
 async def upload(files: List[UploadFile] = File(...)):
@@ -49,6 +65,26 @@ async def upload(files: List[UploadFile] = File(...)):
     return {
         "message": f"{len(files) - len(not_saved_files)} files were succesfully uploaded!",
         "not_supported_files": ", ".join(not_saved_files)
+    }
+
+@router.post("/motion_config")
+async def create_motion_config(config: MotionConfig):
+    print(f"button config pressed {config}")
+    
+    data_schema = JsonLoader(Path.joinpath(workspacefolder, "src/backend/data_schema.json"))
+
+
+    if config is None:  
+        return {
+            "warning": "could not create config file",
+            "message": "",
+        }
+    
+    data_schema.write_json(Path.joinpath(workspacefolder, "data/descriptor_files/new_schema.json"), {"Test": ["testvalue 2"]})
+
+    return {
+        "warning": "",
+        "message": "config file created",
     }
 
 @router.post("/convert_pv_style")

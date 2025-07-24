@@ -89,6 +89,7 @@ export default class Utils
         formData.append("files", file);
       }
       
+      status.textContent = "";
       try 
       {
         const serverResponse = await fetch(fastAPI_url, 
@@ -119,6 +120,67 @@ export default class Utils
       }
     });
   }
+
+
+  static button_motion_config(btn_element: string, status_element: string, fastAPI_url: string)
+  {
+    document.getElementById(btn_element)!.addEventListener("click", async () => 
+    {
+      const status = document.getElementById(status_element) as HTMLDivElement | null;
+      if (!status)
+        return;
+
+      const config = {
+      format:      (document.getElementById('input_format') as HTMLInputElement).value,
+      abbrev:      (document.getElementById('input_abbrev') as HTMLInputElement).value,
+      scale:       parseFloat((document.getElementById('input_scale') as HTMLInputElement).value),
+      positions:   (document.getElementById('input_positions') as HTMLInputElement).value,
+      rotations:   (document.getElementById('input_rotations') as HTMLInputElement).value,
+      systemname:  (document.getElementById('input_systemname') as HTMLInputElement).value,
+      fps:         parseInt((document.getElementById('input_fps') as HTMLInputElement).value, 10),
+      jointcount:  parseInt((document.getElementById('input_jointcount') as HTMLInputElement).value, 10),
+      coloffset:   parseInt((document.getElementById('input_coloffset') as HTMLInputElement).value, 10),
+      colgap:      parseInt((document.getElementById('input_colgap') as HTMLInputElement).value, 10),
+      dimsize:     parseInt((document.getElementById('input_dimsize') as HTMLInputElement).value, 10)
+      };
+
+      status.textContent = "";
+      try 
+      {
+        const serverResponse = await fetch(fastAPI_url, 
+        {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(config)
+        });
+
+        if (!serverResponse.ok) 
+        {
+          throw new Error(`${serverResponse.statusText}` || "unknown error");
+        }
+        
+        const apiResponse = await serverResponse.json();
+        status.textContent = apiResponse.warning
+          ? `⚠️ ${apiResponse.warning}`
+          : `✅ ${apiResponse.message}`;
+      }
+      catch (error) 
+      {
+        if (error instanceof Error) 
+        {
+          status.textContent = `❌ error: ${error.message}`;
+        } 
+        else 
+        {
+          status.textContent = '❌ Unknown error';
+        }
+      }
+
+    });
+
+
+  }
+
 
 
   // Pro tipp

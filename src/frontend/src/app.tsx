@@ -18,7 +18,7 @@ import { BVH_Player } from '@/motion_player/bvh_player';
 import { NPY_Player } from '@/motion_player/npy_player';
 import { FBX_Player } from '@/motion_player/fbx_player';
 import Utils from '@/utils';
-import {ThumbnailGenerator} from '@/thumbnail_generator';
+// import {ThumbnailGenerator} from '@/thumbnail_generator';
 
 class App
 {
@@ -70,6 +70,40 @@ class App
       "upload_files", 
       "http://localhost:8000/motion/uploads");
   }
+
+  motion_config_dropwown()
+  {
+    document.addEventListener("DOMContentLoaded", () => 
+    {
+      const toggleBtn = document.getElementById('motion-config-toggle');
+      const panel = document.getElementById('motion-config-panel');
+
+      if (toggleBtn == null) return;
+      if (panel == null) return;
+
+      // Panel toggle
+      toggleBtn.addEventListener('click', () => 
+      {
+        if (panel.style.display === "none" || !panel.style.display) 
+        {
+          panel.style.display = "block";
+          toggleBtn.style.borderRadius = "8px 8px 0 0";
+        } 
+        else 
+        {
+          panel.style.display = "none";
+          toggleBtn.style.borderRadius = "6px";
+        }
+      });
+
+    });
+
+    Utils.button_motion_config("submit_motion_config", 
+    "config_status", 
+    "http://localhost:8000/motion/motion_config");
+
+  }
+
 
   convert_pv_style() 
   {
@@ -322,7 +356,6 @@ class App
     });
 
   }
-
 
 
 }

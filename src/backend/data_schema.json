@@ -1,0 +1,278 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "format": {
+            "type": "string",
+            "enum": [
+                "pkl",
+                "npz",
+                "npy",
+                "bvh",
+                "csv",
+                "cdf",
+                "mmm",
+                "matlab",
+                "mvnx",
+                "converter",
+                "c3d"
+            ],
+            "default": "csv"
+        },
+        "abbrev": {
+            "type": "string",
+            "default": ""
+        },
+        "scale": {
+            "type": "integer",
+            "default": 1
+        },
+        "positions": {
+            "type": "string",
+            "enum": [
+                "relative",
+                "absolute",
+                "none"
+            ],
+            "default": "absolute"
+        },
+        "data-order": {
+            "type": "array",
+            "items": {
+                "type": "number",
+                "minItems": 3,
+                "maxItems": 3,
+                "uniqueItems": true
+            }
+        },
+        "dim-order": {
+            "type": "array",
+            "items": {
+                "type": "number",
+                "minItems": 3,
+                "maxItems": 3,
+                "uniqueItems": true
+            }
+        },
+        "rotations": {
+            "type": "string",
+            "enum": [
+                "relative",
+                "absolute",
+                "none"
+            ],
+            "default": "none"
+        },
+        "rotation-representation": {
+            "type": "string",
+            "enum": [
+                "euler_xyz",
+                "euler_xzy",
+                "euler_yxz",
+                "euler_yzx",
+                "euler_zxy",
+                "euler_zyx",
+                "quaternion_xyzw",
+                "quaternion_wxyz",
+                "axis-angle"
+            ],
+            "default": "quaternion_wxyz"
+        },
+        "systemname": {
+            "type": "string",
+            "default": ""
+        },
+        "npz-array-name": {
+            "type": "string",
+            "default": ""
+        },
+        "pickle-array-name": {
+            "type": "string",
+            "default": ""
+        },
+        "header-size": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+        },
+        "separator": {
+            "type": "string"
+        },
+        "joint-graph": {
+            "type": "array"
+        },
+        "joint-pos-cols": {
+            "type": "array"
+        },
+        "joint-rot-cols": {
+            "type": "array"
+        },
+        "fps": {
+            "type": "number",
+            "default": 30
+        }
+    },
+    "required": [
+        "format",
+        "systemname",
+        "fps",
+        "dim-order",
+        "scale",
+        "abbrev",
+        "positions",
+        "rotations"
+    ],
+    "if": {
+        "properties": {
+            "format": {
+                "const": "matlab"
+            }
+        }
+    },
+    "then": {
+        "required": [
+            "matlab-array-name"
+        ]
+    },
+    "anyOf": [
+        {
+            "properties": {
+                "format": {
+                    "enum": [
+                        "bvh",
+                        "mvnx"
+                    ]
+                }
+            }
+        },
+        {
+            "required": [
+                "joint-graph"
+            ]
+        }
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "csv"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "header-size"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "csv"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "separator"
+                ]
+            }
+        },
+        {
+            "if": {
+              "allOf": [
+                {
+                  "properties": {
+                    "positions": {
+                      "const": "none"
+                    }
+                  }
+                },
+                {
+                  "not": {
+                    "properties": {
+                      "format": {
+                        "const": "bvh"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "then": {
+              "required": ["joint-offsets"]
+            }
+          },
+        {
+            "if": {
+                "required": [
+                    "joint-offsets"
+                ]
+            },
+            "then": {
+                "required": [
+                    "offset-type"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "pkl"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "pickle-array-name"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "cdf"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "data-array-name"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "npz"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "npz-array-name"
+                ]
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "format": {
+                        "const": "converter"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "converter"
+                ]
+            }
+        }
+    ],
+    "additionalProperties": true
+}

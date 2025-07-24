@@ -73,3 +73,39 @@ canvas {
 }
 
 
+/* 
+=================== Motion Conig Dropdown =================
+*/
+
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.config-row label {
+  min-width: 170px;
+  font-size: 1em;
+  color: #fff;
+  margin-bottom: 0;
+}
+.config-row input {
+  flex: 1;
+  min-width: 50px;
+  font-size: 1em;
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid #aaa;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+#motion-config-form button {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 6px;
+  background: #007bffa1;
+  color: #fff;
+  border: none;
+  font-size: 1.05em;
+  cursor: pointer;
+}
