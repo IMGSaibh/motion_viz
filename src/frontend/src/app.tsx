@@ -1,9 +1,4 @@
-import {
-  PerspectiveCamera, 
-  WebGLRenderer,
-  Scene
-} from 'three'
-
+import React, { useRef, useEffect } from "react";
 import { Loop } from '@/system/loop';
 import { Resizer } from '@/system/resizer';
 import { createScene } from '@/components/scene';
@@ -11,6 +6,7 @@ import { createCamera } from '@/components/camera';
 import { createRenderer } from '@/system/renderer';
 import { createOrbitControls } from '@/components/orbitcontrol';
 
+import {PerspectiveCamera, WebGLRenderer, Scene } from 'three'
 import { BVH_loader } from '@/motion_loader/bvh_loader';
 import { FBX_Loader } from '@/motion_loader/fbx_loader';
 import { NPY_loader } from '@/motion_loader/npy_loader';
@@ -18,302 +14,372 @@ import { BVH_Player } from '@/motion_player/bvh_player';
 import { NPY_Player } from '@/motion_player/npy_player';
 import { FBX_Player } from '@/motion_player/fbx_player';
 import Utils from '@/utils';
-
 import { SquareBracketSlider } from "@/components/SquareBracketSlider";
 
-class App
-{
-  scene: Scene;
-  camera: PerspectiveCamera;
-  renderer: WebGLRenderer;
-  previewRenderer: WebGLRenderer; 
+// class App
+// {
+//   scene: Scene;
+//   camera: PerspectiveCamera;
+//   renderer: WebGLRenderer;
+//   previewRenderer: WebGLRenderer; 
 
-  loop: Loop;
-  currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
-  currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
+//   loop: Loop;
+//   currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
+//   currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
 
-  constructor(container: HTMLDivElement)
-  {
-    this.camera = createCamera();
-    this.renderer = createRenderer();
-    this.scene = createScene();
-    this.loop = new Loop(this.camera, this.scene, this.renderer);
-    container.append(this.renderer.domElement);
+//   constructor(container: HTMLDivElement)
+//   {
+//     this.camera = createCamera();
+//     this.renderer = createRenderer();
+//     this.scene = createScene();
+//     this.loop = new Loop(this.camera, this.scene, this.renderer);
+//     container.append(this.renderer.domElement);
 
-    const orbitControls = createOrbitControls(this.camera, this.renderer);
-    this.loop.updatables.push(orbitControls);
-    const resizer = new Resizer(container, this.camera, this.renderer);
+//     const orbitControls = createOrbitControls(this.camera, this.renderer);
+//     this.loop.updatables.push(orbitControls);
+//     const resizer = new Resizer(container, this.camera, this.renderer);
 
-    this.currentLoader = null;
-    this.currentPlayer = null;
+//     this.currentLoader = null;
+//     this.currentPlayer = null;
 
-    this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
-    this.previewRenderer.setSize(260, 190, false);
+//     this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
+//     this.previewRenderer.setSize(260, 190, false);
 
 
-  }
+//   }
   
-  // use start and stop for animation and frame stream
-  start()
-  {
-    this.loop.start();
-  }
+//   // use start and stop for animation and frame stream
+//   start()
+//   {
+//     this.loop.start();
+//   }
   
-  stop()
-  {
-    this.loop.stop();
-  }
+//   stop()
+//   {
+//     this.loop.stop();
+//   }
 
-  upload_files()
-  {
-    Utils.generic_inputbutton_fastAPI_inputelement("upload_files_btn", 
-      "client_uploads_status", 
-      "upload_files", 
-      "http://localhost:8000/motion/uploads");
-  }
+//   upload_files()
+//   {
+//     Utils.generic_inputbutton_fastAPI_inputelement("upload_files_btn", 
+//       "client_uploads_status", 
+//       "upload_files", 
+//       "http://localhost:8000/motion/uploads");
+//   }
 
-  motion_config_dropwown()
-  {
-    document.addEventListener("DOMContentLoaded", () => 
-    {
-      const toggleBtn = document.getElementById('motion-config-toggle');
-      const panel = document.getElementById('motion-config-panel');
+//   motion_config_dropwown()
+//   {
+//     document.addEventListener("DOMContentLoaded", () => 
+//     {
+//       const toggleBtn = document.getElementById('motion-config-toggle');
+//       const panel = document.getElementById('motion-config-panel');
 
-      if (toggleBtn == null) return;
-      if (panel == null) return;
+//       if (toggleBtn == null) return;
+//       if (panel == null) return;
 
-      // Panel toggle
-      toggleBtn.addEventListener('click', () => 
-      {
-        if (panel.style.display === "none" || !panel.style.display) 
-        {
-          panel.style.display = "block";
-          toggleBtn.style.borderRadius = "8px 8px 0 0";
-        } 
-        else 
-        {
-          panel.style.display = "none";
-          toggleBtn.style.borderRadius = "6px";
-        }
-      });
+//       // Panel toggle
+//       toggleBtn.addEventListener('click', () => 
+//       {
+//         if (panel.style.display === "none" || !panel.style.display) 
+//         {
+//           panel.style.display = "block";
+//           toggleBtn.style.borderRadius = "8px 8px 0 0";
+//         } 
+//         else 
+//         {
+//           panel.style.display = "none";
+//           toggleBtn.style.borderRadius = "6px";
+//         }
+//       });
 
-    });
+//     });
 
-    Utils.button_motion_config("submit_motion_config", 
-    "config_status", 
-    "http://localhost:8000/motion/motion_config");
+//     Utils.button_motion_config("submit_motion_config", 
+//     "config_status", 
+//     "http://localhost:8000/motion/motion_config");
 
-  }
+//   }
 
-  convert_pv_style() 
-  {
-    Utils.generic_button_fastAPI("convert_pv_style_btn", 
-      "convert_pv_style_status", 
-      "http://localhost:8000/motion/convert_pv_style");
-  }
+//   convert_pv_style() 
+//   {
+//     Utils.generic_button_fastAPI("convert_pv_style_btn", 
+//       "convert_pv_style_status", 
+//       "http://localhost:8000/motion/convert_pv_style");
+//   }
 
-  convert_bvh_to_npy() 
-  {
+//   convert_bvh_to_npy() 
+//   {
 
-    Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
-      "convert_bvh_to_npy_status", 
-      "http://localhost:8000/motion/convert_bvh_to_npy");
-  }
+//     Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
+//       "convert_bvh_to_npy_status", 
+//       "http://localhost:8000/motion/convert_bvh_to_npy");
+//   }
 
-  async setup_file_dropdown() 
-  {
-    const file_selector = document.getElementById("file_selector") as HTMLDivElement | null;
-    const dropdown = document.getElementById("file_dropdown") as HTMLSelectElement | null;
-    const status = document.getElementById("file_selector_status") as HTMLDivElement | null;
-    if (!file_selector || !dropdown || !status) 
-    {
-      console.error("File selector or dropdown or status element not found.");
-      return;
-    }
+//   async setup_file_dropdown() 
+//   {
+//     const file_selector = document.getElementById("file_selector") as HTMLDivElement | null;
+//     const dropdown = document.getElementById("file_dropdown") as HTMLSelectElement | null;
+//     const status = document.getElementById("file_selector_status") as HTMLDivElement | null;
+//     if (!file_selector || !dropdown || !status) 
+//     {
+//       console.error("File selector or dropdown or status element not found.");
+//       return;
+//     }
     
-    try 
-    {
-      file_selector.addEventListener("mousedown", async () => {
+//     try 
+//     {
+//       file_selector.addEventListener("mousedown", async () => {
         
-        const response = await fetch("http://localhost:8000/motion/list_files", {
-          method: "POST"
-        });
+//         const response = await fetch("http://localhost:8000/motion/list_files", {
+//           method: "POST"
+//         });
   
-        const files = await response.json();
-        dropdown.innerHTML = '<option disabled selected>-- Datei auswählen --</option>';
+//         const files = await response.json();
+//         dropdown.innerHTML = '<option disabled selected>-- Datei auswählen --</option>';
 
   
-        for (const [type, list] of Object.entries(files)) 
-        {
-          if (!Array.isArray(list)) continue;
+//         for (const [type, list] of Object.entries(files)) 
+//         {
+//           if (!Array.isArray(list)) continue;
 
-          list.forEach(filename => {
-            const option = document.createElement("option");
-            option.value = filename;
-            option.dataset.type = type;
-            option.textContent = `${filename} (${type})`;
-            dropdown.appendChild(option);
-          });
-        }
+//           list.forEach(filename => {
+//             const option = document.createElement("option");
+//             option.value = filename;
+//             option.dataset.type = type;
+//             option.textContent = `${filename} (${type})`;
+//             dropdown.appendChild(option);
+//           });
+//         }
         
 
-      });
+//       });
 
-      // directly start player when user choosed motion file
-      dropdown.addEventListener("change", async () => {
-        const selected = dropdown.selectedOptions[0];
-        const filename = selected.value;
-        const type = selected.dataset.type;
+//       // directly start player when user choosed motion file
+//       dropdown.addEventListener("change", async () => {
+//         const selected = dropdown.selectedOptions[0];
+//         const filename = selected.value;
+//         const type = selected.dataset.type;
 
-        if (!filename || !type) return;
+//         if (!filename || !type) return;
 
-        await this.load_motionfile_and_player(filename);
+//         await this.load_motionfile_and_player(filename);
       
       
-      });
+//       });
 
-    } 
-    catch (error) 
-    {
-        if (error instanceof Error) 
-        {
-          status.textContent = `❌ error: ${error.message}`;
-        } 
-        else 
-        {
-          status.textContent = '❌ Unknown error';
-        } 
-    }
-  }
+//     } 
+//     catch (error) 
+//     {
+//         if (error instanceof Error) 
+//         {
+//           status.textContent = `❌ error: ${error.message}`;
+//         } 
+//         else 
+//         {
+//           status.textContent = '❌ Unknown error';
+//         } 
+//     }
+//   }
 
-  async load_motionfile_and_player(filename: string)
-  {
-    const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
-    const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
+//   async load_motionfile_and_player(filename: string)
+//   {
+//     const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
+//     const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
 
-    switch (file_extension) {
-      case 'bvh':
-        this.currentLoader = new BVH_loader(this.scene);
-        await this.currentLoader.load_bvh_motion(fileUrl);
-        this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
-        break;
+//     switch (file_extension) {
+//       case 'bvh':
+//         this.currentLoader = new BVH_loader(this.scene);
+//         await this.currentLoader.load_bvh_motion(fileUrl);
+//         this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
+//         break;
 
-      case 'fbx':
-        this.currentLoader = new FBX_Loader(this.scene);
-        await this.currentLoader.load_fbx_animation(fileUrl);
-        this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
-        break;
+//       case 'fbx':
+//         this.currentLoader = new FBX_Loader(this.scene);
+//         await this.currentLoader.load_fbx_animation(fileUrl);
+//         this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
+//         break;
 
-      case 'npy':
-        this.currentLoader = new NPY_loader(this.scene);
-        await this.currentLoader.load_npy_animation(fileUrl);
+//       case 'npy':
+//         this.currentLoader = new NPY_loader(this.scene);
+//         await this.currentLoader.load_npy_animation(fileUrl);
 
         
-        const skeletonPath = fileUrl
-        .replace("/npy/", "/json/")
-        .replace(".npy", "_skeleton.json");
-        await this.currentLoader.create_skeleton(skeletonPath);
-        this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
-        break;
-    }
-  }
+//         const skeletonPath = fileUrl
+//         .replace("/npy/", "/json/")
+//         .replace(".npy", "_skeleton.json");
+//         await this.currentLoader.create_skeleton(skeletonPath);
+//         this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
+//         break;
+//     }
+//   }
 
-  cleanup_scene() 
-  {
-    window.addEventListener('keydown', (e) => 
-    {
-      if (e.code === 'KeyR')
-      {
-        if (this.currentPlayer) 
-        {
-          this.currentLoader!.dispose();
-          this.currentPlayer.dispose();
+//   cleanup_scene() 
+//   {
+//     window.addEventListener('keydown', (e) => 
+//     {
+//       if (e.code === 'KeyR')
+//       {
+//         if (this.currentPlayer) 
+//         {
+//           this.currentLoader!.dispose();
+//           this.currentPlayer.dispose();
 
-          this.currentPlayer = null;
-          this.currentLoader = null;
+//           this.currentPlayer = null;
+//           this.currentLoader = null;
           
-          const label = document.getElementById('frame-label') as HTMLDivElement | null;
-          const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
-          slider!.value = '0';
-          label!.textContent = `Frame: 0 / 0`;
-          if (this.previewRenderer) 
-          {
-            this.previewRenderer.dispose();
-          }
-        }
-      }
-    });
+//           const label = document.getElementById('frame-label') as HTMLDivElement | null;
+//           const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
+//           slider!.value = '0';
+//           label!.textContent = `Frame: 0 / 0`;
+//           if (this.previewRenderer) 
+//           {
+//             this.previewRenderer.dispose();
+//           }
+//         }
+//       }
+//     });
 
-  }
+//   }
 
-  print_updateables()
-  {
-    window.addEventListener('keydown', (e) => 
-    {
-      if(e.code == "KeyP")
-      {
-        for (let index = 0; index < this.scene.children.length; index++) 
-        {
-          const element = this.scene.children[index];
-          console.log(`Object type: ${element.type} | Name: ${element.name}`);
-        }
+//   print_updateables()
+//   {
+//     window.addEventListener('keydown', (e) => 
+//     {
+//       if(e.code == "KeyP")
+//       {
+//         for (let index = 0; index < this.scene.children.length; index++) 
+//         {
+//           const element = this.scene.children[index];
+//           console.log(`Object type: ${element.type} | Name: ${element.name}`);
+//         }
 
-        console.log("loop.updatables.length ", this.loop.updatables.length);
-        for (let index = 0; index < this.loop.updatables.length; index++) 
-        {
-          const element = this.loop.updatables[index];
-          if (!element) 
-          {
-            console.log(element);
-          }
+//         console.log("loop.updatables.length ", this.loop.updatables.length);
+//         for (let index = 0; index < this.loop.updatables.length; index++) 
+//         {
+//           const element = this.loop.updatables[index];
+//           if (!element) 
+//           {
+//             console.log(element);
+//           }
           
-        }
-          console.log("loop.updatables ", this.loop.updatables)
-          Utils.log_camera_position(this.camera);
-          console.log("=================================================")
+//         }
+//           console.log("loop.updatables ", this.loop.updatables)
+//           Utils.log_camera_position(this.camera);
+//           console.log("=================================================")
       
-      }
-    });
-  }
+//       }
+//     });
+//   }
 
 
-  slider_preview_frame()
-  {
-    const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
-    const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
-    const previewImg = document.getElementById("preview-img") as HTMLImageElement | null;
+//   slider_preview_frame()
+//   {
+//     const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
+//     const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
+//     const previewImg = document.getElementById("preview-img") as HTMLImageElement | null;
 
-    if (!slider || !preview || !previewImg) 
+//     if (!slider || !preview || !previewImg) 
+//     {
+//       console.error("Slider or preview elements not found.");
+//       return;
+//     }
+
+//     slider.addEventListener("mousemove", async (e) => 
+//     {
+//       const rect = slider.getBoundingClientRect();
+//       const percent = (e.clientX - rect.left) / rect.width;
+//       const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
+
+//       preview.style.left = `${e.clientX - rect.left + 60}px`;
+//       preview.style.display = "block";
+//       if (this.currentPlayer instanceof NPY_Player) 
+//       {
+//         const thumbDataUrl = await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
+//         if (thumbDataUrl) 
+//         {
+//           previewImg.src = thumbDataUrl;
+//         }
+//       }
+//     });
+
+//     slider.addEventListener("mouseleave", () => 
+//     {
+//       preview.style.display = "none";
+//     });
+
+//   }  
+// }
+// export { App };
+
+
+
+
+
+
+export const App: React.FC = () => {
+  const threeContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Halte deine Instanzen in useRef, damit sie persistent bleiben!
+  const loopRef = useRef<Loop | null>(null);
+  const cameraRef = useRef<any>(null); // hier korrekt typisieren!
+  const sceneRef = useRef<any>(null);
+  const rendererRef = useRef<any>(null);
+
+  useEffect(() => {
+    // === Initialisierung, läuft NUR EINMAL ===
+    if (!threeContainerRef.current) return;
+
+    // ThreeJS Basis
+    const camera = createCamera();
+    const scene = createScene();
+    const renderer = createRenderer();
+    threeContainerRef.current.appendChild(renderer.domElement);
+
+    // ECS-Loop
+    const loop = new Loop(camera, scene, renderer);
+    loop.updatables.push(createOrbitControls(camera, renderer));
+    // ...weitere updatables etc...
+
+    loopRef.current = loop;
+    cameraRef.current = camera;
+    sceneRef.current = scene;
+    rendererRef.current = renderer;
+    const resizer = new Resizer(threeContainerRef.current, camera, renderer);
+    
+    // Option: loop.start() automatisch (oder per Button)
+    loop.start();
+
+    // Clean-up bei Unmount
+    return () => 
     {
-      console.error("Slider or preview elements not found.");
-      return;
-    }
+      loop.stop();
+      renderer.dispose();
+      // Optional: Szene räumen, DOM entfernen etc.
+    };
+  }, []);
 
-    slider.addEventListener("mousemove", async (e) => 
-    {
-      const rect = slider.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
+  // Steuere den Loop mit Buttons/Events
+  const handlePlay = () => loopRef.current?.start();
+  const handlePause = () => loopRef.current?.stop();
 
-      preview.style.left = `${e.clientX - rect.left + 60}px`;
-      preview.style.display = "block";
-      if (this.currentPlayer instanceof NPY_Player) 
-      {
-        const thumbDataUrl = await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
-        if (thumbDataUrl) 
-        {
-          previewImg.src = thumbDataUrl;
-        }
-      }
-    });
+  return (
+    <div>
+      <div ref={threeContainerRef} id="scene-container" />
+      <div id="timeline-container">
+        <SquareBracketSlider
+          min={0}
+          max={100}
+          initialMin={10}
+          initialMax={90}
+          onChange={({ min, max }) => {
+            // Frames min bis max, etc.
+          }}
+        />
+        <button onClick={handlePlay}>Play</button>
+        <button onClick={handlePause}>Pause</button>
+      </div>
+      {/* weitere UI */}
+    </div>
+  );
+};
 
-    slider.addEventListener("mouseleave", () => 
-    {
-      preview.style.display = "none";
-    });
-
-  }  
-}
-
-
-export { App };
