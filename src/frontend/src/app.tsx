@@ -241,35 +241,35 @@ import { SquareBracketSlider } from "@/components/SquareBracketSlider";
 
 //   }
 
-//   print_updateables()
-//   {
-//     window.addEventListener('keydown', (e) => 
-//     {
-//       if(e.code == "KeyP")
-//       {
-//         for (let index = 0; index < this.scene.children.length; index++) 
-//         {
-//           const element = this.scene.children[index];
-//           console.log(`Object type: ${element.type} | Name: ${element.name}`);
-//         }
+  // print_updateables()
+  // {
+  //   window.addEventListener('keydown', (e) => 
+  //   {
+  //     if(e.code == "KeyP")
+  //     {
+  //       for (let index = 0; index < this.scene.children.length; index++) 
+  //       {
+  //         const element = this.scene.children[index];
+  //         console.log(`Object type: ${element.type} | Name: ${element.name}`);
+  //       }
 
-//         console.log("loop.updatables.length ", this.loop.updatables.length);
-//         for (let index = 0; index < this.loop.updatables.length; index++) 
-//         {
-//           const element = this.loop.updatables[index];
-//           if (!element) 
-//           {
-//             console.log(element);
-//           }
+  //       console.log("loop.updatables.length ", this.loop.updatables.length);
+  //       for (let index = 0; index < this.loop.updatables.length; index++) 
+  //       {
+  //         const element = this.loop.updatables[index];
+  //         if (!element) 
+  //         {
+  //           console.log(element);
+  //         }
           
-//         }
-//           console.log("loop.updatables ", this.loop.updatables)
-//           Utils.log_camera_position(this.camera);
-//           console.log("=================================================")
+  //       }
+  //         console.log("loop.updatables ", this.loop.updatables)
+  //         Utils.log_camera_position(this.camera);
+  //         console.log("=================================================")
       
-//       }
-//     });
-//   }
+  //     }
+  //   });
+  // }
 
 
 //   slider_preview_frame()
@@ -316,7 +316,8 @@ import { SquareBracketSlider } from "@/components/SquareBracketSlider";
 
 
 
-export const App: React.FC = () => {
+export const App: React.FC = () => 
+{
   const threeContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Halte deine Instanzen in useRef, damit sie persistent bleiben!
@@ -325,7 +326,8 @@ export const App: React.FC = () => {
   const sceneRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     // === Initialisierung, läuft NUR EINMAL ===
     if (!threeContainerRef.current) return;
 
@@ -345,13 +347,53 @@ export const App: React.FC = () => {
     sceneRef.current = scene;
     rendererRef.current = renderer;
     const resizer = new Resizer(threeContainerRef.current, camera, renderer);
-    
+
     // Option: loop.start() automatisch (oder per Button)
     loop.start();
+
+
+
+
+    const handleKeyDown = (e: KeyboardEvent) => 
+    {
+      if (e.code === "KeyP") 
+      {
+        // Annahme: deine Refs sind initialisiert
+        const scene = sceneRef.current;
+        const loop = loopRef.current;
+        const camera = cameraRef.current;
+        if (!scene || !loop || !camera) 
+        {
+          console.log("Scene, loop oder camera nicht bereit.");
+          return;
+        }
+
+        scene.children.forEach((element:any) => 
+        {
+          console.log(`Object type: ${element.type} | Name: ${element.name}`);
+        });
+
+        console.log("loop.updatables.length ", loop.updatables.length);
+        loop.updatables.forEach((element, idx) => 
+        {
+          if (!element) 
+          {
+            console.log(`Empty updatable at index ${idx}:`, element);
+          }
+        });
+        console.log("loop.updatables ", loop.updatables);
+        Utils.log_camera_position(camera);
+        console.log("=================================================");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
 
     // Clean-up bei Unmount
     return () => 
     {
+      window.removeEventListener("keydown", handleKeyDown);
       loop.stop();
       renderer.dispose();
       // Optional: Szene räumen, DOM entfernen etc.

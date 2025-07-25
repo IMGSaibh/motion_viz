@@ -36,7 +36,6 @@ import { App } from "./app";
 import "@/custom.css";
 
 const container = document.getElementById("root");
-console.log(container);
 if (container) 
 {
   const root = createRoot(container);
