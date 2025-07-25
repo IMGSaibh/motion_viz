@@ -8,7 +8,11 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "npyjs": "^0.7.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "three": "^0.176.0",
     "troika-three-text": "^0.52.4"
   },

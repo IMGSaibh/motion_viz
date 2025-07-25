@@ -22,7 +22,6 @@ function main()
 	app.print_updateables();
 
 	app.cleanup_scene();
-
 	// start the loop (produce a stream of frames)
 	app.start();
 
