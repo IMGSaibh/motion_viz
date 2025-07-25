@@ -1,5 +1,6 @@
 import numpy as np
-from typing import List
+from pydantic import BaseModel
+from typing import List, Optional
 from pathlib import Path
 from fastapi import UploadFile, File, APIRouter, Request
 from backend.motion_parser.pv_parser import PVParser
@@ -7,6 +8,7 @@ from backend.motion_parser.csv_parser import CSVParser
 from backend.motion_parser.bvh_parser import BvhParser 
 from backend.motion_parser.csv_c3d_parser import CSV_C3D_Parser
 from backend.motion_parser.csv_segmentbased_parser import SegmentCSVParser
+from backend.json_schema.JsonSchema import JSONGenerator, MotionConfig
 
 router = APIRouter()
 workspacefolder = Path.cwd()
@@ -49,6 +51,25 @@ async def upload(files: List[UploadFile] = File(...)):
     return {
         "message": f"{len(files) - len(not_saved_files)} files were succesfully uploaded!",
         "not_supported_files": ", ".join(not_saved_files)
+    }
+
+@router.post("/motion_config")
+async def create_motion_config(config: MotionConfig):
+    generator = JSONGenerator()
+    data_schema = generator.load_schema(Path.joinpath(workspacefolder, "src/backend/json_schema/data_schema.json"))
+    generator.from_config(config)
+
+    if config is None:  
+        return {
+            "warning": "could not create config file",
+            "message": "",
+        }
+    
+    generator.save(Path.joinpath(workspacefolder, "data/descriptor_files/new_schema.json"))
+
+    return {
+        "warning": "",
+        "message": "config file created",
     }
 
 @router.post("/convert_pv_style")
@@ -110,107 +131,6 @@ async def convert_bvh_to_npy():
         "message": ".bvh-files converted",
         "warning": "",
     }
-
-
-@router.post("/convert_csv_kinectv1_to_npy")
-async def convert_csv_kinectv1_to_npy():
-
-    workspacefolder = Path.cwd()
-    csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
-    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    csv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
-
-
-    csv_files = list(csv_dir_path.glob("*.csv"))
-
-    if not csv_files:
-        return {
-            "warning": "Found no .csv-Files.",
-            "message": "",
-        }
-
-    for csv_file in csv_files:
-        csv_parser = CSVParser(csv_file)
-        dataset = csv_parser.csv_to_numpy()
-
-        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
-        np.save(save_npy_path, dataset)
-
-        save_json_skeleton_path = Path.joinpath(csv_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton.json")
-        csv_parser.export_skeleton_converted(save_json_skeleton_path)
-    
-    return {
-        "message": ".csv-files converted",
-        "warning": "",
-    }
-
-
-@router.post("/convert_csv_c3d_to_npy")
-async def convert_csv_c3d_to_npy():
-
-    workspacefolder = Path.cwd()
-    csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
-    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    csv_c3d_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
-
-
-    csv_files = list(csv_dir_path.glob("*.csv"))
-
-    if not csv_files:
-        return {
-            "warning": "Found no .csv-Files.",
-            "message": "",
-        }
-
-    for csv_file in csv_files:
-        csv_parser = CSV_C3D_Parser(csv_file)
-        dataset = csv_parser.csv_to_numpy()
-
-        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
-        np.save(save_npy_path, dataset)
-        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton.json")
-        csv_parser.export_skeleton_converted(save_json_skeleton_path)
-    
-    return {
-        "message": ".csv-files converted",
-        "warning": "",
-    }
-
-
-@router.post("/convert_csv_segmentbased_to_npy")
-async def convert_csv_segmentbased_to_npy():
-
-    workspacefolder = Path.cwd()
-    csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
-    numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
-    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    csv_c3d_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
-
-
-    csv_files = list(csv_dir_path.glob("*.csv"))
-
-    if not csv_files:
-        return {
-            "warning": "Found no .csv-Files.",
-            "message": "",
-        }
-
-    for csv_file in csv_files:
-        csv_parser = SegmentCSVParser(csv_file)
-        dataset = csv_parser.csv_segmentbased_to_numpy()
-
-        save_npy_path =Path.joinpath(numpy_converted_dir, f"{csv_file.name[:-4]}") # Remove .csv extension
-        np.save(save_npy_path, dataset)
-        save_json_skeleton_path = Path.joinpath(csv_c3d_json_skeleton_dir, f"{csv_file.name[:-4]}_skeleton.json")
-        csv_parser.export_skeleton_converted(save_json_skeleton_path)
-    
-    return {
-        "message": ".csv-files converted",
-        "warning": "",
-    }
-
 
 @router.post("/list_files")
 async def list_motion_files():

@@ -15,17 +15,82 @@
       <button id="upload_files_btn">Upload Files</button>
       <div id="client_uploads_status"></div>
 
+    <div id="motion-config-dropdown" style="margin-top:20px;">
+      <button id="motion-config-toggle" style="
+        width: 100%;
+        background: rgba(0,0,0,0.5);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        padding: 10px 10px;
+        text-align: left;
+        cursor: pointer;
+      ">
+        Motion Config ⚙️
+      </button>
+      <div id="motion-config-panel" style="
+        display: none;
+        background: rgba(0,0,0,0.4);
+        padding: 12px;
+        border-radius: 0 0 8px 8px;
+        margin-top: 0;
+      ">
+        <form id="motion-config-form" style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="config-row">
+            <label for="input_format">Format</label>
+            <input type="text" id="input_format" value="csv" />
+          </div>
+          <div class="config-row">
+            <label for="input_abbrev">Abbreviation</label>
+            <input type="text" id="input_abbrev" value="" />
+          </div>
+          <div class="config-row">
+            <label for="input_scale">Scale</label>
+            <input type="number" id="input_scale" value="1" step="any" />
+          </div>
+          <div class="config-row">
+            <label for="input_positions">Positions</label>
+            <input type="text" id="input_positions" value="absolute" />
+          </div>
+          <div class="config-row">
+            <label for="input_rotations">Rotations</label>
+            <input type="text" id="input_rotations" value="none" />
+          </div>
+          <div class="config-row">
+            <label for="input_systemname">Systemname</label>
+            <input type="text" id="input_systemname" value="" />
+          </div>
+          <div class="config-row">
+            <label for="input_fps">FPS</label>
+            <input type="number" id="input_fps" value="30" min="1" max="1000" />
+          </div>
+          <div class="config-row">
+            <label for="input_jointcount">Joint count</label>
+            <input type="number" id="input_jointcount" value="30" min="1" max="1000" />
+          </div>
+          <div class="config-row">
+            <label for="input_coloffset">Col offset</label>
+            <input type="number" id="input_coloffset" value="0" min="0" />
+          </div>
+          <div class="config-row">
+            <label for="input_colgap">Col gap</label>
+            <input type="number" id="input_colgap" value="0" min="0" />
+          </div>
+          <div class="config-row">
+            <label for="input_dimsize">Dim size for position</label>
+            <input type="number" id="input_dimsize" value="3" min="1" max="10" />
+          </div>
+          <button type="button" id="submit_motion_config" style="margin-top:10px;background:white;color: black">Create Config Json</button>
+          <div id="config_status"></div>
+        </form>
+      </div>
+    </div>
+
+
+
       <button id="convert_bvh_to_npy_btn">Convert BVH to NPY</button>
       <div id="convert_bvh_to_npy_status"></div>
-
-      <button id="convert_csv_kinectv1_to_npy_btn">Convert CSV Kinect_V1 to NPY</button>
-      <div id="convert_csv_kinectv1_to_npy_status"></div>
-
-      <button id="convert_csv_c3d_to_npy_btn">Convert CSV_C3D to NPY</button>
-      <div id="convert_csv_c3d_to_npy_status"></div>
-
-      <button id="convert_csv_sgementbased_to_npy_btn">Convert CSV segment based to NPY</button>
-      <div id="convert_csv_sgementbased_to_npy_status"></div>
 
       <button id="convert_pv_style_btn">Convert File as done in Pose Viewer</button>
       <div id="convert_pv_style_status"></div>
@@ -59,7 +124,8 @@
         border: 1px solid #ccc;
         pointer-events: none;
       ">
-      <img id="preview-img" src="" style="width: 100%; height: 100%;" />
+        <img id="preview-img" src="" style="width: 100%; height: 100%;" />
+      </div>
     </div>
   </body>
 </html>

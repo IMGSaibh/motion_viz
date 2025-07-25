@@ -18,7 +18,8 @@ import { BVH_Player } from '@/motion_player/bvh_player';
 import { NPY_Player } from '@/motion_player/npy_player';
 import { FBX_Player } from '@/motion_player/fbx_player';
 import Utils from '@/utils';
-import {ThumbnailGenerator} from '@/thumbnail_generator';
+
+import { SquareBracketSlider } from "@/components/SquareBracketSlider";
 
 class App
 {
@@ -71,6 +72,39 @@ class App
       "http://localhost:8000/motion/uploads");
   }
 
+  motion_config_dropwown()
+  {
+    document.addEventListener("DOMContentLoaded", () => 
+    {
+      const toggleBtn = document.getElementById('motion-config-toggle');
+      const panel = document.getElementById('motion-config-panel');
+
+      if (toggleBtn == null) return;
+      if (panel == null) return;
+
+      // Panel toggle
+      toggleBtn.addEventListener('click', () => 
+      {
+        if (panel.style.display === "none" || !panel.style.display) 
+        {
+          panel.style.display = "block";
+          toggleBtn.style.borderRadius = "8px 8px 0 0";
+        } 
+        else 
+        {
+          panel.style.display = "none";
+          toggleBtn.style.borderRadius = "6px";
+        }
+      });
+
+    });
+
+    Utils.button_motion_config("submit_motion_config", 
+    "config_status", 
+    "http://localhost:8000/motion/motion_config");
+
+  }
+
   convert_pv_style() 
   {
     Utils.generic_button_fastAPI("convert_pv_style_btn", 
@@ -84,28 +118,6 @@ class App
     Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
       "convert_bvh_to_npy_status", 
       "http://localhost:8000/motion/convert_bvh_to_npy");
-  }
-
-  convert_csv_kinect_v1_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_kinectv1_to_npy_btn", 
-      "convert_csv_kinectv1_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_kinectv1_to_npy");
-  }
-
-  convert_csv_c3d_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_c3d_to_npy_btn", 
-      "convert_csv_c3d_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_c3d_to_npy");
-
-  }
-
-  convert_csv_segmentbased_to_npy()
-  {
-    Utils.generic_button_fastAPI("convert_csv_sgementbased_to_npy_btn", 
-      "convert_csv_sgementbased_to_npy_status",
-      "http://localhost:8000/motion/convert_csv_segmentbased_to_npy");
   }
 
   async setup_file_dropdown() 
@@ -201,13 +213,7 @@ class App
         .replace("/npy/", "/json/")
         .replace(".npy", "_skeleton.json");
         await this.currentLoader.create_skeleton(skeletonPath);
-
-        // const thumbnailGenerator = new ThumbnailGenerator(scene, camera, this.currentLoader, loop);
-        // await thumbnailGenerator.loadAndPrepare();
-        
         this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
-
-
         break;
     }
   }
@@ -283,21 +289,6 @@ class App
       return;
     }
 
-    // slider.addEventListener("mousemove", (e) => 
-    // {
-    //   const rect = slider.getBoundingClientRect();
-    //   const percent = (e.clientX - rect.left) / rect.width;
-    //   const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
-
-    //   // preview window position 
-    //   preview.style.left = `${e.clientX - rect.left + 60}px`;
-    //   preview.style.display = "block";
-
-    //   const base_url = "http://localhost:8000"; // FastAPI runs at 8000
-    //   previewImg.src = `${base_url}/data/thumbnails/frame_${String(frameIndex).padStart(4, '0')}.jpg`;
-    // });
-
-
     slider.addEventListener("mousemove", async (e) => 
     {
       const rect = slider.getBoundingClientRect();
@@ -321,10 +312,7 @@ class App
       preview.style.display = "none";
     });
 
-  }
-
-
-
+  }  
 }
 
 

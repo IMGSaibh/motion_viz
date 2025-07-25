@@ -26,6 +26,11 @@ class JsonLoader:
             raise FileNotFoundError(self.path)
         with self.path.open(encoding="utf-8") as f:
             self._data = json.load(f)
+    
+    def write_json(self, file_path:Path, data:Dict[str, Any])->None:
+        with open(file_path, "w") as json_file:
+            json.dump(data, json_file, indent=4)
+
 
     def _traverse(self, dotted_key: str) -> tuple[Any, bool]:
         current: Any = self._data
