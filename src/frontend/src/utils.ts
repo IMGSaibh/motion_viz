@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { Loop } from '@/system/loop';
 
 export default class Utils 
 {
@@ -29,10 +30,34 @@ export default class Utils
     console.log(`${label} rotation → x: ${camera.rotation.x.toFixed(2)}, y: ${camera.rotation.y.toFixed(2)}, z: ${camera.rotation.z.toFixed(2)}`);
   }
 
-  static generic_button_fastAPI(btn_element: string, status_element: string, fastAPI_url: string) 
+  static print_scene_components(scene: THREE.Scene, loop: Loop, camera: THREE.Camera)
   {
-    document.getElementById(btn_element)!.addEventListener("click", async () => 
+    if (!scene || !loop || !camera) 
     {
+      console.log("Scene, loop oder camera nicht bereit.");
+      return;
+    }
+
+    scene.children.forEach((element:any) => 
+    {
+      console.log(`Object type: ${element.type} | Name: ${element.name}`);
+    });
+
+    console.log("loop.updatables.length ", loop.updatables.length);
+    loop.updatables.forEach((element, idx) => 
+    {
+      if (!element) 
+      {
+        console.log(`Empty updatable at index ${idx}:`, element);
+      }
+    });
+    console.log("loop.updatables ", loop.updatables);
+    Utils.log_camera_position(camera);
+    console.log("=================================================");
+  }
+
+  static async generic_button_fastAPI(btn_element: string, status_element: string, fastAPI_url: string) 
+  {
       const status = document.getElementById(status_element)  as HTMLDivElement | null;
       if (!status)
         return;
@@ -66,8 +91,6 @@ export default class Utils
           status.textContent = '❌ Unknown error';
         }
       }
-
-    });
   }
 
   static generic_inputbutton_fastAPI_inputelement(btn_element: string, status_element: string, input_element: string, fastAPI_url: string)
@@ -121,11 +144,8 @@ export default class Utils
     });
   }
 
-
-  static button_motion_config(btn_element: string, status_element: string, fastAPI_url: string)
+  static async button_motion_config(btn_element: string, status_element: string, fastAPI_url: string)
   {
-    document.getElementById(btn_element)!.addEventListener("click", async () => 
-    {
       const status = document.getElementById(status_element) as HTMLDivElement | null;
       if (!status)
         return;
@@ -175,24 +195,79 @@ export default class Utils
           status.textContent = '❌ Unknown error';
         }
       }
-
-    });
-
-
   }
 
+  static async file_selection_dropdown() : Promise<HTMLSelectElement | undefined>
+  {
+    const file_selector = document.getElementById("file_selector") as HTMLDivElement | null;
+    const dropdown = document.getElementById("file_dropdown") as HTMLSelectElement | null;
+    const status = document.getElementById("file_selector_status") as HTMLDivElement | null;
+
+    if (!file_selector || !dropdown || !status) 
+    {
+      console.error("File selector or dropdown or status element not found.");
+      return;
+    }
+
+    try 
+    {      
+        const response = await fetch("http://localhost:8000/motion/list_files", 
+        {
+          method: "POST"
+        });
+
+        const files = await response.json();
+        dropdown.innerHTML = '<option disabled selected>-- Datei auswählen --</option>';
 
 
-  // Pro tipp
-  // function getById<T extends HTMLElement>(id: string): T {
-  //   const el = document.getElementById(id);
-  //   if (!el) throw new Error(`Element #${id} not found`);
-  //   return el as T;
-  // }
+        for (const [type, list] of Object.entries(files)) 
+        {
+          if (!Array.isArray(list)) continue;
 
-  // // Nutzung
-  // const input = getById<HTMLInputElement>('upload_files');
-  // const status = getById<HTMLElement>('client_uploads_status');
+          list.forEach(filename => {
+            const option = document.createElement("option");
+            option.value = filename;
+            option.dataset.type = type;
+            option.textContent = `${filename} (${type})`;
+            dropdown.appendChild(option);
+          });
+        }
 
+        return dropdown;
+
+      // dropdown.addEventListener("change", async () => 
+      // {
+      //   const selected = dropdown.selectedOptions[0];
+      //   const type = selected.dataset.type;
+      //   const filename = selected.value;
+      //   return filename;
+      // });
+
+    } 
+    catch (error) 
+    {
+        if (error instanceof Error) 
+        {
+          status.textContent = `❌ error: ${error.message}`;
+        } 
+        else 
+        {
+          status.textContent = '❌ Unknown error';
+        } 
+    }
+  }
+
+  static load_dropdown_element(dropdown: HTMLSelectElement | undefined)
+  {
+    if (!dropdown) {return;}
+
+    return new Promise((resolve) => {
+      dropdown.addEventListener("change", () => {
+        const selected = dropdown.selectedOptions[0];
+        const filename = selected.value;
+        resolve(filename);
+      });
+    });
+  }
 
 }

@@ -85,6 +85,49 @@ canvas {
   cursor: pointer;
 }
 
+#motion-config-dropdown
+{
+  margin-top:20px;
+}
+
+#motion-config-toggle button
+{
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  padding: 10px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+#motion-config-panel
+{
+  display: none;
+  background: rgba(0,0,0,0.4);
+  padding: 12px;
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+}
+
+#motion-config-form
+{
+  display: flex; 
+  flex-direction: column; gap: 10px;
+}
+
+#submit_motion_config
+{
+  margin-top:10px;
+  background:white;
+  color: black;
+}
+
+
+
+
 /* 
 =================== slider =================
 */
@@ -113,6 +156,25 @@ canvas {
 #frame-label {
   white-space: nowrap;
 }
+
+#preview-popup
+{
+  display: none;
+  position: absolute;
+  top: -210px;
+  width: 260px;
+  height: 190px;
+  background: black;
+  border: 1px solid #ccc;
+  pointer-events: none;
+}
+
+#preview-img
+{
+  width: 100%; 
+  height: 100%;
+}
+
 
 /* ====================================== */
 
