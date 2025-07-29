@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { ThreeManager } from "./three_js_manager";
-import { SquareBracketSlider } from "@/components/SquareBracketSlider";
+import {DoubleHandleSlider} from "./double_handle_slider"
 
 export const App: React.FC = () => 
 {
@@ -117,19 +117,8 @@ export const App: React.FC = () =>
       </div>
 
       <div ref={threeContainerRef} id="scene-container" />
-      
+
       {/* <div id="timeline-container">
-        <SquareBracketSlider
-          min={0}
-          max={100}
-          initialMin={10}
-          initialMax={90}
-          onChange={({ min, max }) => {
-            // Frames min bis max, etc.
-          }}
-        />
-      </div> */}
-      <div id="timeline-container">
         <div id="frame-label">Frame: 0 / 0</div>
         <input type="range" 
           id="frame-slider" 
@@ -140,7 +129,19 @@ export const App: React.FC = () =>
           onMouseLeave={handleSliderPreviewMouseleave}/>
         <div id="preview-popup">
           <img id="preview-img" src={undefined}/>
-      </div>
+        </div>
+      </div> */}
+      <div id="timeline-container">
+        <DoubleHandleSlider
+          min={0}
+          max={200}
+          initialMin={10}
+          initialMax={80}
+          onChange={({ min, max }) => {
+            console.log("Frame-Range:", min, max);
+          }}
+        />
+
       </div>
     </div>
   );

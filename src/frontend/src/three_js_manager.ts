@@ -90,20 +90,24 @@ export class ThreeManager
         "http://localhost:8000/motion/motion_config");
     }
 
-      convert_pv_style() 
-      {
+    convert_pv_style() 
+    {
         Utils.generic_button_fastAPI("convert_pv_style_btn", 
-          "convert_pv_style_status", 
-          "http://localhost:8000/motion/convert_pv_style");
-      }
+            "convert_pv_style_status", 
+            "http://localhost:8000/motion/convert_pv_style");
+    }
 
-      convert_bvh_to_npy() 
-      {
-
+    convert_bvh_to_npy() 
+    {
         Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
-          "convert_bvh_to_npy_status", 
-          "http://localhost:8000/motion/convert_bvh_to_npy");
-      }
+            "convert_bvh_to_npy_status", 
+            "http://localhost:8000/motion/convert_bvh_to_npy");
+    }
+
+    frame_range_change(min: number, max: number)
+    {
+        console.log("Neuer Frame-Bereich:", min, "-", max);
+    }
 
     async file_selection_dropwown()
     {
@@ -112,7 +116,6 @@ export class ThreeManager
         this.load_motionfile_and_player(str);
         
     }
-
 
     async load_motionfile_and_player(filename: string)
     {
