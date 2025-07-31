@@ -147,35 +147,15 @@ import {DoubleHandleSlider} from "./double_handle_slider"
 //   );
 // };
 
-import { useState } from "react";
-import { api_file_upoload } from "./api/api_file_upload";
 
-export function FireBackendButton() 
-{
-  const { fireBackend } = api_file_upoload();
-  const [result, setResult] = useState<any>(null);
+//  ====================================================================================
 
-  async function handleClick() 
-  {
-    const data = await fireBackend("firebackend");
-    setResult(data);
-  }
-  
-  return (
-    <div>
-      <button onClick={handleClick}>Fire Backend</button>
-      {result && (
-        <pre>{JSON.stringify(result, null, 2)}</pre>
-      )}
-    </div>
-  );
-}
-
+import { WidgetContainer  } from "./components/widget_container";
 export default function App() 
 {
   return (
     <div>
-      <FireBackendButton></FireBackendButton>
+      <WidgetContainer />
       <h1>Welcome to my app</h1>
     </div>
   );

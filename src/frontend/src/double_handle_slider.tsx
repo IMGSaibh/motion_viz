@@ -20,7 +20,7 @@ export const DoubleHandleSlider: React.FC<{
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Drag State & Positions als Refs (damit sie immer aktuell im Handler sind)
-  const dragType = useRef<"min" | "max" | null>(null);
+  const dragType = useRef<"min" | "max">(null);
 
   // Aktuelle Werte auch als Ref (damit handleMouseMove immer aktuelle Werte hat)
   const minRef = useRef(minValue);
