@@ -1,4 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
+import { NPY_Player } from "./threeJS/motion_player/npy_player";
+
 
 export const DoubleHandleSlider: React.FC<{
   min?: number;
@@ -28,41 +30,49 @@ export const DoubleHandleSlider: React.FC<{
   useEffect(() => { maxRef.current = maxValue }, [maxValue]);
 
   // Notifiziere Parent
-  useEffect(() => {
+  useEffect(() => 
+  {
     onChange?.({ min: minValue, max: maxValue });
   }, [minValue, maxValue, onChange]);
 
   const getPercent = useCallback((val: number) => ((val - min) / (max - min)) * 100, [min, max]);
-
-  // Einziger stabiler Handler für MouseMove
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  
+  const handleMouseMove = useCallback((e: MouseEvent) => 
+  {
     if (!sliderRef.current || !dragType.current) return;
+
     const rect = sliderRef.current.getBoundingClientRect();
     const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
     const value = Math.round(min + percent * (max - min));
-    if (dragType.current === "min") {
+
+    if (dragType.current === "min") 
+    {
       setMinValue(Math.min(value, maxRef.current - 1));
-    } else if (dragType.current === "max") {
+    }
+    else if (dragType.current === "max") 
+    {
       setMaxValue(Math.max(value, minRef.current + 1));
     }
   }, [min, max]);
 
-  // Einziger stabiler Handler für MouseUp
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback(() => 
+  {
     dragType.current = null;
     window.removeEventListener("mousemove", handleMouseMove);
     window.removeEventListener("mouseup", handleMouseUp);
   }, [handleMouseMove]);
 
   // Drag Start: MouseDown am Thumb
-  const handleThumbMouseDown = useCallback((type: "min" | "max") => {
+  const handleThumbMouseDown = useCallback((type: "min" | "max") => 
+  {
     dragType.current = type;
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
   }, [handleMouseMove, handleMouseUp]);
 
   // Clean-up falls Komponente unmounted während Drag
-  useEffect(() => () => {
+  useEffect(() => () => 
+  {
     window.removeEventListener("mousemove", handleMouseMove);
     window.removeEventListener("mouseup", handleMouseUp);
   }, [handleMouseMove, handleMouseUp]);
@@ -92,7 +102,7 @@ export const DoubleHandleSlider: React.FC<{
           }}
         />
         {/* Min Handle */}
-        <div
+        <div id="startframe_handle"
           style={{
             position: "absolute",
             left: `calc(${getPercent(minValue)}% - 12px)`,
@@ -118,7 +128,7 @@ export const DoubleHandleSlider: React.FC<{
           |
         </div>
         {/* Max Handle */}
-        <div
+        <div id="endframe_handle"
           style={{
             position: "absolute",
             left: `calc(${getPercent(maxValue)}% - 12px)`,

@@ -13,6 +13,15 @@ from backend.json_schema.JsonSchema import JSONGenerator, MotionConfig
 router = APIRouter()
 workspacefolder = Path.cwd()
 
+@router.post("/firebackend")
+async def firebackend():
+    print("executed")
+    return{
+        "data" : "data_1",
+        "error" : "error"
+    }
+
+
 @router.post("/uploads")
 async def upload(files: List[UploadFile] = File(...)):
     target_dirs = {

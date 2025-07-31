@@ -1,5 +1,5 @@
-import { NPY_loader } from '@/motion_loader/npy_loader';
-import { Loop, Updatable } from '@/system/loop';
+import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
+import { Loop, Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class NPY_Player 
@@ -125,7 +125,6 @@ export class NPY_Player
     this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
   }
 
-
   gotoFrame(frameIndex: number) 
   {
     this.frameIdx = Math.max(0, Math.min(frameIndex, this.frameCount));
@@ -168,8 +167,6 @@ export class NPY_Player
     this.gotoFrame(previousFrame);
 
     return dataUrl;
-
-
   }
 
 }

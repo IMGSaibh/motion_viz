@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Loop } from '@/system/loop';
+import { Loop } from '@/threeJS/system/loop';
 
 export default class Utils 
 {

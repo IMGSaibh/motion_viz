@@ -1,16 +1,16 @@
 import {PerspectiveCamera, WebGLRenderer, Scene } from 'three'
-import { BVH_loader } from '@/motion_loader/bvh_loader';
-import { FBX_Loader } from '@/motion_loader/fbx_loader';
-import { NPY_loader } from '@/motion_loader/npy_loader';
-import { BVH_Player } from '@/motion_player/bvh_player';
-import { NPY_Player } from '@/motion_player/npy_player';
-import { FBX_Player } from '@/motion_player/fbx_player';
-import { Loop } from '@/system/loop';
-import { Resizer } from '@/system/resizer';
-import { createScene } from '@/components/scene';
-import { createCamera } from '@/components/camera';
-import { createRenderer } from '@/system/renderer';
-import { createOrbitControls } from '@/components/orbitcontrol';
+import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
+import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
+import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
+import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
+import { NPY_Player } from '@/threeJS/motion_player/npy_player';
+import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
+import { Loop } from '@/threeJS/system/loop';
+import { Resizer } from '@/threeJS/system/resizer';
+import { createScene } from '@/threeJS/components/scene';
+import { createCamera } from '@/threeJS/components/camera';
+import { createRenderer } from '@/threeJS/system/renderer';
+import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import Utils from '@/utils';
 
 export class ThreeManager 
@@ -104,11 +104,6 @@ export class ThreeManager
             "http://localhost:8000/motion/convert_bvh_to_npy");
     }
 
-    frame_range_change(min: number, max: number)
-    {
-        console.log("Neuer Frame-Bereich:", min, "-", max);
-    }
-
     async file_selection_dropwown()
     {
         const elem = await Utils.file_selection_dropdown();
@@ -146,6 +141,34 @@ export class ThreeManager
             this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
             break;
         }
+    }
+
+    async frame_range_change(min: number, max: number)
+    {
+        const timeline = document.getElementById('timeline-container_2');
+        const startframe_handle = document.getElementById("startframe_handle") as HTMLDivElement | null
+        const endframe_handle = document.getElementById("endframe_handle") as HTMLDivElement | null
+        const previewImg = document.getElementById("preview-img_2") as HTMLImageElement | null;
+        
+
+        if (this.currentPlayer instanceof NPY_Player) 
+        {
+            const thumbDataUrl = await this.currentPlayer.renderThumbnail(min, this.scene, this.camera, 260, 190, this.previewRenderer);
+            if (thumbDataUrl && previewImg)
+            {
+                previewImg.src = thumbDataUrl;
+            }
+        }
+
+    }
+
+    get_frame_count_of_npy_player()
+    {
+        if (this.currentPlayer instanceof NPY_Player)
+        {
+            return this.currentPlayer.frameCount   
+        }
+        return 0;
     }
 
     async slider_preview_mousemove(e: React.MouseEvent<HTMLInputElement, MouseEvent>)

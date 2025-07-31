@@ -1,5 +1,5 @@
-import { FBX_Loader } from '@/motion_loader/fbx_loader';
-import { Loop, Updatable } from '@/system/loop';
+import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
+import { Loop, Updatable } from '@/threeJS/system/loop';
 
 
 export class FBX_Player 
