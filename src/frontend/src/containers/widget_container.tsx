@@ -53,12 +53,18 @@ export function WidgetContainer()
   const inputRef = useRef<HTMLInputElement>(null);
   const { upload_files } = api_file_processing();
   const { create_motion_descriptor } = api_file_processing();
-  const { list_motion_files } = api_file_processing();
   const { convert_with_pose_viewer, convert_bvh } = api_motion_file_conversion();
+  
   const [toggle_dropdown, set_toggle_dropdown] = useState(false);
+  const { list_motion_files } = api_file_processing();
   const [motionFiles, setMotionFiles] = useState<{type: string, name: string}[]>([]);
   const [selectedMotionFile, setSelectedMotionFile] = useState<string | null>(null);
 
+  
+  const sliderRef = useRef<HTMLInputElement | null>(null);
+  const [previewStyle, setPreviewStyle] = useState<React.CSSProperties>({});
+  const [previewImgSrc, setPreviewImgSrc] = useState<string | null>(null);
+  
   const [status_massage, set_status_massage] = useState<string | null>(null);
 
   const refs = 
@@ -152,7 +158,36 @@ export function WidgetContainer()
     setSelectedMotionFile(e.target.value);
     three_js_manager_ref.current!.load_motionfile_and_player(e.target.value);
   }
-  
+
+  function handleSliderPreviewMouseMove(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
+  {
+    if (!sliderRef.current) return;
+
+    const slider = sliderRef.current;
+    const rect = slider.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
+
+    // positioning via CSS
+    setPreviewStyle({
+      display: 'block',
+      left: e.clientX - rect.left + 60,
+    });
+
+    three_js_manager_ref.current?.getThumbnailForFrame(frameIndex).then(dataUrl => 
+    {
+      setPreviewImgSrc(dataUrl);
+    });
+  }
+
+  function handleSliderPreviewMouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+  {
+    setPreviewStyle({
+      display: 'none',
+    });
+    setPreviewImgSrc(null);
+  }
+
   return (
     <>
     <div id="ui-overlay">
@@ -177,7 +212,11 @@ export function WidgetContainer()
     </div>
     <div ref={mountRef} id="scene-container"/>
     <WidgetPresenterSlider
-    
+      sliderRef={sliderRef}
+      onMouseMove={handleSliderPreviewMouseMove}
+      onMouseLeave={handleSliderPreviewMouseLeave}
+      previewStyle={previewStyle}
+      previewImgSrc={previewImgSrc}
     />
     </>
   );

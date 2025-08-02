@@ -115,33 +115,15 @@ export class ThreeManager
         return 0;
     }
 
-    async slider_preview_mousemove(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+    async getThumbnailForFrame(frameIndex: number) 
     {
-        const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
-        const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
-        const previewImg = document.getElementById("preview-img") as HTMLImageElement | null;
-        if (!slider || !preview || !previewImg) 
-        {
-            console.error("Slider or preview elements not found.");
-            return;
-        }
-
-
-        const rect = slider.getBoundingClientRect();
-        const percent = (e.clientX - rect.left) / rect.width;
-        const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
-
-        preview.style.left = `${e.clientX - rect.left + 60}px`;
-        preview.style.display = "block";
         if (this.currentPlayer instanceof NPY_Player) 
         {
-            const thumbDataUrl = await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
-            if (thumbDataUrl)
-            {
-                previewImg.src = thumbDataUrl;
-            }
+            return await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
         }
-    }  
+        return null;
+    }
+
 
     slider_preview_mouseleave()
     {

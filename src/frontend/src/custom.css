@@ -148,7 +148,7 @@ canvas {
 
 #frame-slider {
   flex-grow: 1;
-    pointer-events: auto;
+  pointer-events: auto;
   z-index: 10;
 }
 
