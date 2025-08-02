@@ -11,7 +11,7 @@ import { createScene } from '@/threeJS/components/scene';
 import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
-import Utils from '@/utils';
+import Utils from '@/threeJS/utils';
 
 export class ThreeManager 
 {
@@ -27,6 +27,8 @@ export class ThreeManager
 
     constructor(container: HTMLDivElement)
     {
+        this.currentLoader = null;
+        this.currentPlayer = null;
         this.camera = createCamera();
         this.renderer = createRenderer();
         this.scene = createScene();
@@ -38,8 +40,6 @@ export class ThreeManager
         this.loop.updatables.push(orbitControls);
         const resizer = new Resizer(container, this.camera, this.renderer);
 
-        this.currentLoader = null;
-        this.currentPlayer = null;
 
         this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
         this.previewRenderer.setSize(260, 190, false);
@@ -55,91 +55,35 @@ export class ThreeManager
         this.loop.stop();
     }
 
-    upload_files()
-    {
-        Utils.generic_inputbutton_fastAPI_inputelement(
-            "upload_files_btn", 
-            "client_uploads_status", 
-            "upload_files", 
-            "http://localhost:8000/motion/uploads");
-    }
-
-    toggle_config_panel()
-    {
-        const toggleBtn = document.getElementById('motion-config-toggle');
-        const panel = document.getElementById('motion-config-panel');
-        if (toggleBtn == null) return;
-        if (panel == null) return;
-
-        if (panel.style.display === "none" || !panel.style.display) 
-        {
-            panel.style.display = "block";
-            toggleBtn.style.borderRadius = "8px 8px 0 0";
-        } 
-        else 
-        {
-            panel.style.display = "none";
-            toggleBtn.style.borderRadius = "6px";
-        }
-    }
-
-    submit_config_panel()
-    {
-        Utils.button_motion_config("submit_motion_config", 
-        "config_status", 
-        "http://localhost:8000/motion/motion_config");
-    }
-
-    convert_pv_style() 
-    {
-        Utils.generic_button_fastAPI("convert_pv_style_btn", 
-            "convert_pv_style_status", 
-            "http://localhost:8000/motion/convert_pv_style");
-    }
-
-    convert_bvh_to_npy() 
-    {
-        Utils.generic_button_fastAPI("convert_bvh_to_npy_btn", 
-            "convert_bvh_to_npy_status", 
-            "http://localhost:8000/motion/convert_bvh_to_npy");
-    }
-
-    async file_selection_dropwown()
-    {
-        const elem = await Utils.file_selection_dropdown();
-        const str = await Utils.load_dropdown_element(elem) as string
-        this.load_motionfile_and_player(str);
-        
-    }
-
     async load_motionfile_and_player(filename: string)
     {
         const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
         const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
-        switch (file_extension) {
-        case 'bvh':
-            this.currentLoader = new BVH_loader(this.scene);
-            await this.currentLoader.load_bvh_motion(fileUrl);
-            this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
-            break;
+        switch (file_extension) 
+        {
+            case 'bvh':
+                this.currentLoader = new BVH_loader(this.scene);
+                await this.currentLoader.load_bvh_motion(fileUrl);
+                this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
+                break;
 
-        case 'fbx':
-            this.currentLoader = new FBX_Loader(this.scene);
-            await this.currentLoader.load_fbx_animation(fileUrl);
-            this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
-            break;
+            case 'fbx':
+                this.currentLoader = new FBX_Loader(this.scene);
+                await this.currentLoader.load_fbx_animation(fileUrl);
+                this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
+                break;
 
-        case 'npy':
-            this.currentLoader = new NPY_loader(this.scene);
-            await this.currentLoader.load_npy_animation(fileUrl);
+            case 'npy':
+                this.currentLoader = new NPY_loader(this.scene);
+                await this.currentLoader.load_npy_animation(fileUrl);
 
-        
-            const skeletonPath = fileUrl
-            .replace("/npy/", "/json/")
-            .replace(".npy", "_skeleton.json");
-            await this.currentLoader.create_skeleton(skeletonPath);
-            this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
-            break;
+            
+                const skeletonPath = fileUrl
+                .replace("/npy/", "/json/")
+                .replace(".npy", "_skeleton.json");
+                await this.currentLoader.create_skeleton(skeletonPath);
+                this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
+                break;
         }
     }
 
@@ -176,7 +120,6 @@ export class ThreeManager
         const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
         const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
         const previewImg = document.getElementById("preview-img") as HTMLImageElement | null;
-
         if (!slider || !preview || !previewImg) 
         {
             console.error("Slider or preview elements not found.");
@@ -204,6 +147,8 @@ export class ThreeManager
     {
         const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
         const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
+        console.log("what")
+
         if (!slider || !preview) 
         {
             console.error("Slider or preview elements not found.");

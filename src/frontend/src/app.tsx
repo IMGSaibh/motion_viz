@@ -105,32 +105,32 @@ import {DoubleHandleSlider} from "./double_handle_slider"
 //         <button id="convert_bvh_to_npy_btn" onClick={handleConvertBVHToNpy}>Convert BVH to NPY</button>
 //         <div id="convert_bvh_to_npy_status"></div>
 
-//         <button id="convert_pv_style_btn" onClick={handleConvertPVStyle}>Convert File as done in Pose Viewer</button>
-//         <div id="convert_pv_style_status"></div>
+        // <button id="convert_pv_style_btn" onClick={handleConvertPVStyle}>Convert File as done in Pose Viewer</button>
+        // <div id="convert_pv_style_status"></div>
 
-//         <div id="file_selector">
-//           <select id="file_dropdown" onClick={handleFileFSlectionDropwown}>
-//             <option value="">Choose a motion file</option>
-//           </select>
-//           <div id="file_selector_status"></div>
-//         </div>
-//       </div>
+      //   <div id="file_selector">
+      //     <select id="file_dropdown" onClick={handleFileFSlectionDropwown}>
+      //       <option value="">Choose a motion file</option>
+      //     </select>
+      //     <div id="file_selector_status"></div>
+      //   </div>
+      // </div>
 
 //       <div ref={threeContainerRef} id="scene-container" />
 
-//       <div id="timeline-container">
-//         <div id="frame-label">Frame: 0 / 0</div>
-//         <input type="range" 
-//           id="frame-slider" 
-//           min="0" 
-//           max="100" 
-//           defaultValue="0"   
-//           onMouseMove={e => managerRef.current?.slider_preview_mousemove(e)}
-//           onMouseLeave={handleSliderPreviewMouseleave}/>
-//         <div id="preview-popup">
-//           <img id="preview-img" src={undefined}/>
-//         </div>
-//       </div>
+      // <div id="timeline-container">
+      //   <div id="frame-label">Frame: 0 / 0</div>
+      //   <input type="range" 
+      //     id="frame-slider" 
+      //     min="0" 
+      //     max="100" 
+      //     defaultValue="0"   
+      //     onMouseMove={e => managerRef.current?.slider_preview_mousemove(e)}
+      //     onMouseLeave={handleSliderPreviewMouseleave}/>
+      //   <div id="preview-popup">
+      //     <img id="preview-img" src={undefined}/>
+      //   </div>
+      // </div>
 //       <div id="timeline-container_2">
 //         <DoubleHandleSlider
 //           min={0}
@@ -150,13 +150,12 @@ import {DoubleHandleSlider} from "./double_handle_slider"
 
 //  ====================================================================================
 
-import { WidgetContainer  } from "./components/widget_container";
+import { WidgetContainer  } from "./containers/widget_container";
 export default function App() 
 {
   return (
-    <div>
+    <>
       <WidgetContainer />
-      <h1>Welcome to my app</h1>
-    </div>
+    </>
   );
 }

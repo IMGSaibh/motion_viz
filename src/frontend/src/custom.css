@@ -78,7 +78,7 @@ canvas {
   width: 100%;
   padding: 8px 0;
   border-radius: 6px;
-  background: #007bffa1;
+  background: #45ab45;
   color: #fff;
   border: none;
   font-size: 1.05em;
@@ -105,7 +105,6 @@ canvas {
 
 #motion-config-panel
 {
-  display: none;
   background: rgba(0,0,0,0.4);
   padding: 12px;
   border-radius: 0 0 8px 8px;

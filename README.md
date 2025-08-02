@@ -76,3 +76,37 @@ start tTyp‑checker parallel
 ``` bash
 npm run type-check -- --watch
 ```
+
+# Architecture
+``` bash
+/src
+│
+├── /api
+│   ├── api_file_upload.ts
+│   ├── api_motion_config.ts
+│
+├── /threeJS
+│   └── three_manager.ts
+│
+├── /components
+│   ├── /widgets
+│   │   ├── MotionConfigWidget.tsx  ← UI only (Presenter)
+│   │   ├── FileUploadWidget.tsx    ← UI only (Presenter)
+│   │   └── SceneControlsWidget.tsx ← UI only (Presenter)
+│   └── WidgetPresenter.tsx         ← UI shell for multiple widgets
+│
+├── /containers
+│   └── WidgetContainer.tsx        ← Zentrale Logik + Manager + States
+│
+└── App.tsx                        ← Root
+
+```
+
+# Explanation
+- Container	- Verwaltet Zustand (React useState, useRef, useEffect)
+- Ruft APIs auf (axios)
+- Steuert ThreeManager Presenter - Präsentiert UI
+- Zeigt Eingabefelder, Buttons, Texte
+- Ruft nur Callback-Props auf
+- ThreeManager - Kapselt WebGL-Logik (Scene, Kamera, Licht, Objekte, usw.)
+- api-Layer	- Kümmert sich um alle Backend-Kommunikation
