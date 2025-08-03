@@ -188,36 +188,51 @@ export function WidgetContainer()
     setPreviewImgSrc(null);
   }
 
+
+  // ======================= range label slider ======================= 
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100);
+
   return (
     <>
-    <div id="ui-overlay">
-      <WidgetPresenter
-        inputRef={inputRef}
-        onFileInputChange={handle_file_input_change}
-        triggerFileDialog={open_file_dialog}
-        is_dropdown_open={toggle_dropdown}
-        on_toggle_dropdown={handleToggleDropdown}
-        inputRefs={refs}
-        onCreate={handle_motion_description_attributes}
-        on_convert_pose_viewer={handle_convert_with_pose_viewer}
-        on_convert_bvh={handle_convert_motion_file}
+      <div id="ui-overlay">
+        <WidgetPresenter
+          inputRef={inputRef}
+          onFileInputChange={handle_file_input_change}
+          triggerFileDialog={open_file_dialog}
+          is_dropdown_open={toggle_dropdown}
+          on_toggle_dropdown={handleToggleDropdown}
+          inputRefs={refs}
+          onCreate={handle_motion_description_attributes}
+          on_convert_pose_viewer={handle_convert_with_pose_viewer}
+          on_convert_bvh={handle_convert_motion_file}
 
-        motionFiles={motionFiles}
-        selectedMotionFile={selectedMotionFile}
-        onFetchFileList={handleFetchFileList}
-        onSelectMotionFile={handleSelectMotionFile}
-        
-        status_massage={status_massage}
+          motionFiles={motionFiles}
+          selectedMotionFile={selectedMotionFile}
+          onFetchFileList={handleFetchFileList}
+          onSelectMotionFile={handleSelectMotionFile}
+          
+          status_massage={status_massage}
+        />
+      </div>
+      <div ref={mountRef} id="scene-container"/>
+      <WidgetPresenterSlider
+        sliderRef={sliderRef}
+        onMouseMove={handleSliderPreviewMouseMove}
+        onMouseLeave={handleSliderPreviewMouseLeave}
+        previewStyle={previewStyle}
+        previewImgSrc={previewImgSrc}
+
+        minValue={minValue}
+        maxValue={maxValue}
+        min={0}
+        max={100}
+        onChange={(newMin, newMax) => 
+        {
+          setMinValue(newMin);
+          setMaxValue(newMax);
+        }}
       />
-    </div>
-    <div ref={mountRef} id="scene-container"/>
-    <WidgetPresenterSlider
-      sliderRef={sliderRef}
-      onMouseMove={handleSliderPreviewMouseMove}
-      onMouseLeave={handleSliderPreviewMouseLeave}
-      previewStyle={previewStyle}
-      previewImgSrc={previewImgSrc}
-    />
     </>
   );
 }

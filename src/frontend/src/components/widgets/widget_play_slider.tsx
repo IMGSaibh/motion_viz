@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom';
 
 type WidgetPlaySliderProps = 
 {

@@ -87,6 +87,15 @@ export class ThreeManager
         }
     }
 
+    async getThumbnailForFrame(frameIndex: number) 
+    {
+        if (this.currentPlayer instanceof NPY_Player) 
+        {
+            return await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
+        }
+        return null;
+    }
+
     async frame_range_change(min: number, max: number)
     {
         const timeline = document.getElementById('timeline-container_2');
@@ -105,7 +114,7 @@ export class ThreeManager
         }
 
     }
-
+    
     get_frame_count_of_npy_player()
     {
         if (this.currentPlayer instanceof NPY_Player)
@@ -115,14 +124,6 @@ export class ThreeManager
         return 0;
     }
 
-    async getThumbnailForFrame(frameIndex: number) 
-    {
-        if (this.currentPlayer instanceof NPY_Player) 
-        {
-            return await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
-        }
-        return null;
-    }
 
 
     slider_preview_mouseleave()
