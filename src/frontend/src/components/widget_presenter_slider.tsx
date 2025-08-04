@@ -14,7 +14,16 @@ type WidgetPresenterSliderProps =
   max: number;
   minValue: number;
   maxValue: number;
-  onChange: (min: number, max: number) => void;
+  // onChange: (min: number, max: number) => void;
+
+  value: number;
+  onChange: (_e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  onMouseMove_SliderLabel:(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onMouseLeave_SliderLabel: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  preview_Style_labelslider:  React.CSSProperties;
+  previewImgSrc_labelslider: string | null;
+
+
 };
 
 export function WidgetPresenterSlider({
@@ -28,7 +37,13 @@ export function WidgetPresenterSlider({
   maxValue,
   min, 
   max,
-  onChange
+  onChange,
+
+  value,
+  onMouseMove_SliderLabel     ,
+  onMouseLeave_SliderLabel    ,
+  preview_Style_labelslider   ,
+  previewImgSrc_labelslider   ,
 
 }: WidgetPresenterSliderProps )
 {
@@ -48,8 +63,15 @@ export function WidgetPresenterSlider({
             minValue={minValue}
             maxValue={maxValue}
             min={0}
-            max={100}
+            max={max}
             onChange={onChange}
+
+            value={value}
+            onMouseMove_SliderLabel     ={onMouseMove_SliderLabel}
+            onMouseLeave_SliderLabel    ={onMouseLeave_SliderLabel}
+            preview_Style_labelslider   ={preview_Style_labelslider}
+            previewImgSrc_labelslider   ={previewImgSrc_labelslider}
+
           />
         </div>
     </>

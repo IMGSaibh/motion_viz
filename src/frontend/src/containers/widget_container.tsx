@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from "react";
+import { ThreeManager } from "../threeJS/three_js_manager";
 import { WidgetPresenter } from "../components/widget_presenter";
 import { WidgetPresenterSlider } from "../components/widget_presenter_slider";
-import { ThreeManager } from "../threeJS/three_js_manager";
-import { api_file_processing, MotionDescriptorData } from "../api/api_file_processing";
 import { api_motion_file_conversion } from "../api/api_motion_file_conversion";
+import { api_file_processing, MotionDescriptorData } from "../api/api_file_processing";
 
 export function WidgetContainer() 
 {
@@ -61,9 +61,9 @@ export function WidgetContainer()
   const [selectedMotionFile, setSelectedMotionFile] = useState<string | null>(null);
 
   
-  const sliderRef = useRef<HTMLInputElement | null>(null);
-  const [previewStyle, setPreviewStyle] = useState<React.CSSProperties>({});
-  const [previewImgSrc, setPreviewImgSrc] = useState<string | null>(null);
+  const [frameCount, setFramecount] = useState(0);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100);
   
   const [status_massage, set_status_massage] = useState<string | null>(null);
 
@@ -153,45 +153,124 @@ export function WidgetContainer()
     setMotionFiles(allFiles);
   }
 
-  function handleSelectMotionFile(e: React.ChangeEvent<HTMLSelectElement>) 
+  async function handleSelectMotionFile(e: React.ChangeEvent<HTMLSelectElement>) 
   {
     setSelectedMotionFile(e.target.value);
-    three_js_manager_ref.current!.load_motionfile_and_player(e.target.value);
+    await three_js_manager_ref.current!.load_motionfile_and_player(e.target.value);
+
+    const actualFrameCount = three_js_manager_ref.current!.get_frame_count();
+    setFramecount(actualFrameCount);
+
+    setMinValue(0);
+    setMaxValue(actualFrameCount > 0 ? actualFrameCount : 0);
   }
+
+  
+  
+  
+  // ======================= play slider ======================= 
+
+  const slider_standard_reference = useRef<HTMLInputElement | null>(null);
+  const [slider_standard_preview_CSS, set_standard_preview_CSS] = useState<React.CSSProperties>({});
+  const [slider_standard_preview_src, set_standard_preview_src] = useState<string | null>(null);
 
   function handleSliderPreviewMouseMove(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
   {
-    if (!sliderRef.current) return;
+    if (!slider_standard_reference.current) return;
 
-    const slider = sliderRef.current;
+    const slider = slider_standard_reference.current;
     const rect = slider.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
 
     // positioning via CSS
-    setPreviewStyle({
+    set_standard_preview_CSS({
       display: 'block',
       left: e.clientX - rect.left + 60,
     });
 
     three_js_manager_ref.current?.getThumbnailForFrame(frameIndex).then(dataUrl => 
     {
-      setPreviewImgSrc(dataUrl);
+      set_standard_preview_src(dataUrl);
     });
   }
 
   function handleSliderPreviewMouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
   {
-    setPreviewStyle({
+    set_standard_preview_CSS({
       display: 'none',
     });
-    setPreviewImgSrc(null);
+    set_standard_preview_src(null);
   }
 
 
   // ======================= range label slider ======================= 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(100);
+
+const [slider_label_preview_src, set_label_preview_src] = useState<string | null>(null);
+const [slider_label_preview_CSS, set_label_preview_CSS] = useState<React.CSSProperties>({});
+
+  const [slider_label_value, set_slider_label_value] = useState<number>(0); // Slider-Wert
+  const [labelSliderRange, setLabelSliderRange] = useState<[number, number]>([0, 100]);
+
+  // function handleSliderChange(_event: Event, newValue: number | number[]) 
+  // {
+  //   if (typeof newValue === "number") 
+  //     {
+  //       set_slider_label_value(newValue);
+  //       // Preview updaten wie oben, wenn du live willst!
+  //       console.log("newValue in change")
+  //   }
+  // }
+
+const [activeThumb, setActiveThumb] = useState<0 | 1>(0);
+
+function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) {
+  if (Array.isArray(newValue) && newValue.length === 2) {
+    setLabelSliderRange([newValue[0], newValue[1]]);
+    setActiveThumb(activeThumbIdx as 0 | 1);
+  }
+}
+
+
+
+  function handle_label_slider_preview_MouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    // // Wichtig: target ist Track oder Thumb, immer als HTMLDivElement casten!
+    // const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    // set_label_preview_CSS({
+    //   display: "block",
+    //   left: e.clientX - rect.left + 60,
+    //   position: "absolute",
+    //   top: -200, // over Slider
+    //   zIndex: 20,
+    // });
+    // set_slider_label_value(value);
+
+    // // Hole Preview nur, wenn Frame geändert (Performance)
+    // three_js_manager_ref.current?.getThumbnailForFrame(value).then(dataUrl => {
+    //   set_label_preview_src(dataUrl);
+    // });
+
+  const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+  const val = labelSliderRange[activeThumb];
+  set_label_preview_CSS({
+    display: 'block',
+    left: ((val - minValue) / (maxValue - minValue)) * rect.width + 60, // Position anpassen!
+    position: 'absolute',
+    top: -290,
+    zIndex: 20,
+  });
+  three_js_manager_ref.current?.getThumbnailForFrame(val).then(dataUrl => {
+    set_label_preview_src(dataUrl);
+  });
+  }
+
+  function handle_label_slider_preview_MouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+  {
+      set_label_preview_CSS({ display: "none" });
+      set_label_preview_src(null);
+  }
+
+
 
   return (
     <>
@@ -217,21 +296,28 @@ export function WidgetContainer()
       </div>
       <div ref={mountRef} id="scene-container"/>
       <WidgetPresenterSlider
-        sliderRef={sliderRef}
+        sliderRef={slider_standard_reference}
         onMouseMove={handleSliderPreviewMouseMove}
         onMouseLeave={handleSliderPreviewMouseLeave}
-        previewStyle={previewStyle}
-        previewImgSrc={previewImgSrc}
+        previewStyle={slider_standard_preview_CSS}
+        previewImgSrc={slider_standard_preview_src}
 
         minValue={minValue}
         maxValue={maxValue}
         min={0}
-        max={100}
-        onChange={(newMin, newMax) => 
-        {
-          setMinValue(newMin);
-          setMaxValue(newMax);
-        }}
+        max={frameCount > 0 ? frameCount : 100}
+        // onChange={(newMin, newMax) => 
+        // {
+        //   setMinValue(newMin);
+        //   setMaxValue(newMax);
+        // }}
+        onChange={handleLabelSliderChange}
+        value={slider_label_value}
+        onMouseMove_SliderLabel     ={handle_label_slider_preview_MouseMove}
+        onMouseLeave_SliderLabel    ={handle_label_slider_preview_MouseLeave}
+        preview_Style_labelslider   ={slider_label_preview_CSS}
+        previewImgSrc_labelslider   ={slider_label_preview_src}
+        
       />
     </>
   );

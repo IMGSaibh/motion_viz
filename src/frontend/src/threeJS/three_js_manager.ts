@@ -115,7 +115,7 @@ export class ThreeManager
 
     }
     
-    get_frame_count_of_npy_player()
+    get_frame_count()
     {
         if (this.currentPlayer instanceof NPY_Player)
         {

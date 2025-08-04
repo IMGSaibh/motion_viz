@@ -19,7 +19,6 @@ export function WidgetListFiles({
         value={selectedMotionFile || ""}
         onFocus={onFetchFileList}
         onChange={onSelectMotionFile}
-        style={{ marginTop: 5 }}
       >
         <option value="">Select file</option>
         {motionFiles.map(fileObj =>

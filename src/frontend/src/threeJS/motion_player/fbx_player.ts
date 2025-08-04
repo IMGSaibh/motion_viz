@@ -7,7 +7,7 @@ export class FBX_Player
 
   fbx_player_object: Updatable;
   fbx_loader_object: FBX_Loader;
-  keyframeCount: number;
+  frameCount: number;
   container: HTMLElement;
   slider: HTMLInputElement;
   label: HTMLElement;
@@ -21,7 +21,7 @@ export class FBX_Player
     this.fbx_loader_object = fbx_loader_object;
     // -1 because the last keyframe is not included in the slider
     // fbx is keyframe based, so the keyframe count is the number of keyframes minus one
-    this.keyframeCount = fbx_loader_object.keyframeCount - 1; 
+    this.frameCount = fbx_loader_object.keyframeCount - 1; 
 
     const container = document.getElementById('timeline-container');
     if (!container) 
@@ -44,7 +44,7 @@ export class FBX_Player
 
     this.slider.type = 'range';
     this.slider.min = '0';
-    this.slider.max = this.keyframeCount.toString();
+    this.slider.max = this.frameCount.toString();
     this.slider.step = '1';
     this.slider.value = '0';
     this.isPlaying = false;
@@ -53,7 +53,7 @@ export class FBX_Player
     this.loop = loop;
     
     this.container.appendChild(this.slider);
-    this.label.textContent = `Keyframe: 0 / ${this.keyframeCount}`;
+    this.label.textContent = `Keyframe: 0 / ${this.frameCount}`;
 
     window.addEventListener('keydown', (e) => 
     {
@@ -71,7 +71,7 @@ export class FBX_Player
         const target = e.target as HTMLInputElement;
         this.currentKeyFrame = parseFloat(target.value);
         this.gotoFrame(this.currentKeyFrame);
-        this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.keyframeCount}`;
+        this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.frameCount}`;
     });
 
     this.fbx_player_object = 
@@ -111,15 +111,15 @@ export class FBX_Player
     }
 
     // stop if the closest keyframe is the last one
-    if (this.currentKeyFrame >= this.keyframeCount) 
+    if (this.currentKeyFrame >= this.frameCount) 
     {
-        this.currentKeyFrame = this.keyframeCount;
+        this.currentKeyFrame = this.frameCount;
         this.isPlaying = false;
     }
 
     this.currentKeyFrame = closestIndex;
     this.slider.value = closestIndex.toString();
-    this.label.textContent = `Keyframe: ${closestIndex} / ${this.keyframeCount}`;
+    this.label.textContent = `Keyframe: ${closestIndex} / ${this.frameCount}`;
 
   }
 
@@ -127,7 +127,7 @@ export class FBX_Player
   {
     // toggle play/pause
     this.isPlaying = !this.isPlaying;
-    if (this.currentKeyFrame >= this.keyframeCount) 
+    if (this.currentKeyFrame >= this.frameCount) 
     {
       this.stop();
     }
@@ -140,7 +140,7 @@ stop()
     this.isPlaying = false;
     this.fbx_loader_object.mixer!.stopAllAction();
     this.fbx_loader_object.mixer!.setTime(0);
-    this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.keyframeCount}`;
+    this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.frameCount}`;
   }
 
   truncateToTwoDecimals(num: number): number
@@ -153,7 +153,7 @@ stop()
     if (!this.fbx_loader_object.mixer || !this.fbx_loader_object.clipAction) return;
 
     // Safety clamp
-    frameIndex = Math.max(0, Math.min(frameIndex, this.keyframeCount));
+    frameIndex = Math.max(0, Math.min(frameIndex, this.frameCount));
 
     // Berechne den Zeitwert aus dem Keyframe-Index
     const track = this.fbx_loader_object.clipAction.getClip().tracks[0];

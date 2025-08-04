@@ -42,7 +42,8 @@ canvas {
 }
 
 #ui-overlay button,
-#ui-overlay input {
+#ui-overlay input,
+#ui-overlay select {
   margin-top: 5px;
   display: block;
 }
