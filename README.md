@@ -2,27 +2,27 @@
 
 Parsing, conversion and visualization of motion capture files with FastAPI backend and ThreeJS Engine frontend.
 
-## Voraussetzungen
+# Requirements
 
 - Python 3.12+
 - Node.js 18+ (npm)
 - Poetry (für Python-Env-Management)
 
-## Installation
+# Installation
 
-### Frontend
+## Frontend
 ```bash
 cd src/frontend
 npm install
 ```
-### Backend
+## Backend
 
 ```bash
 cd src/motion_viz
 poetry install
 ```
 
-### create launch.json
+## create launch.json
 ```json
 {
     "version": "0.2.0",
@@ -65,19 +65,8 @@ poetry install
 
 ```
 
-### Commands
 
-start server
-``` bash
-npm run dev
-```
-
-start tTyp‑checker parallel 
-``` bash
-npm run type-check -- --watch
-```
-
-# Architecture
+# Architecture frontend
 ``` bash
 /src
 │
@@ -96,17 +85,23 @@ npm run type-check -- --watch
 │   └── WidgetPresenter.tsx         ← UI shell for multiple widgets
 │
 ├── /containers
-│   └── WidgetContainer.tsx        ← Zentrale Logik + Manager + States
+│   └── WidgetContainer.tsx        ← Central logic + manager + states
 │
 └── App.tsx                        ← Root
 
 ```
 
-# Explanation
-- Container	- Verwaltet Zustand (React useState, useRef, useEffect)
-- Ruft APIs auf (axios)
-- Steuert ThreeManager Presenter - Präsentiert UI
-- Zeigt Eingabefelder, Buttons, Texte
-- Ruft nur Callback-Props auf
-- ThreeManager - Kapselt WebGL-Logik (Scene, Kamera, Licht, Objekte, usw.)
-- api-Layer	- Kümmert sich um alle Backend-Kommunikation
+# Explanation frontend
+- Container 
+    - Manages state (React useState, useRef, useEffect)
+    - Calls APIs (axios)
+    - Controls ThreeManager 
+- Presenter 
+    - Presents UI
+    - Displays input fields, buttons, texts
+    - Only calls callback props
+    - uses material UI (React)
+- ThreeManager 
+    - Encapsulates WebGL logic (scene, camera, light, objects, etc.)
+- API layer 
+    - Handles all backend communication
