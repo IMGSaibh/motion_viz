@@ -10,20 +10,11 @@ type WidgetPresenterSliderProps =
   previewImgSrc: string | null;
 
 
-  min: number;
-  max: number;
-  minValue: number;
-  maxValue: number;
-  // onChange: (min: number, max: number) => void;
-
-  value: number;
+  value: [number, number];
+  framecount: number;
   onChange: (_e: Event, newValue: number | number[], activeThumbIdx: number) => void;
-  onMouseMove_SliderLabel:(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  onMouseLeave_SliderLabel: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   preview_Style_labelslider:  React.CSSProperties;
   previewImgSrc_labelslider: string | null;
-
-
 };
 
 export function WidgetPresenterSlider({
@@ -33,17 +24,11 @@ export function WidgetPresenterSlider({
   previewStyle,
   previewImgSrc,
 
-  minValue,
-  maxValue,
-  min, 
-  max,
-  onChange,
-
   value,
-  onMouseMove_SliderLabel     ,
-  onMouseLeave_SliderLabel    ,
-  preview_Style_labelslider   ,
-  previewImgSrc_labelslider   ,
+  framecount,
+  onChange,
+  preview_Style_labelslider,
+  previewImgSrc_labelslider,
 
 }: WidgetPresenterSliderProps )
 {
@@ -51,27 +36,20 @@ export function WidgetPresenterSlider({
     <>
         <div id="timeline-container">
           <WidgetPlaySlider
-            sliderRef={sliderRef}
-            onMouseMove={onMouseMove}
-            onMouseLeave={onMouseLeave}
-            previewStyle={previewStyle}
-            previewImgSrc={previewImgSrc}
+            sliderRef                   ={sliderRef}
+            onMouseMove                 ={onMouseMove}
+            onMouseLeave                ={onMouseLeave}
+            previewStyle                ={previewStyle}
+            previewImgSrc               ={previewImgSrc}
           />
         </div>
         <div id="timeline-container_2">
           <WidgetLabelSlider
-            minValue={minValue}
-            maxValue={maxValue}
-            min={0}
-            max={max}
-            onChange={onChange}
-
-            value={value}
-            onMouseMove_SliderLabel     ={onMouseMove_SliderLabel}
-            onMouseLeave_SliderLabel    ={onMouseLeave_SliderLabel}
+            framecount                  ={framecount}
+            value                       ={value}
+            onChange                    ={onChange}
             preview_Style_labelslider   ={preview_Style_labelslider}
             previewImgSrc_labelslider   ={previewImgSrc_labelslider}
-
           />
         </div>
     </>

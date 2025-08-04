@@ -209,7 +209,7 @@ export function WidgetContainer()
 const [slider_label_preview_src, set_label_preview_src] = useState<string | null>(null);
 const [slider_label_preview_CSS, set_label_preview_CSS] = useState<React.CSSProperties>({});
 
-  const [slider_label_value, set_slider_label_value] = useState<number>(0); // Slider-Wert
+  // const [slider_label_value, set_slider_label_value] = useState<number>(0); 
   const [labelSliderRange, setLabelSliderRange] = useState<[number, number]>([0, 100]);
 
   // function handleSliderChange(_event: Event, newValue: number | number[]) 
@@ -224,51 +224,72 @@ const [slider_label_preview_CSS, set_label_preview_CSS] = useState<React.CSSProp
 
 const [activeThumb, setActiveThumb] = useState<0 | 1>(0);
 
-function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) {
+// function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) 
+// {
+//   if (Array.isArray(newValue) && newValue.length === 2) 
+//   {
+//     setLabelSliderRange([newValue[0], newValue[1]]);
+//     setActiveThumb(activeThumbIdx as 0 | 1);
+//   }
+
+  
+// }
+
+
+
+  // function handle_label_slider_preview_MouseMove(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
+  // {
+
+  //     const rect = (e.currentTarget as HTMLInputElement).getBoundingClientRect();
+  //     const slider_value = labelSliderRange[activeThumb];
+  //     set_label_preview_CSS({
+  //       display: 'block',
+  //       left: ((slider_value - minValue) / (maxValue - minValue)) * rect.width + 60, // Position anpassen!
+  //       position: 'absolute',
+  //       top: -290,
+  //       zIndex: 20,
+  //     });
+  //     three_js_manager_ref.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
+  //     {
+  //       set_label_preview_src(dataUrl);
+  //     });
+
+  //   console.log("mouse move " + slider_value)
+  // }
+
+
+  function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) {
   if (Array.isArray(newValue) && newValue.length === 2) {
     setLabelSliderRange([newValue[0], newValue[1]]);
     setActiveThumb(activeThumbIdx as 0 | 1);
+
+    const slider_value = newValue[activeThumbIdx];
+    const rect = slider_standard_reference.current?.getBoundingClientRect();
+
+    if (rect) {
+      set_label_preview_CSS({
+        display: 'block',
+        left: ((slider_value - minValue) / (maxValue - minValue)) * rect.width + 60,
+        position: 'absolute',
+        top: -290,
+        zIndex: 20,
+      });
+    }
+
+    three_js_manager_ref.current?.getThumbnailForFrame(slider_value).then(dataUrl => {
+      set_label_preview_src(dataUrl);
+    });
+
+    console.log("Dragging Thumb " + activeThumbIdx + " Value: " + slider_value);
   }
 }
 
 
-
-  function handle_label_slider_preview_MouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    // // Wichtig: target ist Track oder Thumb, immer als HTMLDivElement casten!
-    // const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    // set_label_preview_CSS({
-    //   display: "block",
-    //   left: e.clientX - rect.left + 60,
-    //   position: "absolute",
-    //   top: -200, // over Slider
-    //   zIndex: 20,
-    // });
-    // set_slider_label_value(value);
-
-    // // Hole Preview nur, wenn Frame geändert (Performance)
-    // three_js_manager_ref.current?.getThumbnailForFrame(value).then(dataUrl => {
-    //   set_label_preview_src(dataUrl);
-    // });
-
-  const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-  const val = labelSliderRange[activeThumb];
-  set_label_preview_CSS({
-    display: 'block',
-    left: ((val - minValue) / (maxValue - minValue)) * rect.width + 60, // Position anpassen!
-    position: 'absolute',
-    top: -290,
-    zIndex: 20,
-  });
-  three_js_manager_ref.current?.getThumbnailForFrame(val).then(dataUrl => {
-    set_label_preview_src(dataUrl);
-  });
-  }
-
-  function handle_label_slider_preview_MouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
-  {
-      set_label_preview_CSS({ display: "none" });
-      set_label_preview_src(null);
-  }
+  // function handle_label_slider_preview_MouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+  // {
+  //     set_label_preview_CSS({ display: "none" });
+  //     set_label_preview_src(null);
+  // }
 
 
 
@@ -302,19 +323,10 @@ function handleLabelSliderChange(_e: Event, newValue: number | number[], activeT
         previewStyle={slider_standard_preview_CSS}
         previewImgSrc={slider_standard_preview_src}
 
-        minValue={minValue}
-        maxValue={maxValue}
-        min={0}
-        max={frameCount > 0 ? frameCount : 100}
-        // onChange={(newMin, newMax) => 
-        // {
-        //   setMinValue(newMin);
-        //   setMaxValue(newMax);
-        // }}
+
+        value={labelSliderRange}
+        framecount={frameCount > 0 ? frameCount : 100}
         onChange={handleLabelSliderChange}
-        value={slider_label_value}
-        onMouseMove_SliderLabel     ={handle_label_slider_preview_MouseMove}
-        onMouseLeave_SliderLabel    ={handle_label_slider_preview_MouseLeave}
         preview_Style_labelslider   ={slider_label_preview_CSS}
         previewImgSrc_labelslider   ={slider_label_preview_src}
         
