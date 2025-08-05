@@ -24,9 +24,9 @@ type WidgetPresenterProps =
 };
 
 export function WidgetPresenter({
-    file_dialog_reference: filedialog_reference,
-    file_dialog_on_change: filedialog_on_change,
-    file_dialog_on_click: filedialog_on_click,
+    file_dialog_reference,
+    file_dialog_on_change,
+    file_dialog_on_click,
 
     motion_config_reference,
     motion_config_is_open,
@@ -46,9 +46,9 @@ export function WidgetPresenter({
   return (
     <>
       <WidgetFileUpload
-        filedialog_reference            ={filedialog_reference}
-        filedialog_on_change            ={filedialog_on_change}
-        filedialog_on_click             ={filedialog_on_click}
+        file_dialog_reference           ={file_dialog_reference}
+        file_dialog_on_change           ={file_dialog_on_change}
+        file_dialog_on_click            ={file_dialog_on_click}
       />
       <WidgetCreateDescriptorFile
         motion_config_reference         ={motion_config_reference}    

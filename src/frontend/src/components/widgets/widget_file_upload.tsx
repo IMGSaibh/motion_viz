@@ -1,24 +1,24 @@
 
 type WidgetFileUploadProps = 
 {
-    filedialog_reference: React.RefObject<HTMLInputElement | null>;
-    filedialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    filedialog_on_click: () => void;
+    file_dialog_reference: React.RefObject<HTMLInputElement | null>;
+    file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    file_dialog_on_click: () => void;
 };
 
 export function WidgetFileUpload({ 
-    filedialog_reference, 
-    filedialog_on_change,
-    filedialog_on_click 
+    file_dialog_reference, 
+    file_dialog_on_change,
+    file_dialog_on_click 
 }: WidgetFileUploadProps) {
   return (
     <>
-      <button onClick={filedialog_on_click}>Search for files</button>
+      <button onClick={file_dialog_on_click}>Search for files</button>
       <input
         type="file"
-        ref={filedialog_reference}
+        ref={file_dialog_reference}
         multiple
-        onChange={filedialog_on_change}
+        onChange={file_dialog_on_change}
         style={{ display: "none" }}
       />
     </>

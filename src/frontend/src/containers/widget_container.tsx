@@ -231,8 +231,6 @@ export function WidgetContainer()
       {
         set_labelslider_thumbnail(dataUrl);
       });
-
-      console.log("Dragging Thumb " + active_slidercontrol_idx + " Value: " + slider_value);
     }
   }
 
@@ -269,11 +267,11 @@ export function WidgetContainer()
         std_slider_thumbnail              ={std_slider_thumbnail}
 
         value                             ={label_slider_range}
-        labelslider_framecount            ={framecount > 0 ? framecount : 100}
-        labelslider_on_change             ={handleLabelSliderChange}
-        labelslider_on_mouse_leave        ={handle_std_slider_on_mouse_leave}
-        labelslider_thumbnail_css         ={labelslider_thumbnail_css}
-        labelslider_thumbnail             ={labelslider_thumbnail}
+        label_slider_framecount           ={framecount > 0 ? framecount : 100}
+        label_slider_on_change            ={handleLabelSliderChange}
+        label_slider_on_mouse_leave       ={handle_std_slider_on_mouse_leave}
+        label_slider_thumbnail_css        ={labelslider_thumbnail_css}
+        label_slider_thumbnail            ={labelslider_thumbnail}
         
       />
     </>

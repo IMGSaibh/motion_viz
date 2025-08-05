@@ -11,11 +11,11 @@ type WidgetPresenterSliderProps =
 
 
   value: [number, number];
-  labelslider_framecount: number;
-  labelslider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
-  labelslider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  labelslider_thumbnail_css:  React.CSSProperties;
-  labelslider_thumbnail: string | null;
+  label_slider_framecount: number;
+  label_slider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  label_slider_thumbnail_css:  React.CSSProperties;
+  label_slider_thumbnail: string | null;
 };
 
 export function WidgetPresenterSlider({
@@ -26,11 +26,11 @@ export function WidgetPresenterSlider({
   std_slider_thumbnail,
 
   value,
-  labelslider_framecount,
-  labelslider_on_change,
-  labelslider_on_mouse_leave,
-  labelslider_thumbnail_css,
-  labelslider_thumbnail,
+  label_slider_framecount,
+  label_slider_on_change,
+  label_slider_on_mouse_leave,
+  label_slider_thumbnail_css,
+  label_slider_thumbnail,
 
 }: WidgetPresenterSliderProps )
 {
@@ -48,11 +48,11 @@ export function WidgetPresenterSlider({
         <div id="timeline-container_2">
           <WidgetLabelSlider
             value                           ={value}
-            labelslider_framecount          ={labelslider_framecount}
-            labelslider_on_change           ={labelslider_on_change}
-            labelslider_on_mouse_leave      ={labelslider_on_mouse_leave}
-            labelslider_thumbnail_css       ={labelslider_thumbnail_css}
-            labelslider_thumbnail           ={labelslider_thumbnail}
+            label_slider_framecount         ={label_slider_framecount}
+            label_slider_on_change          ={label_slider_on_change}
+            label_slider_on_mouse_leave     ={label_slider_on_mouse_leave}
+            label_slider_thumbnail_css      ={label_slider_thumbnail_css}
+            label_slider_thumbnail          ={label_slider_thumbnail}
           />
         </div>
     </>
