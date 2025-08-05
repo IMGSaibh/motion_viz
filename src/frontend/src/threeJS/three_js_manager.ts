@@ -5,7 +5,7 @@ import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
-import { Loop } from '@/threeJS/system/loop';
+import { Loop, Updatable } from '@/threeJS/system/loop';
 import { Resizer } from '@/threeJS/system/resizer';
 import { createScene } from '@/threeJS/components/scene';
 import { createCamera } from '@/threeJS/components/camera';
@@ -24,11 +24,13 @@ export class ThreeManager
     loop: Loop;
     currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
     currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
+    npy_player: NPY_Player | null;
 
     constructor(container: HTMLDivElement)
     {
         this.currentLoader = null;
         this.currentPlayer = null;
+        this.npy_player = null;
         this.camera = createCamera();
         this.renderer = createRenderer();
         this.scene = createScene();
@@ -77,77 +79,70 @@ export class ThreeManager
                 this.currentLoader = new NPY_loader(this.scene);
                 await this.currentLoader.load_npy_animation(fileUrl);
 
-            
+
                 const skeletonPath = fileUrl
                 .replace("/npy/", "/json/")
                 .replace(".npy", "_skeleton.json");
                 await this.currentLoader.create_skeleton(skeletonPath);
-                this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
+                this.npy_player = new NPY_Player(this.currentLoader);
+                this.loop.updatables.push(this.npy_player.npy_player_object);
+
                 break;
         }
     }
 
     async getThumbnailForFrame(frameIndex: number) 
     {
-        if (this.currentPlayer instanceof NPY_Player) 
+        if (this.npy_player instanceof NPY_Player) 
         {
-            return await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
+            return await this.npy_player.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
         }
         return null;
     }
 
-    // async frame_range_change(min: number, max: number)
-    // {
-    //     const timeline = document.getElementById('timeline-container_2');
-    //     const startframe_handle = document.getElementById("startframe_handle") as HTMLDivElement | null
-    //     const endframe_handle = document.getElementById("endframe_handle") as HTMLDivElement | null
-    //     const previewImg = document.getElementById("preview-img_2") as HTMLImageElement | null;
-        
+    play_pause()
+    {
+        if (this.npy_player instanceof NPY_Player)
+        {
+            // this.currentPlayer.play_pause()
+            this.npy_player.play_pause()
+        }
+    }
 
-    //     if (this.currentPlayer instanceof NPY_Player) 
-    //     {
-    //         const thumbDataUrl = await this.currentPlayer.renderThumbnail(min, this.scene, this.camera, 260, 190, this.previewRenderer);
-    //         if (thumbDataUrl && previewImg)
-    //         {
-    //             previewImg.src = thumbDataUrl;
-    //         }
-    //     }
-
-    // }
-    
-    get_frame_count()
+    player_stop()
     {
         if (this.currentPlayer instanceof NPY_Player)
         {
-            return this.currentPlayer.frameCount   
+            this.currentPlayer.stop()
+        }
+    }
+
+    go_to_frame(frameIndex: number)
+    {
+        if (this.npy_player instanceof NPY_Player)
+        {
+            return this.npy_player.gotoFrame(frameIndex)
+        }
+        return 0;
+    }
+    
+    get_frame_count()
+    {
+        if (this.npy_player instanceof NPY_Player)
+        {
+            return this.npy_player.frameCount
         }
         return 0;
     }
 
     get_frame_index()
     {
-        if (this.currentPlayer instanceof NPY_Player)
+        if (this.npy_player instanceof NPY_Player)
         {
-            return this.currentPlayer.frameIdx   
+            return this.npy_player.frameIdx   
         }
         return 0;
     }
-
-
-    // slider_preview_mouseleave()
-    // {
-    //     const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
-    //     const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
-    //     console.log("what")
-
-    //     if (!slider || !preview) 
-    //     {
-    //         console.error("Slider or preview elements not found.");
-    //         return;
-    //     }
-
-    //     preview.style.display = "none";
-    // }
 
     print_scene_components()
     {
@@ -177,6 +172,15 @@ export class ThreeManager
             {
                 this.previewRenderer.dispose();
             }
+
+        }
+        const index = this.loop.updatables.indexOf(this.npy_player!.npy_player_object);
+        this.currentLoader!.dispose();
+
+        if (index !== -1) 
+        {
+            console.log("remove NPY motion")
+            this.loop.updatables.splice(index, 1);
         }
     }
 

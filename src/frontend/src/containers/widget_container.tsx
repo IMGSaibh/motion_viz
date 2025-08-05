@@ -10,6 +10,47 @@ export function WidgetContainer()
   const three_js_scene_reference = useRef<HTMLDivElement>(null);
   const three_js_mngr_reference = useRef<ThreeManager>(null);
   
+  const file_dialog_reference = useRef<HTMLInputElement>(null);
+  const { upload_files } = api_file_processing();
+  const { create_motion_descriptor } = api_file_processing();
+  const { convert_with_pose_viewer, convert_bvh } = api_motion_file_conversion();
+  
+  const { list_motion_files } = api_file_processing();
+  const [motion_config_is_open, set_motion_config_is_open] = useState(false);
+  const [motion_files, set_motion_files] = useState<{type: string, name: string}[]>([]);
+  const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
+  const motion_config_references = 
+  {
+    format: useRef<HTMLInputElement>(null),
+    abbrev: useRef<HTMLInputElement>(null),
+    scale: useRef<HTMLInputElement>(null),
+    positions: useRef<HTMLInputElement>(null),
+    rotations: useRef<HTMLInputElement>(null),
+    systemname: useRef<HTMLInputElement>(null),
+    fps: useRef<HTMLInputElement>(null),
+    jointcount: useRef<HTMLInputElement>(null),
+    coloffset: useRef<HTMLInputElement>(null),
+    colgap: useRef<HTMLInputElement>(null),
+    dimsize: useRef<HTMLInputElement>(null),
+  };
+
+  const std_slider_reference = useRef<HTMLSpanElement | null>(null);
+  const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
+  const [std_slider_thumbnail, set_std_slider_thumbnail] = useState<string | null>(null);
+  const [std_slider_value, set_std_slider_value] = useState<number>(0);
+  
+  const [framecount, set_framecount] = useState(0);
+  const [minValue, set_min_value] = useState(0);
+  const [maxValue, set_max_value] = useState(100);
+  
+  const [labelslider_thumbnail_css, set_label_slider_thumbnail_css] = useState<React.CSSProperties>({});
+  const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
+  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
+
+
+  const [status_massage, set_status_massage] = useState<string | null>(null);
+
+
   useEffect(() => 
   {
     const container = three_js_scene_reference.current;
@@ -25,13 +66,21 @@ export function WidgetContainer()
     {
       three_js_mngr_reference.current = new ThreeManager(container);
       three_js_mngr_reference.current.start();
+      console.info("Init");
     }
 
     // keyboard-events
     const handleKeyDown = (e: KeyboardEvent) => 
     {
-      if (e.code === "KeyP"){three_js_mngr_reference.current?.print_scene_components();}
+      if (e.code === "KeyP") {three_js_mngr_reference.current?.print_scene_components();}
       if (e.code === "KeyR") {three_js_mngr_reference.current?.cleanup_scene()}
+      if (e.code === "Space")
+      {
+        three_js_mngr_reference.current?.play_pause()
+        console.log("sapce pressed")
+        // console.log(three_js_mngr_reference.current?.isPlaying)
+      }
+      if (e.code === "KeyS") {three_js_mngr_reference.current?.player_stop()}
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -50,37 +99,9 @@ export function WidgetContainer()
     };
   }, []);
 
-  const file_dialog_reference = useRef<HTMLInputElement>(null);
-  const { upload_files } = api_file_processing();
-  const { create_motion_descriptor } = api_file_processing();
-  const { convert_with_pose_viewer, convert_bvh } = api_motion_file_conversion();
-  
-  const { list_motion_files } = api_file_processing();
-  const [motion_config_is_open, set_motion_config_is_open] = useState(false);
-  const [motion_files, set_motion_files] = useState<{type: string, name: string}[]>([]);
-  const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
 
-  
-  const [framecount, set_framecount] = useState(0);
-  const [minValue, set_min_value] = useState(0);
-  const [maxValue, set_max_value] = useState(100);
-  
-  const [status_massage, set_status_massage] = useState<string | null>(null);
+  // ======================= file dialog upload ======================= 
 
-  const motion_config_references = 
-  {
-    format: useRef<HTMLInputElement>(null),
-    abbrev: useRef<HTMLInputElement>(null),
-    scale: useRef<HTMLInputElement>(null),
-    positions: useRef<HTMLInputElement>(null),
-    rotations: useRef<HTMLInputElement>(null),
-    systemname: useRef<HTMLInputElement>(null),
-    fps: useRef<HTMLInputElement>(null),
-    jointcount: useRef<HTMLInputElement>(null),
-    coloffset: useRef<HTMLInputElement>(null),
-    colgap: useRef<HTMLInputElement>(null),
-    dimsize: useRef<HTMLInputElement>(null),
-  };
 
   function handle_file_dialog_on_click() 
   {
@@ -98,6 +119,8 @@ export function WidgetContainer()
     const warning = response.data.not_supported_files ? `⚠️ ${response.data.not_supported_files}` : "";
     set_status_massage(`${message} ${warning}`);
   }
+
+  // ======================= motion config ======================= 
 
   function handle_motion_config_on_click() 
   {
@@ -126,22 +149,6 @@ export function WidgetContainer()
     });
   }
 
-  async function handle_convert_with_pose_viewer() 
-  {
-    const response = await convert_with_pose_viewer();
-    const message = "✅ " + response.data.message;
-    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : "";
-    set_status_massage(`${message} ${warning}`);
-  }
-
-  async function handle_convert_motion_file() 
-  {
-    const response = await convert_bvh();
-    const message = "✅ " + response.data.message;
-    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : "";
-    set_status_massage(`${message} ${warning}`);
-  }
-
   async function handle_motion_file_list_on_focus() 
   {
     const response = await list_motion_files();
@@ -165,13 +172,25 @@ export function WidgetContainer()
     set_max_value(framecount_threejs > 0 ? framecount_threejs : 0);
   }
 
+  // ======================= file convertion ======================= 
+
+  async function handle_convert_with_pose_viewer() 
+  {
+    const response = await convert_with_pose_viewer();
+    const message = "✅ " + response.data.message;
+    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : "";
+    set_status_massage(`${message} ${warning}`);
+  }
+
+  async function handle_convert_motion_file() 
+  {
+    const response = await convert_bvh();
+    const message = "✅ " + response.data.message;
+    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : "";
+    set_status_massage(`${message} ${warning}`);
+  }
 
   // ======================= standard slider ======================= 
-
-  const std_slider_reference = useRef<HTMLSpanElement | null>(null);
-  const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
-  const [std_slider_thumbnail, set_std_slider_thumbnail] = useState<string | null>(null);
-  const [std_slider_value, set_std_slider_value] = useState<number>(0);
 
 
   function handle_std_slider_on_mouse_move(e: React.MouseEvent) 
@@ -181,6 +200,10 @@ export function WidgetContainer()
     // mouse position as percent on slider bar
     const percent = (e.clientX - rect!.left) / rect!.width;
     const slider_value = Math.round(percent * framecount);
+
+    console.log("framecount = " + framecount)
+    console.log("percent = " + percent)
+    console.log("slider_value = " + slider_value)
 
     set_std_slider_thumbnail_css({
       display: 'block',
@@ -201,8 +224,6 @@ export function WidgetContainer()
   {
     set_std_slider_thumbnail_css({ display: 'none'});
     set_std_slider_thumbnail(null);
-    set_labelslider_thumbnail_css({ display: "none" });
-    set_labelslider_thumbnail(null);
   }
 
   function handle_std_slider_on_change(e: Event, newValue: number)
@@ -212,9 +233,6 @@ export function WidgetContainer()
 
   // ======================= range label slider ======================= 
 
-  const [labelslider_thumbnail_css, set_labelslider_thumbnail_css] = useState<React.CSSProperties>({});
-  const [labelslider_thumbnail, set_labelslider_thumbnail] = useState<string | null>(null);
-  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
 
 
   function handle_label_slider_on_change(e: Event, value: number | number[], active_slidercontrol_idx: number) 
@@ -228,7 +246,7 @@ export function WidgetContainer()
       set_label_slider_range([value[0], value[1]]);
       const slider_value = value[active_slidercontrol_idx];
 
-      set_labelslider_thumbnail_css({
+      set_label_slider_thumbnail_css({
         display: 'block',
         left: ((slider_value - minValue) / (maxValue - minValue)) * rect!.width + 60,
         position: 'absolute',
@@ -238,11 +256,16 @@ export function WidgetContainer()
       });
       three_js_mngr_reference.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
       {
-        set_labelslider_thumbnail(dataUrl);
+        set_label_slider_thumbnail(dataUrl);
       });
     }
   }
 
+  function handle_label_slider_on_mouse_leave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+  {
+    set_label_slider_thumbnail_css({ display: "none" });
+    set_label_slider_thumbnail(null);
+  }
 
   return (
     <>
@@ -281,7 +304,7 @@ export function WidgetContainer()
         label_slider_value                ={label_slider_range}
         label_slider_framecount           ={framecount}
         label_slider_on_change            ={handle_label_slider_on_change}
-        label_slider_on_mouse_leave       ={handle_std_slider_on_mouse_leave}
+        label_slider_on_mouse_leave       ={handle_label_slider_on_mouse_leave}
         label_slider_thumbnail_css        ={labelslider_thumbnail_css}
         label_slider_thumbnail            ={labelslider_thumbnail}
         

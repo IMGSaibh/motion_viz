@@ -14,7 +14,7 @@ export class FBX_Player
   elapsedTime: number;
   loop: Loop;
   isPlaying: boolean = false;
-  currentKeyFrame: number = 0;
+  frameIdx: number = 0;
 
   constructor(fbx_loader_object: FBX_Loader, loop: Loop)
   {
@@ -48,7 +48,7 @@ export class FBX_Player
     this.slider.step = '1';
     this.slider.value = '0';
     this.isPlaying = false;
-    this.currentKeyFrame = 0;
+    this.frameIdx = 0;
     this.elapsedTime = 0;
     this.loop = loop;
     
@@ -69,9 +69,9 @@ export class FBX_Player
         
         this.fbx_loader_object.clipAction.play();
         const target = e.target as HTMLInputElement;
-        this.currentKeyFrame = parseFloat(target.value);
-        this.gotoFrame(this.currentKeyFrame);
-        this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.frameCount}`;
+        this.frameIdx = parseFloat(target.value);
+        this.gotoFrame(this.frameIdx);
+        this.label.textContent = `Keyframe: ${this.frameIdx} / ${this.frameCount}`;
     });
 
     this.fbx_player_object = 
@@ -111,13 +111,13 @@ export class FBX_Player
     }
 
     // stop if the closest keyframe is the last one
-    if (this.currentKeyFrame >= this.frameCount) 
+    if (this.frameIdx >= this.frameCount) 
     {
-        this.currentKeyFrame = this.frameCount;
+        this.frameIdx = this.frameCount;
         this.isPlaying = false;
     }
 
-    this.currentKeyFrame = closestIndex;
+    this.frameIdx = closestIndex;
     this.slider.value = closestIndex.toString();
     this.label.textContent = `Keyframe: ${closestIndex} / ${this.frameCount}`;
 
@@ -127,7 +127,7 @@ export class FBX_Player
   {
     // toggle play/pause
     this.isPlaying = !this.isPlaying;
-    if (this.currentKeyFrame >= this.frameCount) 
+    if (this.frameIdx >= this.frameCount) 
     {
       this.stop();
     }
@@ -136,11 +136,11 @@ export class FBX_Player
 stop() 
   {
     this.slider.value = '0';
-    this.currentKeyFrame = 0;
+    this.frameIdx = 0;
     this.isPlaying = false;
     this.fbx_loader_object.mixer!.stopAllAction();
     this.fbx_loader_object.mixer!.setTime(0);
-    this.label.textContent = `Keyframe: ${this.currentKeyFrame} / ${this.frameCount}`;
+    this.label.textContent = `Keyframe: ${this.frameIdx} / ${this.frameCount}`;
   }
 
   truncateToTwoDecimals(num: number): number

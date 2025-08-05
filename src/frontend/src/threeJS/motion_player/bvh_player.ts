@@ -12,13 +12,14 @@ export class BVH_Player
     frameCount: number; 
     isPlaying: boolean;
     loop: Loop;
+    frameIdx: number;
 
 
   constructor(bvh_loader_object: BVH_loader, loop: Loop) 
   {
     this.bvh_loader_object = bvh_loader_object;
     this.frameCount = bvh_loader_object.frameCount;
-
+    this.frameIdx = 0;
     const container = document.getElementById('timeline-container');
     if (!container) 
     {
@@ -126,7 +127,8 @@ export class BVH_Player
   getCurrentFrame() 
   {
     if (!this.bvh_loader_object.mixer) return 0;
-    return Math.floor(this.bvh_loader_object.mixer!.time * this.bvh_loader_object.fps);
+    this.frameIdx = Math.floor(this.bvh_loader_object.mixer!.time * this.bvh_loader_object.fps);
+    return this.frameIdx;
   }
 
   dispose() 
