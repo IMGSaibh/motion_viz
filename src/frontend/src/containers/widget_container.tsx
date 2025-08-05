@@ -197,7 +197,6 @@ export function WidgetContainer()
     });
   }
 
-
   function handle_std_slider_on_mouse_leave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
   {
     set_std_slider_thumbnail_css({ display: 'none'});
@@ -222,7 +221,7 @@ export function WidgetContainer()
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
     if(!rect){return}
-    
+
     if (Array.isArray(value) && value.length === 2) 
     {
 

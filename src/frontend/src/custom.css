@@ -157,24 +157,6 @@ canvas {
   white-space: nowrap;
 }
 
-/* #preview-popup
-{
-  display: none;
-  position: absolute;
-  top: -210px;
-  width: 260px;
-  height: 190px;
-  background: black;
-  border: 1px solid #ffffff;
-  pointer-events: none;
-}
-
-#preview-img
-{
-  width: 100%; 
-  height: 100%;
-} */
-
 
 /* ====================================== */
 #timeline-container_2 {

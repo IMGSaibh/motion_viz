@@ -24,7 +24,7 @@ export function WidgetPlaySlider({
 }: WidgetPlaySliderProps) {
   return (
     <>
-      <div id="frame-label">Frame: 0 / 0</div>
+      <div id="frame-label">Frame: 0 / 0what</div>
       {/* <input
         value={std_slider_value}
         type="range"
