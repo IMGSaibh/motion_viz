@@ -1,8 +1,8 @@
 import Slider from '@mui/material/Slider';
 
 type WidgetLabelSliderProps = {
+  label_slider_value: [number, number];
   label_slider_framecount: number;
-  value: [number, number];
   label_slider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   label_slider_thumbnail_css:  React.CSSProperties;
@@ -10,7 +10,7 @@ type WidgetLabelSliderProps = {
 };
 
 export function WidgetLabelSlider({
-  value,
+  label_slider_value,
   label_slider_framecount, 
   label_slider_on_change,
   label_slider_on_mouse_leave,
@@ -23,7 +23,7 @@ export function WidgetLabelSlider({
     <>
       <div id="frame-label">Frame: 0 / {label_slider_framecount}</div>
       <Slider
-        value={value}
+        value={label_slider_value}
         min={0}
         max={label_slider_framecount}
         valueLabelDisplay="auto"

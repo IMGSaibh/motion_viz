@@ -8,7 +8,7 @@ export class NPY_Player
   npy_loader_object: NPY_loader;
   frameCount: number;
   container: HTMLElement;
-  slider: HTMLInputElement;
+  // slider: HTMLInputElement;
   label: HTMLElement;
   frameIdx: number;
   elapsedTime: number;
@@ -27,23 +27,23 @@ export class NPY_Player
       throw new Error("Element with id 'timeline-container' not found.");
     }
     this.container = container;
-    const slider = document.getElementById('frame-slider');
-    if (!slider || !(slider instanceof HTMLInputElement)) 
-    {
-      throw new Error("Element with id 'frame-slider' not found or is not an input element.");
-    }
-    this.slider = slider;
+    // const slider = document.getElementById('frame-slider');
+    // if (!slider || !(slider instanceof HTMLInputElement)) 
+    // {
+    //   throw new Error("Element with id 'frame-slider' not found or is not an input element.");
+    // }
+    // this.slider = slider;
     const label = document.getElementById('frame-label');
     if (!label) 
     {
       throw new Error("Element with id 'frame-label' not found.");
     }
     this.label = label;
-    this.slider.type = 'range';
-    this.slider.min = '0';
-    this.slider.max = this.frameCount.toString();
-    this.slider.step = '1';
-    this.slider.value = '0';
+    // this.slider.type = 'range';
+    // this.slider.min = '0';
+    // this.slider.max = this.frameCount.toString();
+    // this.slider.step = '1';
+    // this.slider.value = '0';
 
     this.frameIdx = 0;
     this.elapsedTime = 0;
@@ -53,7 +53,7 @@ export class NPY_Player
     // cause we use three.js delta, we need to convert it to seconds
     this.frameDuration = 1 / this.fps;
 
-    this.container.appendChild(this.slider);
+    // this.container.appendChild(this.slider);
     this.label.textContent = `Frame: 0 / ${this.frameCount}`;
 
     this.loop = loop;
@@ -64,14 +64,14 @@ export class NPY_Player
       if (e.code === 'KeyS') this.stop();
     });
 
-    // input-Event executes always when the slider is moved
-    this.slider.addEventListener('input', (e) => 
-    {
-        const target = e.target as HTMLInputElement;
-        this.frameIdx = parseFloat(target.value);
-        this.gotoFrame(this.frameIdx);
-        this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
-    });
+    // // input-Event executes always when the slider is moved
+    // this.slider.addEventListener('input', (e) => 
+    // {
+    //     const target = e.target as HTMLInputElement;
+    //     this.frameIdx = parseFloat(target.value);
+    //     this.gotoFrame(this.frameIdx);
+    //     this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
+    // });
 
     this.npy_player_object = 
     {
@@ -100,7 +100,7 @@ export class NPY_Player
         this.isPlaying = false;
       }
       this.gotoFrame(this.frameIdx);
-      this.slider.value = this.frameIdx.toString();
+      // this.slider.value = this.frameIdx.toString();
       this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
     }
   }
@@ -112,7 +112,7 @@ export class NPY_Player
     if (this.frameIdx >= this.frameCount) 
     {
       this.frameIdx = 0;
-      this.slider.value = '0';
+      // this.slider.value = '0';
       this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
     }
   }
@@ -120,7 +120,7 @@ export class NPY_Player
   stop() 
   {
     this.frameIdx = 0;
-    this.slider.value = '0';
+    // this.slider.value = '0';
     this.isPlaying = false;
     this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
   }
@@ -134,6 +134,11 @@ export class NPY_Player
     {
       this.npy_loader_object.update_skeleton(this.frameIdx);
     }
+  }
+
+  get_frame_index()
+  {
+    return this.frameIdx;
   }
 
   dispose() 

@@ -96,24 +96,24 @@ export class ThreeManager
         return null;
     }
 
-    async frame_range_change(min: number, max: number)
-    {
-        const timeline = document.getElementById('timeline-container_2');
-        const startframe_handle = document.getElementById("startframe_handle") as HTMLDivElement | null
-        const endframe_handle = document.getElementById("endframe_handle") as HTMLDivElement | null
-        const previewImg = document.getElementById("preview-img_2") as HTMLImageElement | null;
+    // async frame_range_change(min: number, max: number)
+    // {
+    //     const timeline = document.getElementById('timeline-container_2');
+    //     const startframe_handle = document.getElementById("startframe_handle") as HTMLDivElement | null
+    //     const endframe_handle = document.getElementById("endframe_handle") as HTMLDivElement | null
+    //     const previewImg = document.getElementById("preview-img_2") as HTMLImageElement | null;
         
 
-        if (this.currentPlayer instanceof NPY_Player) 
-        {
-            const thumbDataUrl = await this.currentPlayer.renderThumbnail(min, this.scene, this.camera, 260, 190, this.previewRenderer);
-            if (thumbDataUrl && previewImg)
-            {
-                previewImg.src = thumbDataUrl;
-            }
-        }
+    //     if (this.currentPlayer instanceof NPY_Player) 
+    //     {
+    //         const thumbDataUrl = await this.currentPlayer.renderThumbnail(min, this.scene, this.camera, 260, 190, this.previewRenderer);
+    //         if (thumbDataUrl && previewImg)
+    //         {
+    //             previewImg.src = thumbDataUrl;
+    //         }
+    //     }
 
-    }
+    // }
     
     get_frame_count()
     {
@@ -124,22 +124,30 @@ export class ThreeManager
         return 0;
     }
 
-
-
-    slider_preview_mouseleave()
+    get_frame_index()
     {
-        const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
-        const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
-        console.log("what")
-
-        if (!slider || !preview) 
+        if (this.currentPlayer instanceof NPY_Player)
         {
-            console.error("Slider or preview elements not found.");
-            return;
+            return this.currentPlayer.frameIdx   
         }
-
-        preview.style.display = "none";
+        return 0;
     }
+
+
+    // slider_preview_mouseleave()
+    // {
+    //     const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
+    //     const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
+    //     console.log("what")
+
+    //     if (!slider || !preview) 
+    //     {
+    //         console.error("Slider or preview elements not found.");
+    //         return;
+    //     }
+
+    //     preview.style.display = "none";
+    // }
 
     print_scene_components()
     {
@@ -163,7 +171,7 @@ export class ThreeManager
         
             const label = document.getElementById('frame-label') as HTMLDivElement | null;
             const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
-            slider!.value = '0';
+            // slider!.value = '0';
             label!.textContent = `Frame: 0 / 0`;
             if (this.previewRenderer) 
             {

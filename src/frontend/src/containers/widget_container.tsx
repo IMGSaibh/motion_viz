@@ -168,30 +168,35 @@ export function WidgetContainer()
 
   // ======================= standard slider ======================= 
 
-  const std_slider_reference = useRef<HTMLInputElement | null>(null);
+  const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
   const [std_slider_thumbnail, set_std_slider_thumbnail] = useState<string | null>(null);
+  const [std_slider_value, set_std_slider_value] = useState<number>(0);
 
-  function handle_std_slider_on_mouse_move(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
+
+  function handle_std_slider_on_mouse_move(e: React.MouseEvent) 
   {
-    if (!std_slider_reference.current) return;
+    const rect = std_slider_reference.current?.getBoundingClientRect();
+    if(!rect){return}
+    // mouse position as percent on slider bar
+    const percent = (e.clientX - rect!.left) / rect!.width;
+    const slider_value = Math.round(percent * framecount);
 
-    const slider = std_slider_reference.current;
-    const rect = slider.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
-
-    // positioning via CSS
     set_std_slider_thumbnail_css({
       display: 'block',
-      left: e.clientX - rect.left + 60,
+      left: ((slider_value) / (framecount)) * rect!.width + 60,
+      position: 'absolute',
+      border: '1px solid #000000',
+      top: -250,
+      zIndex: 20,
     });
 
-    three_js_mngr_reference.current?.getThumbnailForFrame(frameIndex).then(dataUrl => 
+    three_js_mngr_reference.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
     {
       set_std_slider_thumbnail(dataUrl);
     });
   }
+
 
   function handle_std_slider_on_mouse_leave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
   {
@@ -201,29 +206,34 @@ export function WidgetContainer()
     set_labelslider_thumbnail(null);
   }
 
+  function handle_std_slider_on_change(e: Event, newValue: number)
+  {
+    set_std_slider_value(newValue);
+  }
 
   // ======================= range label slider ======================= 
 
   const [labelslider_thumbnail_css, set_labelslider_thumbnail_css] = useState<React.CSSProperties>({});
   const [labelslider_thumbnail, set_labelslider_thumbnail] = useState<string | null>(null);
   const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
-  const [active_slidercontrol, set_active_slidercontrol] = useState<0 | 1>(0);
 
 
-  function handleLabelSliderChange(e: Event, value: number | number[], active_slidercontrol_idx: number) 
+  function handle_label_slider_on_change(e: Event, value: number | number[], active_slidercontrol_idx: number) 
   {
+    const rect = std_slider_reference.current?.getBoundingClientRect();
+    if(!rect){return}
+    
     if (Array.isArray(value) && value.length === 2) 
     {
-      set_label_slider_range([value[0], value[1]]);
-      set_active_slidercontrol(active_slidercontrol_idx as 0 | 1);
 
+      set_label_slider_range([value[0], value[1]]);
       const slider_value = value[active_slidercontrol_idx];
-      const rect = std_slider_reference.current?.getBoundingClientRect();
 
       set_labelslider_thumbnail_css({
         display: 'block',
         left: ((slider_value - minValue) / (maxValue - minValue)) * rect!.width + 60,
         position: 'absolute',
+        border: '1px solid #000000',
         top: -200,
         zIndex: 20,
       });
@@ -260,15 +270,18 @@ export function WidgetContainer()
       </div>
       <div ref={three_js_scene_reference} id="scene-container"/>
       <WidgetPresenterSlider
+        std_slider_value                  ={std_slider_value}
+        std_slider_framecount             ={framecount}
         std_slider_reference              ={std_slider_reference}
+        std_slider_on_change              ={handle_std_slider_on_change}
         std_slider_on_mouse_move          ={handle_std_slider_on_mouse_move}
         std_slider_on_mouse_leave         ={handle_std_slider_on_mouse_leave}
         std_slider_thumbnail_css          ={std_slider_thumbnail_css}
         std_slider_thumbnail              ={std_slider_thumbnail}
 
-        value                             ={label_slider_range}
-        label_slider_framecount           ={framecount > 0 ? framecount : 100}
-        label_slider_on_change            ={handleLabelSliderChange}
+        label_slider_value                ={label_slider_range}
+        label_slider_framecount           ={framecount}
+        label_slider_on_change            ={handle_label_slider_on_change}
         label_slider_on_mouse_leave       ={handle_std_slider_on_mouse_leave}
         label_slider_thumbnail_css        ={labelslider_thumbnail_css}
         label_slider_thumbnail            ={labelslider_thumbnail}
