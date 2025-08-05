@@ -5,69 +5,66 @@ import { WidgetListFiles } from './widgets/widget_list_motion_files';
 
 type WidgetPresenterProps = 
 {
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  triggerFileDialog: () => void;
-  is_dropdown_open: boolean;
-  on_toggle_dropdown: () => void;
+  file_dialog_reference: React.RefObject<HTMLInputElement | null>;
+  file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  file_dialog_on_click: () => void;
 
-  inputRefs: { [key: string]: React.RefObject<HTMLInputElement | null> };
-  onCreate: () => void;
+  motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
+  motion_config_is_open: boolean;
+  motion_config_on_click: () => void;
+  motion_config_create_on_click: () => void;
+  
+  convert_pv_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  convert_bvh_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
 
-  on_convert_pose_viewer: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  on_convert_bvh: (e: React.MouseEvent<HTMLButtonElement>) => void;
-
-  motionFiles: Array<{type: string, name: string}>;
-  selectedMotionFile: string | null;
-  onFetchFileList: () => void;
-  onSelectMotionFile: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-
-  status_massage: string | null
+  motion_files: Array<{type: string, name: string}>;
+  motion_file_selected: string | null;
+  motion_file_list_on_focus: () => void;
+  motion_file_list_on_change: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
 export function WidgetPresenter({
-    inputRef,
-    onFileInputChange,
-    triggerFileDialog,
-    on_toggle_dropdown,
-    is_dropdown_open,
-    inputRefs,
-    onCreate,
-    on_convert_pose_viewer,
-    on_convert_bvh,
+    file_dialog_reference: filedialog_reference,
+    file_dialog_on_change: filedialog_on_change,
+    file_dialog_on_click: filedialog_on_click,
+
+    motion_config_reference,
+    motion_config_is_open,
+    motion_config_on_click,
+    motion_config_create_on_click,
+
+    convert_pv_files_on_click,
+    convert_bvh_files_on_click,
     
-    motionFiles,
-    selectedMotionFile,
-    onFetchFileList,
-    onSelectMotionFile,
-    
-    status_massage
+    motion_files,
+    motion_file_selected,
+    motion_file_list_on_focus,
+    motion_file_list_on_change,
     
 }: WidgetPresenterProps )
 {
   return (
     <>
       <WidgetFileUpload
-        inputRef={inputRef}
-        onFileInputChange={onFileInputChange}
-        triggerFileDialog={triggerFileDialog}
-        status_massage={status_massage}
+        filedialog_reference            ={filedialog_reference}
+        filedialog_on_change            ={filedialog_on_change}
+        filedialog_on_click             ={filedialog_on_click}
       />
       <WidgetCreateDescriptorFile
-        on_toggle_dropdown={on_toggle_dropdown}
-        isOpen={is_dropdown_open} 
-        inputRefs={inputRefs}        
-        onCreate={onCreate}
+        motion_config_reference         ={motion_config_reference}    
+        motion_config_is_open           ={motion_config_is_open} 
+        motion_config_on_click          ={motion_config_on_click}
+        motion_config_create_on_click   ={motion_config_create_on_click}
       />
       <WidgetConvertMotionFile
-        on_convert_motion_file_pose_viewer={on_convert_pose_viewer}
-        on_convert_motion_file={on_convert_bvh}
+        convert_pv_files_on_click       ={convert_pv_files_on_click}
+        convert_bvh_files_on_click      ={convert_bvh_files_on_click}
       />
       <WidgetListFiles
-        motionFiles={motionFiles}
-        selectedMotionFile={selectedMotionFile}
-        onFetchFileList={onFetchFileList}
-        onSelectMotionFile={onSelectMotionFile}
+        motion_files                    ={motion_files}
+        motion_file_selected            ={motion_file_selected}
+        motion_file_list_on_focus       ={motion_file_list_on_focus}
+        motion_file_list_on_change      ={motion_file_list_on_change}
       />
     </>
   );

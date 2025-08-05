@@ -7,12 +7,12 @@ import { api_file_processing, MotionDescriptorData } from "../api/api_file_proce
 
 export function WidgetContainer() 
 {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const three_js_manager_ref = useRef<ThreeManager>(null);
+  const three_js_scene_reference = useRef<HTMLDivElement>(null);
+  const three_js_mngr_reference = useRef<ThreeManager>(null);
   
   useEffect(() => 
   {
-    const container = mountRef.current;
+    const container = three_js_scene_reference.current;
 
     if (!container) 
     {
@@ -21,17 +21,17 @@ export function WidgetContainer()
     }
 
     // init if manager doesnt exists
-    if (!three_js_manager_ref.current) 
+    if (!three_js_mngr_reference.current) 
     {
-      three_js_manager_ref.current = new ThreeManager(container);
-      three_js_manager_ref.current.start();
+      three_js_mngr_reference.current = new ThreeManager(container);
+      three_js_mngr_reference.current.start();
     }
 
     // keyboard-events
     const handleKeyDown = (e: KeyboardEvent) => 
     {
-      if (e.code === "KeyP"){three_js_manager_ref.current?.print_scene_components();}
-      if (e.code === "KeyR") {three_js_manager_ref.current?.cleanup_scene()}
+      if (e.code === "KeyP"){three_js_mngr_reference.current?.print_scene_components();}
+      if (e.code === "KeyR") {three_js_mngr_reference.current?.cleanup_scene()}
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -41,33 +41,33 @@ export function WidgetContainer()
     {
       window.removeEventListener("keydown", handleKeyDown);
 
-      if (three_js_manager_ref.current) 
+      if (three_js_mngr_reference.current) 
       {
-        three_js_manager_ref.current.stop();
-        three_js_manager_ref.current.dispose();
-        three_js_manager_ref.current = null;
+        three_js_mngr_reference.current.stop();
+        three_js_mngr_reference.current.dispose();
+        three_js_mngr_reference.current = null;
       }
     };
   }, []);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const file_dialog_reference = useRef<HTMLInputElement>(null);
   const { upload_files } = api_file_processing();
   const { create_motion_descriptor } = api_file_processing();
   const { convert_with_pose_viewer, convert_bvh } = api_motion_file_conversion();
   
-  const [toggle_dropdown, set_toggle_dropdown] = useState(false);
   const { list_motion_files } = api_file_processing();
-  const [motionFiles, setMotionFiles] = useState<{type: string, name: string}[]>([]);
-  const [selectedMotionFile, setSelectedMotionFile] = useState<string | null>(null);
+  const [motion_config_is_open, set_motion_config_is_open] = useState(false);
+  const [motion_files, set_motion_files] = useState<{type: string, name: string}[]>([]);
+  const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
 
   
-  const [frameCount, setFramecount] = useState(0);
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(100);
+  const [framecount, set_framecount] = useState(0);
+  const [minValue, set_min_value] = useState(0);
+  const [maxValue, set_max_value] = useState(100);
   
   const [status_massage, set_status_massage] = useState<string | null>(null);
 
-  const refs = 
+  const motion_config_references = 
   {
     format: useRef<HTMLInputElement>(null),
     abbrev: useRef<HTMLInputElement>(null),
@@ -82,13 +82,13 @@ export function WidgetContainer()
     dimsize: useRef<HTMLInputElement>(null),
   };
 
-  function open_file_dialog() 
+  function handle_file_dialog_on_click() 
   {
-    inputRef.current?.click();
+    file_dialog_reference.current?.click();
     set_status_massage("")
   }
 
-  async function handle_file_input_change(e: React.ChangeEvent<HTMLInputElement>) 
+  async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) 
   {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -99,25 +99,25 @@ export function WidgetContainer()
     set_status_massage(`${message} ${warning}`);
   }
 
-  function handleToggleDropdown() 
+  function handle_motion_config_on_click() 
   {
-    set_toggle_dropdown(prev => !prev);
+    set_motion_config_is_open(prev => !prev);
   }
 
-  function handle_motion_description_attributes() 
+  function handle_motion_config_create_on_click() 
   {
     const data: MotionDescriptorData = {
-      format: refs.format.current?.value || "csv",
-      abbrev: refs.abbrev.current?.value || "",
-      scale: parseFloat(refs.scale.current?.value || "1"),
-      positions: refs.positions.current?.value || "absolute",
-      rotations: refs.rotations.current?.value || "none",
-      systemname: refs.systemname.current?.value || "",
-      fps: parseInt(refs.fps.current?.value || "30"),
-      jointcount: parseInt(refs.jointcount.current?.value || "30"),
-      coloffset: parseInt(refs.coloffset.current?.value || "0"),
-      colgap: parseInt(refs.colgap.current?.value || "0"),
-      dimsize: parseInt(refs.dimsize.current?.value || "3"),
+      format: motion_config_references.format.current?.value || "csv",
+      abbrev: motion_config_references.abbrev.current?.value || "",
+      scale: parseFloat(motion_config_references.scale.current?.value || "1"),
+      positions: motion_config_references.positions.current?.value || "absolute",
+      rotations: motion_config_references.rotations.current?.value || "none",
+      systemname: motion_config_references.systemname.current?.value || "",
+      fps: parseInt(motion_config_references.fps.current?.value || "30"),
+      jointcount: parseInt(motion_config_references.jointcount.current?.value || "30"),
+      coloffset: parseInt(motion_config_references.coloffset.current?.value || "0"),
+      colgap: parseInt(motion_config_references.colgap.current?.value || "0"),
+      dimsize: parseInt(motion_config_references.dimsize.current?.value || "3"),
     };
    
     create_motion_descriptor(data).then(() => 
@@ -142,193 +142,138 @@ export function WidgetContainer()
     set_status_massage(`${message} ${warning}`);
   }
 
-  async function handleFetchFileList() 
+  async function handle_motion_file_list_on_focus() 
   {
     const response = await list_motion_files();
-    const allFiles = [
+    const all_files = [
       ...response.data.bvh.map((f: string) => ({ type: "bvh", name: f })),
       ...response.data.fbx.map((f: string) => ({ type: "fbx", name: f })),
       ...response.data.npy.map((f: string) => ({ type: "npy", name: f })),
     ];
-    setMotionFiles(allFiles);
+    set_motion_files(all_files);
   }
 
-  async function handleSelectMotionFile(e: React.ChangeEvent<HTMLSelectElement>) 
+  async function handle_motion_file_list_on_change(e: React.ChangeEvent<HTMLSelectElement>) 
   {
-    setSelectedMotionFile(e.target.value);
-    await three_js_manager_ref.current!.load_motionfile_and_player(e.target.value);
+    set_motion_file_selected(e.target.value);
+    await three_js_mngr_reference.current!.load_motionfile_and_player(e.target.value);
 
-    const actualFrameCount = three_js_manager_ref.current!.get_frame_count();
-    setFramecount(actualFrameCount);
+    const framecount_threejs = three_js_mngr_reference.current!.get_frame_count();
+    set_framecount(framecount_threejs);
 
-    setMinValue(0);
-    setMaxValue(actualFrameCount > 0 ? actualFrameCount : 0);
+    set_min_value(0);
+    set_max_value(framecount_threejs > 0 ? framecount_threejs : 0);
   }
 
-  
-  
-  
-  // ======================= play slider ======================= 
 
-  const slider_standard_reference = useRef<HTMLInputElement | null>(null);
-  const [slider_standard_preview_CSS, set_standard_preview_CSS] = useState<React.CSSProperties>({});
-  const [slider_standard_preview_src, set_standard_preview_src] = useState<string | null>(null);
+  // ======================= standard slider ======================= 
 
-  function handleSliderPreviewMouseMove(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
+  const std_slider_reference = useRef<HTMLInputElement | null>(null);
+  const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
+  const [std_slider_thumbnail, set_std_slider_thumbnail] = useState<string | null>(null);
+
+  function handle_std_slider_on_mouse_move(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
   {
-    if (!slider_standard_reference.current) return;
+    if (!std_slider_reference.current) return;
 
-    const slider = slider_standard_reference.current;
+    const slider = std_slider_reference.current;
     const rect = slider.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const frameIndex = Math.round(percent * (parseInt(slider.max) - parseInt(slider.min)));
 
     // positioning via CSS
-    set_standard_preview_CSS({
+    set_std_slider_thumbnail_css({
       display: 'block',
       left: e.clientX - rect.left + 60,
     });
 
-    three_js_manager_ref.current?.getThumbnailForFrame(frameIndex).then(dataUrl => 
+    three_js_mngr_reference.current?.getThumbnailForFrame(frameIndex).then(dataUrl => 
     {
-      set_standard_preview_src(dataUrl);
+      set_std_slider_thumbnail(dataUrl);
     });
   }
 
-  function handleSliderPreviewMouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
+  function handle_std_slider_on_mouse_leave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
   {
-    set_standard_preview_CSS({
-      display: 'none',
-    });
-    set_standard_preview_src(null);
+    set_std_slider_thumbnail_css({ display: 'none'});
+    set_std_slider_thumbnail(null);
+    set_labelslider_thumbnail_css({ display: "none" });
+    set_labelslider_thumbnail(null);
   }
 
 
   // ======================= range label slider ======================= 
 
-const [slider_label_preview_src, set_label_preview_src] = useState<string | null>(null);
-const [slider_label_preview_CSS, set_label_preview_CSS] = useState<React.CSSProperties>({});
-
-  // const [slider_label_value, set_slider_label_value] = useState<number>(0); 
-  const [labelSliderRange, setLabelSliderRange] = useState<[number, number]>([0, 100]);
-
-  // function handleSliderChange(_event: Event, newValue: number | number[]) 
-  // {
-  //   if (typeof newValue === "number") 
-  //     {
-  //       set_slider_label_value(newValue);
-  //       // Preview updaten wie oben, wenn du live willst!
-  //       console.log("newValue in change")
-  //   }
-  // }
-
-const [activeThumb, setActiveThumb] = useState<0 | 1>(0);
-
-// function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) 
-// {
-//   if (Array.isArray(newValue) && newValue.length === 2) 
-//   {
-//     setLabelSliderRange([newValue[0], newValue[1]]);
-//     setActiveThumb(activeThumbIdx as 0 | 1);
-//   }
-
-  
-// }
+  const [labelslider_thumbnail_css, set_labelslider_thumbnail_css] = useState<React.CSSProperties>({});
+  const [labelslider_thumbnail, set_labelslider_thumbnail] = useState<string | null>(null);
+  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
+  const [active_slidercontrol, set_active_slidercontrol] = useState<0 | 1>(0);
 
 
+  function handleLabelSliderChange(e: Event, value: number | number[], active_slidercontrol_idx: number) 
+  {
+    if (Array.isArray(value) && value.length === 2) 
+    {
+      set_label_slider_range([value[0], value[1]]);
+      set_active_slidercontrol(active_slidercontrol_idx as 0 | 1);
 
-  // function handle_label_slider_preview_MouseMove(e: React.MouseEvent<HTMLInputElement, MouseEvent>) 
-  // {
+      const slider_value = value[active_slidercontrol_idx];
+      const rect = std_slider_reference.current?.getBoundingClientRect();
 
-  //     const rect = (e.currentTarget as HTMLInputElement).getBoundingClientRect();
-  //     const slider_value = labelSliderRange[activeThumb];
-  //     set_label_preview_CSS({
-  //       display: 'block',
-  //       left: ((slider_value - minValue) / (maxValue - minValue)) * rect.width + 60, // Position anpassen!
-  //       position: 'absolute',
-  //       top: -290,
-  //       zIndex: 20,
-  //     });
-  //     three_js_manager_ref.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
-  //     {
-  //       set_label_preview_src(dataUrl);
-  //     });
-
-  //   console.log("mouse move " + slider_value)
-  // }
-
-
-  function handleLabelSliderChange(_e: Event, newValue: number | number[], activeThumbIdx: number) {
-  if (Array.isArray(newValue) && newValue.length === 2) {
-    setLabelSliderRange([newValue[0], newValue[1]]);
-    setActiveThumb(activeThumbIdx as 0 | 1);
-
-    const slider_value = newValue[activeThumbIdx];
-    const rect = slider_standard_reference.current?.getBoundingClientRect();
-
-    if (rect) {
-      set_label_preview_CSS({
+      set_labelslider_thumbnail_css({
         display: 'block',
-        left: ((slider_value - minValue) / (maxValue - minValue)) * rect.width + 60,
+        left: ((slider_value - minValue) / (maxValue - minValue)) * rect!.width + 60,
         position: 'absolute',
-        top: -290,
+        top: -200,
         zIndex: 20,
       });
+      three_js_mngr_reference.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
+      {
+        set_labelslider_thumbnail(dataUrl);
+      });
+
+      console.log("Dragging Thumb " + active_slidercontrol_idx + " Value: " + slider_value);
     }
-
-    three_js_manager_ref.current?.getThumbnailForFrame(slider_value).then(dataUrl => {
-      set_label_preview_src(dataUrl);
-    });
-
-    console.log("Dragging Thumb " + activeThumbIdx + " Value: " + slider_value);
   }
-}
-
-
-  // function handle_label_slider_preview_MouseLeave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
-  // {
-  //     set_label_preview_CSS({ display: "none" });
-  //     set_label_preview_src(null);
-  // }
-
 
 
   return (
     <>
       <div id="ui-overlay">
         <WidgetPresenter
-          inputRef={inputRef}
-          onFileInputChange={handle_file_input_change}
-          triggerFileDialog={open_file_dialog}
-          is_dropdown_open={toggle_dropdown}
-          on_toggle_dropdown={handleToggleDropdown}
-          inputRefs={refs}
-          onCreate={handle_motion_description_attributes}
-          on_convert_pose_viewer={handle_convert_with_pose_viewer}
-          on_convert_bvh={handle_convert_motion_file}
+          file_dialog_reference           ={file_dialog_reference}
+          file_dialog_on_change           ={handle_file_dialog_on_change}
+          file_dialog_on_click            ={handle_file_dialog_on_click}
 
-          motionFiles={motionFiles}
-          selectedMotionFile={selectedMotionFile}
-          onFetchFileList={handleFetchFileList}
-          onSelectMotionFile={handleSelectMotionFile}
-          
-          status_massage={status_massage}
+          motion_config_reference         ={motion_config_references}
+          motion_config_is_open           ={motion_config_is_open}
+          motion_config_on_click          ={handle_motion_config_on_click}
+          motion_config_create_on_click   ={handle_motion_config_create_on_click}
+
+          convert_pv_files_on_click       ={handle_convert_with_pose_viewer}
+          convert_bvh_files_on_click      ={handle_convert_motion_file}
+
+          motion_files                    ={motion_files}
+          motion_file_selected            ={motion_file_selected}
+          motion_file_list_on_focus       ={handle_motion_file_list_on_focus}
+          motion_file_list_on_change      ={handle_motion_file_list_on_change}
         />
+        <p>{status_massage}</p>
       </div>
-      <div ref={mountRef} id="scene-container"/>
+      <div ref={three_js_scene_reference} id="scene-container"/>
       <WidgetPresenterSlider
-        sliderRef={slider_standard_reference}
-        onMouseMove={handleSliderPreviewMouseMove}
-        onMouseLeave={handleSliderPreviewMouseLeave}
-        previewStyle={slider_standard_preview_CSS}
-        previewImgSrc={slider_standard_preview_src}
+        std_slider_reference              ={std_slider_reference}
+        std_slider_on_mouse_move          ={handle_std_slider_on_mouse_move}
+        std_slider_on_mouse_leave         ={handle_std_slider_on_mouse_leave}
+        std_slider_thumbnail_css          ={std_slider_thumbnail_css}
+        std_slider_thumbnail              ={std_slider_thumbnail}
 
-
-        value={labelSliderRange}
-        framecount={frameCount > 0 ? frameCount : 100}
-        onChange={handleLabelSliderChange}
-        preview_Style_labelslider   ={slider_label_preview_CSS}
-        previewImgSrc_labelslider   ={slider_label_preview_src}
+        value                             ={label_slider_range}
+        labelslider_framecount            ={framecount > 0 ? framecount : 100}
+        labelslider_on_change             ={handleLabelSliderChange}
+        labelslider_on_mouse_leave        ={handle_std_slider_on_mouse_leave}
+        labelslider_thumbnail_css         ={labelslider_thumbnail_css}
+        labelslider_thumbnail             ={labelslider_thumbnail}
         
       />
     </>

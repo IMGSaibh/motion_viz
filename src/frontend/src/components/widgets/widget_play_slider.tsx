@@ -1,19 +1,19 @@
 
 type WidgetPlaySliderProps = 
 {
-  sliderRef: React.RefObject<HTMLInputElement | null>;
-  onMouseMove: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  onMouseLeave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  previewStyle: React.CSSProperties;
-  previewImgSrc: string | null;
+  std_slider_reference: React.RefObject<HTMLInputElement | null>;
+  std_slider_on_mouse_move: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  std_slider_thumbnail_css: React.CSSProperties;
+  std_slider_thumbnail: string | null;
 };
 
 export function WidgetPlaySlider({ 
-  sliderRef,
-  onMouseMove,
-  onMouseLeave,
-  previewStyle,
-  previewImgSrc
+  std_slider_reference,
+  std_slider_on_mouse_move,
+  std_slider_on_mouse_leave,
+  std_slider_thumbnail_css,
+  std_slider_thumbnail
 }: WidgetPlaySliderProps) {
   return (
     <>
@@ -24,12 +24,12 @@ export function WidgetPlaySlider({
         min="0"
         max="100"
         defaultValue="0"
-        ref={sliderRef}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
+        ref={std_slider_reference}
+        onMouseMove={std_slider_on_mouse_move}
+        onMouseLeave={std_slider_on_mouse_leave}
       />
-      <div id="preview-popup" style={previewStyle}>
-        <img src={previewImgSrc || undefined} />
+      <div id="preview-popup" style={std_slider_thumbnail_css}>
+        <img src={std_slider_thumbnail || undefined} />
       </div>
     </>
   );

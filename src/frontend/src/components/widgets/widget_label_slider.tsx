@@ -1,38 +1,55 @@
 import Slider from '@mui/material/Slider';
 
 type WidgetLabelSliderProps = {
-  framecount: number;
+  labelslider_framecount: number;
   value: [number, number];
-  onChange: (_e: Event, newValue: number | number[], activeThumbIdx: number) => void;
-  preview_Style_labelslider:  React.CSSProperties;
-  previewImgSrc_labelslider: string | null;
+  labelslider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  labelslider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  labelslider_thumbnail_css:  React.CSSProperties;
+  labelslider_thumbnail: string | null;
 };
 
 export function WidgetLabelSlider({
-  framecount, 
-  onChange,
-
   value,
-  preview_Style_labelslider   ,
-  previewImgSrc_labelslider   ,
+  labelslider_framecount, 
+  labelslider_on_change,
+  labelslider_on_mouse_leave,
+  labelslider_thumbnail_css,
+  labelslider_thumbnail,
 
 }: WidgetLabelSliderProps) {
 
   return (
     <>
-      <div id="frame-label">Frame: 0 / {framecount}</div>
+      <div id="frame-label">Frame: 0 / {labelslider_framecount}</div>
       <Slider
         value={value}
         min={0}
         max={100}
         valueLabelDisplay="auto"
         sx={{
-          color: '#007bff'
+          color: '#45ab45',
+          '& .MuiSlider-thumb': {
+            backgroundColor: '#fff',
+            border: '2px solid #45ab45',
+          },
+          '& .MuiSlider-rail': {
+            backgroundColor: '#ffffffff',
+            opacity: 1,
+          },
+          '& .MuiSlider-track': {
+            backgroundColor: '#45ab45',
+          },
+          '& .MuiSlider-valueLabel': {
+            color: '#fff',
+            background: '#45ab45',
+          },
         }}
-        onChange={onChange}
+        onChange={labelslider_on_change}
+        onMouseLeave={labelslider_on_mouse_leave}
       />
-      <div id="preview-popup" style={preview_Style_labelslider}>
-        <img src={previewImgSrc_labelslider || undefined} />
+      <div id="preview-popup" style={labelslider_thumbnail_css}>
+        <img src={labelslider_thumbnail || undefined} />
       </div>
     </>
   );

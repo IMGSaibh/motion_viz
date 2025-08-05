@@ -3,32 +3,34 @@ import { WidgetLabelSlider } from './widgets/widget_label_slider';
 
 type WidgetPresenterSliderProps = 
 {
-  sliderRef: React.RefObject<HTMLInputElement | null>;
-  onMouseMove: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  onMouseLeave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  previewStyle: React.CSSProperties;
-  previewImgSrc: string | null;
+  std_slider_reference: React.RefObject<HTMLInputElement | null>;
+  std_slider_on_mouse_move: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  std_slider_thumbnail_css: React.CSSProperties;
+  std_slider_thumbnail: string | null;
 
 
   value: [number, number];
-  framecount: number;
-  onChange: (_e: Event, newValue: number | number[], activeThumbIdx: number) => void;
-  preview_Style_labelslider:  React.CSSProperties;
-  previewImgSrc_labelslider: string | null;
+  labelslider_framecount: number;
+  labelslider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  labelslider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  labelslider_thumbnail_css:  React.CSSProperties;
+  labelslider_thumbnail: string | null;
 };
 
 export function WidgetPresenterSlider({
-  sliderRef,
-  onMouseMove,
-  onMouseLeave,
-  previewStyle,
-  previewImgSrc,
+  std_slider_reference,
+  std_slider_on_mouse_move,
+  std_slider_on_mouse_leave,
+  std_slider_thumbnail_css,
+  std_slider_thumbnail,
 
   value,
-  framecount,
-  onChange,
-  preview_Style_labelslider,
-  previewImgSrc_labelslider,
+  labelslider_framecount,
+  labelslider_on_change,
+  labelslider_on_mouse_leave,
+  labelslider_thumbnail_css,
+  labelslider_thumbnail,
 
 }: WidgetPresenterSliderProps )
 {
@@ -36,20 +38,21 @@ export function WidgetPresenterSlider({
     <>
         <div id="timeline-container">
           <WidgetPlaySlider
-            sliderRef                   ={sliderRef}
-            onMouseMove                 ={onMouseMove}
-            onMouseLeave                ={onMouseLeave}
-            previewStyle                ={previewStyle}
-            previewImgSrc               ={previewImgSrc}
+            std_slider_reference            ={std_slider_reference}
+            std_slider_on_mouse_move        ={std_slider_on_mouse_move}
+            std_slider_on_mouse_leave       ={std_slider_on_mouse_leave}
+            std_slider_thumbnail_css        ={std_slider_thumbnail_css}
+            std_slider_thumbnail            ={std_slider_thumbnail}
           />
         </div>
         <div id="timeline-container_2">
           <WidgetLabelSlider
-            framecount                  ={framecount}
-            value                       ={value}
-            onChange                    ={onChange}
-            preview_Style_labelslider   ={preview_Style_labelslider}
-            previewImgSrc_labelslider   ={previewImgSrc_labelslider}
+            value                           ={value}
+            labelslider_framecount          ={labelslider_framecount}
+            labelslider_on_change           ={labelslider_on_change}
+            labelslider_on_mouse_leave      ={labelslider_on_mouse_leave}
+            labelslider_thumbnail_css       ={labelslider_thumbnail_css}
+            labelslider_thumbnail           ={labelslider_thumbnail}
           />
         </div>
     </>
