@@ -1,5 +1,5 @@
-import { BVH_loader } from '@/motion_loader/bvh_loader';
-import { Loop, Updatable } from '@/system/loop';
+import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
+import { Loop, Updatable } from '@/threeJS/system/loop';
 
 export class BVH_Player 
 {

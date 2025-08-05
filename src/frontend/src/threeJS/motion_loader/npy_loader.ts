@@ -1,6 +1,6 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
-import { JointCoordsystemLocal } from '@/components/JointCoordSystemLocal';
+import { JointCoordsystemLocal } from '@/threeJS/components/JointCoordSystemLocal';
 
 
 type HierarchyTuple = [number, number]
