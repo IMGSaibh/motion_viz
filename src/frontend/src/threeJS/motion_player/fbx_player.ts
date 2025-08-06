@@ -170,6 +170,10 @@ stop()
     this.fbx_loader_object.mixer.setTime(time);
   }
 
+  get_frame_count(): number
+  {
+    return this.frameCount;
+  }
 
   dispose()
   {

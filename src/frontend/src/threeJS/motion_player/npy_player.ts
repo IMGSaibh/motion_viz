@@ -5,19 +5,18 @@ import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 export class NPY_Player 
 {
   npy_player_object: Updatable;
-  npy_loader_object: NPY_loader;
-  frameCount: number;
-  frameIdx: number;
-  elapsedTime: number;
-  fps: number;
-  frameDuration: number;
-  isPlaying: boolean = false;
-  public onFrameChanged?: (frameIdx: number) => void;
+  private npy_loader_object: NPY_loader;
+  private fps: number;
+  private frame_index: number;
+  private frame_count: number = 0;
+  private elapsedTime: number;
+  private frameDuration: number;
+  private isPlaying: boolean = false;
 
   constructor(npy_loader_object: NPY_loader) 
   {
     this.npy_loader_object = npy_loader_object;    
-    this.frameCount = npy_loader_object.frameCount;
+    this.frame_count = npy_loader_object.frameCount;
 
     this.npy_player_object = 
     {
@@ -27,22 +26,12 @@ export class NPY_Player
       }
     }
 
-    this.frameIdx = 0;
+    this.frame_index = 0;
     this.elapsedTime = 0;
-
     this.fps = npy_loader_object.fps;
     // 1 / fps gives us the duration of one frame in seconds
     // cause we use three.js delta, we need to convert it to seconds
     this.frameDuration = 1 / this.fps;
-
-    // // input-Event executes always when the slider is moved
-    // this.slider.addEventListener('input', (e) => 
-    // {
-    //     const target = e.target as HTMLInputElement;
-    //     this.frameIdx = parseFloat(target.value);
-    //     this.gotoFrame(this.frameIdx);
-    //     this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
-    // });
   }
 
   update(delta: number) 
@@ -53,52 +42,52 @@ export class NPY_Player
     while (this.elapsedTime >= this.frameDuration) 
     {
       this.elapsedTime -= this.frameDuration;
-      this.frameIdx++;
+      this.frame_index++;
       
-      if (this.frameIdx >= this.frameCount) 
+      if (this.frame_index >= this.frame_count) 
       {
-        this.frameIdx = this.frameCount;
+        this.frame_index = this.frame_count;
         this.isPlaying = false;
       }
-      this.gotoFrame(this.frameIdx);
-      if (this.onFrameChanged) 
-      {
-            this.onFrameChanged(this.frameIdx);
-      }
+      this.go_to_frame(this.frame_index);
     }
+  }
+
+  get_frame_count(): number
+  {
+    return this.frame_count;
+  }
+
+  get_frame_index(): number
+  {
+    return this.frame_index;
   }
 
   play_pause() 
   {
     // toggle play/pause
     this.isPlaying = !this.isPlaying;
-    console.log("this.isPlaying in player " + this.isPlaying)
-    if (this.frameIdx >= this.frameCount) 
+    if (this.frame_index >= this.frame_count) 
     {
-      this.frameIdx = 0;
+      this.frame_index = 0;
     }
   }
 
   stop() 
   {
-    this.frameIdx = 0;
+    this.frame_index = 0;
     this.isPlaying = false;
   }
 
-  gotoFrame(frameIndex: number) 
+  go_to_frame(frameIndex: number) 
   {
-    this.frameIdx = Math.max(0, Math.min(frameIndex, this.frameCount));
+    this.frame_index = Math.max(0, Math.min(frameIndex, this.frame_count));
     // avoid index mismatch in set_sphere_for_joint_positions()
     // last frameIdx leads last undefined joint positions 
-    if (this.frameIdx < this.frameCount) 
+    if (this.frame_index < this.frame_count) 
     {
-      this.npy_loader_object.update_skeleton(this.frameIdx);
+      this.npy_loader_object.update_skeleton(this.frame_index);
     }
-  }
-
-  get_frame_index()
-  {
-    return this.frameIdx;
   }
 
   dispose() 
@@ -110,6 +99,7 @@ export class NPY_Player
     // }
   }
 
+  // needs to be a seperate class with dispose and pi pa po
   async renderThumbnail(
     frameIndex: number,
     scene: Scene,
@@ -122,14 +112,14 @@ export class NPY_Player
     renderer.setSize(width, height, false);
 
     // save frame
-    const previousFrame = this.frameIdx;
-    this.gotoFrame(frameIndex);
+    const previousFrame = this.frame_index;
+    this.go_to_frame(frameIndex);
 
     renderer.render(scene, camera);
 
     const dataUrl = renderer.domElement.toDataURL();
 
-    this.gotoFrame(previousFrame);
+    this.go_to_frame(previousFrame);
 
     return dataUrl;
   }

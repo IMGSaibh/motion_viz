@@ -41,7 +41,7 @@ export function WidgetContainer()
   
   const [framecount, set_framecount] = useState(0);
   const [minValue, set_min_value] = useState(0);
-  const [maxValue, set_max_value] = useState(100);
+  const [maxValue, set_max_value] = useState(0);
   
   const [labelslider_thumbnail_css, set_label_slider_thumbnail_css] = useState<React.CSSProperties>({});
   const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
@@ -53,9 +53,9 @@ export function WidgetContainer()
 
   useEffect(() => 
   {
-    const container = three_js_scene_reference.current;
+    const three_js_scene_container = three_js_scene_reference.current;
 
-    if (!container) 
+    if (!three_js_scene_container) 
     {
       console.warn("Three.js not found");
       return;
@@ -64,9 +64,9 @@ export function WidgetContainer()
     // init if manager doesnt exists
     if (!three_js_mngr_reference.current) 
     {
-      three_js_mngr_reference.current = new ThreeManager(container);
-      three_js_mngr_reference.current.start();
-      console.info("Init");
+      three_js_mngr_reference.current = new ThreeManager(three_js_scene_container);
+      three_js_mngr_reference.current.start_engine_cycle();
+      console.info("three_js_mngr_reference was initialized");
     }
 
     // keyboard-events
@@ -74,12 +74,7 @@ export function WidgetContainer()
     {
       if (e.code === "KeyP") {three_js_mngr_reference.current?.print_scene_components();}
       if (e.code === "KeyR") {three_js_mngr_reference.current?.cleanup_scene()}
-      if (e.code === "Space")
-      {
-        three_js_mngr_reference.current?.play_pause()
-        console.log("sapce pressed")
-        // console.log(three_js_mngr_reference.current?.isPlaying)
-      }
+      if (e.code === "Space"){three_js_mngr_reference.current?.play_pause()}
       if (e.code === "KeyS") {three_js_mngr_reference.current?.player_stop()}
     };
 
@@ -92,7 +87,7 @@ export function WidgetContainer()
 
       if (three_js_mngr_reference.current) 
       {
-        three_js_mngr_reference.current.stop();
+        three_js_mngr_reference.current.stop_engine_cycle();
         three_js_mngr_reference.current.dispose();
         three_js_mngr_reference.current = null;
       }
@@ -164,12 +159,11 @@ export function WidgetContainer()
   {
     set_motion_file_selected(e.target.value);
     await three_js_mngr_reference.current!.load_motionfile_and_player(e.target.value);
+    const framecount_threejs:number = three_js_mngr_reference.current!.get_frame_count();
 
-    const framecount_threejs = three_js_mngr_reference.current!.get_frame_count();
     set_framecount(framecount_threejs);
-
+    set_max_value(framecount_threejs);
     set_min_value(0);
-    set_max_value(framecount_threejs > 0 ? framecount_threejs : 0);
   }
 
   // ======================= file convertion ======================= 
@@ -196,18 +190,17 @@ export function WidgetContainer()
   function handle_std_slider_on_mouse_move(e: React.MouseEvent) 
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
-    if(!rect){return}
-    // mouse position as percent on slider bar
-    const percent = (e.clientX - rect!.left) / rect!.width;
-    const slider_value = Math.round(percent * framecount);
+    if(!rect || !framecount){return}
+    
+    let percent = (e.clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(percent, 1));
 
-    console.log("framecount = " + framecount)
-    console.log("percent = " + percent)
-    console.log("slider_value = " + slider_value)
-
+    let slider_value = Math.round(percent * framecount);
+    slider_value = Math.max(0, Math.min(slider_value, framecount - 1));
+    
     set_std_slider_thumbnail_css({
       display: 'block',
-      left: ((slider_value) / (framecount)) * rect!.width + 60,
+      left: (slider_value / framecount) * rect!.width,
       position: 'absolute',
       border: '1px solid #000000',
       top: -250,
@@ -226,9 +219,10 @@ export function WidgetContainer()
     set_std_slider_thumbnail(null);
   }
 
-  function handle_std_slider_on_change(e: Event, newValue: number)
+  function handle_std_slider_on_change(e: Event, new_value: number)
   {
-    set_std_slider_value(newValue);
+    set_std_slider_value(new_value)
+    three_js_mngr_reference.current?.go_to_frame(new_value)
   }
 
   // ======================= range label slider ======================= 
@@ -238,17 +232,16 @@ export function WidgetContainer()
   function handle_label_slider_on_change(e: Event, value: number | number[], active_slidercontrol_idx: number) 
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
-    if(!rect){return}
+    if(!rect || !framecount){return}
 
     if (Array.isArray(value) && value.length === 2) 
     {
-
       set_label_slider_range([value[0], value[1]]);
       const slider_value = value[active_slidercontrol_idx];
 
       set_label_slider_thumbnail_css({
         display: 'block',
-        left: ((slider_value - minValue) / (maxValue - minValue)) * rect!.width + 60,
+        left: (slider_value / framecount) * rect!.width,
         position: 'absolute',
         border: '1px solid #000000',
         top: -200,

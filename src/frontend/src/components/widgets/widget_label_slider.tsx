@@ -21,7 +21,7 @@ export function WidgetLabelSlider({
 
   return (
     <>
-      <div id="frame-label">Frame: 0 / {label_slider_framecount}</div>
+      <div id="label-slider-label">Frame: 0 / {label_slider_framecount}</div>
       <Slider
         value={label_slider_value}
         min={0}

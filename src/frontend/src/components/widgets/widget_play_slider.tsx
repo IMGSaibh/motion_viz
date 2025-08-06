@@ -5,7 +5,7 @@ type WidgetPlaySliderProps =
   std_slider_value: number;
   std_slider_framecount: number;
   std_slider_reference: React.RefObject<HTMLSpanElement | null>;
-  std_slider_on_change: (e: Event, newValue: number) => void;
+  std_slider_on_change: (e: Event, new_value: number) => void;
   std_slider_on_mouse_move: (e: React.MouseEvent<HTMLSpanElement>) => void;
   std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   std_slider_thumbnail_css: React.CSSProperties;
@@ -24,7 +24,7 @@ export function WidgetPlaySlider({
 }: WidgetPlaySliderProps) {
   return (
     <>
-      <div id="frame-label">Frame: 0 / 0what</div>
+      <div id="frame-label">Frame: {std_slider_value} / {std_slider_framecount}</div>
       {/* <input
         value={std_slider_value}
         type="range"
@@ -42,6 +42,7 @@ export function WidgetPlaySlider({
         min={0}
         max={std_slider_framecount}
         ref={std_slider_reference}
+        step={1}
         valueLabelDisplay="auto"
         onChange={std_slider_on_change}
         onMouseMove={std_slider_on_mouse_move}

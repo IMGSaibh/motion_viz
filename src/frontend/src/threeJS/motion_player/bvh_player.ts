@@ -131,6 +131,11 @@ export class BVH_Player
     return this.frameIdx;
   }
 
+  get_frame_count(): number
+  {
+    return this.frameCount;
+  }
+
   dispose() 
   {
     const index = this.loop.updatables.indexOf(this.bvh_player_object);

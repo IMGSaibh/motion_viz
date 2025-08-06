@@ -5,7 +5,7 @@ import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
-import { Loop, Updatable } from '@/threeJS/system/loop';
+import { Loop } from '@/threeJS/system/loop';
 import { Resizer } from '@/threeJS/system/resizer';
 import { createScene } from '@/threeJS/components/scene';
 import { createCamera } from '@/threeJS/components/camera';
@@ -15,44 +15,56 @@ import Utils from '@/threeJS/utils';
 
 export class ThreeManager 
 {
+    private npy_loader: NPY_loader | null;
+    private npy_player: NPY_Player | null;
+    
+    private bvh_loader: BVH_loader | null;
+    private bvh_player: BVH_Player | null;
+
+    private fbx_loader: FBX_Loader | null;
+    private fbx_player: FBX_Player | null;
+
     private scene: Scene;
-    private camera: PerspectiveCamera;
     private renderer: WebGLRenderer;
-    private previewRenderer: WebGLRenderer; 
-    private container: HTMLDivElement;
+    private scene_container: HTMLDivElement;
+    private camera: PerspectiveCamera;
+    private thumbnail_renderer: WebGLRenderer; 
 
     loop: Loop;
-    currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
-    currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
-    npy_player: NPY_Player | null;
 
-    constructor(container: HTMLDivElement)
+    constructor(scene_container: HTMLDivElement)
     {
-        this.currentLoader = null;
-        this.currentPlayer = null;
         this.npy_player = null;
+        this.npy_loader = null;
+
+        this.bvh_loader = null;
+        this.bvh_player = null;
+
+        this.fbx_player = null;
+        this.fbx_loader = null;
+
         this.camera = createCamera();
         this.renderer = createRenderer();
         this.scene = createScene();
         this.loop = new Loop(this.camera, this.scene, this.renderer);
-        this.container = container;
-        this.container.append(this.renderer.domElement);
+        this.scene_container = scene_container;
+        this.scene_container.append(this.renderer.domElement);
 
         const orbitControls = createOrbitControls(this.camera, this.renderer);
         this.loop.updatables.push(orbitControls);
-        const resizer = new Resizer(container, this.camera, this.renderer);
+        const resizer = new Resizer(scene_container, this.camera, this.renderer);
 
 
-        this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
-        this.previewRenderer.setSize(260, 190, false);
+        this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
+        this.thumbnail_renderer.setSize(260, 190, false);
     }
 
-    start()
+    start_engine_cycle()
     {
         this.loop.start();
     }
 
-    stop()
+    stop_engine_cycle()
     {
         this.loop.stop();
     }
@@ -64,84 +76,93 @@ export class ThreeManager
         switch (file_extension) 
         {
             case 'bvh':
-                this.currentLoader = new BVH_loader(this.scene);
-                await this.currentLoader.load_bvh_motion(fileUrl);
-                this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
+                this.bvh_loader = new BVH_loader(this.scene);
+                await this.bvh_loader.load_bvh_motion(fileUrl);
+                this.bvh_player = new BVH_Player(this.bvh_loader, this.loop);
                 break;
 
             case 'fbx':
-                this.currentLoader = new FBX_Loader(this.scene);
-                await this.currentLoader.load_fbx_animation(fileUrl);
-                this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
+                this.fbx_loader = new FBX_Loader(this.scene);
+                await this.fbx_loader.load_fbx_animation(fileUrl);
+                this.fbx_player = new FBX_Player(this.fbx_loader, this.loop);
                 break;
 
             case 'npy':
-                this.currentLoader = new NPY_loader(this.scene);
-                await this.currentLoader.load_npy_animation(fileUrl);
-
+                this.npy_loader = new NPY_loader(this.scene);
+                await this.npy_loader.load_npy_animation(fileUrl);
 
                 const skeletonPath = fileUrl
                 .replace("/npy/", "/json/")
                 .replace(".npy", "_skeleton.json");
-                await this.currentLoader.create_skeleton(skeletonPath);
-                this.npy_player = new NPY_Player(this.currentLoader);
+                await this.npy_loader.create_skeleton(skeletonPath);
+                this.npy_player = new NPY_Player(this.npy_loader);
                 this.loop.updatables.push(this.npy_player.npy_player_object);
 
                 break;
         }
     }
 
-    async getThumbnailForFrame(frameIndex: number) 
+    async getThumbnailForFrame(frame_index: number) 
     {
-        if (this.npy_player instanceof NPY_Player) 
-        {
-            return await this.npy_player.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
-        }
-        return null;
+
+        if (this.npy_player)
+            return await this.npy_player.renderThumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer);
+        else
+            return null;
     }
 
     play_pause()
     {
-        if (this.npy_player instanceof NPY_Player)
-        {
-            // this.currentPlayer.play_pause()
+        if (this.npy_player)
             this.npy_player.play_pause()
-        }
+        else if(this.bvh_player)
+            this.bvh_player.play_pause()
+        else if(this.fbx_player)
+            this.fbx_player.play_pause()
     }
 
     player_stop()
     {
-        if (this.currentPlayer instanceof NPY_Player)
-        {
-            this.currentPlayer.stop()
-        }
+        if (this.npy_player)
+            this.npy_player.stop()
+        else if(this.bvh_player)
+            this.bvh_player.stop()
+        else if(this.fbx_player)
+            this.fbx_player.stop()
     }
 
     go_to_frame(frameIndex: number)
     {
-        if (this.npy_player instanceof NPY_Player)
-        {
-            return this.npy_player.gotoFrame(frameIndex)
-        }
-        return 0;
+        if (this.npy_player)
+            this.npy_player.go_to_frame(frameIndex)
+        else if(this.bvh_player)
+            console.warn("not implemented yet")
+        else if(this.fbx_player)
+            this.fbx_player.gotoFrame(frameIndex)
     }
     
-    get_frame_count()
+    get_frame_count(): number
     {
-        if (this.npy_player instanceof NPY_Player)
-        {
-            return this.npy_player.frameCount
-        }
+        if (this.npy_player)
+            return this.npy_player.get_frame_count()
+        else if(this.bvh_player)
+            return this.bvh_player.get_frame_count()
+        else if(this.fbx_player)
+            return this.fbx_player.get_frame_count()
         return 0;
     }
 
     get_frame_index()
     {
-        if (this.npy_player instanceof NPY_Player)
-        {
-            return this.npy_player.frameIdx   
-        }
+        if (this.npy_player)
+            return this.npy_player.get_frame_index()
+        // else if(this.bvh_player)
+        //     return this.bvh_player.get_frame_index()
+        // else if(this.fbx_player)
+        //     return this.fbx_player.get_frame_index()
         return 0;
+
+
     }
 
     print_scene_components()
@@ -156,40 +177,45 @@ export class ThreeManager
 
     cleanup_scene()
     {
-        if (this.currentPlayer) 
+        if(this.npy_player)
         {
-            this.currentLoader!.dispose();
-            this.currentPlayer.dispose();
-
-            this.currentPlayer = null;
-            this.currentLoader = null;
+            const index = this.loop.updatables.indexOf(this.npy_player!.npy_player_object)
+            if (index !== -1) 
+                {
+                    console.log("removed npy_player_object from loop")
+                    this.loop.updatables.splice(index, 1)
+                }
+            this.npy_player.dispose()
+            this.npy_player = null
+            this.npy_loader?.dispose()
+        }
+        else if(this.bvh_player)
+        {
+            this.bvh_player.dispose()
+            this.bvh_player = null
+            this.bvh_loader?.dispose()
+        }
+        else if(this.fbx_player)
+        {
+            this.fbx_player.dispose()
+            this.fbx_player = null
+            this.fbx_loader?.dispose()
+        }
         
-            const label = document.getElementById('frame-label') as HTMLDivElement | null;
-            const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
-            // slider!.value = '0';
-            label!.textContent = `Frame: 0 / 0`;
-            if (this.previewRenderer) 
-            {
-                this.previewRenderer.dispose();
-            }
-
-        }
-        const index = this.loop.updatables.indexOf(this.npy_player!.npy_player_object);
-        this.currentLoader!.dispose();
-
-        if (index !== -1) 
+        if (this.thumbnail_renderer) 
         {
-            console.log("remove NPY motion")
-            this.loop.updatables.splice(index, 1);
+            this.thumbnail_renderer.dispose();
         }
+
     }
 
     dispose() 
     {
         // TODO: dispose other stuff too
-        this.stop();
+        this.cleanup_scene()
+        this.stop_engine_cycle();
         this.renderer.dispose();
-        this.container.removeChild(this.renderer.domElement);
+        this.scene_container.removeChild(this.renderer.domElement);
     }
 
 }
