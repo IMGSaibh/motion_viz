@@ -26,6 +26,7 @@ export function WidgetLabelSlider({
         value={label_slider_value}
         min={0}
         max={label_slider_framecount}
+        step={1}
         valueLabelDisplay="auto"
         sx={{
           color: '#45ab45',

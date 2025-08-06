@@ -1,9 +1,10 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, SetStateAction } from "react";
 import { ThreeManager } from "../threeJS/three_js_manager";
 import { WidgetPresenter } from "../components/widget_presenter";
 import { WidgetPresenterSlider } from "../components/widget_presenter_slider";
 import { api_motion_file_conversion } from "../api/api_motion_file_conversion";
 import { api_file_processing, MotionDescriptorData } from "../api/api_file_processing";
+import { NPY_Player } from "@/threeJS/motion_player/npy_player";
 
 export function WidgetContainer() 
 {
@@ -40,8 +41,6 @@ export function WidgetContainer()
   const [std_slider_value, set_std_slider_value] = useState<number>(0);
   
   const [framecount, set_framecount] = useState(0);
-  const [minValue, set_min_value] = useState(0);
-  const [maxValue, set_max_value] = useState(0);
   
   const [labelslider_thumbnail_css, set_label_slider_thumbnail_css] = useState<React.CSSProperties>({});
   const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
@@ -68,6 +67,18 @@ export function WidgetContainer()
       three_js_mngr_reference.current.start_engine_cycle();
       console.info("three_js_mngr_reference was initialized");
     }
+
+    // const player = three_js_mngr_reference.current.get_current_player()
+    // console.log("was ist player " + player)
+    // if(player instanceof NPY_Player)
+    // {
+    //   console.log("in if NPY_Player")
+    //   player.setOnFrameChangedCallback((new_frame_index: number) => 
+    //   {
+    //     set_std_slider_value(new_frame_index);
+    //     console.log("on frame changed")
+    //   }); 
+    // }
 
     // keyboard-events
     const handleKeyDown = (e: KeyboardEvent) => 
@@ -162,8 +173,16 @@ export function WidgetContainer()
     const framecount_threejs:number = three_js_mngr_reference.current!.get_frame_count();
 
     set_framecount(framecount_threejs);
-    set_max_value(framecount_threejs);
-    set_min_value(0);
+
+    const player = three_js_mngr_reference.current!.get_current_player();
+    if (player && player instanceof NPY_Player) 
+    {
+      player.setOnFrameChangedCallback((new_frame_index: number) => {
+        set_std_slider_value(new_frame_index);
+      });
+    }
+
+
   }
 
   // ======================= file convertion ======================= 
@@ -207,7 +226,7 @@ export function WidgetContainer()
       zIndex: 20,
     });
 
-    three_js_mngr_reference.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
+    three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then(dataUrl => 
     {
       set_std_slider_thumbnail(dataUrl);
     });
@@ -247,7 +266,7 @@ export function WidgetContainer()
         top: -200,
         zIndex: 20,
       });
-      three_js_mngr_reference.current?.getThumbnailForFrame(slider_value).then(dataUrl => 
+      three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then(dataUrl => 
       {
         set_label_slider_thumbnail(dataUrl);
       });

@@ -12,6 +12,7 @@ import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import Utils from '@/threeJS/utils';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export class ThreeManager 
 {
@@ -53,7 +54,6 @@ export class ThreeManager
         const orbitControls = createOrbitControls(this.camera, this.renderer);
         this.loop.updatables.push(orbitControls);
         const resizer = new Resizer(scene_container, this.camera, this.renderer);
-
 
         this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
         this.thumbnail_renderer.setSize(260, 190, false);
@@ -102,9 +102,19 @@ export class ThreeManager
         }
     }
 
-    async getThumbnailForFrame(frame_index: number) 
+    get_current_player() : NPY_Player | BVH_Player | FBX_Player | null
     {
+        if (this.npy_player)
+            return this.npy_player
+        else if(this.bvh_player)
+            return this.bvh_player
+        else if(this.fbx_player)
+            return this.fbx_player
+        return null
+    }
 
+    async get_thumbnail_for_frame(frame_index: number) 
+    {
         if (this.npy_player)
             return await this.npy_player.renderThumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer);
         else

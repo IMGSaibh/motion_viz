@@ -4,7 +4,7 @@ import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class NPY_Player 
 {
-  npy_player_object: Updatable;
+  public npy_player_object: Updatable;
   private npy_loader_object: NPY_loader;
   private fps: number;
   private frame_index: number;
@@ -12,6 +12,8 @@ export class NPY_Player
   private elapsedTime: number;
   private frameDuration: number;
   private isPlaying: boolean = false;
+  
+  private onFrameChangedCallback?: (frameIndex: number) => void;
 
   constructor(npy_loader_object: NPY_loader) 
   {
@@ -34,6 +36,11 @@ export class NPY_Player
     this.frameDuration = 1 / this.fps;
   }
 
+  setOnFrameChangedCallback(cb: (frameIndex: number) => void)
+  {
+    this.onFrameChangedCallback = cb;
+  }
+
   update(delta: number) 
   {
     if (!this.isPlaying) return;
@@ -50,6 +57,10 @@ export class NPY_Player
         this.isPlaying = false;
       }
       this.go_to_frame(this.frame_index);
+      if (this.onFrameChangedCallback) 
+      {
+        this.onFrameChangedCallback(this.frame_index);
+      }
     }
   }
 
@@ -77,6 +88,7 @@ export class NPY_Player
   {
     this.frame_index = 0;
     this.isPlaying = false;
+    this.go_to_frame(this.frame_index);
   }
 
   go_to_frame(frameIndex: number) 
@@ -92,11 +104,7 @@ export class NPY_Player
 
   dispose() 
   {
-    // const index = this.loop.updatables.indexOf(this.npy_player_object);
-    // if (index !== -1) 
-    // {
-    //   this.loop.updatables.splice(index, 1);
-    // }
+
   }
 
   // needs to be a seperate class with dispose and pi pa po
