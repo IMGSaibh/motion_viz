@@ -6,7 +6,7 @@ type WidgetPresenterSliderProps =
   std_slider_value: number;
   std_slider_framecount: number;
   std_slider_reference: React.RefObject<HTMLSpanElement | null>;
-  std_slider_on_change: (e: Event, newValue: number) => void;
+  std_slider_on_change: (e: Event, value: number) => void;
   std_slider_on_mouse_move: (e: React.MouseEvent<HTMLSpanElement>) => void;
   std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   std_slider_thumbnail_css: React.CSSProperties;
@@ -15,7 +15,7 @@ type WidgetPresenterSliderProps =
 
   label_slider_value: [number, number];
   label_slider_framecount: number;
-  label_slider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   label_slider_thumbnail_css:  React.CSSProperties;
   label_slider_thumbnail: string | null;

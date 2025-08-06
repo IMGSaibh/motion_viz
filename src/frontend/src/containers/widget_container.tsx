@@ -88,7 +88,6 @@ export function WidgetContainer()
       if (e.code === "Space"){three_js_mngr_reference.current?.play_pause()}
       if (e.code === "KeyS") {three_js_mngr_reference.current?.player_stop()}
     };
-
     window.addEventListener("keydown", handleKeyDown);
 
     // cleanup
@@ -168,17 +167,19 @@ export function WidgetContainer()
 
   async function handle_motion_file_list_on_change(e: React.ChangeEvent<HTMLSelectElement>) 
   {
+    three_js_mngr_reference.current?.cleanup_scene()
     set_motion_file_selected(e.target.value);
-    await three_js_mngr_reference.current!.load_motionfile_and_player(e.target.value);
-    const framecount_threejs:number = three_js_mngr_reference.current!.get_frame_count();
+    await three_js_mngr_reference.current!.load_motionfile_and_player(e.target.value)
+    let framecount_threejs = three_js_mngr_reference.current!.get_frame_count()
 
-    set_framecount(framecount_threejs);
+    set_framecount(framecount_threejs)
 
-    const player = three_js_mngr_reference.current!.get_current_player();
-    if (player && player instanceof NPY_Player) 
+    const player = three_js_mngr_reference.current!.get_current_player()
+    if (player instanceof NPY_Player)
     {
-      player.setOnFrameChangedCallback((new_frame_index: number) => {
-        set_std_slider_value(new_frame_index);
+      player.setOnFrameChangedCallback((new_frame_index: number) =>
+      {
+        set_std_slider_value(new_frame_index)
       });
     }
 
@@ -222,33 +223,34 @@ export function WidgetContainer()
       left: (slider_value / framecount) * rect!.width,
       position: 'absolute',
       border: '1px solid #000000',
-      top: -250,
-      zIndex: 20,
+      top: -280,
+      zIndex: 0,
     });
 
     three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then(dataUrl => 
     {
-      set_std_slider_thumbnail(dataUrl);
+      set_std_slider_thumbnail(dataUrl)
     });
+
   }
 
   function handle_std_slider_on_mouse_leave(e: React.MouseEvent<HTMLInputElement, MouseEvent>)
   {
-    set_std_slider_thumbnail_css({ display: 'none'});
-    set_std_slider_thumbnail(null);
+    set_std_slider_thumbnail_css({ display: 'none'})
+    set_std_slider_thumbnail(null)
   }
 
-  function handle_std_slider_on_change(e: Event, new_value: number)
+  function handle_std_slider_on_change(e: Event, value: number)
   {
-    set_std_slider_value(new_value)
-    three_js_mngr_reference.current?.go_to_frame(new_value)
+    three_js_mngr_reference.current?.player_stop()
+    three_js_mngr_reference.current?.go_to_frame(value)
+    set_std_slider_value(value)
   }
 
   // ======================= range label slider ======================= 
 
 
-
-  function handle_label_slider_on_change(e: Event, value: number | number[], active_slidercontrol_idx: number) 
+  function handle_label_slider_on_change(e: Event, value: number | number[], active_slider_hndl_idx: number) 
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
     if(!rect || !framecount){return}
@@ -256,16 +258,17 @@ export function WidgetContainer()
     if (Array.isArray(value) && value.length === 2) 
     {
       set_label_slider_range([value[0], value[1]]);
-      const slider_value = value[active_slidercontrol_idx];
+      const slider_value = value[active_slider_hndl_idx];
 
       set_label_slider_thumbnail_css({
         display: 'block',
         left: (slider_value / framecount) * rect!.width,
         position: 'absolute',
         border: '1px solid #000000',
-        top: -200,
-        zIndex: 20,
+        top: -220,
+        zIndex: 0,
       });
+
       three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then(dataUrl => 
       {
         set_label_slider_thumbnail(dataUrl);

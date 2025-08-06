@@ -69,36 +69,40 @@ export class ThreeManager
         this.loop.stop();
     }
 
-    async load_motionfile_and_player(filename: string)
+    async load_motionfile_and_player(filename: string | null)
     {
-        const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
-        const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
+        if (!filename) 
+        {
+            console.log("no motion file selected")
+            return
+        }
+        const file_extension = filename.split('.').pop()?.toLowerCase() ?? ''
+        const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`
         switch (file_extension) 
         {
             case 'bvh':
-                this.bvh_loader = new BVH_loader(this.scene);
-                await this.bvh_loader.load_bvh_motion(fileUrl);
-                this.bvh_player = new BVH_Player(this.bvh_loader, this.loop);
-                break;
+                this.bvh_loader = new BVH_loader(this.scene)
+                await this.bvh_loader.load_bvh_motion(fileUrl)
+                this.bvh_player = new BVH_Player(this.bvh_loader, this.loop)
+                break
 
             case 'fbx':
-                this.fbx_loader = new FBX_Loader(this.scene);
-                await this.fbx_loader.load_fbx_animation(fileUrl);
-                this.fbx_player = new FBX_Player(this.fbx_loader, this.loop);
-                break;
+                this.fbx_loader = new FBX_Loader(this.scene)
+                await this.fbx_loader.load_fbx_animation(fileUrl)
+                this.fbx_player = new FBX_Player(this.fbx_loader, this.loop)
+                break
 
             case 'npy':
-                this.npy_loader = new NPY_loader(this.scene);
-                await this.npy_loader.load_npy_animation(fileUrl);
+                this.npy_loader = new NPY_loader(this.scene)
+                await this.npy_loader.load_npy_animation(fileUrl)
 
                 const skeletonPath = fileUrl
                 .replace("/npy/", "/json/")
-                .replace(".npy", "_skeleton.json");
-                await this.npy_loader.create_skeleton(skeletonPath);
-                this.npy_player = new NPY_Player(this.npy_loader);
-                this.loop.updatables.push(this.npy_player.npy_player_object);
-
-                break;
+                .replace(".npy", "_skeleton.json")
+                await this.npy_loader.create_skeleton(skeletonPath)
+                this.npy_player = new NPY_Player(this.npy_loader)
+                this.loop.updatables.push(this.npy_player.npy_player_object)
+                break
         }
     }
 

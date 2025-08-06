@@ -1,21 +1,21 @@
 import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
-import { Loop, Updatable } from '@/threeJS/system/loop';
+import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class NPY_Player 
 {
   public npy_player_object: Updatable;
   private npy_loader_object: NPY_loader;
-  private fps: number;
-  private frame_index: number;
+  private fps: number = 0;
+  private frame_index: number = 0;
   private frame_count: number = 0;
-  private elapsedTime: number;
-  private frameDuration: number;
+  private elapsedTime: number  = 0;
+  private frameDuration: number = 0;
   private isPlaying: boolean = false;
   
-  private onFrameChangedCallback?: (frameIndex: number) => void;
+  private on_frame_changed_callback?: (frameIndex: number) => void;
 
-  constructor(npy_loader_object: NPY_loader) 
+  constructor(npy_loader_object: NPY_loader)
   {
     this.npy_loader_object = npy_loader_object;    
     this.frame_count = npy_loader_object.frameCount;
@@ -38,7 +38,7 @@ export class NPY_Player
 
   setOnFrameChangedCallback(cb: (frameIndex: number) => void)
   {
-    this.onFrameChangedCallback = cb;
+    this.on_frame_changed_callback = cb;
   }
 
   update(delta: number) 
@@ -57,9 +57,9 @@ export class NPY_Player
         this.isPlaying = false;
       }
       this.go_to_frame(this.frame_index);
-      if (this.onFrameChangedCallback) 
+      if (this.on_frame_changed_callback) 
       {
-        this.onFrameChangedCallback(this.frame_index);
+        this.on_frame_changed_callback(this.frame_index);
       }
     }
   }
@@ -86,7 +86,6 @@ export class NPY_Player
 
   stop() 
   {
-    this.frame_index = 0;
     this.isPlaying = false;
     this.go_to_frame(this.frame_index);
   }
@@ -120,14 +119,14 @@ export class NPY_Player
     renderer.setSize(width, height, false);
 
     // save frame
-    const previousFrame = this.frame_index;
+    const previous_frame = this.frame_index;
     this.go_to_frame(frameIndex);
 
     renderer.render(scene, camera);
 
     const dataUrl = renderer.domElement.toDataURL();
 
-    this.go_to_frame(previousFrame);
+    this.go_to_frame(previous_frame);
 
     return dataUrl;
   }

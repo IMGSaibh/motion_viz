@@ -3,7 +3,7 @@ import Slider from '@mui/material/Slider';
 type WidgetLabelSliderProps = {
   label_slider_value: [number, number];
   label_slider_framecount: number;
-  label_slider_on_change: (e: Event, newValue: number | number[], activeThumbIdx: number) => void;
+  label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   label_slider_thumbnail_css:  React.CSSProperties;
   label_slider_thumbnail: string | null;
@@ -37,6 +37,7 @@ export function WidgetLabelSlider({
             border: '2px solid #45ab45',
             '&:hover, &.Mui-focusVisible': { boxShadow: '0 0 0 4px rgba(69, 171, 69, 0.3)',},
             '&.Mui-active': {boxShadow: '0 0 0 8px rgba(69, 171, 69, 0.5)'},
+            transition: 'none !important',
           },
           '& .MuiSlider-rail': 
           {
@@ -46,6 +47,7 @@ export function WidgetLabelSlider({
           '& .MuiSlider-track': 
           {
             backgroundColor: '#45ab45',
+            transition: 'none !important',
           },
           '& .MuiSlider-valueLabel': 
           {

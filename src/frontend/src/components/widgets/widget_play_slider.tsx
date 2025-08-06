@@ -25,18 +25,6 @@ export function WidgetPlaySlider({
   return (
     <>
       <div id="frame-label">Frame: {std_slider_value} / {std_slider_framecount}</div>
-      {/* <input
-        value={std_slider_value}
-        type="range"
-        id="frame-slider"
-        min="0"
-        max="100"
-        // defaultValue="0"
-        ref={std_slider_reference}
-        // onChange={std_slider_on_change}
-        onMouseMove={std_slider_on_mouse_move}
-        onMouseLeave={std_slider_on_mouse_leave}
-      /> */}
       <Slider
         value={std_slider_value}
         min={0}
@@ -44,6 +32,7 @@ export function WidgetPlaySlider({
         ref={std_slider_reference}
         step={1}
         valueLabelDisplay="auto"
+        disableSwap={true}
         onChange={std_slider_on_change}
         onMouseMove={std_slider_on_mouse_move}
         onMouseLeave={std_slider_on_mouse_leave}
@@ -56,6 +45,7 @@ export function WidgetPlaySlider({
             border: '2px solid #45ab45',
             '&:hover, &.Mui-focusVisible': { boxShadow: '0 0 0 4px rgba(69, 171, 69, 0.3)',},
             '&.Mui-active': {boxShadow: '0 0 0 8px rgba(69, 171, 69, 0.5)'},
+            transition: 'none !important',
           },
           '& .MuiSlider-rail': 
           {
@@ -65,6 +55,7 @@ export function WidgetPlaySlider({
           '& .MuiSlider-track': 
           {
             backgroundColor: '#45ab45',
+            transition: 'none !important',
           },
           '& .MuiSlider-valueLabel': 
           {
