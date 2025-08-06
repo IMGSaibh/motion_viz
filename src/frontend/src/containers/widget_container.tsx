@@ -258,18 +258,17 @@ export function WidgetContainer()
     if (Array.isArray(value) && value.length === 2) 
     {
       set_label_slider_range([value[0], value[1]]);
-      const slider_value = value[active_slider_hndl_idx];
 
       set_label_slider_thumbnail_css({
         display: 'block',
-        left: (slider_value / framecount) * rect!.width,
+        left: (value[active_slider_hndl_idx] / framecount) * rect!.width,
         position: 'absolute',
         border: '1px solid #000000',
         top: -220,
         zIndex: 0,
       });
 
-      three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then(dataUrl => 
+      three_js_mngr_reference.current?.get_thumbnail_for_frame(value[active_slider_hndl_idx]).then(dataUrl => 
       {
         set_label_slider_thumbnail(dataUrl);
       });
