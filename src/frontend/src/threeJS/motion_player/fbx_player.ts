@@ -46,16 +46,16 @@ export class FBX_Player
     // get the closest keyframe index based on the current time
     const track = this.fbx_loader_object.clipAction!.getClip().tracks[0]
 
-    let closestIndex = 0;
-    let minDiff = Infinity
+    let closest_index = 0;
+    let min_diff = Infinity
 
     for (let i = 0; i < track.times.length; i++) 
     {
         const diff = Math.abs(track.times[i] - time)
-        if (diff < minDiff) 
+        if (diff < min_diff) 
         {
-            minDiff = diff;
-            closestIndex = i
+            min_diff = diff;
+            closest_index = i
         }
     }
 
@@ -65,7 +65,7 @@ export class FBX_Player
         this.is_playing = false
     }
 
-    this.frame_index = closestIndex;
+    this.frame_index = closest_index;
 
     if (this.on_frame_changed_callback) 
     {

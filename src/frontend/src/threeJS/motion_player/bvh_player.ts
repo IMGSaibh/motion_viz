@@ -41,8 +41,7 @@ export class BVH_Player
     this.bvh_loader_object.mixer!.update(delta);
     this.currentTime = this.bvh_loader_object.mixer!.time;
 
-    if (!this.is_playing) return;
-    else if (this.get_frame_index() >= this.bvh_loader_object.frameCount) 
+    if (this.get_frame_index() >= this.bvh_loader_object.frameCount) 
     {
       this.is_playing = false;
     }
@@ -51,17 +50,16 @@ export class BVH_Player
     {
       this.on_frame_changed_callback(this.frame_index);
     }
-
   }
 
   play_pause() 
   {
-    // toggle play/pause
     this.is_playing = !this.is_playing;
 
+    // Always go to the current frame if we have just jumped
     this.go_to_frame(this.frame_index);
 
-    if(this.get_frame_index() >= this.bvh_loader_object.frameCount)
+    if (this.get_frame_index() >= this.bvh_loader_object.frameCount) 
     {
       this.bvh_loader_object.mixer!.setTime(0);
       this.currentTime = 0;
@@ -71,9 +69,8 @@ export class BVH_Player
 
   stop() 
   {
-    // this.currentTime = 0;
     this.is_playing = false;
-    // this.bvh_loader_object.mixer!.time = 0;
+    this.bvh_loader_object.mixer!.time = 0;
   }
 
   get_frame_index() 
@@ -90,9 +87,9 @@ export class BVH_Player
 
   go_to_frame(frame_index: number) 
   {
-    if(this.bvh_loader_object.mixer && this.bvh_loader_object.clipAction)
-    {
-      this.currentTime = frame_index; 
+    if (this.bvh_loader_object.mixer && this.bvh_loader_object.clipAction) {
+      this.currentTime = frame_index;
+      this.frame_index = frame_index;
       this.bvh_loader_object.mixer!.setTime(frame_index / this.bvh_loader_object.fps);
     }
   }
