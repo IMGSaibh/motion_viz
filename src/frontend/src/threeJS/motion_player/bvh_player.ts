@@ -37,7 +37,6 @@ export class BVH_Player
 
   update(delta: number) 
   {
-    this.bvh_loader_object.clipAction!.play();
     this.bvh_loader_object.mixer!.update(delta);
     this.currentTime = this.bvh_loader_object.mixer!.time;
 
@@ -55,6 +54,7 @@ export class BVH_Player
   play_pause() 
   {
     this.is_playing = !this.is_playing;
+    if (this.is_playing) { this.bvh_loader_object.clipAction!.play()} 
 
     // Always go to the current frame if we have just jumped
     this.go_to_frame(this.frame_index);

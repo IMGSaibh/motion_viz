@@ -41,7 +41,6 @@ export class FBX_Player
   update(delta: number) 
   {   
     this.fbx_loader_object.mixer!.update(delta)
-    this.fbx_loader_object.clipAction!.play()
     const time = this.fbx_loader_object.mixer!.time
     // get the closest keyframe index based on the current time
     const track = this.fbx_loader_object.clipAction!.getClip().tracks[0]
@@ -54,7 +53,7 @@ export class FBX_Player
         const diff = Math.abs(track.times[i] - time)
         if (diff < min_diff) 
         {
-            min_diff = diff;
+            min_diff = diff
             closest_index = i
         }
     }
@@ -85,6 +84,7 @@ export class FBX_Player
       return
     }
     this.is_playing = !this.is_playing
+    if (this.is_playing) { this.fbx_loader_object.clipAction!.play()} 
 
   }
 
