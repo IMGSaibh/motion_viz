@@ -1,86 +1,38 @@
 import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
-import { Loop, Updatable } from '@/threeJS/system/loop';
+import { Updatable } from '@/threeJS/system/loop';
+import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class BVH_Player 
 {
-    bvh_player_object: Updatable;
-    bvh_loader_object: BVH_loader;
-    container: HTMLElement;
-    slider: HTMLInputElement;
-    label: HTMLElement;
-    currentTime: number;
-    frameCount: number; 
-    isPlaying: boolean;
-    loop: Loop;
-    frameIdx: number;
+  public bvh_player_object: Updatable;
+  private bvh_loader_object: BVH_loader;
+  private currentTime: number;
+  private frame_count: number;
+  private is_playing: boolean;
+  private frame_index: number;
 
+  private on_frame_changed_callback?: (frameIndex: number) => void;
 
-  constructor(bvh_loader_object: BVH_loader, loop: Loop) 
+  constructor(bvh_loader_object: BVH_loader) 
   {
     this.bvh_loader_object = bvh_loader_object;
-    this.frameCount = bvh_loader_object.frameCount;
-    this.frameIdx = 0;
-    const container = document.getElementById('timeline-container');
-    if (!container) 
-    {
-      throw new Error("Element with id 'timeline-container' not found.");
-    }
-    this.container = container;
-
-    const slider = document.getElementById('frame-slider');
-    if (!slider || !(slider instanceof HTMLInputElement)) 
-    {
-      throw new Error("Element with id 'frame-slider' not found or is not an input element.");
-    }
-    this.slider = slider as HTMLInputElement;
-    const label = document.getElementById('frame-label');
-    if (!label) 
-    {
-      throw new Error("Element with id 'frame-label' not found.");
-    }
-    this.label = label;
-    this.slider.type = 'range';
-    this.slider.min = '0';
-    this.slider.max = this.frameCount.toString();
-    this.slider.step = '1';
-    this.slider.value = '0';
+    this.frame_count = bvh_loader_object.frameCount;
+    this.frame_index = 0;
     this.currentTime = 0;
-    this.isPlaying = false;
-    this.container.appendChild(this.slider);
-    this.label.textContent = `Frame: 0 / ${this.bvh_loader_object.frameCount}`;
-    this.loop = loop;
-
-    
-    window.addEventListener('keydown', (e) => 
-    {
-      if (e.code === 'Space') this.play_pause();
-      if (e.code === 'KeyS') this.stop();
-    });
-
-    // input-Event executes always when the slider is moved
-    this.slider.addEventListener('input', (e) => 
-    {
-      if (this.bvh_loader_object.mixer && this.bvh_loader_object.clipAction) 
-      {
-        this.bvh_loader_object.clipAction.play();
-        const targetValue = parseFloat((e.target as HTMLInputElement).value);
-        // this.currentTime = parseFloat(e.target.value);
-        this.currentTime = targetValue; 
-        this.bvh_loader_object.mixer!.setTime(this.currentTime / this.bvh_loader_object.fps);
-        this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
-      }
-    });
+    this.is_playing = false;
 
     this.bvh_player_object = 
     {
       tick: (delta: number) => 
       {
-        if (this.isPlaying) this.update(delta)
+        if (this.is_playing) this.update(delta)
       }
     }
+  }
 
-    this.loop.updatables.push(this.bvh_player_object);
-
+  set_on_frame_changed_callback(cb: (frameIndex: number) => void)
+  {
+    this.on_frame_changed_callback = cb;
   }
 
   update(delta: number) 
@@ -89,64 +41,90 @@ export class BVH_Player
     this.bvh_loader_object.mixer!.update(delta);
     this.currentTime = this.bvh_loader_object.mixer!.time;
 
-    if (!this.isPlaying) return;
-    else if (this.getCurrentFrame() >= this.bvh_loader_object.frameCount) 
+    if (!this.is_playing) return;
+    else if (this.get_frame_index() >= this.bvh_loader_object.frameCount) 
     {
-      this.isPlaying = false;
+      this.is_playing = false;
     }
 
-
-    this.slider.value = this.getCurrentFrame().toString();
-    this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
+    if (this.on_frame_changed_callback) 
+    {
+      this.on_frame_changed_callback(this.frame_index);
+    }
 
   }
-
 
   play_pause() 
   {
     // toggle play/pause
-    this.isPlaying = !this.isPlaying;
-    if(this.getCurrentFrame() >= this.bvh_loader_object.frameCount)
+    this.is_playing = !this.is_playing;
+
+    this.go_to_frame(this.frame_index);
+
+    if(this.get_frame_index() >= this.bvh_loader_object.frameCount)
     {
       this.bvh_loader_object.mixer!.setTime(0);
-      this.slider.value = '0';
       this.currentTime = 0;
-      this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
+      this.frame_index = 0;
     }
   }
 
   stop() 
   {
-    this.currentTime = 0;
-    this.slider.value = '0';
-    this.isPlaying = false;
-    this.bvh_loader_object.mixer!.time = 0;
-    this.label.textContent = `Frame: ${this.getCurrentFrame()} / ${this.bvh_loader_object.frameCount}`;
+    // this.currentTime = 0;
+    this.is_playing = false;
+    // this.bvh_loader_object.mixer!.time = 0;
   }
 
-  getCurrentFrame() 
+  get_frame_index() 
   {
     if (!this.bvh_loader_object.mixer) return 0;
-    this.frameIdx = Math.floor(this.bvh_loader_object.mixer!.time * this.bvh_loader_object.fps);
-    return this.frameIdx;
+    this.frame_index = Math.floor(this.bvh_loader_object.mixer!.time * this.bvh_loader_object.fps);
+    return this.frame_index;
   }
 
   get_frame_count(): number
   {
-    return this.frameCount;
+    return this.frame_count;
+  }
+
+  go_to_frame(frame_index: number) 
+  {
+    if(this.bvh_loader_object.mixer && this.bvh_loader_object.clipAction)
+    {
+      this.currentTime = frame_index; 
+      this.bvh_loader_object.mixer!.setTime(frame_index / this.bvh_loader_object.fps);
+    }
   }
 
   dispose() 
-  {
-    const index = this.loop.updatables.indexOf(this.bvh_player_object);
-    if (index !== -1) 
-    {
-      this.loop.updatables.splice(index, 1);
-    }
+  { 
+
     this.bvh_loader_object.mixer?.stopAllAction();
     this.bvh_loader_object.mixer = null;
   }
 
+    // needs to be a seperate class with dispose and pi pa po
+    async render_thumbnail(
+      frameIndex: number,
+      scene: Scene,
+      camera: PerspectiveCamera,
+      width: number = 260,
+      height: number = 190,
+      renderer: WebGLRenderer
+    ): Promise<string> 
+    {
+      renderer.setSize(width, height, false)
+      // save frame
+      const previous_frame = this.frame_index
+      this.go_to_frame(frameIndex)
+  
+      renderer.render(scene, camera)
+  
+      const dataUrl = renderer.domElement.toDataURL()
+      this.go_to_frame(previous_frame)
+      return dataUrl
+    }
 
 }
 

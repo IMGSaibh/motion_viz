@@ -50,17 +50,18 @@ export class NPY_loader
 
   }
 
-  async load_npy_animation(fileUrl: string) 
+  async load_npy_animation(file_url: string) 
   {
-    const loader = new npyjs();
-    const response = await fetch(fileUrl);
-    const arrayBuffer = await response.arrayBuffer();
-    const parsed_npy = loader.parse(arrayBuffer);
+    const loader = new npyjs()
+    const response = await fetch(file_url)
+    const arrayBuffer = await response.arrayBuffer()
+    const parsed_npy = loader.parse(arrayBuffer)
 
-    this.numpy_data = parsed_npy.data;
-    const [frameCount, jointCount, _] = parsed_npy.shape;
-    this.frameCount = frameCount;
-    this.jointCount = jointCount;
+    this.npy_motion.name = file_url
+    this.numpy_data = parsed_npy.data
+    const [frameCount, jointCount, _] = parsed_npy.shape
+    this.frameCount = frameCount
+    this.jointCount = jointCount
 
     // // TODO: uncomment to use this
     // this.joint_orientations = Array.from({ length: this.jointCount }, () => ({

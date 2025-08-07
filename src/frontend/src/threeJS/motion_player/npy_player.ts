@@ -11,7 +11,7 @@ export class NPY_Player
   private frame_count: number = 0;
   private elapsedTime: number  = 0;
   private frameDuration: number = 0;
-  private isPlaying: boolean = false;
+  private is_playing: boolean = false;
   
   private on_frame_changed_callback?: (frameIndex: number) => void;
 
@@ -24,7 +24,7 @@ export class NPY_Player
     {
       tick: (delta: number) => 
       {
-        if (this.isPlaying) this.update(delta)
+        if (this.is_playing) this.update(delta)
       }
     }
 
@@ -36,14 +36,14 @@ export class NPY_Player
     this.frameDuration = 1 / this.fps;
   }
 
-  setOnFrameChangedCallback(cb: (frameIndex: number) => void)
+  set_on_frame_changed_callback(cb: (frameIndex: number) => void)
   {
     this.on_frame_changed_callback = cb;
   }
 
   update(delta: number) 
   {
-    if (!this.isPlaying) return;
+    if (!this.is_playing) return;
 
     this.elapsedTime += delta;
     while (this.elapsedTime >= this.frameDuration) 
@@ -54,7 +54,7 @@ export class NPY_Player
       if (this.frame_index >= this.frame_count) 
       {
         this.frame_index = this.frame_count;
-        this.isPlaying = false;
+        this.is_playing = false;
       }
       this.go_to_frame(this.frame_index);
       if (this.on_frame_changed_callback) 
@@ -77,7 +77,7 @@ export class NPY_Player
   play_pause() 
   {
     // toggle play/pause
-    this.isPlaying = !this.isPlaying;
+    this.is_playing = !this.is_playing;
     if (this.frame_index >= this.frame_count) 
     {
       this.frame_index = 0;
@@ -86,15 +86,14 @@ export class NPY_Player
 
   stop() 
   {
-    this.isPlaying = false;
-    this.go_to_frame(this.frame_index);
+    this.is_playing = false;
   }
 
-  go_to_frame(frameIndex: number) 
+  go_to_frame(frame_index: number) 
   {
-    this.frame_index = Math.max(0, Math.min(frameIndex, this.frame_count));
+    this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
     // avoid index mismatch in set_sphere_for_joint_positions()
-    // last frameIdx leads last undefined joint positions 
+    // last frame_index leads to  last undefined joint positions 
     if (this.frame_index < this.frame_count) 
     {
       this.npy_loader_object.update_skeleton(this.frame_index);
@@ -103,12 +102,13 @@ export class NPY_Player
 
   dispose() 
   {
-
+    // TODO: remove cause loader dispose is called in three js manager
+    this.npy_loader_object.dispose()
   }
 
   // needs to be a seperate class with dispose and pi pa po
-  async renderThumbnail(
-    frameIndex: number,
+  async render_thumbnail(
+    frame_index: number,
     scene: Scene,
     camera: PerspectiveCamera,
     width: number = 260,
@@ -120,7 +120,7 @@ export class NPY_Player
 
     // save frame
     const previous_frame = this.frame_index;
-    this.go_to_frame(frameIndex);
+    this.go_to_frame(frame_index);
 
     renderer.render(scene, camera);
 

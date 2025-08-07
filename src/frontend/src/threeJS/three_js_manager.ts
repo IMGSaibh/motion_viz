@@ -11,52 +11,56 @@ import { createScene } from '@/threeJS/components/scene';
 import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Utils from '@/threeJS/utils';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export class ThreeManager 
 {
-    private npy_loader: NPY_loader | null;
-    private npy_player: NPY_Player | null;
+    private npy_loader: NPY_loader | null
+    private npy_player: NPY_Player | null
     
-    private bvh_loader: BVH_loader | null;
-    private bvh_player: BVH_Player | null;
+    private bvh_loader: BVH_loader | null
+    private bvh_player: BVH_Player | null
 
-    private fbx_loader: FBX_Loader | null;
-    private fbx_player: FBX_Player | null;
+    private fbx_loader: FBX_Loader | null
+    private fbx_player: FBX_Player | null
 
     private scene: Scene;
-    private renderer: WebGLRenderer;
-    private scene_container: HTMLDivElement;
-    private camera: PerspectiveCamera;
-    private thumbnail_renderer: WebGLRenderer; 
+    private renderer: WebGLRenderer
+    private scene_container: HTMLDivElement
+    private camera: PerspectiveCamera
+    private thumbnail_renderer: WebGLRenderer
+
+    // copy to remove updateables from scene loop
+    private _orbitControls: OrbitControls | null
 
     loop: Loop;
 
     constructor(scene_container: HTMLDivElement)
     {
-        this.npy_player = null;
-        this.npy_loader = null;
+        this.npy_player = null
+        this.npy_loader = null
 
-        this.bvh_loader = null;
-        this.bvh_player = null;
+        this.bvh_loader = null
+        this.bvh_player = null
 
-        this.fbx_player = null;
-        this.fbx_loader = null;
+        this.fbx_player = null
+        this.fbx_loader = null
 
-        this.camera = createCamera();
-        this.renderer = createRenderer();
-        this.scene = createScene();
-        this.loop = new Loop(this.camera, this.scene, this.renderer);
-        this.scene_container = scene_container;
-        this.scene_container.append(this.renderer.domElement);
+        this.camera = createCamera()
+        this.renderer = createRenderer()
+        this.scene = createScene()
+        this.loop = new Loop(this.camera, this.scene, this.renderer)
+        this.scene_container = scene_container
+        this.scene_container.append(this.renderer.domElement)
 
-        const orbitControls = createOrbitControls(this.camera, this.renderer);
-        this.loop.updatables.push(orbitControls);
-        const resizer = new Resizer(scene_container, this.camera, this.renderer);
+        const orbitControls = createOrbitControls(this.camera, this.renderer)
+        this._orbitControls = orbitControls
+        this.loop.updatables.push(orbitControls)
+        const resizer = new Resizer(scene_container, this.camera, this.renderer)
 
-        this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
-        this.thumbnail_renderer.setSize(260, 190, false);
+        this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true })
+        this.thumbnail_renderer.setSize(260, 190, false)
     }
 
     start_engine_cycle()
@@ -83,13 +87,15 @@ export class ThreeManager
             case 'bvh':
                 this.bvh_loader = new BVH_loader(this.scene)
                 await this.bvh_loader.load_bvh_motion(fileUrl)
-                this.bvh_player = new BVH_Player(this.bvh_loader, this.loop)
+                this.bvh_player = new BVH_Player(this.bvh_loader)
+                this.loop.updatables.push(this.bvh_player.bvh_player_object)
                 break
 
             case 'fbx':
                 this.fbx_loader = new FBX_Loader(this.scene)
                 await this.fbx_loader.load_fbx_animation(fileUrl)
-                this.fbx_player = new FBX_Player(this.fbx_loader, this.loop)
+                this.fbx_player = new FBX_Player(this.fbx_loader)
+                this.loop.updatables.push(this.fbx_player.fbx_player_object)
                 break
 
             case 'npy':
@@ -120,9 +126,12 @@ export class ThreeManager
     async get_thumbnail_for_frame(frame_index: number) 
     {
         if (this.npy_player)
-            return await this.npy_player.renderThumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer);
-        else
-            return null;
+            return await this.npy_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        else if (this.fbx_player)
+            return await this.fbx_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        else if(this.bvh_player)
+            return await this.bvh_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        return null
     }
 
     play_pause()
@@ -135,7 +144,7 @@ export class ThreeManager
             this.fbx_player.play_pause()
     }
 
-    player_stop()
+    stop()
     {
         if (this.npy_player)
             this.npy_player.stop()
@@ -145,14 +154,14 @@ export class ThreeManager
             this.fbx_player.stop()
     }
 
-    go_to_frame(frameIndex: number)
+    go_to_frame(frame_index: number)
     {
         if (this.npy_player)
-            this.npy_player.go_to_frame(frameIndex)
+            this.npy_player.go_to_frame(frame_index)
         else if(this.bvh_player)
-            console.warn("not implemented yet")
+            this.bvh_player.go_to_frame(frame_index)
         else if(this.fbx_player)
-            this.fbx_player.gotoFrame(frameIndex)
+            this.fbx_player.go_to_frame(frame_index)
     }
     
     get_frame_count(): number
@@ -170,10 +179,10 @@ export class ThreeManager
     {
         if (this.npy_player)
             return this.npy_player.get_frame_index()
-        // else if(this.bvh_player)
-        //     return this.bvh_player.get_frame_index()
-        // else if(this.fbx_player)
-        //     return this.fbx_player.get_frame_index()
+        else if(this.bvh_player)
+            return this.bvh_player.get_frame_index()
+        else if(this.fbx_player)
+            return this.fbx_player.get_frame_index()
         return 0;
 
 
@@ -183,7 +192,7 @@ export class ThreeManager
     {
         if (!this.scene || !this.loop || !this.camera) 
         {
-            console.log("Scene, loop oder camera nicht bereit.");
+            console.log("Scene, loop oder camera nicht bereit.")
             return;  
         }
         Utils.print_scene_components(this.scene, this.loop, this.camera)
@@ -191,14 +200,11 @@ export class ThreeManager
 
     cleanup_scene()
     {
+
+        this.loop.updatables = this.loop.updatables.filter( obj => obj === this._orbitControls)
+
         if(this.npy_player)
         {
-            const index = this.loop.updatables.indexOf(this.npy_player!.npy_player_object)
-            if (index !== -1) 
-                {
-                    console.log("removed npy_player_object from loop")
-                    this.loop.updatables.splice(index, 1)
-                }
             this.npy_player.dispose()
             this.npy_player = null
             this.npy_loader?.dispose()
@@ -218,7 +224,7 @@ export class ThreeManager
         
         if (this.thumbnail_renderer) 
         {
-            this.thumbnail_renderer.dispose();
+            this.thumbnail_renderer.dispose()
         }
 
     }
@@ -227,9 +233,9 @@ export class ThreeManager
     {
         // TODO: dispose other stuff too
         this.cleanup_scene()
-        this.stop_engine_cycle();
-        this.renderer.dispose();
-        this.scene_container.removeChild(this.renderer.domElement);
+        this.stop_engine_cycle()
+        this.renderer.dispose()
+        this.scene_container.removeChild(this.renderer.domElement)
     }
 
 }

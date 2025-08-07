@@ -1,10 +1,9 @@
-import { useRef, useEffect, useState, SetStateAction } from "react";
+import { useRef, useEffect, useState } from "react";
 import { ThreeManager } from "../threeJS/three_js_manager";
 import { WidgetPresenter } from "../components/widget_presenter";
 import { WidgetPresenterSlider } from "../components/widget_presenter_slider";
 import { api_motion_file_conversion } from "../api/api_motion_file_conversion";
 import { api_file_processing, MotionDescriptorData } from "../api/api_file_processing";
-import { NPY_Player } from "@/threeJS/motion_player/npy_player";
 
 export function WidgetContainer() 
 {
@@ -61,34 +60,36 @@ export function WidgetContainer()
     }
 
     // init if manager doesnt exists
+    // React 18 (and newer) executes components twice in strict mode. 
+    // so dont be worry if react executes this code twice
     if (!three_js_mngr_reference.current) 
     {
-      three_js_mngr_reference.current = new ThreeManager(three_js_scene_container);
-      three_js_mngr_reference.current.start_engine_cycle();
-      console.info("three_js_mngr_reference was initialized");
+      three_js_mngr_reference.current = new ThreeManager(three_js_scene_container)
+      three_js_mngr_reference.current.start_engine_cycle()
+      console.info("three_js_mngr_reference was initialized")
     }
-
-    // const player = three_js_mngr_reference.current.get_current_player()
-    // console.log("was ist player " + player)
-    // if(player instanceof NPY_Player)
-    // {
-    //   console.log("in if NPY_Player")
-    //   player.setOnFrameChangedCallback((new_frame_index: number) => 
-    //   {
-    //     set_std_slider_value(new_frame_index);
-    //     console.log("on frame changed")
-    //   }); 
-    // }
 
     // keyboard-events
     const handleKeyDown = (e: KeyboardEvent) => 
     {
-      if (e.code === "KeyP") {three_js_mngr_reference.current?.print_scene_components();}
-      if (e.code === "KeyR") {three_js_mngr_reference.current?.cleanup_scene()}
       if (e.code === "Space"){three_js_mngr_reference.current?.play_pause()}
-      if (e.code === "KeyS") {three_js_mngr_reference.current?.player_stop()}
+      if (e.code === "KeyS")
+      {
+        three_js_mngr_reference.current?.stop()
+        three_js_mngr_reference.current?.go_to_frame(0)
+        set_std_slider_value(0)
+      }
+      if (e.code === "KeyR") 
+      {
+        three_js_mngr_reference.current?.cleanup_scene()
+        set_label_slider_range([0,0])
+        set_std_slider_value(0)
+        set_framecount(0)
+      }
+      if (e.code === "KeyP") {three_js_mngr_reference.current?.print_scene_components();}
     };
     window.addEventListener("keydown", handleKeyDown);
+
 
     // cleanup
     return () => 
@@ -134,7 +135,8 @@ export function WidgetContainer()
 
   function handle_motion_config_create_on_click() 
   {
-    const data: MotionDescriptorData = {
+    const data: MotionDescriptorData = 
+    {
       format: motion_config_references.format.current?.value || "csv",
       abbrev: motion_config_references.abbrev.current?.value || "",
       scale: parseFloat(motion_config_references.scale.current?.value || "1"),
@@ -156,13 +158,13 @@ export function WidgetContainer()
 
   async function handle_motion_file_list_on_focus() 
   {
-    const response = await list_motion_files();
+    const response = await list_motion_files()
     const all_files = [
       ...response.data.bvh.map((f: string) => ({ type: "bvh", name: f })),
       ...response.data.fbx.map((f: string) => ({ type: "fbx", name: f })),
       ...response.data.npy.map((f: string) => ({ type: "npy", name: f })),
     ];
-    set_motion_files(all_files);
+    set_motion_files(all_files)
   }
 
   async function handle_motion_file_list_on_change(e: React.ChangeEvent<HTMLSelectElement>) 
@@ -173,15 +175,14 @@ export function WidgetContainer()
     let framecount_threejs = three_js_mngr_reference.current!.get_frame_count()
 
     set_framecount(framecount_threejs)
+    set_label_slider_range([0,0])
+    set_std_slider_value(0)
 
     const player = three_js_mngr_reference.current!.get_current_player()
-    if (player instanceof NPY_Player)
+    player!.set_on_frame_changed_callback((new_frame_index: number) =>
     {
-      player.setOnFrameChangedCallback((new_frame_index: number) =>
-      {
-        set_std_slider_value(new_frame_index)
-      });
-    }
+      set_std_slider_value(new_frame_index)
+    });
 
 
   }
@@ -210,7 +211,7 @@ export function WidgetContainer()
   function handle_std_slider_on_mouse_move(e: React.MouseEvent) 
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
-    if(!rect || !framecount){return}
+    if(!rect || !framecount) {return}
     
     let percent = (e.clientX - rect.left) / rect.width;
     percent = Math.max(0, Math.min(percent, 1));
@@ -242,7 +243,7 @@ export function WidgetContainer()
 
   function handle_std_slider_on_change(e: Event, value: number)
   {
-    three_js_mngr_reference.current?.player_stop()
+    three_js_mngr_reference.current?.stop()
     three_js_mngr_reference.current?.go_to_frame(value)
     set_std_slider_value(value)
   }
@@ -253,7 +254,7 @@ export function WidgetContainer()
   function handle_label_slider_on_change(e: Event, value: number | number[], active_slider_hndl_idx: number) 
   {
     const rect = std_slider_reference.current?.getBoundingClientRect();
-    if(!rect || !framecount){return}
+    if(!rect || !framecount) {return}
 
     if (Array.isArray(value) && value.length === 2) 
     {
