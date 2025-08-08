@@ -6,19 +6,15 @@ type WidgetFileUploadProps =
     file_dialog_on_click: () => void;
 };
 
-export function WidgetFileUpload({ 
-    file_dialog_reference, 
-    file_dialog_on_change,
-    file_dialog_on_click 
-}: WidgetFileUploadProps) {
+export function WidgetFileUpload(widget_file_upload_props: WidgetFileUploadProps) {
   return (
     <>
-      <button onClick={file_dialog_on_click}>Search for files</button>
+      <button onClick={widget_file_upload_props.file_dialog_on_click}>Search for files</button>
       <input
         type="file"
-        ref={file_dialog_reference}
+        ref={widget_file_upload_props.file_dialog_reference}
         multiple
-        onChange={file_dialog_on_change}
+        onChange={widget_file_upload_props.file_dialog_on_change}
         style={{ display: "none" }}
       />
     </>

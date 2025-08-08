@@ -3,24 +3,24 @@ html, body, #root {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /* ================ Three JS Scene ============= */
 #scene-container
 {
     /* tell our scene container to take up the full page */
-    position: absolute;
+    /* position: absolute; */
     width: 100%;
     height: 100%;
 }
 
 canvas {
-  display: block;
-  position: absolute;
-  top: 0;
+  /* display: block; */
+  /* position: absolute; */
+  /* top: 0;
   left: 0;
-  z-index: 0;
+  z-index: 0; */
 }
 
 /* ================ ui-overlay ============= */
@@ -30,7 +30,7 @@ canvas {
   top: 20px;
   left: 20px;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   padding: 10px;
   border-radius: 8px;
   color: white;
@@ -132,7 +132,7 @@ canvas {
 =================== slider =================
 */
 
-#timeline-container {
+.slider-container {
   position: absolute;
   bottom: 20px;
   left: 20px;
@@ -145,21 +145,11 @@ canvas {
   border-radius: 8px;
   color: white;
   font-family: sans-serif;
+  margin-bottom: 30;
 }
-
-#frame-slider {
-  flex-grow: 1;
-  pointer-events: auto;
-  z-index: 10;
-}
-
-#frame-label {
-  white-space: nowrap;
-}
-
 
 /* ====================================== */
-#timeline-container_2 {
+.label-slider-container {
   position: absolute;
   bottom: 80px;
   left: 20px;
@@ -174,6 +164,6 @@ canvas {
   font-family: sans-serif;
 }
 
-#label-slider-label {
+.slider-label {
   white-space: nowrap;
 }

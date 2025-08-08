@@ -1,4 +1,4 @@
-import { WidgetPlaySlider } from './widgets/widget_play_slider';
+import { WidgetStdSlider } from './widgets/widget_std_slider';
 import { WidgetLabelSlider } from './widgets/widget_label_slider';
 
 type WidgetPresenterSliderProps = 
@@ -21,47 +21,34 @@ type WidgetPresenterSliderProps =
   label_slider_thumbnail: string | null;
 };
 
-export function WidgetPresenterSlider({
-  std_slider_value,
-  std_slider_framecount,
-  std_slider_reference,
-  std_slider_on_change,
-  std_slider_on_mouse_move,
-  std_slider_on_mouse_leave,
-  std_slider_thumbnail_css,
-  std_slider_thumbnail,
-
-  label_slider_value,
-  label_slider_framecount,
-  label_slider_on_change,
-  label_slider_on_mouse_leave,
-  label_slider_thumbnail_css,
-  label_slider_thumbnail,
-
-}: WidgetPresenterSliderProps )
+export function WidgetPresenterSlider(widget_presenter_slider_props: WidgetPresenterSliderProps )
 {
   return (
     <>
-        <div id="timeline-container">
-          <WidgetPlaySlider
-            std_slider_value                ={std_slider_value}
-            std_slider_framecount           ={std_slider_framecount}
-            std_slider_reference            ={std_slider_reference}
-            std_slider_on_change            ={std_slider_on_change}
-            std_slider_on_mouse_move        ={std_slider_on_mouse_move}
-            std_slider_on_mouse_leave       ={std_slider_on_mouse_leave}
-            std_slider_thumbnail_css        ={std_slider_thumbnail_css}
-            std_slider_thumbnail            ={std_slider_thumbnail}
+        <div className="slider-container">
+          <WidgetStdSlider
+            {...{
+              std_slider_value: widget_presenter_slider_props.std_slider_value,
+              std_slider_framecount: widget_presenter_slider_props.std_slider_framecount,
+              std_slider_reference: widget_presenter_slider_props.std_slider_reference,
+              std_slider_on_change: widget_presenter_slider_props.std_slider_on_change,
+              std_slider_on_mouse_move: widget_presenter_slider_props.std_slider_on_mouse_move,
+              std_slider_on_mouse_leave: widget_presenter_slider_props.std_slider_on_mouse_leave,
+              std_slider_thumbnail_css: widget_presenter_slider_props.std_slider_thumbnail_css,
+              std_slider_thumbnail: widget_presenter_slider_props.std_slider_thumbnail,
+            }}
           />
         </div>
-        <div id="timeline-container_2">
+        <div className="label-slider-container">
           <WidgetLabelSlider
-            label_slider_value              ={label_slider_value}
-            label_slider_framecount         ={label_slider_framecount}
-            label_slider_on_change          ={label_slider_on_change}
-            label_slider_on_mouse_leave     ={label_slider_on_mouse_leave}
-            label_slider_thumbnail_css      ={label_slider_thumbnail_css}
-            label_slider_thumbnail          ={label_slider_thumbnail}
+            {...{
+              label_slider_value: widget_presenter_slider_props.label_slider_value,
+              label_slider_framecount: widget_presenter_slider_props.label_slider_framecount,
+              label_slider_on_change: widget_presenter_slider_props.label_slider_on_change,
+              label_slider_on_mouse_leave: widget_presenter_slider_props.label_slider_on_mouse_leave,
+              label_slider_thumbnail_css: widget_presenter_slider_props.label_slider_thumbnail_css,
+              label_slider_thumbnail: widget_presenter_slider_props.label_slider_thumbnail,
+            }}
           />
         </div>
     </>

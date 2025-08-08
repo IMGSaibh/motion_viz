@@ -12,30 +12,22 @@ type WidgetPlaySliderProps =
   std_slider_thumbnail: string | null;
 };
 
-export function WidgetPlaySlider({ 
-  std_slider_value,
-  std_slider_framecount,
-  std_slider_reference,
-  std_slider_on_change,
-  std_slider_on_mouse_move,
-  std_slider_on_mouse_leave,
-  std_slider_thumbnail_css,
-  std_slider_thumbnail
-}: WidgetPlaySliderProps) {
+export function WidgetStdSlider(widget_std_slider_props: WidgetPlaySliderProps) 
+{
   return (
     <>
-      <div id="frame-label">Frame: {std_slider_value} / {std_slider_framecount}</div>
+      <div className="slider-label">Frame: {widget_std_slider_props.std_slider_value} / {widget_std_slider_props.std_slider_framecount}</div>
       <Slider
-        value={std_slider_value}
+        value={widget_std_slider_props.std_slider_value}
         min={0}
-        max={std_slider_framecount}
-        ref={std_slider_reference}
+        max={widget_std_slider_props.std_slider_framecount}
+        ref={widget_std_slider_props.std_slider_reference}
         step={1}
         valueLabelDisplay="auto"
         disableSwap={true}
-        onChange={std_slider_on_change}
-        onMouseMove={std_slider_on_mouse_move}
-        onMouseLeave={std_slider_on_mouse_leave}
+        onChange={widget_std_slider_props.std_slider_on_change}
+        onMouseMove={widget_std_slider_props.std_slider_on_mouse_move}
+        onMouseLeave={widget_std_slider_props.std_slider_on_mouse_leave}
         sx={{
           color: '#45ab45',
           
@@ -64,8 +56,8 @@ export function WidgetPlaySlider({
           },
         }}
       />
-      <div id="preview-popup" style={std_slider_thumbnail_css}>
-        <img src={std_slider_thumbnail || undefined} />
+      <div id="preview-popup" style={widget_std_slider_props.std_slider_thumbnail_css}>
+        <img src={widget_std_slider_props.std_slider_thumbnail || undefined} />
       </div>
     </>
   );

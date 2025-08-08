@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { ThreeManager } from "../threeJS/three_js_manager";
-import { WidgetPresenter } from "../components/widget_presenter";
+import { WidgetPresenterUI } from "../components/widget_presenter_UI";
 import { WidgetPresenterSlider } from "../components/widget_presenter_slider";
 import { api_motion_file_conversion } from "../api/api_motion_file_conversion";
 import { api_file_processing, MotionDescriptorData } from "../api/api_file_processing";
@@ -285,7 +285,7 @@ export function WidgetContainer()
   return (
     <>
       <div id="ui-overlay">
-        <WidgetPresenter
+        <WidgetPresenterUI
           file_dialog_reference           ={file_dialog_reference}
           file_dialog_on_change           ={handle_file_dialog_on_change}
           file_dialog_on_click            ={handle_file_dialog_on_click}
