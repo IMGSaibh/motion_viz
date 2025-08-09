@@ -103,11 +103,6 @@ export function WidgetContainer() {
 
   // ======================= file dialog upload =======================
 
-  function handle_file_dialog_on_click() {
-    file_dialog_reference.current?.click();
-    set_status_massage('');
-  }
-
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -273,7 +268,6 @@ export function WidgetContainer() {
         <WidgetPresenterUI
           file_dialog_reference={file_dialog_reference}
           file_dialog_on_change={handle_file_dialog_on_change}
-          file_dialog_on_click={handle_file_dialog_on_click}
           motion_config_reference={motion_config_references}
           motion_config_is_open={motion_config_is_open}
           motion_config_on_click={handle_motion_config_on_click}

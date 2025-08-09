@@ -1,7 +1,7 @@
 import { WidgetStdSlider } from './widgets/widget_std_slider';
 import { WidgetLabelSlider } from './widgets/widget_label_slider';
 
-type WidgetPresenterSliderProps = {
+type Props = {
   std_slider_value: number;
   std_slider_framecount: number;
   std_slider_reference: React.RefObject<HTMLSpanElement | null>;
@@ -23,41 +23,37 @@ type WidgetPresenterSliderProps = {
   label_slider_thumbnail: string | null;
 };
 
-export function WidgetPresenterSlider(widget_presenter_slider_props: WidgetPresenterSliderProps) {
+export function WidgetPresenterSlider(props: Props) {
   return (
     <>
       <div className="slider-overlay">
         <div className="slider-widget">
-          <label htmlFor="slider-label">
-            Frame: 0 / {widget_presenter_slider_props.label_slider_framecount}
-          </label>
+          <label htmlFor="slider-label">Frame: 0 / {props.label_slider_framecount}</label>
           <WidgetLabelSlider
             {...{
-              label_slider_value: widget_presenter_slider_props.label_slider_value,
-              label_slider_framecount: widget_presenter_slider_props.label_slider_framecount,
-              label_slider_on_change: widget_presenter_slider_props.label_slider_on_change,
-              label_slider_on_mouse_leave:
-                widget_presenter_slider_props.label_slider_on_mouse_leave,
-              label_slider_thumbnail_css: widget_presenter_slider_props.label_slider_thumbnail_css,
-              label_slider_thumbnail: widget_presenter_slider_props.label_slider_thumbnail,
+              label_slider_value: props.label_slider_value,
+              label_slider_framecount: props.label_slider_framecount,
+              label_slider_on_change: props.label_slider_on_change,
+              label_slider_on_mouse_leave: props.label_slider_on_mouse_leave,
+              label_slider_thumbnail_css: props.label_slider_thumbnail_css,
+              label_slider_thumbnail: props.label_slider_thumbnail,
             }}
           />
         </div>
         <div className="slider-widget">
           <label htmlFor="slider-label">
-            Frame: {widget_presenter_slider_props.std_slider_value} /{' '}
-            {widget_presenter_slider_props.std_slider_framecount}
+            Frame: {props.std_slider_value} / {props.std_slider_framecount}
           </label>
           <WidgetStdSlider
             {...{
-              std_slider_value: widget_presenter_slider_props.std_slider_value,
-              std_slider_framecount: widget_presenter_slider_props.std_slider_framecount,
-              std_slider_reference: widget_presenter_slider_props.std_slider_reference,
-              std_slider_on_change: widget_presenter_slider_props.std_slider_on_change,
-              std_slider_on_mouse_move: widget_presenter_slider_props.std_slider_on_mouse_move,
-              std_slider_on_mouse_leave: widget_presenter_slider_props.std_slider_on_mouse_leave,
-              std_slider_thumbnail_css: widget_presenter_slider_props.std_slider_thumbnail_css,
-              std_slider_thumbnail: widget_presenter_slider_props.std_slider_thumbnail,
+              std_slider_value: props.std_slider_value,
+              std_slider_framecount: props.std_slider_framecount,
+              std_slider_reference: props.std_slider_reference,
+              std_slider_on_change: props.std_slider_on_change,
+              std_slider_on_mouse_move: props.std_slider_on_mouse_move,
+              std_slider_on_mouse_leave: props.std_slider_on_mouse_leave,
+              std_slider_thumbnail_css: props.std_slider_thumbnail_css,
+              std_slider_thumbnail: props.std_slider_thumbnail,
             }}
           />
         </div>

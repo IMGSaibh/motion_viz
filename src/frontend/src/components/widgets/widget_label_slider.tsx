@@ -1,6 +1,6 @@
 import Slider from '@mui/material/Slider';
 
-type WidgetLabelSliderProps = {
+type Props = {
   label_slider_value: [number, number];
   label_slider_framecount: number;
   label_slider_on_change: (
@@ -13,20 +13,20 @@ type WidgetLabelSliderProps = {
   label_slider_thumbnail: string | null;
 };
 
-export function WidgetLabelSlider(label_slider_porps: WidgetLabelSliderProps) {
+export function WidgetLabelSlider(porps: Props) {
   return (
     <>
       <Slider
-        value={label_slider_porps.label_slider_value}
+        value={porps.label_slider_value}
         min={0}
-        max={label_slider_porps.label_slider_framecount}
+        max={porps.label_slider_framecount}
         step={1}
         valueLabelDisplay="auto"
-        onChange={label_slider_porps.label_slider_on_change}
-        onMouseLeave={label_slider_porps.label_slider_on_mouse_leave}
+        onChange={porps.label_slider_on_change}
+        onMouseLeave={porps.label_slider_on_mouse_leave}
       />
-      <div id="preview-popup" style={label_slider_porps.label_slider_thumbnail_css}>
-        <img src={label_slider_porps.label_slider_thumbnail || undefined} />
+      <div id="preview-popup" style={porps.label_slider_thumbnail_css}>
+        <img src={porps.label_slider_thumbnail || undefined} />
       </div>
     </>
   );
