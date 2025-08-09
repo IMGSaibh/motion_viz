@@ -1,5 +1,5 @@
 import { WidgetFileUpload } from './widgets/widget_file_upload';
-import { WidgetCreateDescriptorFile } from './widgets/widget_motion_descriptor';
+import { WidgetMotionDescriptorBar } from './widgets/widget_motion_descriptor';
 import { WidgetConvertMotionFile } from './widgets/widget_motion_file_conversion';
 import { WidgetListFiles } from './widgets/widget_list_motion_files';
 import { SelectChangeEvent } from '@mui/material/Select';
@@ -35,7 +35,7 @@ export function WidgetPresenterUI(widget_presenter_ui_props: WidgetPresenterUIPr
             file_dialog_on_click: widget_presenter_ui_props.file_dialog_on_click,
           }}
         />
-        <WidgetCreateDescriptorFile
+        <WidgetMotionDescriptorBar
           {...{
             motion_config_reference: widget_presenter_ui_props.motion_config_reference,
             motion_config_is_open: widget_presenter_ui_props.motion_config_is_open,

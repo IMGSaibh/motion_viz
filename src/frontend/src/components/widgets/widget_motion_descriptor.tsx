@@ -1,14 +1,14 @@
 import Button from '@mui/material/Button';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-type MotionDescriptorProps = {
+type WidgetMotionDescriptorBarProps = {
   motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
   motion_config_is_open: boolean;
   motion_config_on_click: () => void;
   motion_config_create_on_click: () => void;
 };
 
-export function WidgetCreateDescriptorFile(motion_descriptor_props: MotionDescriptorProps) {
+export function WidgetMotionDescriptorBar(motion_descriptor_props: WidgetMotionDescriptorBarProps) {
   return (
     <div id="motion-config-dropdown">
       <Button
