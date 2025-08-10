@@ -26,7 +26,7 @@ export function WidgetStdSlider(props: Props) {
         onMouseMove={props.std_slider_on_mouse_move}
         onMouseLeave={props.std_slider_on_mouse_leave}
       />
-      <div id="preview-popup" style={props.std_slider_thumbnail_css}>
+      <div style={props.std_slider_thumbnail_css}>
         <img src={props.std_slider_thumbnail || undefined} />
       </div>
     </>

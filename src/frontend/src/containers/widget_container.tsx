@@ -5,6 +5,8 @@ import { WidgetPresenterSlider } from '../components/widget_presenter_slider';
 import { api_motion_file_conversion } from '../api/api_motion_file_conversion';
 import { api_file_processing, MotionDescriptorData } from '../api/api_file_processing';
 import { SelectChangeEvent } from '@mui/material/Select';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export function WidgetContainer() {
   const three_js_scene_reference = useRef<HTMLDivElement>(null);
@@ -48,7 +50,9 @@ export function WidgetContainer() {
   const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
   const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
 
-  const [status_massage, set_status_massage] = useState<string | null>(null);
+  const [snackbar_open, set_snackbar_open] = useState(false);
+  const [success_message, set_success_message] = useState<string | null>(null);
+  const [warning_message, set_warning_message] = useState<string | null>(null);
 
   useEffect(() => {
     const three_js_scene_container = three_js_scene_reference.current;
@@ -108,12 +112,31 @@ export function WidgetContainer() {
     if (files.length === 0) return;
 
     const response = await upload_files(files);
-    const message = '✅ ' + response.data.message;
-    const warning = response.data.not_supported_files
-      ? `⚠️ ${response.data.not_supported_files}`
-      : '';
-    set_status_massage(`${message} ${warning}`);
+
+    let success = response.data.message;
+    if (success > 0) {
+      success = response.data.message + ' files uploaded';
+    } else {
+      success = null;
+    }
+
+    const warning = response.data.warning
+      ? 'not uploaded files: ' + `${response.data.warning}`
+      : null;
+
+    set_success_message(success || null);
+    set_warning_message(warning || null);
+    set_snackbar_open(true);
+
+    e.target.value = '';
   }
+
+  const handle_snack_close = (_?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    set_snackbar_open(false);
+    set_success_message(null);
+    set_warning_message(null);
+  };
 
   // ======================= motion config =======================
 
@@ -137,7 +160,8 @@ export function WidgetContainer() {
     };
 
     create_motion_descriptor(data).then(() => {
-      set_status_massage('✅ Created descriptor file!');
+      set_success_message('Created descriptor file!');
+      set_snackbar_open(true);
     });
   }
 
@@ -151,7 +175,6 @@ export function WidgetContainer() {
     set_motion_files(all_files);
   }
 
-  // async function handle_motion_file_list_on_change(e: React.ChangeEvent<HTMLSelectElement>) {
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     three_js_mngr_reference.current?.cleanup_scene();
     set_motion_file_selected(e.target.value);
@@ -172,16 +195,22 @@ export function WidgetContainer() {
 
   async function handle_convert_with_pose_viewer() {
     const response = await convert_with_pose_viewer();
-    const message = '✅ ' + response.data.message;
-    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : '';
-    set_status_massage(`${message} ${warning}`);
+    const message = response.data.message;
+    const warning = response.data.warning ? `${response.data.warning}` : '';
+
+    set_success_message(message);
+    set_warning_message(warning);
+    set_snackbar_open(true);
   }
 
   async function handle_convert_motion_file() {
     const response = await convert_bvh();
-    const message = '✅ ' + response.data.message;
-    const warning = response.data.warning ? `⚠️ ${response.data.warning}` : '';
-    set_status_massage(`${message} ${warning}`);
+    const message = response.data.message;
+    const warning = response.data.warning ? ` ${response.data.warning}` : '';
+
+    set_success_message(message);
+    set_warning_message(warning);
+    set_snackbar_open(true);
   }
 
   // ======================= standard slider =======================
@@ -203,7 +232,7 @@ export function WidgetContainer() {
       left: (slider_value / framecount) * rect!.width,
       position: 'absolute',
       border: '1px solid #000000',
-      top: -280,
+      top: -220,
       zIndex: 0,
     });
 
@@ -264,25 +293,20 @@ export function WidgetContainer() {
     <>
       <div ref={three_js_scene_reference} id="scene-container" />
 
-      <div className="ui-overlay">
-        <WidgetPresenterUI
-          file_dialog_reference={file_dialog_reference}
-          file_dialog_on_change={handle_file_dialog_on_change}
-          motion_config_reference={motion_config_references}
-          motion_config_is_open={motion_config_is_open}
-          motion_config_on_click={handle_motion_config_on_click}
-          motion_config_create_on_click={handle_motion_config_create_on_click}
-          convert_pv_files_on_click={handle_convert_with_pose_viewer}
-          convert_bvh_files_on_click={handle_convert_motion_file}
-          motion_files={motion_files}
-          motion_file_selected={motion_file_selected}
-          motion_file_list_on_focus={handle_motion_file_list_on_focus}
-          motion_file_list_on_change={handle_motion_file_list_on_change}
-        />
-        <div className=".status-panel">
-          <p>{status_massage}</p>
-        </div>
-      </div>
+      <WidgetPresenterUI
+        file_dialog_reference={file_dialog_reference}
+        file_dialog_on_change={handle_file_dialog_on_change}
+        motion_config_reference={motion_config_references}
+        motion_config_is_open={motion_config_is_open}
+        motion_config_on_click={handle_motion_config_on_click}
+        motion_config_create_on_click={handle_motion_config_create_on_click}
+        convert_pv_files_on_click={handle_convert_with_pose_viewer}
+        convert_bvh_files_on_click={handle_convert_motion_file}
+        motion_files={motion_files}
+        motion_file_selected={motion_file_selected}
+        motion_file_list_on_focus={handle_motion_file_list_on_focus}
+        motion_file_list_on_change={handle_motion_file_list_on_change}
+      />
       <WidgetPresenterSlider
         std_slider_value={std_slider_value}
         std_slider_framecount={framecount}
@@ -299,6 +323,27 @@ export function WidgetContainer() {
         label_slider_thumbnail_css={labelslider_thumbnail_css}
         label_slider_thumbnail={labelslider_thumbnail}
       />
+      {/* Global Snackbar */}
+      <Snackbar
+        className="snackbar-centered"
+        open={snackbar_open}
+        autoHideDuration={8000}
+        onClose={handle_snack_close}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <div>
+          {success_message && (
+            <Alert onClose={handle_snack_close} severity="success" variant="filled">
+              {success_message}
+            </Alert>
+          )}
+          {warning_message && (
+            <Alert onClose={handle_snack_close} severity="warning" variant="filled">
+              {warning_message}
+            </Alert>
+          )}
+        </div>
+      </Snackbar>
     </>
   );
 }

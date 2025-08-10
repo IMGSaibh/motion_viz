@@ -41,6 +41,6 @@ async def upload(files: List[UploadFile] = File(...)):
             f.write(contents)
 
     return {
-        "message": f"succesfully uploaded files: {len(files) - len(not_saved_files)}",
-        "not_supported_files": ", ".join(not_saved_files)
+        "message": f"{len(files) - len(not_saved_files)}",
+        "warning": ", ".join(not_saved_files)
     }

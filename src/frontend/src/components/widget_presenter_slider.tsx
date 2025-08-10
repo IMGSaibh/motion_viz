@@ -28,7 +28,7 @@ export function WidgetPresenterSlider(props: Props) {
     <>
       <div className="slider-overlay">
         <div className="slider-widget">
-          <label htmlFor="slider-label">Frame: 0 / {props.label_slider_framecount}</label>
+          <label htmlFor="slider-label">FRAME: 0 / {props.label_slider_framecount}</label>
           <WidgetLabelSlider
             {...{
               label_slider_value: props.label_slider_value,
@@ -42,7 +42,7 @@ export function WidgetPresenterSlider(props: Props) {
         </div>
         <div className="slider-widget">
           <label htmlFor="slider-label">
-            Frame: {props.std_slider_value} / {props.std_slider_framecount}
+            FRAME: {props.std_slider_value} / {props.std_slider_framecount}
           </label>
           <WidgetStdSlider
             {...{

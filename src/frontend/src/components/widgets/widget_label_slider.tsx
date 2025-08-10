@@ -25,7 +25,7 @@ export function WidgetLabelSlider(porps: Props) {
         onChange={porps.label_slider_on_change}
         onMouseLeave={porps.label_slider_on_mouse_leave}
       />
-      <div id="preview-popup" style={porps.label_slider_thumbnail_css}>
+      <div style={porps.label_slider_thumbnail_css}>
         <img src={porps.label_slider_thumbnail || undefined} />
       </div>
     </>
