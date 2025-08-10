@@ -63,7 +63,7 @@ poetry install
 
 ## Optional
 
-### create worksapce settings.json for prettier plugin (autoformat code)
+### create workspace settings.json for prettier plugin (autoformat code)
 
 ```json
 {
