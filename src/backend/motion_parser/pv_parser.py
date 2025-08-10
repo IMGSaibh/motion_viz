@@ -37,8 +37,8 @@ class PVParser:
             self.joint_hierarchy.append(rel)
 
         skeleton = {
-            "joints": list(self.joint_names),         # sicherstellen, dass es keine np.array ist
-            "hierarchy": self.joint_hierarchy              # reine Python-Liste von Listen
+            "joints": list(self.joint_names),         # make sure it is not a np.array
+            "hierarchy": self.joint_hierarchy         # pure python liste of listen
         }
 
         with open(output_path, "w") as f:

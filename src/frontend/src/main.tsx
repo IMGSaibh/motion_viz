@@ -1,4 +1,3 @@
-// import '@/custom.css';
 import App from './app';
 import React from 'react';
 import { theme } from './theme';
