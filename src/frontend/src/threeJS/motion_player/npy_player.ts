@@ -1,152 +1,114 @@
 import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
-import { Loop, Updatable } from '@/threeJS/system/loop';
+import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene} from 'three'
 
 export class NPY_Player 
 {
-  npy_player_object: Updatable;
-  npy_loader_object: NPY_loader;
-  frameCount: number;
-  container: HTMLElement;
-  slider: HTMLInputElement;
-  label: HTMLElement;
-  frameIdx: number;
-  elapsedTime: number;
-  fps: number;
-  frameDuration: number;
-  loop: Loop;
-  isPlaying: boolean = false;
+  public npy_player_object: Updatable;
+  private npy_loader_object: NPY_loader;
+  private fps: number = 0;
+  private frame_index: number = 0;
+  private frame_count: number = 0;
+  private elapsedTime: number  = 0;
+  private frameDuration: number = 0;
+  private is_playing: boolean = false;
+  
+  private on_frame_changed_callback?: (frameIndex: number) => void;
 
-  constructor(npy_loader_object: NPY_loader, loop: Loop) 
+  constructor(npy_loader_object: NPY_loader)
   {
     this.npy_loader_object = npy_loader_object;    
-    this.frameCount = npy_loader_object.frameCount;
-    const container = document.getElementById('timeline-container');
-    if (!container) 
-    {
-      throw new Error("Element with id 'timeline-container' not found.");
-    }
-    this.container = container;
-    const slider = document.getElementById('frame-slider');
-    if (!slider || !(slider instanceof HTMLInputElement)) 
-    {
-      throw new Error("Element with id 'frame-slider' not found or is not an input element.");
-    }
-    this.slider = slider;
-    const label = document.getElementById('frame-label');
-    if (!label) 
-    {
-      throw new Error("Element with id 'frame-label' not found.");
-    }
-    this.label = label;
-    this.slider.type = 'range';
-    this.slider.min = '0';
-    this.slider.max = this.frameCount.toString();
-    this.slider.step = '1';
-    this.slider.value = '0';
-
-    this.frameIdx = 0;
-    this.elapsedTime = 0;
-
-    this.fps = npy_loader_object.fps;
-    // 1 / fps gives us the duration of one frame in seconds
-    // cause we use three.js delta, we need to convert it to seconds
-    this.frameDuration = 1 / this.fps;
-
-    this.container.appendChild(this.slider);
-    this.label.textContent = `Frame: 0 / ${this.frameCount}`;
-
-    this.loop = loop;
-
-    window.addEventListener('keydown', (e) => 
-    {
-      if (e.code === 'Space') this.play_pause();
-      if (e.code === 'KeyS') this.stop();
-    });
-
-    // input-Event executes always when the slider is moved
-    this.slider.addEventListener('input', (e) => 
-    {
-        const target = e.target as HTMLInputElement;
-        this.frameIdx = parseFloat(target.value);
-        this.gotoFrame(this.frameIdx);
-        this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
-    });
+    this.frame_count = npy_loader_object.frameCount;
 
     this.npy_player_object = 
     {
       tick: (delta: number) => 
       {
-        if (this.isPlaying) this.update(delta)
+        if (this.is_playing) this.update(delta)
       }
     }
 
-    this.loop.updatables.push(this.npy_player_object);
+    this.frame_index = 0;
+    this.elapsedTime = 0;
+    this.fps = npy_loader_object.fps;
+    // 1 / fps gives us the duration of one frame in seconds
+    // cause we use three.js delta, we need to convert it to seconds
+    this.frameDuration = 1 / this.fps;
+  }
+
+  set_on_frame_changed_callback(cb: (frameIndex: number) => void)
+  {
+    this.on_frame_changed_callback = cb;
   }
 
   update(delta: number) 
   {
-    if (!this.isPlaying) return;
+    if (!this.is_playing) return;
 
     this.elapsedTime += delta;
     while (this.elapsedTime >= this.frameDuration) 
     {
       this.elapsedTime -= this.frameDuration;
-      this.frameIdx++;
+      this.frame_index++;
       
-      if (this.frameIdx >= this.frameCount) 
+      if (this.frame_index >= this.frame_count) 
       {
-        this.frameIdx = this.frameCount;
-        this.isPlaying = false;
+        this.frame_index = this.frame_count;
+        this.is_playing = false;
       }
-      this.gotoFrame(this.frameIdx);
-      this.slider.value = this.frameIdx.toString();
-      this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
+      this.go_to_frame(this.frame_index);
+      if (this.on_frame_changed_callback) 
+      {
+        this.on_frame_changed_callback(this.frame_index);
+      }
     }
+  }
+
+  get_frame_count(): number
+  {
+    return this.frame_count;
+  }
+
+  get_frame_index(): number
+  {
+    return this.frame_index;
   }
 
   play_pause() 
   {
     // toggle play/pause
-    this.isPlaying = !this.isPlaying;
-    if (this.frameIdx >= this.frameCount) 
+    this.is_playing = !this.is_playing;
+    if (this.frame_index >= this.frame_count) 
     {
-      this.frameIdx = 0;
-      this.slider.value = '0';
-      this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
+      this.frame_index = 0;
     }
   }
 
   stop() 
   {
-    this.frameIdx = 0;
-    this.slider.value = '0';
-    this.isPlaying = false;
-    this.label.textContent = `Frame: ${this.frameIdx} / ${this.frameCount}`;
+    this.is_playing = false;
   }
 
-  gotoFrame(frameIndex: number) 
+  go_to_frame(frame_index: number) 
   {
-    this.frameIdx = Math.max(0, Math.min(frameIndex, this.frameCount));
+    this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
     // avoid index mismatch in set_sphere_for_joint_positions()
-    // last frameIdx leads last undefined joint positions 
-    if (this.frameIdx < this.frameCount) 
+    // last frame_index leads to  last undefined joint positions 
+    if (this.frame_index < this.frame_count) 
     {
-      this.npy_loader_object.update_skeleton(this.frameIdx);
+      this.npy_loader_object.update_skeleton(this.frame_index);
     }
   }
 
   dispose() 
   {
-    const index = this.loop.updatables.indexOf(this.npy_player_object);
-    if (index !== -1) 
-    {
-      this.loop.updatables.splice(index, 1);
-    }
+    // TODO: remove cause loader dispose is called in three js manager
+    this.npy_loader_object.dispose()
   }
 
-  async renderThumbnail(
-    frameIndex: number,
+  // needs to be a seperate class with dispose and pi pa po
+  async render_thumbnail(
+    frame_index: number,
     scene: Scene,
     camera: PerspectiveCamera,
     width: number = 260,
@@ -157,14 +119,14 @@ export class NPY_Player
     renderer.setSize(width, height, false);
 
     // save frame
-    const previousFrame = this.frameIdx;
-    this.gotoFrame(frameIndex);
+    const previous_frame = this.frame_index;
+    this.go_to_frame(frame_index);
 
     renderer.render(scene, camera);
 
     const dataUrl = renderer.domElement.toDataURL();
 
-    this.gotoFrame(previousFrame);
+    this.go_to_frame(previous_frame);
 
     return dataUrl;
   }

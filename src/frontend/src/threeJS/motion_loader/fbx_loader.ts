@@ -15,8 +15,9 @@ export class FBX_Loader
 
   constructor(scene: THREE.Scene) 
   {
-    this.fbx_loader = new FBXLoader();
-    this.fbx_motion = new THREE.Group();
+    this.fbx_loader = new FBXLoader()
+    this.fbx_motion = new THREE.Group()
+    this.fbx_motion.name = "fbx_motion"
     this.mixer = null;
     this.clipAction = null;
     this.skeletonHelper = null;
@@ -34,6 +35,7 @@ export class FBX_Loader
     if (this.fbx_motion) 
     {
       this.fbx_motion.add(result);
+      this.fbx_motion.name = fileUrl
     }
     this.mixer = new THREE.AnimationMixer(result);
     this.clipAction = this.mixer.clipAction(result.animations[0]);

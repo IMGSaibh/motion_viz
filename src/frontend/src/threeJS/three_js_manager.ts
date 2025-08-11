@@ -11,141 +11,188 @@ import { createScene } from '@/threeJS/components/scene';
 import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Utils from '@/threeJS/utils';
 
 export class ThreeManager 
 {
+    private npy_loader: NPY_loader | null
+    private npy_player: NPY_Player | null
+    
+    private bvh_loader: BVH_loader | null
+    private bvh_player: BVH_Player | null
+
+    private fbx_loader: FBX_Loader | null
+    private fbx_player: FBX_Player | null
+
     private scene: Scene;
-    private camera: PerspectiveCamera;
-    private renderer: WebGLRenderer;
-    private previewRenderer: WebGLRenderer; 
-    private container: HTMLDivElement;
+    private renderer: WebGLRenderer
+    private scene_container: HTMLDivElement
+    private camera: PerspectiveCamera
+    private thumbnail_renderer: WebGLRenderer
+
+    // copy to remove updateables from scene loop
+    private _orbitControls: OrbitControls | null
 
     loop: Loop;
-    currentLoader: BVH_loader | FBX_Loader | NPY_loader | null;
-    currentPlayer: BVH_Player | FBX_Player | NPY_Player | null;
 
-    constructor(container: HTMLDivElement)
+    constructor(scene_container: HTMLDivElement)
     {
-        this.currentLoader = null;
-        this.currentPlayer = null;
-        this.camera = createCamera();
-        this.renderer = createRenderer();
-        this.scene = createScene();
-        this.loop = new Loop(this.camera, this.scene, this.renderer);
-        this.container = container;
-        this.container.append(this.renderer.domElement);
+        this.npy_player = null
+        this.npy_loader = null
 
-        const orbitControls = createOrbitControls(this.camera, this.renderer);
-        this.loop.updatables.push(orbitControls);
-        const resizer = new Resizer(container, this.camera, this.renderer);
+        this.bvh_loader = null
+        this.bvh_player = null
 
+        this.fbx_player = null
+        this.fbx_loader = null
 
-        this.previewRenderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
-        this.previewRenderer.setSize(260, 190, false);
+        this.camera = createCamera()
+        this.renderer = createRenderer()
+        this.scene = createScene()
+        this.loop = new Loop(this.camera, this.scene, this.renderer)
+        this.scene_container = scene_container
+        this.scene_container.append(this.renderer.domElement)
+
+        const orbitControls = createOrbitControls(this.camera, this.renderer)
+        this._orbitControls = orbitControls
+        this.loop.updatables.push(orbitControls)
+        const resizer = new Resizer(scene_container, this.camera, this.renderer)
+
+        this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true })
+        this.thumbnail_renderer.setSize(260, 190, false)
     }
 
-    start()
+    start_engine_cycle()
     {
         this.loop.start();
     }
 
-    stop()
+    stop_engine_cycle()
     {
         this.loop.stop();
     }
 
-    async load_motionfile_and_player(filename: string)
+    async load_motionfile_and_player(filename: string | null)
     {
-        const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
-        const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
+        if (!filename) 
+        {
+            console.log("no motion file selected")
+            return
+        }
+        const file_extension = filename.split('.').pop()?.toLowerCase() ?? ''
+        const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`
         switch (file_extension) 
         {
             case 'bvh':
-                this.currentLoader = new BVH_loader(this.scene);
-                await this.currentLoader.load_bvh_motion(fileUrl);
-                this.currentPlayer = new BVH_Player(this.currentLoader, this.loop);
-                break;
+                this.bvh_loader = new BVH_loader(this.scene)
+                await this.bvh_loader.load_bvh_motion(fileUrl)
+                this.bvh_player = new BVH_Player(this.bvh_loader)
+                this.loop.updatables.push(this.bvh_player.bvh_player_object)
+                break
 
             case 'fbx':
-                this.currentLoader = new FBX_Loader(this.scene);
-                await this.currentLoader.load_fbx_animation(fileUrl);
-                this.currentPlayer = new FBX_Player(this.currentLoader, this.loop);
-                break;
+                this.fbx_loader = new FBX_Loader(this.scene)
+                await this.fbx_loader.load_fbx_animation(fileUrl)
+                this.fbx_player = new FBX_Player(this.fbx_loader)
+                this.loop.updatables.push(this.fbx_player.fbx_player_object)
+                break
 
             case 'npy':
-                this.currentLoader = new NPY_loader(this.scene);
-                await this.currentLoader.load_npy_animation(fileUrl);
+                this.npy_loader = new NPY_loader(this.scene)
+                await this.npy_loader.load_npy_animation(fileUrl)
 
-            
                 const skeletonPath = fileUrl
                 .replace("/npy/", "/json/")
-                .replace(".npy", "_skeleton.json");
-                await this.currentLoader.create_skeleton(skeletonPath);
-                this.currentPlayer = new NPY_Player(this.currentLoader, this.loop);
-                break;
+                .replace(".npy", "_skeleton.json")
+                await this.npy_loader.create_skeleton(skeletonPath)
+                this.npy_player = new NPY_Player(this.npy_loader)
+                this.loop.updatables.push(this.npy_player.npy_player_object)
+                break
         }
     }
 
-    async getThumbnailForFrame(frameIndex: number) 
+    get_current_player() : NPY_Player | BVH_Player | FBX_Player | null
     {
-        if (this.currentPlayer instanceof NPY_Player) 
-        {
-            return await this.currentPlayer.renderThumbnail(frameIndex, this.scene, this.camera, 260, 190, this.previewRenderer);
-        }
-        return null;
+        if (this.npy_player)
+            return this.npy_player
+        else if(this.bvh_player)
+            return this.bvh_player
+        else if(this.fbx_player)
+            return this.fbx_player
+        return null
     }
 
-    async frame_range_change(min: number, max: number)
+    async get_thumbnail_for_frame(frame_index: number) 
     {
-        const timeline = document.getElementById('timeline-container_2');
-        const startframe_handle = document.getElementById("startframe_handle") as HTMLDivElement | null
-        const endframe_handle = document.getElementById("endframe_handle") as HTMLDivElement | null
-        const previewImg = document.getElementById("preview-img_2") as HTMLImageElement | null;
-        
+        if (this.npy_player)
+            return await this.npy_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        else if (this.fbx_player)
+            return await this.fbx_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        else if(this.bvh_player)
+            return await this.bvh_player.render_thumbnail(frame_index, this.scene, this.camera, 260, 190, this.thumbnail_renderer)
+        return null
+    }
 
-        if (this.currentPlayer instanceof NPY_Player) 
-        {
-            const thumbDataUrl = await this.currentPlayer.renderThumbnail(min, this.scene, this.camera, 260, 190, this.previewRenderer);
-            if (thumbDataUrl && previewImg)
-            {
-                previewImg.src = thumbDataUrl;
-            }
-        }
+    play_pause()
+    {
+        if (this.npy_player)
+            this.npy_player.play_pause()
+        else if(this.bvh_player)
+            this.bvh_player.play_pause()
+        else if(this.fbx_player)
+            this.fbx_player.play_pause()
+    }
 
+    stop()
+    {
+        if (this.npy_player)
+            this.npy_player.stop()
+        else if(this.bvh_player)
+            this.bvh_player.stop()
+        else if(this.fbx_player)
+            this.fbx_player.stop()
+    }
+
+    go_to_frame(frame_index: number)
+    {
+        if (this.npy_player)
+            this.npy_player.go_to_frame(frame_index)
+        else if(this.bvh_player)
+            this.bvh_player.go_to_frame(frame_index)
+        else if(this.fbx_player)
+            this.fbx_player.go_to_frame(frame_index)
     }
     
-    get_frame_count()
+    get_frame_count(): number
     {
-        if (this.currentPlayer instanceof NPY_Player)
-        {
-            return this.currentPlayer.frameCount   
-        }
+        if (this.npy_player)
+            return this.npy_player.get_frame_count()
+        else if(this.bvh_player)
+            return this.bvh_player.get_frame_count()
+        else if(this.fbx_player)
+            return this.fbx_player.get_frame_count()
         return 0;
     }
 
-
-
-    slider_preview_mouseleave()
+    get_frame_index()
     {
-        const slider = document.getElementById("frame-slider") as HTMLInputElement | null;
-        const preview = document.getElementById("preview-popup") as HTMLDivElement | null;
-        console.log("what")
+        if (this.npy_player)
+            return this.npy_player.get_frame_index()
+        else if(this.bvh_player)
+            return this.bvh_player.get_frame_index()
+        else if(this.fbx_player)
+            return this.fbx_player.get_frame_index()
+        return 0;
 
-        if (!slider || !preview) 
-        {
-            console.error("Slider or preview elements not found.");
-            return;
-        }
 
-        preview.style.display = "none";
     }
 
     print_scene_components()
     {
         if (!this.scene || !this.loop || !this.camera) 
         {
-            console.log("Scene, loop oder camera nicht bereit.");
+            console.log("Scene, loop oder camera nicht bereit.")
             return;  
         }
         Utils.print_scene_components(this.scene, this.loop, this.camera)
@@ -153,31 +200,42 @@ export class ThreeManager
 
     cleanup_scene()
     {
-        if (this.currentPlayer) 
-        {
-            this.currentLoader!.dispose();
-            this.currentPlayer.dispose();
 
-            this.currentPlayer = null;
-            this.currentLoader = null;
-        
-            const label = document.getElementById('frame-label') as HTMLDivElement | null;
-            const slider = document.getElementById('frame-slider')as HTMLInputElement | null;
-            slider!.value = '0';
-            label!.textContent = `Frame: 0 / 0`;
-            if (this.previewRenderer) 
-            {
-                this.previewRenderer.dispose();
-            }
+        this.loop.updatables = this.loop.updatables.filter( obj => obj === this._orbitControls)
+
+        if(this.npy_player)
+        {
+            this.npy_player.dispose()
+            this.npy_player = null
+            this.npy_loader?.dispose()
         }
+        else if(this.bvh_player)
+        {
+            this.bvh_player.dispose()
+            this.bvh_player = null
+            this.bvh_loader?.dispose()
+        }
+        else if(this.fbx_player)
+        {
+            this.fbx_player.dispose()
+            this.fbx_player = null
+            this.fbx_loader?.dispose()
+        }
+        
+        if (this.thumbnail_renderer) 
+        {
+            this.thumbnail_renderer.dispose()
+        }
+
     }
 
     dispose() 
     {
         // TODO: dispose other stuff too
-        this.stop();
-        this.renderer.dispose();
-        this.container.removeChild(this.renderer.domElement);
+        this.cleanup_scene()
+        this.stop_engine_cycle()
+        this.renderer.dispose()
+        this.scene_container.removeChild(this.renderer.domElement)
     }
 
 }

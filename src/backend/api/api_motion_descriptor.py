@@ -20,6 +20,6 @@ async def create_motion_config(config: MotionConfig):
     generator.save(Path.joinpath(workspacefolder, "data/descriptor_files/new_schema.json"))
 
     return {
-        "warning": "",
         "message": "config file created",
+        "warning": "",
     }

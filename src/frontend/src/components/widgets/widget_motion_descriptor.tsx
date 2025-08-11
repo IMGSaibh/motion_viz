@@ -1,89 +1,162 @@
+import Button from '@mui/material/Button';
+import SettingsIcon from '@mui/icons-material/Settings';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
 
-type MotionDescriptorProps = 
-{
+type Props = {
   motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
   motion_config_is_open: boolean;
-  motion_config_on_click: () => void;
-  motion_config_create_on_click: () => void;
+  motion_config_on_click: () => void; // Toggle open/close
+  motion_config_create_on_click: () => void; // Create descriptor
 };
 
-export function WidgetCreateDescriptorFile({ 
-  motion_config_reference, 
-  motion_config_is_open,
-  motion_config_on_click,
-  motion_config_create_on_click
-}: MotionDescriptorProps) 
-{
+export function WidgetMotionDescriptorBar(props: Props) {
   return (
-    <div id="motion-config-dropdown">
-      <button
-        id="motion-config-toggle"
-        onClick={motion_config_on_click}
-        style={{
-          display: "block",
-          borderRadius: motion_config_is_open ? "8px 8px 0 0" : "6px",
-        }}
-      >
-        Motion Config ⚙️ 
-      </button>
-      {motion_config_is_open && (
-        <div id="motion-config-panel">
-          <form id="motion-config-form" onSubmit={(e) => e.preventDefault()}>
-            <div className="config-row">
-              <label htmlFor="input_format">Format</label>
-              <input type="text" id="input_format" defaultValue="csv" ref={motion_config_reference.format} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_abbrev">Abbreviation</label>
-              <input type="text" id="input_abbrev" defaultValue="" ref={motion_config_reference.abbrev} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_scale">Scale</label>
-              <input type="number" id="input_scale" defaultValue="1" step="any" ref={motion_config_reference.scale} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_positions">Positions</label>
-              <input type="text" id="input_positions" defaultValue="absolute" ref={motion_config_reference.positions} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_rotations">Rotations</label>
-              <input type="text" id="input_rotations" defaultValue="none" ref={motion_config_reference.rotations} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_systemname">Systemname</label>
-              <input type="text" id="input_systemname" defaultValue="" ref={motion_config_reference.systemname} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_fps">FPS</label>
-              <input type="number" id="input_fps" defaultValue="30" min="1" max="1000" ref={motion_config_reference.fps} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_jointcount">Joint count</label>
-              <input type="number" id="input_jointcount" defaultValue="30" min="1" max="1000" ref={motion_config_reference.jointcount} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_coloffset">Col offset</label>
-              <input type="number" id="input_coloffset" defaultValue="0" min="0" ref={motion_config_reference.coloffset} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_colgap">Col gap</label>
-              <input type="number" id="input_colgap" defaultValue="0" min="0" ref={motion_config_reference.colgap} />
-            </div>
-            <div className="config-row">
-              <label htmlFor="input_dimsize">Dim size for position</label>
-              <input type="number" id="input_dimsize" defaultValue="3" min="1" max="10" ref={motion_config_reference.dimsize} />
-            </div>
+    <>
+      {/* Trigger Topbar */}
+      <Button onClick={props.motion_config_on_click} startIcon={<SettingsIcon />}>
+        Motion Config
+      </Button>
 
-            <button
-              type="button"
-              id="submit_motion_config"
-              onClick={motion_config_create_on_click}
-            >
+      {/* panel as Modal */}
+      <Dialog
+        open={props.motion_config_is_open}
+        onClose={props.motion_config_on_click}
+        fullWidth
+        maxWidth="md"
+        keepMounted // keeps contents/Refs mountet
+      >
+        <DialogTitle>Motion Configuration</DialogTitle>
+
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Format"
+                defaultValue="csv"
+                inputRef={props.motion_config_reference.format as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Abbreviation"
+                defaultValue=""
+                inputRef={props.motion_config_reference.abbrev as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Scale"
+                type="number"
+                defaultValue="1"
+                inputRef={props.motion_config_reference.scale as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Positions"
+                defaultValue="absolute"
+                inputRef={props.motion_config_reference.positions as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Rotations"
+                defaultValue="none"
+                inputRef={props.motion_config_reference.rotations as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Systemname"
+                defaultValue=""
+                inputRef={props.motion_config_reference.systemname as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="FPS"
+                type="number"
+                defaultValue="30"
+                inputRef={props.motion_config_reference.fps as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Joint count"
+                type="number"
+                defaultValue="30"
+                inputRef={props.motion_config_reference.jointcount as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Col offset"
+                type="number"
+                defaultValue="0"
+                inputRef={props.motion_config_reference.coloffset as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Col gap"
+                type="number"
+                defaultValue="0"
+                inputRef={props.motion_config_reference.colgap as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Dim size for position"
+                type="number"
+                defaultValue="3"
+                inputRef={props.motion_config_reference.dimsize as any}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+
+        <DialogActions>
+          <Stack direction="row" spacing={1}>
+            <Button onClick={props.motion_config_on_click}>Close</Button>
+            <Button onClick={props.motion_config_create_on_click} variant="contained">
               Create descriptor Json
-            </button>
-          </form>
-        </div>
-      )}
-    </div>
+            </Button>
+          </Stack>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

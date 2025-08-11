@@ -1,26 +1,24 @@
+import Button from '@mui/material/Button';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-type WidgetFileUploadProps = 
-{
-    file_dialog_reference: React.RefObject<HTMLInputElement | null>;
-    file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    file_dialog_on_click: () => void;
+type Props = {
+  file_dialog_reference: React.RefObject<HTMLInputElement | null>;
+  file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function WidgetFileUpload({ 
-    file_dialog_reference, 
-    file_dialog_on_change,
-    file_dialog_on_click 
-}: WidgetFileUploadProps) {
+export function WidgetFileUpload(props: Props) {
   return (
     <>
-      <button onClick={file_dialog_on_click}>Search for files</button>
-      <input
-        type="file"
-        ref={file_dialog_reference}
-        multiple
-        onChange={file_dialog_on_change}
-        style={{ display: "none" }}
-      />
+      <Button component="label" startIcon={<CloudUploadIcon />}>
+        Upload Files
+        <input
+          ref={props.file_dialog_reference}
+          type="file"
+          multiple
+          hidden
+          onChange={props.file_dialog_on_change}
+        />
+      </Button>
     </>
   );
 }

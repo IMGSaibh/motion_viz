@@ -1,11 +1,5 @@
-# import numpy as np
-# from pydantic import BaseModel
-# from typing import List, Optional
 from pathlib import Path
 from fastapi import APIRouter
-# from backend.motion_parser.pv_parser import PVParser
-# from backend.motion_parser.bvh_parser import BvhParser 
-# from backend.json_schema.JsonSchema import JSONGenerator, MotionConfig
 
 router = APIRouter()
 workspacefolder = Path.cwd()
@@ -30,15 +24,3 @@ async def list_motion_files():
         # "mvnx":[f.name for f in mvnx_dir.glob("*.mvnx")],
         "npy": [f.name for f in npy_dir.glob("*.npy")]
     }
-
-# TODO: remove cause we use life renderer
-# @router.post("/thumbnails")
-# async def upload_thumb(request: Request):
-
-#     thumbnails_dir = Path.joinpath(workspacefolder, "data/thumbnails/")
-#     thumbnails_dir.mkdir(parents=True, exist_ok=True)
-
-#     filename = request.headers.get("X-File-Name", "thumb.jpg")
-#     data = await request.body()
-#     (thumbnails_dir / filename).write_bytes(data)
-#     return {"ok": True}
