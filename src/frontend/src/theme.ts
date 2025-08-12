@@ -201,7 +201,27 @@ export const theme = createTheme({
           '&.Mui-active': {
             boxShadow: '0 0 0 8px rgba(69, 171, 69, 0.5)',
           },
+          // only first Thumb
+          '&[data-index="0"]': {
+            width: 10,
+            height: 24,
+            borderRadius: 0,
+            backgroundColor: theme.palette.text.primary,
+            border: '2px solid #45ab45',
+          },
+          // only second Thumb
+          '&[data-index="1"]': {
+            borderRadius: '50%',
+            backgroundColor: theme.palette.text.primary,
+          },
+          '&[data-index="2"]': {
+            width: 10,
+            height: 24,
+            borderRadius: 0,
+            backgroundColor: 'blue',
+          },
         }),
+
         valueLabel: ({ theme }) => ({
           color: theme.palette.text.primary,
           background: theme.palette.primary.main,
