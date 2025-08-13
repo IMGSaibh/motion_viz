@@ -11,13 +11,7 @@ export function WidgetFileUpload(props: Props) {
     <>
       <Button component="label" startIcon={<CloudUploadIcon />}>
         Upload Files
-        <input
-          ref={props.file_dialog_reference}
-          type="file"
-          multiple
-          hidden
-          onChange={props.file_dialog_on_change}
-        />
+        <input ref={props.file_dialog_reference} type="file" multiple hidden onChange={props.file_dialog_on_change} />
       </Button>
     </>
   );

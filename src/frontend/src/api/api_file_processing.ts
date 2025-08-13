@@ -1,7 +1,9 @@
-import axios from "axios";
+import { fetch_json, fetch_form } from './api_client';
 
-export type MotionDescriptorData = 
-{
+export type MotionFilesResponse = { bvh: string[]; fbx: string[]; npy: string[] };
+export type MotionFileItem = { type: 'bvh' | 'fbx' | 'npy'; name: string };
+
+export type MotionDescriptorData = {
   format: string;
   abbrev: string;
   scale: number;
@@ -15,38 +17,36 @@ export type MotionDescriptorData =
   dimsize: number;
 };
 
-export function api_file_processing() 
-{
-  async function upload_files(files: File[])
-  {
-    const formData = new FormData();
-    files.forEach(file => { formData.append("files", file);});
+export async function list_motion_files(opts?: { signal?: AbortSignal }): Promise<MotionFilesResponse> {
+  return fetch_json<MotionFilesResponse>('/api_list_files/list_files', { signal: opts?.signal });
+}
 
-    const response = await axios.post("http://localhost:8000/api_file_upload/upload", formData, 
-    {
-      headers: 
-      {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    return response;
-  }
+export async function uploadFiles(files: File[], opts?: { signal?: AbortSignal }) {
+  const form = new FormData();
+  files.forEach((f) => form.append('files', f));
+  return fetch_form<{ message?: string | number; warning?: string[] | string }>('/api_file_upload/upload', form, {
+    signal: opts?.signal,
+  });
+}
 
-  async function create_motion_descriptor(data: MotionDescriptorData) 
-  {
-    const response = await axios.post("http://localhost:8000/api_motion_descriptor/motion_descriptor", data);
-    return response;
-  }
+export async function createMotionDescriptor(data: MotionDescriptorData, opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message: string }>('/api_motion_descriptor/motion_descriptor', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    signal: opts?.signal,
+  });
+}
 
-  async function list_motion_files() 
-  {
-    const response = await axios.post("http://localhost:8000/api_list_files/list_files");
-    return response;
-  }
+export async function convertWithPoseViewer(opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message: string; warning?: string | string[] }>('/api_pose_viewer_conversion/convert_pv_style', {
+    method: 'POST',
+    signal: opts?.signal,
+  });
+}
 
-  return { 
-    upload_files: upload_files, 
-    create_motion_descriptor: create_motion_descriptor,
-    list_motion_files: list_motion_files
-  };
+export async function convertBvh(opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message: string; warning?: string | string[] }>(
+    '/api_motion_file_conversion/convert_bvh_to_npy',
+    { method: 'POST', signal: opts?.signal },
+  );
 }
