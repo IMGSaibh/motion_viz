@@ -1,9 +1,20 @@
-import { ThreeJSEngine } from '@/context_three_js';
 import { useRef, useEffect, useState } from 'react';
-import { WidgetPresenterSlider } from '../components/widget_presenter_slider';
+import { ThreeJSEngine } from '@/context_three_js';
+import { WidgetPresenterSlider } from '@/components/widget_presenter_slider';
 
 export function WidgetContainerSlider() {
-  const { three_js_mngr_reference, cleanup_scene, go_to_frame, stop, play_pause, frame_count } = ThreeJSEngine();
+  const {
+    frame_count,
+    current_frame,
+    go_to_frame,
+    stop,
+    play_pause,
+    cleanup_player,
+    cleanup_loop,
+    cleanup_thumbnail_render,
+    print_scene_components,
+    get_thumbnail_for_frame,
+  } = ThreeJSEngine();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
@@ -13,8 +24,9 @@ export function WidgetContainerSlider() {
   const [labelslider_thumbnail_css, set_label_slider_thumbnail_css] = useState<React.CSSProperties>({});
   const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
   const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
-
-  // Globale Keyboard-Shortcuts weiter nutzen – aber über Context-Engine
+  useEffect(() => {
+    set_std_slider_value(current_frame ?? 0);
+  }, [current_frame]);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') play_pause();
@@ -22,18 +34,24 @@ export function WidgetContainerSlider() {
         stop();
         go_to_frame(0);
         set_std_slider_value(0);
+        set_label_slider_range([0, 0]);
       }
       if (e.code === 'KeyR') {
-        cleanup_scene();
+        stop();
         set_label_slider_range([0, 0]);
         set_std_slider_value(0);
-        // set_frame_count(0);
+        cleanup_player();
+        cleanup_loop();
+        cleanup_thumbnail_render();
       }
-      if (e.code === 'KeyP') three_js_mngr_reference.current?.print_scene_components();
+      if (e.code === 'KeyP') print_scene_components();
     };
+
     window.addEventListener('keydown', handleKeyDown);
+    // set_std_slider_value(current_frame ?? 0);
+
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [three_js_mngr_reference, go_to_frame, play_pause, stop, frame_count]);
+  }, [go_to_frame, play_pause, stop, frame_count]);
 
   function handle_std_slider_on_mouse_move(e: React.MouseEvent) {
     const rect = std_slider_reference.current?.getBoundingClientRect();
@@ -42,15 +60,16 @@ export function WidgetContainerSlider() {
     percent = Math.max(0, Math.min(percent, 1));
     let slider_value = Math.round(percent * frame_count);
     slider_value = Math.max(0, Math.min(slider_value, frame_count - 1));
-    set_std_slider_thumbnail_css({
-      display: 'block',
-      left: (slider_value / frame_count) * rect.width,
-      position: 'absolute',
-      border: '1px solid #000000',
-      top: -220,
-      zIndex: 0,
-    });
-    three_js_mngr_reference.current?.get_thumbnail_for_frame(slider_value).then((dataUrl) => {
+
+    get_thumbnail_for_frame(slider_value).then((dataUrl) => {
+      set_std_slider_thumbnail_css({
+        display: 'block',
+        left: (slider_value / frame_count) * rect.width,
+        position: 'absolute',
+        border: '1px solid #000000',
+        top: -220,
+        zIndex: 0,
+      });
       set_std_slider_thumbnail(dataUrl);
     });
   }
@@ -79,9 +98,7 @@ export function WidgetContainerSlider() {
         top: -220,
         zIndex: 0,
       });
-      three_js_mngr_reference.current
-        ?.get_thumbnail_for_frame(value[active_idx])
-        .then((dataUrl) => set_label_slider_thumbnail(dataUrl));
+      get_thumbnail_for_frame(value[active_idx]).then((dataUrl) => set_label_slider_thumbnail(dataUrl));
     }
   }
 

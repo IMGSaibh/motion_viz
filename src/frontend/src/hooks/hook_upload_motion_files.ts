@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { uploadFiles } from '../api/api_file_processing';
 
-export function useUploadMotionFiles() {
+export function upload_motion_files() {
   const query_keys = {
     motionFiles: ['motion-files'] as const,
   };

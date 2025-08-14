@@ -1,22 +1,19 @@
 import { useRef, useState } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
 import { ThreeJSEngine } from '@/context_three_js';
-
 import { WidgetPresenterTopbar } from '@/components/widget_presenter_topbar';
 
+import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
-import { useUploadMotionFiles as upload_motion_files } from '@/hooks/hook_upload_motion_files';
-import { useCreateMotionDescriptor as create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
+import { upload_motion_files } from '@/hooks/hook_upload_motion_files';
+import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 
-import type { MotionDescriptorData } from '@/api/api_file_processing';
-
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-
 export function WidgetContainerTopbar() {
-  const { three_js_scene_reference, set_selected_motion } = ThreeJSEngine();
+  const { set_selected_motion, reload_motion_file } = ThreeJSEngine();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
 
@@ -93,6 +90,7 @@ export function WidgetContainerTopbar() {
 
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     set_selected_motion(e.target.value);
+    reload_motion_file(e.target.value);
   }
 
   async function handle_convert_with_pose_viewer() {
@@ -130,8 +128,6 @@ export function WidgetContainerTopbar() {
 
   return (
     <>
-      <div ref={three_js_scene_reference} id="scene-container" />
-
       <WidgetPresenterTopbar
         file_dialog_reference={file_dialog_reference}
         file_dialog_on_change={handle_file_dialog_on_change}

@@ -2,81 +2,103 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { ThreeManager } from '@/threeJS/three_js_manager';
 
 type ThreeContextShape = {
-  three_js_scene_reference: React.RefObject<HTMLDivElement | null>;
-  three_js_mngr_reference: React.RefObject<ThreeManager | null>;
+  threejs_scene_ref: React.RefObject<HTMLDivElement | null>;
+  threejs_mngr_ref: React.RefObject<ThreeManager | null>;
 
   selected_motion: string | null;
   set_selected_motion: (f: string | null) => void;
 
   frame_count: number;
+  current_frame: number;
   go_to_frame: (i: number) => void;
   play_pause: () => void;
   stop: () => void;
-  cleanup_scene: () => void;
-  reload_motion: (file: string) => Promise<void>;
+  reload_motion_file: (file: string) => Promise<void>;
+  cleanup_player: () => void;
+  cleanup_loop: () => void;
+  cleanup_thumbnail_render: () => void;
+  print_scene_components: () => void;
+  get_thumbnail_for_frame: (i: number) => Promise<string | null>;
 };
 
 const ThreeContext = createContext<ThreeContextShape | null>(null);
 
 export function ThreeProvider({ children }: { children: React.ReactNode }) {
-  const three_js_scene_reference = useRef<HTMLDivElement | null>(null);
-  const three_js_mngr_reference = useRef<ThreeManager | null>(null);
+  const threejs_scene_ref = useRef<HTMLDivElement | null>(null);
+  const threejs_mngr_ref = useRef<ThreeManager | null>(null);
   const [selected_motion, set_selected_motion] = useState<string | null>(null);
   const [frame_count, set_frame_count] = useState(0);
-
+  const [current_frame, set_current_frame] = useState(0);
   // start engine at App-Start
   useEffect(() => {
-    if (!three_js_scene_reference.current) return;
-    const three_manager = new ThreeManager(three_js_scene_reference.current);
-    three_js_mngr_reference.current = three_manager;
+    if (!threejs_scene_ref.current) return;
+    const three_manager = new ThreeManager(threejs_scene_ref.current);
+    threejs_mngr_ref.current = three_manager;
     three_manager.start_engine_cycle();
 
     return () => {
-      three_js_mngr_reference.current?.stop_engine_cycle?.();
-      three_js_mngr_reference.current?.dispose?.();
-      three_js_mngr_reference.current = null;
+      threejs_mngr_ref.current?.stop_engine_cycle?.();
+      threejs_mngr_ref.current?.dispose?.();
+      threejs_mngr_ref.current = null;
     };
   }, []);
 
   // Explizites Laden / Neu-Laden einer Datei (ohne Engine neu zu bauen)
-  const reload_motion = useCallback(async (file: string) => {
-    if (!three_js_mngr_reference.current) return; // Engine noch nicht bereit
+  const reload_motion_file = useCallback(async (file: string) => {
+    if (!threejs_mngr_ref.current) return; // Engine noch nicht bereit
 
     // Player/Scene aufräumen – bevorzugt gezielt den Player, Fallback: cleanup_scene
-    // three_js_mngr_reference.current.cleanup_player?.();
-    // three_js_mngr_reference.current.cleanup_loop?.();
-    // three_js_mngr_reference.current.cleanup_thumbnail_render?.();
+    threejs_mngr_ref.current.cleanup_player?.();
+    threejs_mngr_ref.current.cleanup_loop?.();
+    threejs_mngr_ref.current.cleanup_thumbnail_render?.();
 
-    await three_js_mngr_reference.current.load_motionfile_and_player(file);
+    await threejs_mngr_ref.current.load_motionfile_and_player(file);
 
-    const fc = three_js_mngr_reference.current.get_frame_count?.() ?? 0;
+    const fc = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
     set_frame_count(fc);
 
-    const player = three_js_mngr_reference.current.get_current_player?.();
-    player?.set_on_frame_changed_callback?.((_idx: number) => {
-      // Optional: hier globalen Current-Frame-State pflegen, falls nötig
-      console.log('Player:', player);
+    const player = threejs_mngr_ref.current.get_current_player?.();
+    player?.set_on_frame_changed_callback?.((idx: number) => {
+      set_current_frame(idx);
     });
   }, []);
-
-  const go_to_frame = useCallback((i: number) => three_js_mngr_reference.current?.go_to_frame?.(i), []);
-  const play_pause = useCallback(() => three_js_mngr_reference.current?.play_pause?.(), []);
-  const stop = useCallback(() => three_js_mngr_reference.current?.stop?.(), []);
-  const cleanup_scene = useCallback(() => three_js_mngr_reference.current?.cleanup_player?.(), []);
+  const get_thumbnail_for_frame = useCallback(
+    (i: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(i) ?? Promise.resolve(null),
+    [],
+  );
+  const go_to_frame = useCallback((i: number) => threejs_mngr_ref.current?.go_to_frame?.(i), []);
+  const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
+  const stop = useCallback(() => {
+    threejs_mngr_ref.current?.stop?.();
+    threejs_mngr_ref.current?.go_to_frame?.(0);
+    set_current_frame(0);
+    set_frame_count(0);
+  }, []);
+  const cleanup_player = useCallback(() => threejs_mngr_ref.current?.cleanup_player?.(), []);
+  const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
+  const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
+  const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
 
   return (
     <ThreeContext.Provider
       value={{
-        three_js_scene_reference,
-        three_js_mngr_reference,
+        threejs_scene_ref: threejs_scene_ref,
+        threejs_mngr_ref: threejs_mngr_ref,
+
         selected_motion,
         set_selected_motion,
+        reload_motion_file,
+
         frame_count,
+        current_frame,
         go_to_frame,
-        play_pause,
         stop,
-        reload_motion,
-        cleanup_scene,
+        play_pause,
+        cleanup_player,
+        cleanup_loop,
+        cleanup_thumbnail_render,
+        print_scene_components,
+        get_thumbnail_for_frame,
       }}
     >
       {children}
