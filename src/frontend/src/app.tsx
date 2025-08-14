@@ -1,10 +1,16 @@
+import { WidgetContainerSlider } from '@/containers/widget_container_slider';
+import { WidgetContainerTopbar } from '@/containers/widget_container_topbar';
+import { ThreeProvider } from '@/context_three_js';
+import ThreeJSScene from '@/threeJS/three_js_scene';
 
-import { WidgetContainer  } from "./containers/widget_container";
-export default function App() 
-{
+export default function App() {
   return (
     <>
-      <WidgetContainer />
+      <ThreeProvider>
+        <ThreeJSScene />
+        <WidgetContainerTopbar />
+        <WidgetContainerSlider />
+      </ThreeProvider>
     </>
   );
 }

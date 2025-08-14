@@ -4,7 +4,7 @@ import { convertBvh, convertWithPoseViewer } from '../api/api_file_processing';
 const query_keys = {
   motionFiles: ['motion-files'] as const,
 };
-export function useConvertWithPoseViewer() {
+export function convert_with_pose_viewer() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => convertWithPoseViewer(),
@@ -12,7 +12,7 @@ export function useConvertWithPoseViewer() {
   });
 }
 
-export function useConvertBvh() {
+export function convert_bvh() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => convertBvh(),

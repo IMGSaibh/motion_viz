@@ -17,8 +17,8 @@ async def convert_pv_style():
 
     if not mvnx_files:
         return {
-            "warning": "Found no pv-compatible files.",
             "message": "",
+            "warning": "no pose viewer compatible files found.",
         }
 
     for mvnx_file in mvnx_files:
@@ -30,6 +30,6 @@ async def convert_pv_style():
         pv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
 
     return {
-        "message": "pv-compatible files converted",
+        "message": "pose viewer compatible files converted",
         "warning": "",
     }

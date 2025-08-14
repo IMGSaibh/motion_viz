@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { list_motion_files, MotionFileItem } from '../api/api_file_processing';
 
-export function useMotionFiles(options?: { enabled?: boolean; staleTime?: number }) {
+export function select_motion_files(options?: { enabled?: boolean; staleTime?: number }) {
   const query_keys = {
     motionFiles: ['motion-files'] as const,
   };

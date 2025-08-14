@@ -181,9 +181,7 @@ export class ThreeManager {
     Utils.print_scene_components(this.scene, this.loop, this.camera);
   }
 
-  cleanup_scene() {
-    this.loop.updatables = this.loop.updatables.filter((obj) => obj === this._orbitControls);
-
+  cleanup_player() {
     if (this.npy_player) {
       this.npy_player.dispose();
       this.npy_player = null;
@@ -197,7 +195,12 @@ export class ThreeManager {
       this.fbx_player = null;
       this.fbx_loader?.dispose();
     }
+  }
 
+  cleanup_loop() {
+    this.loop.updatables = this.loop.updatables.filter((obj) => obj === this._orbitControls);
+  }
+  cleanup_thumbnail_render() {
     if (this.thumbnail_renderer) {
       this.thumbnail_renderer.dispose();
     }
@@ -205,7 +208,7 @@ export class ThreeManager {
 
   dispose() {
     // TODO: dispose other stuff too
-    this.cleanup_scene();
+    this.cleanup_player();
     this.stop_engine_cycle();
     this.renderer.dispose();
     this.scene_container.removeChild(this.renderer.domElement);

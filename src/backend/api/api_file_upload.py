@@ -40,7 +40,8 @@ async def upload(files: List[UploadFile] = File(...)):
         with open(target_path, "wb") as f:
             f.write(contents)
 
+    saved = len(files) - len(not_saved_files)
     return {
-        "message": f"{len(files) - len(not_saved_files)}",
-        "warning": ", ".join(not_saved_files)
+        "message": saved or "",
+        "warning": ", ".join(not_saved_files)  or ""
     }
