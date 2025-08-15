@@ -14,7 +14,7 @@ import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Utils from '@/threeJS/utils';
 
-export class ThreeManager {
+export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;
   private npy_player: NPY_Player | null;
 

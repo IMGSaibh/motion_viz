@@ -7,8 +7,8 @@ type Props = {
   std_slider_on_change: (e: Event, new_value: number) => void;
   std_slider_on_mouse_move: (e: React.MouseEvent<HTMLSpanElement>) => void;
   std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  std_slider_thumbnail_css: React.CSSProperties;
-  std_slider_thumbnail: string | null;
+  // std_slider_thumbnail_css: React.CSSProperties;
+  // std_slider_thumbnail: string | null;
 };
 
 export function WidgetStdSlider(props: Props) {
@@ -26,9 +26,9 @@ export function WidgetStdSlider(props: Props) {
         onMouseMove={props.std_slider_on_mouse_move}
         onMouseLeave={props.std_slider_on_mouse_leave}
       />
-      <div style={props.std_slider_thumbnail_css}>
+      {/* <div style={props.std_slider_thumbnail_css}>
         <img src={props.std_slider_thumbnail || undefined} />
-      </div>
+      </div> */}
     </>
   );
 }

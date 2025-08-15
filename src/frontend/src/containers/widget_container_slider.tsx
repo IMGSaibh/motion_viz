@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
-import { ThreeJSEngine } from '@/context_three_js';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { useThreeJSEngine } from '@/context_three_js_engine';
 import { WidgetPresenterSlider } from '@/components/widget_presenter_slider';
 
 export function WidgetContainerSlider() {
@@ -9,21 +9,20 @@ export function WidgetContainerSlider() {
     go_to_frame,
     stop,
     play_pause,
-    cleanup_player,
-    cleanup_loop,
-    cleanup_thumbnail_render,
     print_scene_components,
     get_thumbnail_for_frame,
-  } = ThreeJSEngine();
+    reset,
+  } = useThreeJSEngine();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
-  const [std_slider_thumbnail_css, set_std_slider_thumbnail_css] = useState<React.CSSProperties>({});
-  const [std_slider_thumbnail, set_std_slider_thumbnail] = useState<string | null>(null);
   const [std_slider_value, set_std_slider_value] = useState<number>(0);
-
-  const [labelslider_thumbnail_css, set_label_slider_thumbnail_css] = useState<React.CSSProperties>({});
-  const [labelslider_thumbnail, set_label_slider_thumbnail] = useState<string | null>(null);
   const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
+
+  // --- Thumbnail über DOM steuern (kein State-Thrash)
+  const hoverImgRef = useRef<HTMLImageElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const seqRef = useRef(0);
+
   useEffect(() => {
     set_std_slider_value(current_frame ?? 0);
   }, [current_frame]);
@@ -37,94 +36,149 @@ export function WidgetContainerSlider() {
         set_label_slider_range([0, 0]);
       }
       if (e.code === 'KeyR') {
-        stop();
-        set_label_slider_range([0, 0]);
+        go_to_frame(0);
+        reset();
         set_std_slider_value(0);
-        cleanup_player();
-        cleanup_loop();
-        cleanup_thumbnail_render();
+        set_label_slider_range([0, 0]);
       }
       if (e.code === 'KeyP') print_scene_components();
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    // set_std_slider_value(current_frame ?? 0);
 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [go_to_frame, play_pause, stop, frame_count]);
 
-  function handle_std_slider_on_mouse_move(e: React.MouseEvent) {
-    const rect = std_slider_reference.current?.getBoundingClientRect();
-    if (!rect || !frame_count) return;
-    let percent = (e.clientX - rect.left) / rect.width;
-    percent = Math.max(0, Math.min(percent, 1));
-    let slider_value = Math.round(percent * frame_count);
-    slider_value = Math.max(0, Math.min(slider_value, frame_count - 1));
+  // --- Hover Thumbnail ohne State-Thrash, mit rAF + Stale-Guard
+  const update_preview_thumbnail = useCallback(
+    (clientX: number) => {
+      const rect = std_slider_reference.current?.getBoundingClientRect();
+      if (!rect || !frame_count || frame_count < 2) return;
 
-    get_thumbnail_for_frame(slider_value).then((dataUrl) => {
-      set_std_slider_thumbnail_css({
-        display: 'block',
-        left: (slider_value / frame_count) * rect.width,
-        position: 'absolute',
-        border: '1px solid #000000',
-        top: -220,
-        zIndex: 0,
+      const pct = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+      const idx = Math.round(pct * (frame_count - 1)); // (frame_count-1) für korrekte Endposition. :contentReference[oaicite:2]{index=2}
+
+      // DOM-Position direkt setzen
+      if (hoverImgRef.current) {
+        const x = pct * rect.width;
+        hoverImgRef.current.style.display = 'block';
+        hoverImgRef.current.style.position = 'absolute';
+        hoverImgRef.current.style.left = `${x}px`;
+        hoverImgRef.current.style.top = `650px`;
+        hoverImgRef.current.style.zIndex = '0';
+        hoverImgRef.current.style.border = '1px solid #000';
+      }
+
+      const mySeq = ++seqRef.current;
+      get_thumbnail_for_frame(idx).then((dataUrl) => {
+        if (seqRef.current !== mySeq) return;
+        if (hoverImgRef.current && dataUrl) hoverImgRef.current.src = dataUrl;
       });
-      set_std_slider_thumbnail(dataUrl);
-    });
-  }
+    },
+    [frame_count, get_thumbnail_for_frame],
+  );
 
-  function handle_std_slider_on_mouse_leave() {
-    set_std_slider_thumbnail_css({ display: 'none' });
-    set_std_slider_thumbnail(null);
-  }
+  const handle_std_slider_on_mouse_move = useCallback(
+    (e: React.MouseEvent) => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => update_preview_thumbnail(e.clientX));
+    },
+    [update_preview_thumbnail],
+  );
 
-  function handle_std_slider_on_change(_e: Event, value: number) {
-    stop();
-    go_to_frame(value);
-    set_std_slider_value(value);
-  }
-
-  function handle_label_slider_on_change(_e: Event, value: number | number[], active_idx: number) {
-    const rect = std_slider_reference.current?.getBoundingClientRect();
-    if (!rect || !frame_count) return;
-    if (Array.isArray(value) && value.length === 2) {
-      set_label_slider_range([value[0], value[1]]);
-      set_label_slider_thumbnail_css({
-        display: 'block',
-        left: (value[active_idx] / frame_count) * rect.width,
-        position: 'absolute',
-        border: '1px solid #000000',
-        top: -220,
-        zIndex: 0,
-      });
-      get_thumbnail_for_frame(value[active_idx]).then((dataUrl) => set_label_slider_thumbnail(dataUrl));
+  const handle_std_slider_on_mouse_leave = useCallback(() => {
+    if (hoverImgRef.current) {
+      hoverImgRef.current.style.display = 'none';
+      hoverImgRef.current.removeAttribute('src');
     }
-  }
+    seqRef.current++;
+  }, []);
 
-  function handle_label_slider_on_mouse_leave() {
-    set_label_slider_thumbnail_css({ display: 'none' });
-    set_label_slider_thumbnail(null);
-  }
+  const handle_std_slider_on_change = useCallback(
+    (_e: Event, value: number) => {
+      stop();
+      go_to_frame(value);
+      set_std_slider_value(value);
+    },
+    [stop, go_to_frame],
+  );
 
+  const handle_label_slider_on_change = useCallback(
+    (_e: Event, value: number | number[], active_idx: number) => {
+      const rect = std_slider_reference.current?.getBoundingClientRect();
+      if (!rect || !frame_count) return;
+
+      if (Array.isArray(value) && value.length === 2) {
+        set_label_slider_range([value[0], value[1]]);
+        const idx = value[active_idx];
+        const pct = frame_count > 1 ? idx / (frame_count - 1) : 0;
+        const x = pct * rect.width;
+
+        if (hoverImgRef.current) {
+          hoverImgRef.current.style.display = 'block';
+          hoverImgRef.current.style.position = 'absolute';
+          hoverImgRef.current.style.left = `${x}px`;
+          hoverImgRef.current.style.top = `650px`;
+          hoverImgRef.current.style.zIndex = '0';
+          hoverImgRef.current.style.border = '1px solid #000';
+        }
+
+        const mySeq = ++seqRef.current;
+        get_thumbnail_for_frame(idx).then((dataUrl) => {
+          if (seqRef.current !== mySeq) return;
+          if (hoverImgRef.current && dataUrl) hoverImgRef.current.src = dataUrl;
+        });
+      }
+    },
+    [frame_count, get_thumbnail_for_frame],
+  );
+
+  const handle_label_slider_on_mouse_leave = useCallback(() => {
+    if (hoverImgRef.current) {
+      hoverImgRef.current.style.display = 'none';
+      hoverImgRef.current.removeAttribute('src');
+    }
+    seqRef.current++;
+  }, []);
+
+  const stdProps = useMemo(
+    () => ({
+      std_slider_value,
+      std_slider_framecount: frame_count,
+      std_slider_reference,
+      std_slider_on_change: handle_std_slider_on_change,
+      std_slider_on_mouse_move: handle_std_slider_on_mouse_move,
+      std_slider_on_mouse_leave: handle_std_slider_on_mouse_leave,
+    }),
+    [
+      std_slider_value,
+      frame_count,
+      handle_std_slider_on_change,
+      handle_std_slider_on_mouse_move,
+      handle_std_slider_on_mouse_leave,
+    ],
+  );
+
+  const rangeProps = useMemo(
+    () => ({
+      label_slider_value: label_slider_range,
+      label_slider_framecount: frame_count,
+      label_slider_on_change: handle_label_slider_on_change,
+      label_slider_on_mouse_leave: handle_label_slider_on_mouse_leave,
+    }),
+    [label_slider_range, frame_count, handle_label_slider_on_change, handle_label_slider_on_mouse_leave],
+  );
+
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
   return (
     <>
-      <WidgetPresenterSlider
-        std_slider_value={std_slider_value}
-        std_slider_framecount={frame_count}
-        std_slider_reference={std_slider_reference}
-        std_slider_on_change={handle_std_slider_on_change}
-        std_slider_on_mouse_move={handle_std_slider_on_mouse_move}
-        std_slider_on_mouse_leave={handle_std_slider_on_mouse_leave}
-        std_slider_thumbnail_css={std_slider_thumbnail_css}
-        std_slider_thumbnail={std_slider_thumbnail}
-        label_slider_value={label_slider_range}
-        label_slider_framecount={frame_count}
-        label_slider_on_change={handle_label_slider_on_change}
-        label_slider_on_mouse_leave={handle_label_slider_on_mouse_leave}
-        label_slider_thumbnail_css={labelslider_thumbnail_css}
-        label_slider_thumbnail={labelslider_thumbnail}
-      />
+      <WidgetPresenterSlider {...stdProps} {...rangeProps} />
+      <img ref={hoverImgRef} alt="" />
     </>
   );
 }

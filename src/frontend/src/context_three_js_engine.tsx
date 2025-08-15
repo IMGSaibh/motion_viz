@@ -1,16 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { ThreeManager } from '@/threeJS/three_js_manager';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ThreeJSEngine } from '@/threeJS/three_js_manager';
 
-type ThreeContextShape = {
+type ThreeJSEngineContext = {
   threejs_scene_ref: React.RefObject<HTMLDivElement | null>;
-  threejs_mngr_ref: React.RefObject<ThreeManager | null>;
 
   selected_motion: string | null;
-  set_selected_motion: (f: string | null) => void;
+  set_selected_motion: (file: string | null) => void;
 
   frame_count: number;
   current_frame: number;
-  go_to_frame: (i: number) => void;
+  go_to_frame: (frame_idx: number) => void;
   play_pause: () => void;
   stop: () => void;
   reload_motion_file: (file: string) => Promise<void>;
@@ -19,20 +18,22 @@ type ThreeContextShape = {
   cleanup_thumbnail_render: () => void;
   print_scene_components: () => void;
   get_thumbnail_for_frame: (i: number) => Promise<string | null>;
+  reset: () => void;
 };
 
-const ThreeContext = createContext<ThreeContextShape | null>(null);
+const three_js_engine_context = createContext<ThreeJSEngineContext | null>(null);
 
-export function ThreeProvider({ children }: { children: React.ReactNode }) {
+export function ThreeJSEngineProvider({ children }: { children: React.ReactNode }) {
   const threejs_scene_ref = useRef<HTMLDivElement | null>(null);
-  const threejs_mngr_ref = useRef<ThreeManager | null>(null);
+  const threejs_mngr_ref = useRef<ThreeJSEngine | null>(null);
   const [selected_motion, set_selected_motion] = useState<string | null>(null);
   const [frame_count, set_frame_count] = useState(0);
   const [current_frame, set_current_frame] = useState(0);
+
   // start engine at App-Start
   useEffect(() => {
     if (!threejs_scene_ref.current) return;
-    const three_manager = new ThreeManager(threejs_scene_ref.current);
+    const three_manager = new ThreeJSEngine(threejs_scene_ref.current);
     threejs_mngr_ref.current = three_manager;
     three_manager.start_engine_cycle();
 
@@ -43,71 +44,95 @@ export function ThreeProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Explizites Laden / Neu-Laden einer Datei (ohne Engine neu zu bauen)
   const reload_motion_file = useCallback(async (file: string) => {
-    if (!threejs_mngr_ref.current) return; // Engine noch nicht bereit
+    if (!threejs_mngr_ref.current) return; // Engine not ready
 
-    // Player/Scene aufräumen – bevorzugt gezielt den Player, Fallback: cleanup_scene
     threejs_mngr_ref.current.cleanup_player?.();
     threejs_mngr_ref.current.cleanup_loop?.();
     threejs_mngr_ref.current.cleanup_thumbnail_render?.();
 
     await threejs_mngr_ref.current.load_motionfile_and_player(file);
 
-    const fc = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
-    set_frame_count(fc);
+    const framecount = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
+    set_frame_count(framecount);
 
     const player = threejs_mngr_ref.current.get_current_player?.();
     player?.set_on_frame_changed_callback?.((idx: number) => {
       set_current_frame(idx);
     });
   }, []);
+
   const get_thumbnail_for_frame = useCallback(
-    (i: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(i) ?? Promise.resolve(null),
+    (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
   );
-  const go_to_frame = useCallback((i: number) => threejs_mngr_ref.current?.go_to_frame?.(i), []);
+  const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
   const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
   const stop = useCallback(() => {
     threejs_mngr_ref.current?.stop?.();
     threejs_mngr_ref.current?.go_to_frame?.(0);
     set_current_frame(0);
-    set_frame_count(0);
   }, []);
+
   const cleanup_player = useCallback(() => threejs_mngr_ref.current?.cleanup_player?.(), []);
   const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
 
-  return (
-    <ThreeContext.Provider
-      value={{
-        threejs_scene_ref: threejs_scene_ref,
-        threejs_mngr_ref: threejs_mngr_ref,
+  const reset = useCallback(() => {
+    threejs_mngr_ref.current?.stop?.();
+    threejs_mngr_ref.current?.go_to_frame?.(0);
+    set_current_frame(0);
+    set_frame_count(0);
+    threejs_mngr_ref.current?.cleanup_player?.();
+    threejs_mngr_ref.current?.cleanup_loop?.();
+    threejs_mngr_ref.current?.cleanup_thumbnail_render?.();
+  }, []);
 
-        selected_motion,
-        set_selected_motion,
-        reload_motion_file,
+  const value = useMemo<ThreeJSEngineContext>(
+    () => ({
+      threejs_scene_ref,
 
-        frame_count,
-        current_frame,
-        go_to_frame,
-        stop,
-        play_pause,
-        cleanup_player,
-        cleanup_loop,
-        cleanup_thumbnail_render,
-        print_scene_components,
-        get_thumbnail_for_frame,
-      }}
-    >
-      {children}
-    </ThreeContext.Provider>
+      selected_motion,
+      set_selected_motion,
+
+      frame_count,
+      current_frame,
+
+      reload_motion_file,
+      go_to_frame,
+      play_pause,
+      stop,
+
+      cleanup_player,
+      cleanup_loop,
+      cleanup_thumbnail_render,
+      print_scene_components,
+      get_thumbnail_for_frame,
+      reset,
+    }),
+    [
+      selected_motion,
+      frame_count,
+      current_frame,
+      reload_motion_file,
+      go_to_frame,
+      play_pause,
+      stop,
+      cleanup_player,
+      cleanup_loop,
+      cleanup_thumbnail_render,
+      print_scene_components,
+      get_thumbnail_for_frame,
+      reset,
+    ],
   );
+
+  return <three_js_engine_context.Provider value={value}>{children}</three_js_engine_context.Provider>;
 }
 
-export const ThreeJSEngine = () => {
-  const ctx = useContext(ThreeContext);
+export const useThreeJSEngine = () => {
+  const ctx = useContext(three_js_engine_context);
   if (!ctx) throw new Error('useThree must be used within a ThreeProvider');
   return ctx;
 };

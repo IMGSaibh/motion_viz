@@ -3,7 +3,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-import { ThreeJSEngine } from '@/context_three_js';
+import { useThreeJSEngine } from '@/context_three_js_engine';
 import { WidgetPresenterTopbar } from '@/components/widget_presenter_topbar';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
@@ -13,7 +13,7 @@ import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descri
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 
 export function WidgetContainerTopbar() {
-  const { set_selected_motion, reload_motion_file } = ThreeJSEngine();
+  const { set_selected_motion, reload_motion_file } = useThreeJSEngine();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
 
@@ -45,20 +45,23 @@ export function WidgetContainerTopbar() {
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  // ======================= Handlers =======================
+  // ======================= Handler =======================
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    const respond = await mutation_upload_files.mutateAsync(files);
-
-    const success = respond.message !== '' ? `${respond.message} Files Uploaded` : null;
-    const warning = respond.warning !== '' ? `${respond.warning} not supported` : null;
-
-    set_success_message(success);
-    set_warning_message(warning);
-    set_snackbar_open(Boolean(success || warning));
-
-    e.target.value = '';
+    try {
+      const respond = await mutation_upload_files.mutateAsync(files);
+      const success = respond.message !== '' ? `${respond.message} Files Uploaded` : null;
+      const warning = respond.warning !== '' ? `${respond.warning} not supported` : null;
+      set_success_message(success);
+      set_warning_message(warning);
+      set_snackbar_open(Boolean(success || warning));
+    } catch (err: any) {
+      set_warning_message(err?.message || 'Upload failed');
+      set_snackbar_open(true);
+    } finally {
+      e.target.value = '';
+    }
   }
 
   function handle_motion_config_on_click() {
@@ -94,25 +97,34 @@ export function WidgetContainerTopbar() {
   }
 
   async function handle_convert_with_pose_viewer() {
-    const respond = await mutation_convert_pv.mutateAsync();
+    try {
+      const respond = await mutation_convert_pv.mutateAsync();
+      const success = respond.message !== '' ? `${respond.message}` : null;
+      const warning = respond.warning !== '' ? `${respond.warning}` : null;
 
-    const success = respond.message !== '' ? `${respond.message}` : null;
-    const warning = respond.warning !== '' ? `${respond.warning}` : null;
-
-    set_success_message(success);
-    set_warning_message(warning);
-    set_snackbar_open(Boolean(success || warning));
+      set_success_message(success);
+      set_warning_message(warning);
+      set_snackbar_open(Boolean(success || warning));
+    } catch (error: any) {
+      set_warning_message(error?.message || 'Conversion failed');
+      set_snackbar_open(true);
+    }
   }
 
   async function handle_convert_motion_file() {
-    const respond = await mutation_convert_bvh.mutateAsync();
+    try {
+      const respond = await mutation_convert_bvh.mutateAsync();
 
-    const success = respond.message !== '' ? `${respond.message}` : null;
-    const warning = respond.warning !== '' ? `${respond.warning}` : null;
+      const success = respond.message !== '' ? `${respond.message}` : null;
+      const warning = respond.warning !== '' ? `${respond.warning}` : null;
 
-    set_success_message(success);
-    set_warning_message(warning);
-    set_snackbar_open(Boolean(success || warning));
+      set_success_message(success);
+      set_warning_message(warning);
+      set_snackbar_open(Boolean(success || warning));
+    } catch (error: any) {
+      set_warning_message(error?.message || 'Conversion failed');
+      set_snackbar_open(true);
+    }
   }
 
   async function handle_motion_file_list_on_focus() {

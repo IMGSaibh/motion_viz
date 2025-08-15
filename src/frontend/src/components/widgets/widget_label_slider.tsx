@@ -5,8 +5,8 @@ type Props = {
   label_slider_framecount: number;
   label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  label_slider_thumbnail_css: React.CSSProperties;
-  label_slider_thumbnail: string | null;
+  // label_slider_thumbnail_css: React.CSSProperties;
+  // label_slider_thumbnail: string | null;
 };
 
 export function WidgetLabelSlider(porps: Props) {
@@ -21,9 +21,9 @@ export function WidgetLabelSlider(porps: Props) {
         onChange={porps.label_slider_on_change}
         onMouseLeave={porps.label_slider_on_mouse_leave}
       />
-      <div style={porps.label_slider_thumbnail_css}>
+      {/* <div style={porps.label_slider_thumbnail_css}>
         <img src={porps.label_slider_thumbnail || undefined} />
-      </div>
+      </div> */}
     </>
   );
 }
