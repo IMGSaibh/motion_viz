@@ -1,5 +1,10 @@
 import { WidgetStdSlider } from './widgets/widget_std_slider';
 import { WidgetLabelSlider } from './widgets/widget_label_slider';
+import { SliderListEntry, WidgetSliderList } from './widgets/widget_slider_list';
+import { useRef, useState } from 'react';
+import { BottomSliderBar } from './widgets/widget_bottom_slider_bar';
+import { Box, Container, Paper, Typography } from '@mui/material';
+import { Label } from '@mui/icons-material';
 
 type Props = {
   std_slider_value: number;
@@ -11,6 +16,7 @@ type Props = {
 
   label_slider_value: [number, number];
   label_slider_framecount: number;
+  label_slider_reference: React.RefObject<HTMLSpanElement | null>;
   label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
 };
@@ -18,24 +24,26 @@ type Props = {
 export function WidgetPresenterSlider(props: Props) {
   return (
     <>
-      <div className="slider-overlay">
-        <div className="slider-widget">
-          <label htmlFor="slider-label">
-            FRAME: {props.label_slider_value} / {props.label_slider_framecount}
-          </label>
-          <WidgetLabelSlider
-            {...{
-              label_slider_value: props.label_slider_value,
-              label_slider_framecount: props.label_slider_framecount,
-              label_slider_on_change: props.label_slider_on_change,
-              label_slider_on_mouse_leave: props.label_slider_on_mouse_leave,
-            }}
-          />
-        </div>
-        <div className="slider-widget">
-          <label htmlFor="slider-label">
-            FRAME: {props.std_slider_value} / {props.std_slider_framecount}
-          </label>
+      <Box
+        sx={(theme) => ({
+          position: 'absolute',
+          left: '1vw',
+          right: '1vw',
+          bottom: '3vw',
+          zIndex: 0,
+          padding: '1rem',
+          bgcolor: theme.palette.background.paper,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          borderRadius: '0.5rem',
+        })}
+      >
+        {/* <Typography sx={{ whiteSpace: 'nowrap' }}>
+          FRAME: {props.label_slider_value} / {props.label_slider_framecount}
+        </Typography> */}
+
+        <div style={{ position: 'relative', flex: 1, minWidth: 0, height: 30 }}>
           <WidgetStdSlider
             {...{
               std_slider_value: props.std_slider_value,
@@ -46,8 +54,19 @@ export function WidgetPresenterSlider(props: Props) {
               std_slider_on_mouse_leave: props.std_slider_on_mouse_leave,
             }}
           />
+          <WidgetLabelSlider
+            {...{
+              label_slider_value: props.label_slider_value,
+              label_slider_framecount: props.label_slider_framecount,
+              label_slider_reference: props.label_slider_reference,
+              label_slider_on_change: props.label_slider_on_change,
+              label_slider_on_mouse_leave: props.label_slider_on_mouse_leave,
+            }}
+          />
         </div>
-      </div>
+
+        {/* Hier kannst du später noch Buttons, Dropdowns, Icons etc. ergänzen */}
+      </Box>
     </>
   );
 }

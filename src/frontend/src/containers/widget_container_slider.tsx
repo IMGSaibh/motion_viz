@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useThreeJSEngine } from '@/context_three_js_engine';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { WidgetPresenterSlider } from '@/components/widget_presenter_slider';
 
 export function WidgetContainerSlider() {
@@ -15,10 +15,11 @@ export function WidgetContainerSlider() {
   } = useThreeJSEngine();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
+  const label_slider_reference = useRef<HTMLSpanElement | null>(null);
   const [std_slider_value, set_std_slider_value] = useState<number>(0);
-  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 100]);
+  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 10]);
 
-  // --- Thumbnail über DOM steuern (kein State-Thrash)
+  // control thumbnail via DOM  (no State-Thrash)
   const hoverImgRef = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
@@ -26,6 +27,7 @@ export function WidgetContainerSlider() {
   useEffect(() => {
     set_std_slider_value(current_frame ?? 0);
   }, [current_frame]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') play_pause();
@@ -33,13 +35,13 @@ export function WidgetContainerSlider() {
         stop();
         go_to_frame(0);
         set_std_slider_value(0);
-        set_label_slider_range([0, 0]);
+        set_label_slider_range([0, 1]);
       }
       if (e.code === 'KeyR') {
         go_to_frame(0);
         reset();
         set_std_slider_value(0);
-        set_label_slider_range([0, 0]);
+        set_label_slider_range([0, 1]);
       }
       if (e.code === 'KeyP') print_scene_components();
     };
@@ -49,16 +51,16 @@ export function WidgetContainerSlider() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [go_to_frame, play_pause, stop, frame_count]);
 
-  // --- Hover Thumbnail ohne State-Thrash, mit rAF + Stale-Guard
+  // hover thumbnail without State-Thrash, with rAF + Stale-Guard
   const update_preview_thumbnail = useCallback(
     (clientX: number) => {
       const rect = std_slider_reference.current?.getBoundingClientRect();
       if (!rect || !frame_count || frame_count < 2) return;
 
       const pct = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
-      const idx = Math.round(pct * (frame_count - 1)); // (frame_count-1) für korrekte Endposition. :contentReference[oaicite:2]{index=2}
+      const idx = Math.round(pct * (frame_count - 1));
 
-      // DOM-Position direkt setzen
+      // set DOM-position
       if (hoverImgRef.current) {
         const x = pct * rect.width;
         hoverImgRef.current.style.display = 'block';
@@ -105,7 +107,7 @@ export function WidgetContainerSlider() {
 
   const handle_label_slider_on_change = useCallback(
     (_e: Event, value: number | number[], active_idx: number) => {
-      const rect = std_slider_reference.current?.getBoundingClientRect();
+      const rect = label_slider_reference.current?.getBoundingClientRect();
       if (!rect || !frame_count) return;
 
       if (Array.isArray(value) && value.length === 2) {
@@ -141,7 +143,7 @@ export function WidgetContainerSlider() {
     seqRef.current++;
   }, []);
 
-  const stdProps = useMemo(
+  const std_slider_props = useMemo(
     () => ({
       std_slider_value,
       std_slider_framecount: frame_count,
@@ -159,10 +161,11 @@ export function WidgetContainerSlider() {
     ],
   );
 
-  const rangeProps = useMemo(
+  const label_slider_props = useMemo(
     () => ({
       label_slider_value: label_slider_range,
       label_slider_framecount: frame_count,
+      label_slider_reference,
       label_slider_on_change: handle_label_slider_on_change,
       label_slider_on_mouse_leave: handle_label_slider_on_mouse_leave,
     }),
@@ -177,7 +180,7 @@ export function WidgetContainerSlider() {
   );
   return (
     <>
-      <WidgetPresenterSlider {...stdProps} {...rangeProps} />
+      <WidgetPresenterSlider {...label_slider_props} {...std_slider_props} />
       <img ref={hoverImgRef} alt="" />
     </>
   );

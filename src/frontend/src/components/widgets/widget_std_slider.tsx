@@ -1,5 +1,28 @@
+import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 
+const StdSlider = styled(Slider)(({ theme }) => ({
+  zIndex: 0,
+  color: 'transparent',
+  // height: 0,
+  '& .MuiSlider-track': {
+    backgroundColor: 'transparent',
+    border: 'none',
+  },
+  '& .MuiSlider-thumb': {
+    width: 4,
+    height: 24,
+    backgroundColor: theme.palette.secondary.main,
+    borderRadius: 0,
+    boxShadow: 'none',
+    outline: 'none',
+    transition: 'none',
+  },
+  '& .MuiSlider-valueLabel': {
+    background: theme.palette.secondary.main,
+    transform: 'translateY(-140%) scale(1)',
+  },
+}));
 type Props = {
   std_slider_value: number;
   std_slider_framecount: number;
@@ -7,28 +30,24 @@ type Props = {
   std_slider_on_change: (e: Event, new_value: number) => void;
   std_slider_on_mouse_move: (e: React.MouseEvent<HTMLSpanElement>) => void;
   std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
-  // std_slider_thumbnail_css: React.CSSProperties;
-  // std_slider_thumbnail: string | null;
 };
 
 export function WidgetStdSlider(props: Props) {
   return (
     <>
-      <Slider
+      <StdSlider
+        style={{ position: 'absolute', inset: 0 }}
         value={props.std_slider_value}
         min={0}
         max={props.std_slider_framecount}
         ref={props.std_slider_reference}
         step={1}
-        valueLabelDisplay="auto"
+        valueLabelDisplay="on"
         disableSwap={true}
-        onChange={props.std_slider_on_change}
+        // onChange={props.std_slider_on_change}
         onMouseMove={props.std_slider_on_mouse_move}
         onMouseLeave={props.std_slider_on_mouse_leave}
       />
-      {/* <div style={props.std_slider_thumbnail_css}>
-        <img src={props.std_slider_thumbnail || undefined} />
-      </div> */}
     </>
   );
 }
