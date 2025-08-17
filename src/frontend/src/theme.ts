@@ -156,57 +156,7 @@ export const theme = createTheme({
         }),
       },
     },
-    // ===== Slider: no animation; rail white; track green; thumb white/green =====
-    // MuiSlider: {
-    //   styleOverrides: {
-    //     root: { transition: 'none' },
-    //     rail: ({ theme }) => ({
-    //       color: theme.palette.text.primary,
-    //       opacity: 1,
-    //     }),
-    //     track: ({ theme }) => ({
-    //       color: theme.palette.primary.main,
-    //       transition: 'none',
-    //     }),
-    //     thumb: ({ theme }) => ({
-    //       backgroundColor: theme.palette.text.primary,
-    //       border: `2px solid ${theme.palette.primary.main}`,
-    //       transition: 'none',
-    //       '&:hover, &.Mui-focusVisible': {
-    //         boxShadow: '0 0 0 4px rgba(69, 171, 69, 0.3)',
-    //       },
-    //       '&.Mui-active': {
-    //         boxShadow: '0 0 0 8px rgba(69, 171, 69, 0.5)',
-    //       },
-    //       // only first Thumb
-    //       '&[data-index="0"]': {
-    //         width: 10,
-    //         height: 24,
-    //         borderRadius: 0,
-    //         backgroundColor: theme.palette.text.primary,
-    //         // border: '2px solid #1611b7ff',
-    //       },
-    //       // only second Thumb
-    //       '&[data-index="1"]': {
-    //         width: 10,
-    //         height: 24,
-    //         borderRadius: 0,
-    //         backgroundColor: 'red',
-    //       },
-    //       '&[data-index="2"]': {
-    //         width: 10,
-    //         height: 24,
-    //         borderRadius: 0,
-    //         backgroundColor: 'red',
-    //       },
-    //     }),
 
-    //     valueLabel: ({ theme }) => ({
-    //       color: theme.palette.text.primary,
-    //       background: theme.palette.primary.main,
-    //     }),
-    //   },
-    // },
     // ================ snackbar and alert for success and warning =====================
     MuiSnackbar: {
       styleOverrides: {
