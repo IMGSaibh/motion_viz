@@ -23,7 +23,7 @@ type Props = {
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
 
-export function WidgetPresenterTopbar(props: Props) {
+export function PresenterTopbar(props: Props) {
   return (
     <>
       {/* Menu: Topbar */}

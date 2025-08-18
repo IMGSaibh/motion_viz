@@ -1,5 +1,5 @@
-import { WidgetContainerSlider } from '@/containers/container_slider';
-import { WidgetContainerTopbar } from '@/containers/container_topbar';
+import { ContainerSlider } from '@/containers/container_slider';
+import { ContainerTopbar } from '@/containers/container_topbar';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import ThreeJSScene from '@/threeJS/three_js_scene';
 
@@ -8,8 +8,8 @@ export default function App() {
     <>
       <ThreeJSEngineProvider>
         <ThreeJSScene />
-        <WidgetContainerTopbar />
-        <WidgetContainerSlider />
+        <ContainerTopbar />
+        <ContainerSlider />
       </ThreeJSEngineProvider>
     </>
   );

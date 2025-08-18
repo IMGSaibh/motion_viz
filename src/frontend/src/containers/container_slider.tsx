@@ -1,8 +1,8 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { WidgetPresenterSlider } from '@/components/presenter/presenter_slider';
+import { PresenterSlider } from '@/components/presenter/presenter_slider';
 
-export function WidgetContainerSlider() {
+export function ContainerSlider() {
   const {
     frame_count,
     current_frame,
@@ -180,7 +180,7 @@ export function WidgetContainerSlider() {
   );
   return (
     <>
-      <WidgetPresenterSlider {...label_slider_props} {...std_slider_props} />
+      <PresenterSlider {...label_slider_props} {...std_slider_props} />
       <img ref={hoverImgRef} alt="" />
     </>
   );

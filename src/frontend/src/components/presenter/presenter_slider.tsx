@@ -57,7 +57,7 @@ type Props = {
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
 };
 
-export function WidgetPresenterSlider(props: Props) {
+export function PresenterSlider(props: Props) {
   const buttons: ImageBtn[] = [{ src: btn1 }, { src: btn2 }, { src: btn3 }, { src: btn4 }];
   const [items, setItems] = useState<SliderListEntry[]>(SLIDER_ITEMS);
   return (
@@ -81,7 +81,7 @@ export function WidgetPresenterSlider(props: Props) {
       </Typography> */}
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          {/* Overlay-Wrapper: Slider exakt übereinander */}
+          {/* overlay wrapper: sliders precisely on top of each other */}
           <Box
             sx={{
               position: 'relative',
@@ -140,7 +140,6 @@ export function WidgetPresenterSlider(props: Props) {
               </ButtonImages>
             ))}
           </Box>
-          {/* Slider list */}
           <WidgetSliderList items={items} />
         </Box>
       </Box>
