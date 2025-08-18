@@ -1,6 +1,6 @@
-import { useThreeJSEngine } from '@/context_three_js_engine';
+import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { WidgetPresenterSlider } from '@/components/widget_presenter_slider';
+import { WidgetPresenterSlider } from '@/components/presenter/presenter_slider';
 
 export function WidgetContainerSlider() {
   const {

@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
@@ -57,19 +57,46 @@ type Props = {
 };
 
 export function WidgetLabelSlider(props: Props) {
+  const theme = useTheme();
+  const [start, end] = props.label_slider_value;
+  const max = props.label_slider_framecount;
+  const leftPct = (start / max) * 100;
+  const widthPct = ((end - start) / max) * 100;
   return (
     <>
-      <LabelSlider
-        style={{ position: 'absolute', inset: 0, zIndex: 2 }}
-        value={props.label_slider_value}
-        min={0}
-        max={props.label_slider_framecount}
-        step={1}
-        valueLabelDisplay="on"
-        ref={props.label_slider_reference}
-        onChange={props.label_slider_on_change}
-        onMouseLeave={props.label_slider_on_mouse_leave}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <LabelSlider
+          style={{ inset: 0, zIndex: 2 }}
+          value={props.label_slider_value}
+          min={0}
+          max={props.label_slider_framecount}
+          step={1}
+          valueLabelDisplay="on"
+          ref={props.label_slider_reference}
+          onChange={props.label_slider_on_change}
+          onMouseLeave={props.label_slider_on_mouse_leave}
+        />
+        {/* Rechteck direkt unter dem Slider */}
+        <div
+          style={{
+            position: 'relative',
+            height: 10,
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              left: `${leftPct}%`,
+              width: `${widthPct}%`,
+              top: 0,
+              bottom: 0,
+              background: theme.palette.warning.main,
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 }

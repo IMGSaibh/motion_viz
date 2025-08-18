@@ -3,10 +3,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, Divider } from '@mui/material';
+import { Box, Button, Divider, IconButton } from '@mui/material';
 import { Fragment, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
+import ModeEditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -69,10 +71,6 @@ export function WidgetSliderList({ items, title = 'Label-Liste' }: Props) {
         endIcon={
           <ExpandMoreIcon sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }} />
         }
-        sx={{
-          width: '100%',
-          justifyContent: 'space-between',
-        }}
       >
         {title}
       </Button>
@@ -85,24 +83,29 @@ export function WidgetSliderList({ items, title = 'Label-Liste' }: Props) {
             borderRadius: 2,
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
-            maxHeight: 5 * 56, // scroll list >5 items
+            maxHeight: 5 * 56, // scroll list > 5 items
             overflowY: 'auto',
           }}
         >
           {items.map((it, i) => (
             <Fragment key={it.id}>
-              <ListItem
-                sx={{
-                  // Horizontal-Layout: links Text, rechts Slider
-                  display: 'grid',
-                  gridTemplateColumns: 'minmax(180px,auto) 1fr',
-                  alignItems: 'center',
-                }}
-              >
-                <ListItemText primary={it.label} secondary={`Frame: ${it.value[0]} – ${it.value[1]}`} />
+              <ListItem>
+                <ListItemText
+                  primary={it.label}
+                  secondary={`Frame: ${it.value[0]} – ${it.value[1]}`}
+                  sx={{ flexShrink: 0 }}
+                />
 
-                <Box sx={{ pointerEvents: 'none' }}>
+                <Box sx={{ pointerEvents: 'none', width: '100%', ml: 10, mr: 6 }}>
                   <LabelSliderTemplate value={it.value} max={999} />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>
+                    <ModeEditIcon fontSize="small" />
+                  </IconButton>
                 </Box>
               </ListItem>
 

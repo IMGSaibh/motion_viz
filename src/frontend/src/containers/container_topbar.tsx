@@ -3,8 +3,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-import { useThreeJSEngine } from '@/context_three_js_engine';
-import { WidgetPresenterTopbar } from '@/components/widget_presenter_topbar';
+import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { WidgetPresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';

@@ -1,13 +1,13 @@
-import { WidgetStdSlider } from './widgets/widget_std_slider';
-import { WidgetLabelSlider } from './widgets/widget_label_slider';
-import { SliderListEntry, WidgetSliderList } from './widgets/widget_slider_list';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Box, ButtonBase, Typography } from '@mui/material';
+import { WidgetStdSlider } from '../widgets/widget_std_slider';
+import { WidgetLabelSlider } from '../widgets/widget_label_slider';
+import { SliderListEntry, WidgetSliderList } from '../widgets/widget_slider_list';
+import { styled } from '@mui/material/styles';
 import btn1 from '@/Assets/Label_1.png';
 import btn2 from '@/Assets/Label_2.png';
 import btn3 from '@/Assets/Label_3.png';
 import btn4 from '@/Assets/Label_4.png';
-import { styled } from '@mui/material/styles';
 
 export const SLIDER_ITEMS: SliderListEntry[] = [
   { id: '1', label: 'Label_1', value: [10, 48] },
@@ -37,7 +37,7 @@ const ButtonImages = styled(ButtonBase)(({ theme }) => ({
   color: theme.palette.primary.main,
   '& .MuiTouchRipple-root': { zIndex: 4 },
   '& .MuiTouchRipple-child': {
-    backgroundColor: 'currentColor', // Ripple-Farbe = 'color'
+    backgroundColor: 'currentColor',
     opacity: 1,
   },
 }));
@@ -59,7 +59,6 @@ type Props = {
 
 export function WidgetPresenterSlider(props: Props) {
   const buttons: ImageBtn[] = [{ src: btn1 }, { src: btn2 }, { src: btn3 }, { src: btn4 }];
-  // const buttons: ImageBtn[] = [];
   const [items, setItems] = useState<SliderListEntry[]>(SLIDER_ITEMS);
   return (
     <>
@@ -83,7 +82,15 @@ export function WidgetPresenterSlider(props: Props) {
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {/* Overlay-Wrapper: Slider exakt übereinander */}
-          <Box sx={{ position: 'relative', height: 56 }}>
+          <Box
+            sx={{
+              position: 'relative',
+              height: 56,
+              bgcolor: 'background.paper',
+              mb: '1vw',
+              borderRadius: 2,
+            }}
+          >
             <WidgetStdSlider
               {...{
                 std_slider_value: props.std_slider_value,
@@ -108,12 +115,13 @@ export function WidgetPresenterSlider(props: Props) {
           <Box
             sx={(theme) => ({
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 128px)',
+              gridTemplateColumns: 'repeat(4, 64px)',
               gap: 2,
               width: '100%',
               bgcolor: theme.palette.background.paper,
-              p: '15px',
+              p: '0.75vw',
               borderRadius: 2,
+              mb: '1vw',
             })}
           >
             {buttons.slice(0, 4).map((button_lm, i) => (
@@ -123,7 +131,6 @@ export function WidgetPresenterSlider(props: Props) {
                     position: 'absolute',
                     inset: 0,
                     zIndex: 0,
-                    // pointerEvents: 'none', // lässt Klicks/Ripple durch
                     backgroundImage: `url(${button_lm.src})`,
                     backgroundColor: 'white',
                     backgroundSize: 'cover',
@@ -134,13 +141,7 @@ export function WidgetPresenterSlider(props: Props) {
             ))}
           </Box>
           {/* Slider list */}
-          <Box
-            sx={(theme) => ({
-              mt: '1vw',
-            })}
-          >
-            <WidgetSliderList items={items} />
-          </Box>
+          <WidgetSliderList items={items} />
         </Box>
       </Box>
     </>
