@@ -1,6 +1,7 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
+import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 
 export function ContainerSlider() {
   const {
@@ -181,6 +182,7 @@ export function ContainerSlider() {
   return (
     <>
       <PresenterSlider {...label_slider_props} {...std_slider_props} />
+      <PresenterLabelButtons></PresenterLabelButtons>
       <img ref={hoverImgRef} alt="" />
     </>
   );

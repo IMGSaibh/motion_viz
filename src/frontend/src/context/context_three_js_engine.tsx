@@ -133,6 +133,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
 
 export const useThreeJSEngine = () => {
   const ctx = useContext(three_js_engine_context);
-  if (!ctx) throw new Error('useThree must be used within a ThreeProvider');
+  if (!ctx) throw new Error('useThreeJSEngine must be used within a ThreeJSEngineProvider');
   return ctx;
 };

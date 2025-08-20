@@ -76,7 +76,7 @@ export function WidgetLabelSlider(props: Props) {
           onChange={props.label_slider_on_change}
           onMouseLeave={props.label_slider_on_mouse_leave}
         />
-        {/* Rechteck direkt unter dem Slider */}
+        {/* label rectangle under slider */}
         <div
           style={{
             position: 'relative',

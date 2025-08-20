@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { SliderListEntry } from '../presenter/presenter_slider_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -49,20 +50,13 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
     borderBottom: '4px solid white',
   },
 }));
-export type SliderListEntry = {
-  id: string;
-  label: string;
-  value: [number, number];
-};
 
 type Props = {
-  items: SliderListEntry[];
-  title?: string;
+  items?: SliderListEntry[];
 };
 
-export function WidgetSliderList({ items, title = 'Label-Liste' }: Props) {
+export function WidgetSliderList({ items = [] }: Props) {
   const [open, setOpen] = useState<boolean>(true);
-
   return (
     <Box sx={{ width: '100%' }}>
       {/* Dropdown-Header */}
@@ -72,7 +66,7 @@ export function WidgetSliderList({ items, title = 'Label-Liste' }: Props) {
           <ExpandMoreIcon sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }} />
         }
       >
-        {title}
+        {'Label-Liste'}
       </Button>
 
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -87,17 +81,17 @@ export function WidgetSliderList({ items, title = 'Label-Liste' }: Props) {
             overflowY: 'auto',
           }}
         >
-          {items.map((it, i) => (
-            <Fragment key={it.id}>
+          {items.map((slider_item, i) => (
+            <Fragment key={slider_item.id}>
               <ListItem>
                 <ListItemText
-                  primary={it.label}
-                  secondary={`Frame: ${it.value[0]} – ${it.value[1]}`}
+                  primary={slider_item.label}
+                  secondary={`Frame: ${slider_item.value[0]} – ${slider_item.value[1]}`}
                   sx={{ flexShrink: 0 }}
                 />
 
                 <Box sx={{ pointerEvents: 'none', width: '100%', ml: 10, mr: 6 }}>
-                  <LabelSliderTemplate value={it.value} max={999} />
+                  <LabelSliderTemplate value={slider_item.value} min={0} max={slider_item.framecount} />
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>

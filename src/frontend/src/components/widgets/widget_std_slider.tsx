@@ -22,6 +22,14 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     background: theme.palette.secondary.main,
     transform: 'translateY(-140%) scale(1)',
   },
+  // '&:hover, &.Mui-focusVisible, &.Mui-active': {
+  //   boxShadow: 'none',
+  //   outline: 'none',
+  // },
+  // '&::before, &::after': {
+  //   content: '""',
+  //   display: 'none',
+  // },
 }));
 type Props = {
   std_slider_value: number;
@@ -44,7 +52,6 @@ export function WidgetStdSlider(props: Props) {
         step={1}
         valueLabelDisplay="on"
         disableSwap={true}
-        // onChange={props.std_slider_on_change}
         onMouseMove={props.std_slider_on_mouse_move}
         onMouseLeave={props.std_slider_on_mouse_leave}
       />
