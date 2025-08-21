@@ -60,6 +60,7 @@ export function WidgetLabelSlider(props: Props) {
   return (
     <>
       <LabelSlider
+        style={{ inset: 0, zIndex: 2 }}
         value={props.label_slider_value}
         min={0}
         max={props.label_slider_framecount}
