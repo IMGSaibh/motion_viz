@@ -1,9 +1,10 @@
-import { ContainerTopbar } from '@/containers/container_topbar';
-import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
-import ThreeJSScene from '@/threeJS/three_js_scene';
 import { Box } from '@mui/material';
-import { ContainerSliderList } from './containers/container_slider_list';
+import ThreeJSScene from '@/threeJS/three_js_scene';
 import { ContainerSlider } from './containers/container_slider';
+import { ContainerTopbar } from '@/containers/container_topbar';
+import { ContainerSliderList } from './containers/container_slider_list';
+import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
+import { SliderSliderlistProvider } from './context/context_slider_slider_list';
 
 export default function App() {
   return (
@@ -23,8 +24,10 @@ export default function App() {
             bgcolor: theme.palette.background.paper,
           })}
         >
-          <ContainerSlider></ContainerSlider>
-          <ContainerSliderList></ContainerSliderList>
+          <SliderSliderlistProvider>
+            <ContainerSlider></ContainerSlider>
+            <ContainerSliderList></ContainerSliderList>
+          </SliderSliderlistProvider>
         </Box>
       </ThreeJSEngineProvider>
     </>

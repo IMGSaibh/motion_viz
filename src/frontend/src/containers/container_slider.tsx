@@ -1,7 +1,7 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
+import { use_set_range_context } from '@/context/context_slider_slider_list';
 
 export function ContainerSlider() {
   const {
@@ -19,6 +19,8 @@ export function ContainerSlider() {
   const label_slider_reference = useRef<HTMLSpanElement | null>(null);
   const [std_slider_value, set_std_slider_value] = useState<number>(0);
   const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 10]);
+
+  const set_range = use_set_range_context();
 
   // control thumbnail via DOM  (no State-Thrash)
   const hoverImgRef = useRef<HTMLImageElement | null>(null);
@@ -117,6 +119,9 @@ export function ContainerSlider() {
         const pct = frame_count > 1 ? idx / (frame_count - 1) : 0;
         const x = pct * rect.width;
 
+        // for storing values per saved label
+        set_range([value[0], value[1]]);
+
         if (hoverImgRef.current) {
           hoverImgRef.current.style.display = 'block';
           hoverImgRef.current.style.position = 'absolute';
@@ -182,7 +187,6 @@ export function ContainerSlider() {
   return (
     <>
       <PresenterSlider {...label_slider_props} {...std_slider_props} />
-      <PresenterLabelButtons></PresenterLabelButtons>
       <img ref={hoverImgRef} alt="" />
     </>
   );

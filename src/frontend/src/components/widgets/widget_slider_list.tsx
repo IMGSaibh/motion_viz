@@ -52,10 +52,16 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  items?: SliderListEntry[];
+  items: SliderListEntry[];
+  widget_slider_list_on_click?: (id: string) => void;
+  handle_widget_slider_list_on_cick_clear_list?: () => void;
 };
 
-export function WidgetSliderList({ items = [] }: Props) {
+export function WidgetSliderList({
+  items = [],
+  widget_slider_list_on_click,
+  handle_widget_slider_list_on_cick_clear_list,
+}: Props) {
   const [open, setOpen] = useState<boolean>(true);
   return (
     <Box sx={{ width: '100%' }}>
@@ -69,7 +75,12 @@ export function WidgetSliderList({ items = [] }: Props) {
         {'Label-Liste'}
       </Button>
 
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Button onClick={handle_widget_slider_list_on_cick_clear_list}>
+        <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
+        {'Clear label list'}
+      </Button>
+
+      <Collapse in={open && items.length > 0} timeout="auto" unmountOnExit>
         <List
           sx={{
             width: '100%',
@@ -90,11 +101,15 @@ export function WidgetSliderList({ items = [] }: Props) {
                   sx={{ flexShrink: 0 }}
                 />
 
-                <Box sx={{ pointerEvents: 'none', width: '100%', ml: 10, mr: 6 }}>
-                  <LabelSliderTemplate value={slider_item.value} min={0} max={slider_item.framecount} />
+                <Box sx={{ width: '100%', ml: 10, mr: 6 }}>
+                  <LabelSliderTemplate disabled={true} value={slider_item.value} min={0} max={slider_item.framecount} />
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>
+                  <IconButton
+                    size="small"
+                    sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
+                    onClick={() => widget_slider_list_on_click?.(slider_item.id)}
+                  >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                   <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>

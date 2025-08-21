@@ -24,8 +24,17 @@ const LabelButtons = styled(ButtonBase)(({ theme }) => ({
   },
 }));
 
-export function PresenterLabelButtons() {
-  const buttons: LabelButtons[] = [{ src: btn1 }, { src: btn2 }, { src: btn3 }, { src: btn4 }];
+type Props = {
+  onAnyLabelClick?: (label?: string) => void;
+};
+
+export function PresenterLabelButtons(props: Props) {
+  const buttons: LabelButtons[] = [
+    { src: btn1, label: 'Button_1' },
+    { src: btn2, label: 'Button_2' },
+    { src: btn3, label: 'Button_3' },
+    { src: btn4, label: 'Button_4' },
+  ];
 
   return (
     <>
@@ -42,7 +51,7 @@ export function PresenterLabelButtons() {
         })}
       >
         {buttons.map((imgButton, i) => (
-          <LabelButtons key={i}>
+          <LabelButtons key={i} onClick={() => props.onAnyLabelClick?.(imgButton.label)}>
             <Box
               sx={{
                 position: 'absolute',

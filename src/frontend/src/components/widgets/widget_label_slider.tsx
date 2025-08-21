@@ -1,11 +1,12 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
+import { backdropClasses } from '@mui/material';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   zIndex: 1,
 
   '& .MuiSlider-track': {
-    color: theme.palette.primary.main,
+    color: theme.palette.info.main,
   },
   '& .MuiSlider-rail': {
     height: 4,
@@ -13,7 +14,7 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
     opacity: 1,
   },
   '& .MuiSlider-valueLabel': {
-    background: theme.palette.primary.main,
+    background: theme.palette.info.main,
     transform: 'translateY(-140%) scale(1)',
   },
   '& .MuiSlider-thumb': {
@@ -92,7 +93,7 @@ export function WidgetLabelSlider(props: Props) {
               width: `${widthPct}%`,
               top: 0,
               bottom: 0,
-              background: theme.palette.warning.main,
+              background: theme.palette.success.main,
             }}
           />
         </div>
