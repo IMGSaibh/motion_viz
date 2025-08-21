@@ -4,7 +4,6 @@ import Slider from '@mui/material/Slider';
 const StdSlider = styled(Slider)(({ theme }) => ({
   zIndex: 0,
   color: 'transparent',
-  // height: 0,
   '& .MuiSlider-track': {
     backgroundColor: 'transparent',
     border: 'none',
@@ -22,14 +21,6 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     background: theme.palette.secondary.main,
     transform: 'translateY(-140%) scale(1)',
   },
-  // '&:hover, &.Mui-focusVisible, &.Mui-active': {
-  //   boxShadow: 'none',
-  //   outline: 'none',
-  // },
-  // '&::before, &::after': {
-  //   content: '""',
-  //   display: 'none',
-  // },
 }));
 type Props = {
   std_slider_value: number;

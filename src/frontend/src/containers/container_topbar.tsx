@@ -160,6 +160,7 @@ export function ContainerTopbar() {
         autoHideDuration={8000}
         onClose={handle_snack_close}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ zIndex: '1000' }}
       >
         <div>
           {success_message && (

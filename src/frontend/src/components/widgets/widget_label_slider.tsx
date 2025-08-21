@@ -29,12 +29,6 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
       content: '""',
       display: 'none',
     },
-
-    // sicherheitshalber auch States neutralisieren
-    // '&:hover, &.Mui-focusVisible, &.Mui-active': {
-    //   boxShadow: 'none',
-    //   outline: 'none',
-    // },
   },
 
   // Linke/rechte Klammer
@@ -65,39 +59,39 @@ export function WidgetLabelSlider(props: Props) {
   const widthPct = ((end - start) / max) * 100;
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <LabelSlider
-          style={{ inset: 0, zIndex: 2 }}
-          value={props.label_slider_value}
-          min={0}
-          max={props.label_slider_framecount}
-          step={1}
-          valueLabelDisplay="on"
-          ref={props.label_slider_reference}
-          onChange={props.label_slider_on_change}
-          onMouseLeave={props.label_slider_on_mouse_leave}
-        />
-        {/* label rectangle under slider */}
+      {/* <div style={{ display: 'flex', flexDirection: 'column' }}> */}
+      <LabelSlider
+        style={{ inset: 0, zIndex: 2 }}
+        value={props.label_slider_value}
+        min={0}
+        max={props.label_slider_framecount}
+        step={1}
+        valueLabelDisplay="on"
+        ref={props.label_slider_reference}
+        onChange={props.label_slider_on_change}
+        onMouseLeave={props.label_slider_on_mouse_leave}
+      />
+      {/* label rectangle under slider */}
+      <div
+        style={{
+          position: 'relative',
+          height: 10,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
         <div
           style={{
-            position: 'relative',
-            height: 10,
-            borderRadius: 2,
-            overflow: 'hidden',
+            position: 'absolute',
+            left: `${leftPct}%`,
+            width: `${widthPct}%`,
+            top: 0,
+            bottom: 0,
+            background: theme.palette.success.main,
           }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              left: `${leftPct}%`,
-              width: `${widthPct}%`,
-              top: 0,
-              bottom: 0,
-              background: theme.palette.success.main,
-            }}
-          />
-        </div>
+        />
       </div>
+      {/* </div> */}
     </>
   );
 }
