@@ -35,7 +35,6 @@ export function WidgetStdSlider(props: Props) {
   return (
     <>
       <StdSlider
-        style={{ position: 'absolute', inset: 0 }}
         value={props.std_slider_value}
         min={0}
         max={props.std_slider_framecount}
