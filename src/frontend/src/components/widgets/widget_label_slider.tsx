@@ -59,7 +59,6 @@ export function WidgetLabelSlider(props: Props) {
   const widthPct = ((end - start) / max) * 100;
   return (
     <>
-      {/* <div style={{ display: 'flex', flexDirection: 'column' }}> */}
       <LabelSlider
         style={{ inset: 0, zIndex: 2 }}
         value={props.label_slider_value}
@@ -91,7 +90,6 @@ export function WidgetLabelSlider(props: Props) {
           }}
         />
       </div>
-      {/* </div> */}
     </>
   );
 }

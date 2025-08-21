@@ -1,6 +1,7 @@
 # motion_viz
 
-Parsing, conversion and visualization of motion capture files with FastAPI backend and ThreeJS Engine frontend.
+Parsing, conversion and visualization of motion capture files with FastAPI
+backend and ThreeJS Engine frontend.
 
 # Requirements
 
@@ -132,19 +133,3 @@ poetry install
 |
 └── main.tsx                            ← Root
 ```
-
-# Explanation frontend
-
-- Container
-  - Manages state (React useState, useRef, useEffect)
-  - Calls APIs (axios)
-  - Controls ThreeManager
-- Presenter
-  - Presents UI
-  - Displays input fields, buttons, texts
-  - Only calls callback props
-  - Uses material UI (Library)
-- ThreeManager
-  - Encapsulates WebGL logic (scene, camera, light, objects, etc.)
-- API layer
-  - Handles all backend communication
