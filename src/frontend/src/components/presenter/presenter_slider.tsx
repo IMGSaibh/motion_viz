@@ -20,10 +20,6 @@ type Props = {
 export function PresenterSlider(props: Props) {
   return (
     <>
-      {/* <Typography sx={{ whiteSpace: 'nowrap' }}>
-        FRAME: {props.label_slider_value} / {props.label_slider_framecount}
-      </Typography> */}
-
       {/* overlay wrapper: sliders precisely on top of each other */}
       <Box
         sx={{
@@ -33,9 +29,14 @@ export function PresenterSlider(props: Props) {
           mb: '1vw',
           borderRadius: 2,
           p: 2,
+          display: 'flex', // horizontal layout
+          alignItems: 'center',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Typography sx={{ whiteSpace: 'nowrap', mr: 4, flexShrink: 0 }}>
+          Frame: {props.label_slider_value[0]} – {props.label_slider_value[1]} / {props.label_slider_framecount}
+        </Typography>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           <WidgetStdSlider
             {...{
               std_slider_value: props.std_slider_value,
@@ -54,6 +55,7 @@ export function PresenterSlider(props: Props) {
             label_slider_on_mouse_leave={props.label_slider_on_mouse_leave}
           />
         </div>
+        <Box sx={{ ml: 10, mr: 6 }}>{}</Box>
       </Box>
     </>
   );
