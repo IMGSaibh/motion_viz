@@ -17,8 +17,8 @@ async def convert_bvh_to_npy():
 
     if not bvh_files:
         return {
-            "warning": "Found no .bvh-Files.",
             "message": "",
+            "warning": "No [.bvh] files found.",
         }
 
     for bvh_file in bvh_files:
@@ -32,6 +32,6 @@ async def convert_bvh_to_npy():
         bvh_parser.export_skeleton_converted(save_json_skeleton_path)
 
     return {
-        "message": ".bvh-files converted",
+        "message": "[.bvh] files converted",
         "warning": "",
     }

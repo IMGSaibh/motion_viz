@@ -1,6 +1,7 @@
 # motion_viz
 
-Parsing, conversion and visualization of motion capture files with FastAPI backend and ThreeJS Engine frontend.
+Parsing, conversion and visualization of motion capture files with FastAPI
+backend and ThreeJS Engine frontend.
 
 # Requirements
 
@@ -101,6 +102,21 @@ poetry install
 
 # Architecture - React Container-Presenter-Pattern -
 
+### backend
+
+```bash
+/api
+├── api_1.py
+├── api_2.py
+├── api_3.py
+├── ...
+/motion_parser
+├── bvh_parser.py
+├── pv_parser.py
+├── ...
+main.py
+```
+
 ### frontend
 
 ```bash
@@ -111,8 +127,12 @@ poetry install
 │   ├── api_2.ts                        ← communication with FastAPI backend
 │   ├── ...                             ← communication with FastAPI backend
 │
-├── /threeJS
-│   └── three_manager.ts                ← 3D webgl engine
+├── /threeJS                            ← 3D webgl engine
+│   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
+│   └──/components                      ← 3D webgl engine (camera, scene, ...)
+│   └──/system                          ← 3D webgl engine (renderer, engine loop whoch holds all updatable objects)
+│   └──/motion_loader                   ← loads motion files (bvh, mvnx, ...)
+│   └──/motion_player                   ← plays a motion file (bvh, fbx, npy, ...)
 │
 ├── /components
 │   ├── /widgets
@@ -126,25 +146,16 @@ poetry install
 │   └── ...                             ← UI shell for multiple widgets
 │
 ├── /containers
-│   └── widget_container.tsx            ← Central logic + manager + states
+│   └── widget_container_1.tsx          ← Central logic + manager + states
+│   └── widget_container_2.tsx          ← Central logic + manager + states
+|   └── ...
+|
+├── /context
+|   └── context_1.tsx                   ← context objects + dependencies to other modul
+|   └── context_2.tsx                   ← context objects + dependencies to other modul
+|   └── ...
 │
 ├── app.tsx                             ← contains all containers
 |
 └── main.tsx                            ← Root
 ```
-
-# Explanation frontend
-
-- Container
-  - Manages state (React useState, useRef, useEffect)
-  - Calls APIs (axios)
-  - Controls ThreeManager
-- Presenter
-  - Presents UI
-  - Displays input fields, buttons, texts
-  - Only calls callback props
-  - Uses material UI (Library)
-- ThreeManager
-  - Encapsulates WebGL logic (scene, camera, light, objects, etc.)
-- API layer
-  - Handles all backend communication
