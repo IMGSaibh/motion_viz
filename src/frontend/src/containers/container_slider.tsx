@@ -1,7 +1,7 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { use_set_range_context } from '@/context/context_slider_slider_list';
+import { use_set_range_context } from '@/context/context_slider_sliderlist';
 
 export function ContainerSlider() {
   const {

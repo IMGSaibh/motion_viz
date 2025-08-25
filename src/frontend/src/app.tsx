@@ -4,7 +4,7 @@ import { ContainerSlider } from './containers/container_slider';
 import { ContainerTopbar } from '@/containers/container_topbar';
 import { ContainerSliderList } from './containers/container_slider_list';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
-import { SliderSliderlistProvider } from './context/context_slider_slider_list';
+import { SliderSliderlistProvider } from './context/context_slider_sliderlist';
 
 export default function App() {
   return (

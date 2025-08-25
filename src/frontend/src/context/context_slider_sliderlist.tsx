@@ -27,9 +27,6 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const clearVisited = useCallback(() => setVisited([]), []);
 
   return (
-    // <slider_range_context.Provider value={value}>
-    //   <set_range_context.Provider value={set}>{children}</set_range_context.Provider>
-    // </slider_range_context.Provider>
     <slider_range_context.Provider value={value}>
       <set_range_context.Provider value={set}>
         <visited_context.Provider value={visited}>

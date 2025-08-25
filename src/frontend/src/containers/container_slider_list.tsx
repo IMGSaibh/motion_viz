@@ -7,7 +7,7 @@ import {
   use_add_visited_context,
   use_remove_visited_context,
   use_clear_visited_context,
-} from '@/context/context_slider_slider_list';
+} from '@/context/context_slider_sliderlist';
 
 export const SLIDER_ITEMS: SliderListEntry[] = [];
 
