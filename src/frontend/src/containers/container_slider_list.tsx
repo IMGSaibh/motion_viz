@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import { PresenterSliderList, SliderListEntry } from '@/components/presenter/presenter_slider_list';
-import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
+import { PresenterSliderList, SliderListEntry } from '@/components/presenter/presenter_slider_list';
 import {
   use_slider_range_context,
   use_add_visited_context,
@@ -62,15 +62,6 @@ export function ContainerSliderList() {
 
   return (
     <>
-      {/* <PresenterLabelButtons onAnyLabelClick={widget_slider_list_add_slider_item}></PresenterLabelButtons>
-
-      <PresenterSliderList
-        slider_list_items={items}
-        widget_slider_list_on_click={handle_widget_slider_list_on_click}
-        handle_widget_slider_list_on_cick_clear_list={handle_widget_slider_list_on_cick_clear_list}
-      />
- */}
-
       <PresenterLabelButtons onAnyLabelClick={widget_slider_list_add_slider_item}></PresenterLabelButtons>
 
       <PresenterSliderList

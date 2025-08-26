@@ -1,15 +1,17 @@
+import { Fragment, useState } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Button, Divider, IconButton } from '@mui/material';
-import { Fragment, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SliderListEntry } from '../presenter/presenter_slider_list';
+
+import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -63,6 +65,9 @@ export function WidgetSliderList({
   handle_widget_slider_list_on_cick_clear_list,
 }: Props) {
   const [open, setOpen] = useState<boolean>(true);
+
+  const startEdit = use_start_edit_visited_context();
+
   return (
     <Box sx={{ width: '100%' }}>
       {/* Dropdown-Header */}
@@ -112,7 +117,11 @@ export function WidgetSliderList({
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
-                  <IconButton size="small" sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}>
+                  <IconButton
+                    size="small"
+                    sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
+                    onClick={() => startEdit(slider_item.id)}
+                  >
                     <ModeEditIcon fontSize="small" />
                   </IconButton>
                 </Box>

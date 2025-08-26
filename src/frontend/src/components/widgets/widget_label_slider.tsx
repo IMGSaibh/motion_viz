@@ -1,7 +1,7 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import { Box } from '@mui/material';
-import { use_visited_context } from '@/context/context_slider_sliderlist';
+import { use_labeled_rect_context } from '@/context/context_slider_sliderlist';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -39,7 +39,7 @@ type Props = {
 
 export function WidgetLabelSlider(props: Props) {
   const theme = useTheme();
-  const visited = use_visited_context(); // << gespeicherte Bereiche
+  const visited = use_labeled_rect_context(); // << gespeicherte Bereiche
 
   const max = Math.max(0, props.label_slider_framecount);
   const clamp = (n: number) => Math.max(0, Math.min(n, max));

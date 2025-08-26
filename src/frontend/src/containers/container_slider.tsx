@@ -1,7 +1,7 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { use_set_range_context } from '@/context/context_slider_sliderlist';
+import { use_set_range_context, use_slider_range_context } from '@/context/context_slider_sliderlist';
 
 export function ContainerSlider() {
   const {
@@ -18,14 +18,14 @@ export function ContainerSlider() {
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const label_slider_reference = useRef<HTMLSpanElement | null>(null);
   const [std_slider_value, set_std_slider_value] = useState<number>(0);
-  const [label_slider_range, set_label_slider_range] = useState<[number, number]>([0, 10]);
-
-  const set_range = use_set_range_context();
 
   // control thumbnail via DOM  (no State-Thrash)
   const hoverImgRef = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
+
+  const label_slider_range = use_slider_range_context();
+  const set_range = use_set_range_context();
 
   useEffect(() => {
     set_std_slider_value(current_frame ?? 0);
@@ -38,13 +38,12 @@ export function ContainerSlider() {
         stop();
         go_to_frame(0);
         set_std_slider_value(0);
-        set_label_slider_range([0, 1]);
+        set_range([0, 1]);
       }
       if (e.code === 'KeyR') {
         go_to_frame(0);
         reset();
         set_std_slider_value(0);
-        set_label_slider_range([0, 1]);
       }
       if (e.code === 'KeyP') print_scene_components();
     };
@@ -114,7 +113,6 @@ export function ContainerSlider() {
       if (!rect || !frame_count) return;
 
       if (Array.isArray(value) && value.length === 2) {
-        set_label_slider_range([value[0], value[1]]);
         const idx = value[active_idx];
         const pct = frame_count > 1 ? idx / (frame_count - 1) : 0;
         const x = pct * rect.width;
