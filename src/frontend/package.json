@@ -19,7 +19,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "three": "^0.176.0",
-    "troika-three-text": "^0.52.4"
+    "troika-three-text": "^0.52.4",
+    "use-context-selector": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.10",

@@ -2,7 +2,7 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 
 export type Range = [number, number];
-export type RangeLabel = { id: string; from: number; to: number; color?: string };
+export type RangeLabel = { id: string; from: number; to: number; color?: string; label?: string };
 
 type SliderSliderlistContext = {
   range: Range;
@@ -23,11 +23,11 @@ type SliderSliderlistContext = {
 const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
 
 // ===== Marker-Reducer: vermeidet unnötige Referenzwechsel =====
-function normalize(range: RangeLabel): RangeLabel {
-  if (Number.isNaN(range.from) || Number.isNaN(range.to)) return range;
-  const from = Math.min(range.from, range.to);
-  const to = Math.max(range.from, range.to);
-  return { ...range, from, to };
+function normalize(label: RangeLabel): RangeLabel {
+  if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
+  const from = Math.min(label.from, label.to);
+  const to = Math.max(label.from, label.to);
+  return { ...label, from, to };
 }
 
 type MarkerAction =

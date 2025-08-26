@@ -10,8 +10,17 @@ import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SliderLabel } from '@/containers/container_slider_list';
+// import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
 
-import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
+// + neue Imports:
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+  use_start_edit_visited_context,
+  use_save_edit_visited_context,
+  use_cancel_edit_visited_context,
+  use_editing_visited_id_context,
+} from '@/context/context_slider_sliderlist';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -65,8 +74,10 @@ export function WidgetSliderList({
   slider_list_clear_on_click,
 }: Props) {
   const [open, setOpen] = useState<boolean>(true);
-
   const startEdit = use_start_edit_visited_context();
+  const saveEdit = use_save_edit_visited_context();
+  const cancelEdit = use_cancel_edit_visited_context();
+  const editingId = use_editing_visited_id_context();
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -119,16 +130,40 @@ export function WidgetSliderList({
                     size="small"
                     sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
                     onClick={() => slider_list_on_click?.(slider_label.id)}
+                    aria-label="Delete label"
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
-                    onClick={() => startEdit(slider_label.id)}
-                  >
-                    <ModeEditIcon fontSize="small" />
-                  </IconButton>
+
+                  {editingId === slider_label.id ? (
+                    <>
+                      <IconButton
+                        size="small"
+                        sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
+                        onClick={saveEdit}
+                        aria-label="Save edited label"
+                      >
+                        <CheckIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
+                        onClick={cancelEdit}
+                        aria-label="Cancel editing"
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <IconButton
+                      size="small"
+                      sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
+                      onClick={() => startEdit(slider_label.id)}
+                      aria-label="Edit label"
+                    >
+                      <ModeEditIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </Box>
               </ListItem>
 
