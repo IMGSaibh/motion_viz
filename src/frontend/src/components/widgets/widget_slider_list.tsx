@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { SliderListEntry } from '../presenter/presenter_slider_list';
+import { SliderLabel } from '@/containers/container_slider_list';
 
 import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
 
@@ -54,15 +54,15 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  items: SliderListEntry[];
-  widget_slider_list_on_click?: (id: string) => void;
-  handle_widget_slider_list_on_cick_clear_list?: () => void;
+  slider_labels: SliderLabel[];
+  slider_list_on_click?: (id: string) => void;
+  slider_list_clear_on_click?: () => void;
 };
 
 export function WidgetSliderList({
-  items = [],
-  widget_slider_list_on_click,
-  handle_widget_slider_list_on_cick_clear_list,
+  slider_labels: slider_labels = [],
+  slider_list_on_click,
+  slider_list_clear_on_click,
 }: Props) {
   const [open, setOpen] = useState<boolean>(true);
 
@@ -80,12 +80,12 @@ export function WidgetSliderList({
         {'Label-Liste'}
       </Button>
 
-      <Button onClick={handle_widget_slider_list_on_cick_clear_list}>
+      <Button onClick={slider_list_clear_on_click}>
         <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
         {'Clear label list'}
       </Button>
 
-      <Collapse in={open && items.length > 0} timeout="auto" unmountOnExit>
+      <Collapse in={open && slider_labels.length > 0} timeout="auto" unmountOnExit>
         <List
           sx={{
             width: '100%',
@@ -97,37 +97,42 @@ export function WidgetSliderList({
             overflowY: 'auto',
           }}
         >
-          {items.map((slider_item, i) => (
-            <Fragment key={slider_item.id}>
+          {slider_labels.map((slider_label, i) => (
+            <Fragment key={slider_label.id}>
               <ListItem>
                 <ListItemText
-                  primary={slider_item.label}
-                  secondary={`Frame: ${slider_item.value[0]} – ${slider_item.value[1]}`}
+                  primary={slider_label.label}
+                  secondary={`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
                   sx={{ flexShrink: 0 }}
                 />
 
                 <Box sx={{ width: '100%', ml: 10, mr: 6 }}>
-                  <LabelSliderTemplate disabled={true} value={slider_item.value} min={0} max={slider_item.framecount} />
+                  <LabelSliderTemplate
+                    disabled={true}
+                    value={slider_label.range}
+                    min={0}
+                    max={slider_label.framecount}
+                  />
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <IconButton
                     size="small"
                     sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
-                    onClick={() => widget_slider_list_on_click?.(slider_item.id)}
+                    onClick={() => slider_list_on_click?.(slider_label.id)}
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                   <IconButton
                     size="small"
                     sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
-                    onClick={() => startEdit(slider_item.id)}
+                    onClick={() => startEdit(slider_label.id)}
                   >
                     <ModeEditIcon fontSize="small" />
                   </IconButton>
                 </Box>
               </ListItem>
 
-              {i < items.length - 1 && <Divider component="li" />}
+              {i < slider_labels.length - 1 && <Divider component="li" />}
             </Fragment>
           ))}
         </List>

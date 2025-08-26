@@ -6,12 +6,12 @@ export type RangeLabel = { id: string; from: number; to: number; color?: string 
 
 type SliderSliderlistContext = {
   range: Range;
-  set_range: (r: Range) => void;
+  set_slider_label_range: (r: Range) => void;
 
   range_marker: RangeLabel[];
-  add_label_rect: (m: RangeLabel) => void;
-  remove_label_rect: (id: string) => void;
-  clear_label_rects: () => void;
+  add_slider_label: (m: RangeLabel) => void;
+  remove_slider_label: (id: string) => void;
+  clear_slider_label_list: () => void;
 
   // Editing-Flow
   editing_id: string | null;
@@ -105,11 +105,11 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const value = useMemo<SliderSliderlistContext>(
     () => ({
       range,
-      set_range,
+      set_slider_label_range: set_range,
       range_marker,
-      add_label_rect,
-      remove_label_rect,
-      clear_label_rects,
+      add_slider_label: add_label_rect,
+      remove_slider_label: remove_label_rect,
+      clear_slider_label_list: clear_label_rects,
       editing_id,
       start_edit_label_rect,
       save_current_edit_label_rect,
@@ -142,7 +142,7 @@ export function use_slider_range_context() {
 export function use_set_range_context() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_set_range_context must be used within <SliderSliderlistProvider>');
-    return v.set_range;
+    return v.set_slider_label_range;
   });
 }
 
@@ -153,24 +153,24 @@ export function use_labeled_rect_context() {
   });
 }
 
-export function use_add_visited_context() {
+export function use_add_slider_label_ctx() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_add_visited_context must be used within <SliderSliderlistProvider>');
-    return v.add_label_rect;
+    return v.add_slider_label;
   });
 }
 
-export function use_remove_visited_context() {
+export function use_remove_slider_label_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_remove_visited_context must be used within <SliderSliderlistProvider>');
-    return v.remove_label_rect;
+    return v.remove_slider_label;
   });
 }
 
-export function use_clear_visited_context() {
+export function use_clear_slider_label_list_ctx() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_clear_visited_context must be used within <SliderSliderlistProvider>');
-    return v.clear_label_rects;
+    return v.clear_slider_label_list;
   });
 }
 
