@@ -12,7 +12,7 @@ type ThreeJSEngineContext = {
   go_to_frame: (frame_idx: number) => void;
   play_pause: () => void;
   stop: () => void;
-  reload_motion_file: (file: string) => Promise<void>;
+  load_motion_file: (file: string) => Promise<void>;
   cleanup_player: () => void;
   cleanup_loop: () => void;
   cleanup_thumbnail_render: () => void;
@@ -44,7 +44,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     };
   }, []);
 
-  const reload_motion_file = useCallback(async (file: string) => {
+  const load_motion_file = useCallback(async (file: string) => {
     if (!threejs_mngr_ref.current) return; // Engine not ready
 
     threejs_mngr_ref.current.cleanup_player?.();
@@ -99,7 +99,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       frame_count,
       current_frame,
 
-      reload_motion_file,
+      load_motion_file,
       go_to_frame,
       play_pause,
       stop,
@@ -115,7 +115,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       selected_motion,
       frame_count,
       current_frame,
-      reload_motion_file,
+      load_motion_file,
       go_to_frame,
       play_pause,
       stop,

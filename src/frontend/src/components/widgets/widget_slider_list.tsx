@@ -19,7 +19,7 @@ import {
   use_start_edit_visited_context,
   use_save_edit_visited_context,
   use_cancel_edit_visited_context,
-  use_editing_visited_id_context,
+  use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
@@ -77,7 +77,7 @@ export function WidgetSliderList({
   const startEdit = use_start_edit_visited_context();
   const saveEdit = use_save_edit_visited_context();
   const cancelEdit = use_cancel_edit_visited_context();
-  const editingId = use_editing_visited_id_context();
+  const editingId = use_editing_label_id_cxt();
 
   return (
     <Box sx={{ width: '100%' }}>

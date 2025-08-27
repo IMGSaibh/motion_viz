@@ -18,6 +18,9 @@ type SliderSliderlistContext = {
   start_editing_label: (id: string) => void; // setzt range auf [from,to] und merkt sich das Ziel
   save_current_edited_label: () => void; // speichert aktuellen range in den Marker mit editing_id
   cancel_current_edit_label: () => void; // beendet den Edit-Modus ohne zu speichern
+
+  std_slider_value: number;
+  set_std_slider_value: (n: number) => void;
 };
 
 const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
@@ -102,6 +105,8 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
     set_editing_id(null);
   }, [editing_id]);
 
+  const [std_slider_value, set_std_slider_value] = useState(0);
+
   const value = useMemo<SliderSliderlistContext>(
     () => ({
       range,
@@ -114,6 +119,8 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
       start_editing_label: start_editing_label,
       save_current_edited_label: save_current_edited_label,
       cancel_current_edit_label: cancel_current_edit_label,
+      std_slider_value,
+      set_std_slider_value,
     }),
     [
       range,
@@ -125,6 +132,9 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
       start_editing_label,
       save_current_edited_label,
       cancel_current_edit_label,
+
+      std_slider_value,
+      set_std_slider_value,
     ],
   );
 
@@ -175,7 +185,7 @@ export function use_clear_slider_label_list_ctx() {
 }
 
 // === Edit-Selector-Hooks ===
-export function use_editing_visited_id_context() {
+export function use_editing_label_id_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_editing_visited_id_context must be used within <SliderSliderlistProvider>');
     return v.editing_id;
@@ -200,5 +210,18 @@ export function use_cancel_edit_visited_context() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_cancel_edit_visited_context must be used within <SliderSliderlistProvider>');
     return v.cancel_current_edit_label;
+  });
+}
+
+export function use_std_slider_value_cxt() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_std_slider_value_context must be used within <SliderSliderlistProvider>');
+    return v.std_slider_value;
+  });
+}
+export function use_set_std_slider_value_cxt() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_set_std_slider_value_context must be used within <SliderSliderlistProvider>');
+    return v.set_std_slider_value;
   });
 }

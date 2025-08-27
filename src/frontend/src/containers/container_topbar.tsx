@@ -11,12 +11,17 @@ import { select_motion_files } from '@/hooks/hook_select_motion_files';
 import { upload_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
+import {
+  use_set_range_context,
+  use_set_std_slider_value_cxt,
+  use_std_slider_value_cxt,
+} from '@/context/context_slider_label_list';
 
 export function ContainerTopbar() {
-  const { set_selected_motion, reload_motion_file } = useThreeJSEngine();
+  const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
+  const set_range = use_set_range_context();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
-
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
   const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
 
@@ -44,6 +49,9 @@ export function ContainerTopbar() {
   const mutation_create_descriptor = create_motion_descriptor();
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
+
+  const std_slider_value = use_std_slider_value_cxt();
+  const set_std_slider_value = use_set_std_slider_value_cxt();
 
   // ======================= Handler =======================
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
@@ -93,7 +101,11 @@ export function ContainerTopbar() {
 
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     set_selected_motion(e.target.value);
-    reload_motion_file(e.target.value);
+    await load_motion_file(e.target.value);
+    stop();
+    go_to_frame(0);
+    set_std_slider_value(0);
+    set_range([0, 1]);
   }
 
   async function handle_convert_with_pose_viewer() {
