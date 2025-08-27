@@ -27,7 +27,6 @@ type Props = {
   std_slider_framecount: number;
   std_slider_reference: React.RefObject<HTMLSpanElement | null>;
   std_slider_on_change: (e: Event, new_value: number) => void;
-  std_slider_on_mouse_move: (e: React.MouseEvent<HTMLSpanElement>) => void;
   std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
 };
 
@@ -43,7 +42,6 @@ export function WidgetStdSlider(props: Props) {
         step={1}
         valueLabelDisplay="on"
         disableSwap={true}
-        onMouseMove={props.std_slider_on_mouse_move}
         onMouseLeave={props.std_slider_on_mouse_leave}
       />
     </>

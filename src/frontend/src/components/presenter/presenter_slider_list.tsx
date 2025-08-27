@@ -1,19 +1,19 @@
 import { WidgetSliderList } from '@/components/widgets/widget_slider_list';
-export type SliderListEntry = { id: string; label: string; value: [number, number]; framecount: number };
+import { SliderLabel } from '@/containers/container_label_list';
 
 type Props = {
-  slider_list_items: SliderListEntry[];
-  widget_slider_list_on_click?: (id: string) => void;
-  handle_widget_slider_list_on_cick_clear_list?: () => void;
+  slider_lables: SliderLabel[];
+  slider_list_on_click?: (id: string) => void;
+  slider_list_clear_on_click?: () => void;
 };
 
 export function PresenterSliderList(props: Props) {
   return (
     <>
       <WidgetSliderList
-        items={props.slider_list_items}
-        widget_slider_list_on_click={props.widget_slider_list_on_click}
-        handle_widget_slider_list_on_cick_clear_list={props.handle_widget_slider_list_on_cick_clear_list}
+        slider_labels={props.slider_lables}
+        slider_list_on_click={props.slider_list_on_click}
+        slider_list_clear_on_click={props.slider_list_clear_on_click}
       />
     </>
   );

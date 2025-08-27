@@ -1,7 +1,7 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import { Box } from '@mui/material';
-import { use_visited_context } from '@/context/context_slider_sliderlist';
+import { use_labeled_rect_context } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -30,7 +30,7 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  label_slider_value: [number, number];
+  label_slider_range: [number, number];
   label_slider_framecount: number;
   label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
   label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
@@ -39,13 +39,13 @@ type Props = {
 
 export function WidgetLabelSlider(props: Props) {
   const theme = useTheme();
-  const visited = use_visited_context(); // << gespeicherte Bereiche
+  const saved_labels = use_labeled_rect_context(); // << saved labels
 
   const max = Math.max(0, props.label_slider_framecount);
   const clamp = (n: number) => Math.max(0, Math.min(n, max));
 
-  const a = clamp(props.label_slider_value[0]);
-  const b = clamp(props.label_slider_value[1]);
+  const a = clamp(props.label_slider_range[0]);
+  const b = clamp(props.label_slider_range[1]);
   const from = Math.min(a, b);
   const to = Math.max(a, b);
   const len = Math.max(0, to - from);
@@ -70,7 +70,7 @@ export function WidgetLabelSlider(props: Props) {
         onMouseLeave={props.label_slider_on_mouse_leave}
       />
 
-      {/* Unterer Layer: gespeicherte Bereiche + aktueller Bereich */}
+      {/* Layer underneath label slider: saved labels + current labels */}
       <Box
         sx={{
           position: 'relative',
@@ -81,8 +81,8 @@ export function WidgetLabelSlider(props: Props) {
         }}
         aria-hidden
       >
-        {/* gespeicherte Bereiche */}
-        {visited.map(({ id, from: vf, to: vt, color }) => {
+        {/* saved labels */}
+        {saved_labels.map(({ id, from: vf, to: vt, color }) => {
           const vvFrom = clamp(Math.min(vf, vt));
           const vvTo = clamp(Math.max(vf, vt));
           const vvLen = Math.max(0, vvTo - vvFrom);
@@ -107,7 +107,7 @@ export function WidgetLabelSlider(props: Props) {
           );
         })}
 
-        {/* aktueller Bereich */}
+        {/* current labels */}
         <Box
           sx={{
             position: 'absolute',
