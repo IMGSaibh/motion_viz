@@ -75,7 +75,6 @@ export function WidgetLabelSlider(props: Props) {
         sx={{
           position: 'relative',
           height: 10,
-          // mt: 0.75,
           overflow: 'hidden',
           background: theme.palette.action.hover,
         }}
