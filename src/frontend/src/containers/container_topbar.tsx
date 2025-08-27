@@ -17,6 +17,8 @@ import {
   use_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
 
+import { use_clear_slider_label_list_ctx } from '@/context/context_slider_label_list';
+
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
   const set_range = use_set_range_context();
@@ -52,6 +54,8 @@ export function ContainerTopbar() {
 
   const std_slider_value = use_std_slider_value_cxt();
   const set_std_slider_value = use_set_std_slider_value_cxt();
+
+  const clear_slider_label_list = use_clear_slider_label_list_ctx();
 
   // ======================= Handler =======================
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
@@ -106,6 +110,7 @@ export function ContainerTopbar() {
     go_to_frame(0);
     set_std_slider_value(0);
     set_range([0, 1]);
+    clear_slider_label_list();
   }
 
   async function handle_convert_with_pose_viewer() {

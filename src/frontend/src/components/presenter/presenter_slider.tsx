@@ -27,7 +27,7 @@ export function PresenterSlider(props: Props) {
           bgcolor: 'background.paper',
           mb: '1vw',
           borderRadius: 2,
-          p: 2,
+          p: 1,
           display: 'flex',
           alignItems: 'center',
         }}

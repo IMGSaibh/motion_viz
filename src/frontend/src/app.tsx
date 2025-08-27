@@ -18,9 +18,8 @@ export default function App() {
           <Box
             sx={(theme) => ({
               position: 'absolute',
-              left: '1vw',
-              right: '1vw',
-              bottom: '1vw',
+              width: '100%',
+              bottom: '0vw',
               p: '1rem',
               bgcolor: theme.palette.background.paper,
             })}
