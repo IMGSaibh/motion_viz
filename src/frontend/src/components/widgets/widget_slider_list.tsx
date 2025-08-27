@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { SliderLabel } from '@/containers/container_slider_list';
+import { SliderLabel } from '@/containers/container_label_list';
 // import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
 
 // + neue Imports:
@@ -20,7 +20,7 @@ import {
   use_save_edit_visited_context,
   use_cancel_edit_visited_context,
   use_editing_visited_id_context,
-} from '@/context/context_slider_sliderlist';
+} from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -104,7 +104,7 @@ export function WidgetSliderList({
             borderRadius: 2,
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
-            maxHeight: 5 * 56, // scroll list > 5 items
+            maxHeight: 4 * 56, // scroll list > 5 items
             overflowY: 'auto',
           }}
         >

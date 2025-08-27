@@ -1,7 +1,7 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import { Box } from '@mui/material';
-import { use_labeled_rect_context } from '@/context/context_slider_sliderlist';
+import { use_labeled_rect_context } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   zIndex: 1,

@@ -2,9 +2,9 @@ import { Box } from '@mui/material';
 import ThreeJSScene from '@/threeJS/three_js_scene';
 import { ContainerSlider } from './containers/container_slider';
 import { ContainerTopbar } from '@/containers/container_topbar';
-import { ContainerSliderList } from './containers/container_slider_list';
+import { ContainerSliderList } from './containers/container_label_list';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
-import { SliderSliderlistProvider } from './context/context_slider_sliderlist';
+import { SliderSliderlistProvider } from './context/context_slider_label_list';
 
 export default function App() {
   return (

@@ -1,4 +1,3 @@
-// import { useCallback, useRef, useState } from 'react';
 import { useCallback, useRef, useMemo } from 'react';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
@@ -9,16 +8,15 @@ import {
   use_add_slider_label_ctx,
   use_remove_slider_label_cxt,
   use_clear_slider_label_list_ctx,
-  use_labeled_rect_context, // << NEU: leerst die Liste direkt aus dem Context
-} from '@/context/context_slider_sliderlist';
+  use_labeled_rect_context,
+} from '@/context/context_slider_label_list';
 
 export type SliderLabel = { id: string; label: string; range: [number, number]; framecount: number };
 export const slider_lables: SliderLabel[] = [];
 
 export function ContainerSliderList() {
   const slider_range = use_slider_range_context();
-  // const [slider_labels, set_slider_labels] = useState<SliderLabel[]>(slider_lables);
-  const markers = use_labeled_rect_context(); // << alle Labels aus dem Context holen
+  const markers = use_labeled_rect_context();
   const slider_label_id = useRef<number>(slider_lables.length + 1);
 
   const { frame_count, current_frame } = useThreeJSEngine();
@@ -29,7 +27,6 @@ export function ContainerSliderList() {
 
   const slider_list_on_click = useCallback(
     (id: string) => {
-      // set_slider_labels((prev) => prev.filter((it) => it.id !== id));
       remove_slider_label(id);
     },
     [remove_slider_label],
@@ -48,24 +45,20 @@ export function ContainerSliderList() {
       b = clamp(b);
       if (a > b) [a, b] = [b, a];
 
-      // Fallback: wenn Range noch [0,0] und wir einen aktuellen Frame haben, nimm den
+      // TODO:  Fallback: wenn Range noch [0,0] und wir einen aktuellen Frame haben, nimm den
       const value: [number, number] =
         a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
 
-      // set_slider_labels((prev) => [...prev, { id, label, range: value, framecount: fc }]);
       add_slider_label({ id, from: value[0], to: value[1], label });
     },
-    // [slider_range, frame_count, current_frame, set_slider_labels],
     [slider_range, frame_count, current_frame, add_slider_label],
   );
 
   const slider_list_on_click_clear_list = useCallback(() => {
-    // set_slider_labels([]);
     slider_label_id.current = 1;
     clear_slider_label_list();
   }, [clear_slider_label_list]);
 
-  // << Ableitung für die Anzeige (Presenter/Widget) – kein eigener State!
   const slider_labels: SliderLabel[] = useMemo(() => {
     const fc = Math.max(0, frame_count ?? 0);
     return markers.map((m) => ({

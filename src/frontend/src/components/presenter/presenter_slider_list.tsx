@@ -1,5 +1,5 @@
 import { WidgetSliderList } from '@/components/widgets/widget_slider_list';
-import { SliderLabel } from '@/containers/container_slider_list';
+import { SliderLabel } from '@/containers/container_label_list';
 
 type Props = {
   slider_lables: SliderLabel[];
