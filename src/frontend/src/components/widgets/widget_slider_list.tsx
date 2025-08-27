@@ -78,7 +78,7 @@ export function WidgetSliderList({
   const editingId = use_editing_label_id_cxt();
 
   return (
-    <Box sx={{}}>
+    <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         {/* Dropdown-Header */}
         <Button
