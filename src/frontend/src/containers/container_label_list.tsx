@@ -16,13 +16,12 @@ export type SliderLabel = { id: string; label: string; range: [number, number]; 
 export const slider_lables: SliderLabel[] = [];
 
 export function ContainerSliderList() {
+  const { frame_count, current_frame, selected_motion } = useThreeJSEngine();
   const slider_range = use_slider_range_cxt();
   const markers = use_label_cxt();
   const slider_label_id = useRef<number>(slider_lables.length + 1);
 
   const hook_save_labels = hook_save_labels_to_json();
-
-  const { frame_count, current_frame } = useThreeJSEngine();
 
   const add_slider_label = use_add_label_ctx();
   const remove_slider_label = use_remove_label_cxt();
@@ -72,18 +71,20 @@ export function ContainerSliderList() {
     }));
   }, [markers, frame_count]);
 
-  // ===== Speichern-Handler: speichert aktuelle Liste ins Backend =====
-  const on_save_click = useCallback(
-    (file_name: string) => {
-      const labels = markers.map((m) => {
-        const a = Math.min(m.from, m.to);
-        const b = Math.max(m.from, m.to);
-        return { startframe: a, endframe: b };
-      });
-      hook_save_labels.mutate({ file_name, labels });
-    },
-    [markers, hook_save_labels],
-  );
+  // ===== Speichern-Handler: speichert aktuelle lable Liste ins Backend =====
+  const on_save_click = useCallback(() => {
+    if (!selected_motion) return;
+
+    const labels = markers.map((m) => {
+      const startframe = Math.min(m.from, m.to);
+      const endframe = Math.max(m.from, m.to);
+      return { startframe, endframe };
+    });
+
+    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
+
+    hook_save_labels.mutate({ motion_name, labels });
+  }, [markers, selected_motion, hook_save_labels]);
 
   return (
     <>

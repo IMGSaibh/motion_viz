@@ -62,11 +62,9 @@ export function ContainerSlider() {
       }
       if (e.code === 'KeyD') print_scene_components();
       if (e.code === 'Digit1' && e.location === 0) {
-        console.log(`${std_slider_value}`);
         set_range([std_slider_value, label_slider_range[1]]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        console.log(`${std_slider_value}`);
         set_range([label_slider_range[0], std_slider_value]);
       }
     };

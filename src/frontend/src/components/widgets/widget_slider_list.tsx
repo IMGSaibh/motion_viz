@@ -65,7 +65,7 @@ type Props = {
   slider_labels: SliderLabel[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
-  save_labels_on_click?: (motion_file_name: string) => void;
+  save_labels_on_click?: () => void;
 };
 
 export function WidgetSliderList({
@@ -99,7 +99,7 @@ export function WidgetSliderList({
           <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
           {'Clear label list'}
         </Button>
-        <Button onClick={() => save_labels_on_click?.('motion_name_test')}>
+        <Button onClick={() => save_labels_on_click?.()}>
           <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
           {'Save labels to json'}
         </Button>
