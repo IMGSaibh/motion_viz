@@ -4,26 +4,26 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { PresenterSliderList } from '@/components/presenter/presenter_slider_list';
 
 import {
-  use_slider_range_context,
-  use_add_slider_label_ctx,
-  use_remove_slider_label_cxt,
-  use_clear_slider_label_list_ctx,
-  use_labeled_rect_context,
+  use_slider_range_cxt,
+  use_add_label_ctx,
+  use_remove_label_cxt,
+  use_clear_label_list_ctx,
+  use_label_cxt,
 } from '@/context/context_slider_label_list';
 
 export type SliderLabel = { id: string; label: string; range: [number, number]; framecount: number };
 export const slider_lables: SliderLabel[] = [];
 
 export function ContainerSliderList() {
-  const slider_range = use_slider_range_context();
-  const markers = use_labeled_rect_context();
+  const slider_range = use_slider_range_cxt();
+  const markers = use_label_cxt();
   const slider_label_id = useRef<number>(slider_lables.length + 1);
 
   const { frame_count, current_frame } = useThreeJSEngine();
 
-  const add_slider_label = use_add_slider_label_ctx();
-  const remove_slider_label = use_remove_slider_label_cxt();
-  const clear_slider_label_list = use_clear_slider_label_list_ctx();
+  const add_slider_label = use_add_label_ctx();
+  const remove_slider_label = use_remove_label_cxt();
+  const clear_slider_label_list = use_clear_label_list_ctx();
 
   const slider_list_on_click = useCallback(
     (id: string) => {

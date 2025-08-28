@@ -12,16 +12,16 @@ import { upload_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 import {
-  use_set_range_context,
+  use_set_range_cxt,
   use_set_std_slider_value_cxt,
   use_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
 
-import { use_clear_slider_label_list_ctx } from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
-  const set_range = use_set_range_context();
+  const set_range = use_set_range_cxt();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
@@ -55,7 +55,7 @@ export function ContainerTopbar() {
   const std_slider_value = use_std_slider_value_cxt();
   const set_std_slider_value = use_set_std_slider_value_cxt();
 
-  const clear_slider_label_list = use_clear_slider_label_list_ctx();
+  const clear_slider_label_list = use_clear_label_list_ctx();
 
   // ======================= Handler =======================
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {

@@ -2,8 +2,8 @@ import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import {
-  use_set_range_context,
-  use_slider_range_context,
+  use_set_range_cxt,
+  use_slider_range_cxt,
   use_std_slider_value_cxt,
   use_set_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
@@ -23,8 +23,8 @@ export function ContainerSlider() {
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const label_slider_reference = useRef<HTMLSpanElement | null>(null);
 
-  const label_slider_range = use_slider_range_context();
-  const set_range = use_set_range_context();
+  const label_slider_range = use_slider_range_cxt();
+  const set_range = use_set_range_cxt();
 
   const std_slider_value = use_std_slider_value_cxt();
   const set_std_slider_value = use_set_std_slider_value_cxt();

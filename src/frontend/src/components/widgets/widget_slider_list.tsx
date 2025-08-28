@@ -9,14 +9,15 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
 import { SliderLabel } from '@/containers/container_label_list';
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import {
-  use_start_edit_visited_context,
-  use_save_edit_visited_context,
-  use_cancel_edit_visited_context,
+  use_start_edit_label_cxt,
+  use_save_edit_label_cxt,
+  use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
 
@@ -72,9 +73,9 @@ export function WidgetSliderList({
   slider_list_clear_on_click,
 }: Props) {
   const [open, setOpen] = useState<boolean>(true);
-  const startEdit = use_start_edit_visited_context();
-  const saveEdit = use_save_edit_visited_context();
-  const cancelEdit = use_cancel_edit_visited_context();
+  const startEdit = use_start_edit_label_cxt();
+  const saveEdit = use_save_edit_label_cxt();
+  const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
 
   return (
@@ -95,6 +96,10 @@ export function WidgetSliderList({
         <Button onClick={slider_list_clear_on_click}>
           <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
           {'Clear label list'}
+        </Button>
+        <Button onClick={alert}>
+          <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
+          {'Save labels to json'}
         </Button>
       </Box>
 

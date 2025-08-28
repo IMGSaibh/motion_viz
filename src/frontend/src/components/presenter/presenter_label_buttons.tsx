@@ -1,5 +1,5 @@
 import { Box, ButtonBase, styled } from '@mui/material';
-import { use_can_save_context } from '@/context/context_slider_label_list';
+import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 
 import btn1 from '@/Assets/Label_1.png';
 import btn2 from '@/Assets/Label_2.png';
@@ -38,7 +38,7 @@ export function PresenterLabelButtons(props: Props) {
     { src: btn4, label: 'Button_4' },
   ];
 
-  const canSave = use_can_save_context();
+  const canSave = use_can_save_label_cxt();
 
   return (
     <>

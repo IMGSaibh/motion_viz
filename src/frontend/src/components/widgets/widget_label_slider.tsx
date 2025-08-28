@@ -1,7 +1,7 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import { Box } from '@mui/material';
-import { use_labeled_rect_context } from '@/context/context_slider_label_list';
+import { use_label_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
@@ -44,7 +44,7 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 
 export function WidgetLabelSlider(props: Props) {
   const theme = useTheme();
-  const saved_labels = use_labeled_rect_context();
+  const saved_labels = use_label_cxt();
   const editing_id = use_editing_label_id_cxt();
 
   const max = Math.max(0, props.label_slider_framecount);
