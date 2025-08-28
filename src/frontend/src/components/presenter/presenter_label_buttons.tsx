@@ -1,4 +1,6 @@
 import { Box, ButtonBase, styled } from '@mui/material';
+import { use_can_save_context } from '@/context/context_slider_label_list';
+
 import btn1 from '@/Assets/Label_1.png';
 import btn2 from '@/Assets/Label_2.png';
 import btn3 from '@/Assets/Label_3.png';
@@ -36,6 +38,8 @@ export function PresenterLabelButtons(props: Props) {
     { src: btn4, label: 'Button_4' },
   ];
 
+  const canSave = use_can_save_context();
+
   return (
     <>
       <Box
@@ -51,7 +55,7 @@ export function PresenterLabelButtons(props: Props) {
         })}
       >
         {buttons.map((imgButton, i) => (
-          <LabelButtons key={i} onClick={() => props.onAnyLabelClick?.(imgButton.label)}>
+          <LabelButtons key={i} onClick={() => props.onAnyLabelClick?.(imgButton.label)} disabled={!canSave}>
             <Box
               sx={{
                 position: 'absolute',

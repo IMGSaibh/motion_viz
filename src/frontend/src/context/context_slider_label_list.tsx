@@ -13,7 +13,6 @@ type SliderSliderlistContext = {
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
-  // Editing-Flow
   editing_id: string | null;
   start_editing_label: (id: string) => void; // setzt range auf [from,to] und merkt sich das Ziel
   save_current_edited_label: () => void; // speichert aktuellen range in den Marker mit editing_id
@@ -31,7 +30,6 @@ type MarkerAction =
   | { type: 'clear' }
   | { type: 'update'; id: string; from: number; to: number };
 
-// ===== Marker-Reducer: vermeidet unnötige Referenzwechsel =====
 function normalize(label: RangeLabel): RangeLabel {
   if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
   const from = Math.min(label.from, label.to);
@@ -44,7 +42,6 @@ function markerReducer(state: RangeLabel[], action: MarkerAction): RangeLabel[] 
     case 'add': {
       const label = normalize(action.range_label);
       if (!label.id) return state;
-      // Duplikate (id) vermeiden; No-Op → gleiche Referenz zurückgeben
       if (state.some((x) => x.id === label.id)) return state;
       return [...state, label];
     }
@@ -72,6 +69,10 @@ function markerReducer(state: RangeLabel[], action: MarkerAction): RangeLabel[] 
   }
 }
 
+function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
+  return aFrom < bTo && aTo > bFrom;
+}
+
 export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
   const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeLabel[]);
@@ -81,7 +82,6 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
-  // === Edit-Flow ===
   const start_editing_label = useCallback(
     (id: string) => {
       const m = range_marker.find((x) => x.id === id);
@@ -223,5 +223,16 @@ export function use_set_std_slider_value_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_set_std_slider_value_context must be used within <SliderSliderlistProvider>');
     return v.set_std_slider_value;
+  });
+}
+
+export function use_can_save_context() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_can_save_context must be used within <SliderSliderlistProvider>');
+    const [fromRaw, toRaw] = v.range;
+    const from = Math.min(fromRaw, toRaw);
+    const to = Math.max(fromRaw, toRaw);
+    const hasOverlap = v.range_marker.some((m) => overlaps(from, to, Math.min(m.from, m.to), Math.max(m.from, m.to)));
+    return !hasOverlap;
   });
 }
