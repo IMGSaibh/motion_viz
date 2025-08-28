@@ -13,11 +13,13 @@ type SliderSliderlistContext = {
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
-  // Editing-Flow
   editing_id: string | null;
   start_editing_label: (id: string) => void; // setzt range auf [from,to] und merkt sich das Ziel
   save_current_edited_label: () => void; // speichert aktuellen range in den Marker mit editing_id
   cancel_current_edit_label: () => void; // beendet den Edit-Modus ohne zu speichern
+
+  std_slider_value: number;
+  set_std_slider_value: (n: number) => void;
 };
 
 const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
@@ -28,7 +30,6 @@ type MarkerAction =
   | { type: 'clear' }
   | { type: 'update'; id: string; from: number; to: number };
 
-// ===== Marker-Reducer: vermeidet unnötige Referenzwechsel =====
 function normalize(label: RangeLabel): RangeLabel {
   if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
   const from = Math.min(label.from, label.to);
@@ -41,7 +42,6 @@ function markerReducer(state: RangeLabel[], action: MarkerAction): RangeLabel[] 
     case 'add': {
       const label = normalize(action.range_label);
       if (!label.id) return state;
-      // Duplikate (id) vermeiden; No-Op → gleiche Referenz zurückgeben
       if (state.some((x) => x.id === label.id)) return state;
       return [...state, label];
     }
@@ -69,6 +69,10 @@ function markerReducer(state: RangeLabel[], action: MarkerAction): RangeLabel[] 
   }
 }
 
+function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
+  return aFrom < bTo && aTo > bFrom;
+}
+
 export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
   const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeLabel[]);
@@ -78,7 +82,6 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
-  // === Edit-Flow ===
   const start_editing_label = useCallback(
     (id: string) => {
       const m = range_marker.find((x) => x.id === id);
@@ -102,6 +105,8 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
     set_editing_id(null);
   }, [editing_id]);
 
+  const [std_slider_value, set_std_slider_value] = useState(0);
+
   const value = useMemo<SliderSliderlistContext>(
     () => ({
       range,
@@ -114,6 +119,8 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
       start_editing_label: start_editing_label,
       save_current_edited_label: save_current_edited_label,
       cancel_current_edit_label: cancel_current_edit_label,
+      std_slider_value,
+      set_std_slider_value,
     }),
     [
       range,
@@ -125,6 +132,9 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
       start_editing_label,
       save_current_edited_label,
       cancel_current_edit_label,
+
+      std_slider_value,
+      set_std_slider_value,
     ],
   );
 
@@ -175,7 +185,7 @@ export function use_clear_slider_label_list_ctx() {
 }
 
 // === Edit-Selector-Hooks ===
-export function use_editing_visited_id_context() {
+export function use_editing_label_id_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_editing_visited_id_context must be used within <SliderSliderlistProvider>');
     return v.editing_id;
@@ -200,5 +210,29 @@ export function use_cancel_edit_visited_context() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_cancel_edit_visited_context must be used within <SliderSliderlistProvider>');
     return v.cancel_current_edit_label;
+  });
+}
+
+export function use_std_slider_value_cxt() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_std_slider_value_context must be used within <SliderSliderlistProvider>');
+    return v.std_slider_value;
+  });
+}
+export function use_set_std_slider_value_cxt() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_set_std_slider_value_context must be used within <SliderSliderlistProvider>');
+    return v.set_std_slider_value;
+  });
+}
+
+export function use_can_save_context() {
+  return useContextSelector(slider_sliderlist_context, (v) => {
+    if (!v) throw new Error('use_can_save_context must be used within <SliderSliderlistProvider>');
+    const [fromRaw, toRaw] = v.range;
+    const from = Math.min(fromRaw, toRaw);
+    const to = Math.max(fromRaw, toRaw);
+    const hasOverlap = v.range_marker.some((m) => overlaps(from, to, Math.min(m.from, m.to), Math.max(m.from, m.to)));
+    return !hasOverlap;
   });
 }

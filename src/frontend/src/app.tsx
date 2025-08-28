@@ -11,24 +11,23 @@ export default function App() {
     <>
       <ThreeJSEngineProvider>
         <ThreeJSScene />
-        <ContainerTopbar />
+        <SliderSliderlistProvider>
+          <ContainerTopbar />
 
-        {/* bottom ui  */}
-        <Box
-          sx={(theme) => ({
-            position: 'absolute',
-            left: '1vw',
-            right: '1vw',
-            bottom: '1vw',
-            p: '1rem',
-            bgcolor: theme.palette.background.paper,
-          })}
-        >
-          <SliderSliderlistProvider>
+          {/* bottom ui  */}
+          <Box
+            sx={(theme) => ({
+              position: 'absolute',
+              width: '100%',
+              bottom: '0vw',
+              p: '1rem',
+              bgcolor: theme.palette.background.paper,
+            })}
+          >
             <ContainerSlider></ContainerSlider>
             <ContainerSliderList></ContainerSliderList>
-          </SliderSliderlistProvider>
-        </Box>
+          </Box>
+        </SliderSliderlistProvider>
       </ThreeJSEngineProvider>
     </>
   );

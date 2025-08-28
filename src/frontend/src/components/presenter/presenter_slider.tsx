@@ -27,7 +27,7 @@ export function PresenterSlider(props: Props) {
           bgcolor: 'background.paper',
           mb: '1vw',
           borderRadius: 2,
-          p: 2,
+          p: 1,
           display: 'flex',
           alignItems: 'center',
         }}
@@ -35,7 +35,7 @@ export function PresenterSlider(props: Props) {
         <Typography sx={{ whiteSpace: 'nowrap', mr: 4, flexShrink: 0 }}>
           Frame: {props.label_slider_range[0]} – {props.label_slider_range[1]} / {props.label_slider_framecount}
         </Typography>
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ position: 'relative', flex: 1, height: '100%' }}>
           <WidgetStdSlider
             {...{
               std_slider_value: props.std_slider_value,
@@ -52,7 +52,7 @@ export function PresenterSlider(props: Props) {
             label_slider_on_change={props.label_slider_on_change}
             label_slider_on_mouse_leave={props.label_slider_on_mouse_leave}
           />
-        </div>
+        </Box>
         <Box sx={{ ml: 10, mr: 6 }}>{}</Box>
       </Box>
     </>

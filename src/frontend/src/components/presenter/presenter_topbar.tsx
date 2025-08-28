@@ -30,10 +30,10 @@ export function PresenterTopbar(props: Props) {
       <AppBar>
         <Toolbar>
           <Container maxWidth={false} disableGutters>
-            <Stack direction="row" alignItems="center" spacing={2} flexWrap="nowrap">
+            <Stack direction="row" alignItems="center" flexWrap="nowrap">
               {/* LEFT: Buttons */}
               <Stack direction="row" spacing={2} alignItems="center" flexWrap="nowrap">
-                <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <WidgetFileUpload
                     {...{
                       file_dialog_reference: props.file_dialog_reference,

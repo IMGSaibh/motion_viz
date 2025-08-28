@@ -10,16 +10,14 @@ import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { SliderLabel } from '@/containers/container_label_list';
-// import { use_start_edit_visited_context } from '@/context/context_slider_sliderlist';
 
-// + neue Imports:
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   use_start_edit_visited_context,
   use_save_edit_visited_context,
   use_cancel_edit_visited_context,
-  use_editing_visited_id_context,
+  use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
@@ -77,24 +75,28 @@ export function WidgetSliderList({
   const startEdit = use_start_edit_visited_context();
   const saveEdit = use_save_edit_visited_context();
   const cancelEdit = use_cancel_edit_visited_context();
-  const editingId = use_editing_visited_id_context();
+  const editingId = use_editing_label_id_cxt();
 
   return (
-    <Box sx={{ width: '100%' }}>
-      {/* Dropdown-Header */}
-      <Button
-        onClick={() => setOpen((v) => !v)}
-        endIcon={
-          <ExpandMoreIcon sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }} />
-        }
-      >
-        {'Label-Liste'}
-      </Button>
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Dropdown-Header */}
+        <Button
+          onClick={() => setOpen((v) => !v)}
+          endIcon={
+            <ExpandMoreIcon
+              sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
+            />
+          }
+        >
+          {'Label-Liste'}
+        </Button>
 
-      <Button onClick={slider_list_clear_on_click}>
-        <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-        {'Clear label list'}
-      </Button>
+        <Button onClick={slider_list_clear_on_click}>
+          <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
+          {'Clear label list'}
+        </Button>
+      </Box>
 
       <Collapse in={open && slider_labels.length > 0} timeout="auto" unmountOnExit>
         <List

@@ -1,7 +1,12 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { use_set_range_context, use_slider_range_context } from '@/context/context_slider_label_list';
+import {
+  use_set_range_context,
+  use_slider_range_context,
+  use_std_slider_value_cxt,
+  use_set_std_slider_value_cxt,
+} from '@/context/context_slider_label_list';
 
 export function ContainerSlider() {
   const {
@@ -14,17 +19,18 @@ export function ContainerSlider() {
     get_thumbnail_for_frame,
     reset,
   } = useThreeJSEngine();
+  const label_slider_range = use_slider_range_context();
+  const set_range = use_set_range_context();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const label_slider_reference = useRef<HTMLSpanElement | null>(null);
-  const [std_slider_value, set_std_slider_value] = useState<number>(0);
+
+  const std_slider_value = use_std_slider_value_cxt();
+  const set_std_slider_value = use_set_std_slider_value_cxt();
 
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
-
-  const label_slider_range = use_slider_range_context();
-  const set_range = use_set_range_context();
 
   useEffect(
     () => () => {
@@ -35,7 +41,7 @@ export function ContainerSlider() {
 
   useEffect(() => {
     set_std_slider_value(current_frame ?? 0);
-  }, [current_frame]);
+  }, [current_frame, set_std_slider_value]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,11 +49,13 @@ export function ContainerSlider() {
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
-        set_std_slider_value(0);
         set_range([0, 1]);
+        set_std_slider_value(0);
       }
       if (e.code === 'KeyR') {
+        stop();
         go_to_frame(0);
+        set_range([0, 1]);
         reset();
         set_std_slider_value(0);
       }
