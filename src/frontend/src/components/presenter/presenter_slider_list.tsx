@@ -5,6 +5,7 @@ type Props = {
   slider_lables: SliderLabel[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
+  save_labels_on_click?: (motion_file_name: string) => void;
 };
 
 export function PresenterSliderList(props: Props) {
@@ -14,6 +15,7 @@ export function PresenterSliderList(props: Props) {
         slider_labels={props.slider_lables}
         slider_list_on_click={props.slider_list_on_click}
         slider_list_clear_on_click={props.slider_list_clear_on_click}
+        save_labels_on_click={props.save_labels_on_click}
       />
     </>
   );

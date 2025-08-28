@@ -50,3 +50,14 @@ export async function convertBvh(opts?: { signal?: AbortSignal }) {
     { method: 'POST', signal: opts?.signal },
   );
 }
+
+/** ===== Labels speichern ===== */
+export type LabelItem = { startframe: number; endframe: number };
+
+export async function save_labels_to_json(motion_name: string, labels: LabelItem[], opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message: string; file: string }>('/api_save_labels/save_labels', {
+    method: 'POST',
+    body: JSON.stringify({ motion_name, labels }),
+    signal: opts?.signal,
+  });
+}

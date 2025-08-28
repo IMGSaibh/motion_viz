@@ -65,12 +65,14 @@ type Props = {
   slider_labels: SliderLabel[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
+  save_labels_on_click?: (motion_file_name: string) => void;
 };
 
 export function WidgetSliderList({
   slider_labels: slider_labels = [],
   slider_list_on_click,
   slider_list_clear_on_click,
+  save_labels_on_click,
 }: Props) {
   const [open, setOpen] = useState<boolean>(true);
   const startEdit = use_start_edit_label_cxt();
@@ -97,7 +99,7 @@ export function WidgetSliderList({
           <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
           {'Clear label list'}
         </Button>
-        <Button onClick={alert}>
+        <Button onClick={() => save_labels_on_click?.('motion_name_test')}>
           <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
           {'Save labels to json'}
         </Button>

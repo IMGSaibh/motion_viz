@@ -2,6 +2,7 @@ import { useCallback, useRef, useMemo } from 'react';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { PresenterSliderList } from '@/components/presenter/presenter_slider_list';
+import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 
 import {
   use_slider_range_cxt,
@@ -18,6 +19,8 @@ export function ContainerSliderList() {
   const slider_range = use_slider_range_cxt();
   const markers = use_label_cxt();
   const slider_label_id = useRef<number>(slider_lables.length + 1);
+
+  const hook_save_labels = hook_save_labels_to_json();
 
   const { frame_count, current_frame } = useThreeJSEngine();
 
@@ -69,6 +72,19 @@ export function ContainerSliderList() {
     }));
   }, [markers, frame_count]);
 
+  // ===== Speichern-Handler: speichert aktuelle Liste ins Backend =====
+  const on_save_click = useCallback(
+    (file_name: string) => {
+      const labels = markers.map((m) => {
+        const a = Math.min(m.from, m.to);
+        const b = Math.max(m.from, m.to);
+        return { startframe: a, endframe: b };
+      });
+      hook_save_labels.mutate({ file_name, labels });
+    },
+    [markers, hook_save_labels],
+  );
+
   return (
     <>
       <PresenterLabelButtons onAnyLabelClick={add_slider_label_on_click}></PresenterLabelButtons>
@@ -77,6 +93,7 @@ export function ContainerSliderList() {
         slider_lables={slider_labels}
         slider_list_on_click={slider_list_on_click}
         slider_list_clear_on_click={slider_list_on_click_clear_list}
+        save_labels_on_click={on_save_click}
       />
     </>
   );
