@@ -14,9 +14,9 @@ type SliderSliderlistContext = {
   clear_slider_label_list: () => void;
 
   editing_id: string | null;
-  start_editing_label: (id: string) => void; // setzt range auf [from,to] und merkt sich das Ziel
-  save_current_edited_label: () => void; // speichert aktuellen range in den Marker mit editing_id
-  cancel_current_edit_label: () => void; // beendet den Edit-Modus ohne zu speichern
+  start_editing_label: (id: string) => void;
+  save_current_edited_label: () => void;
+  cancel_current_edit_label: () => void;
 
   std_slider_value: number;
   set_std_slider_value: (n: number) => void;
@@ -88,8 +88,6 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
       if (!m) return;
       set_range([m.from, m.to]);
       set_editing_id(id);
-      console.log('start edit', id);
-      console.log('range_marker', range_marker);
     },
     [range_marker],
   );

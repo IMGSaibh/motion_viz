@@ -130,7 +130,7 @@ main.py
 ├── /threeJS                            ← 3D webgl engine
 │   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
 │   └──/components                      ← 3D webgl engine (camera, scene, ...)
-│   └──/system                          ← 3D webgl engine (renderer, engine loop whoch holds all updatable objects)
+│   └──/system                          ← 3D webgl engine (renderer, engine loop, holds all updatable objects)
 │   └──/motion_loader                   ← loads motion files (bvh, mvnx, ...)
 │   └──/motion_player                   ← plays a motion file (bvh, fbx, npy, ...)
 │
@@ -148,14 +148,14 @@ main.py
 ├── /containers
 │   └── widget_container_1.tsx          ← Central logic + manager + states
 │   └── widget_container_2.tsx          ← Central logic + manager + states
-|   └── ...
-|
+│   └── ...
+│
 ├── /context
-|   └── context_1.tsx                   ← context objects + dependencies to other modul
-|   └── context_2.tsx                   ← context objects + dependencies to other modul
-|   └── ...
+│   └── context_1.tsx                   ← context objects + dependencies to other modul
+│   └── context_2.tsx                   ← context objects + dependencies to other modul
+│   └── ...
 │
 ├── app.tsx                             ← contains all containers
-|
+│
 └── main.tsx                            ← Root
 ```
