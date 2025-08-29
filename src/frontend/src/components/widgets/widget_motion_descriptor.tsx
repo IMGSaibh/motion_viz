@@ -151,7 +151,7 @@ export function WidgetMotionDescriptorBar(props: Props) {
         <DialogActions>
           <Stack direction="row" spacing={1}>
             <Button onClick={props.motion_config_on_click}>Close</Button>
-            <Button onClick={props.motion_config_create_on_click} variant="contained">
+            <Button onClick={props.motion_config_create_on_click} variant="outlined">
               Create descriptor Json
             </Button>
           </Stack>
