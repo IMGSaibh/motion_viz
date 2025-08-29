@@ -1,5 +1,6 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
+import { PresenterSlider_2 } from '@/components/presenter/presenter_slider_2';
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   use_set_range_cxt,
@@ -167,7 +168,8 @@ export function ContainerSlider() {
 
   return (
     <>
-      <PresenterSlider {...label_slider_props} {...std_slider_props} />
+      <PresenterSlider_2 {...label_slider_props} {...std_slider_props} />
+      {/* <PresenterSlider {...label_slider_props} {...std_slider_props} /> */}
       <img ref={preview_render_img_ref} alt="" />
     </>
   );

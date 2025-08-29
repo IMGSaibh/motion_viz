@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 
 const StdSlider = styled(Slider)(({ theme }) => ({
-  zIndex: 0,
+  padding: 0,
   '& .MuiSlider-track': {
     backgroundColor: 'transparent',
     border: 'none',
@@ -20,6 +20,7 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     boxShadow: 'none',
     outline: 'none',
     transition: 'none',
+    '&::before, &::after': { content: '""', display: 'none' },
   },
 }));
 type Props = {
@@ -34,7 +35,6 @@ export function WidgetStdSlider(props: Props) {
   return (
     <>
       <StdSlider
-        style={{ position: 'absolute', inset: 0 }}
         value={props.std_slider_value}
         min={0}
         max={props.std_slider_framecount}

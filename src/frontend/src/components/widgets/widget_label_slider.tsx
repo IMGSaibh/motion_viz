@@ -5,7 +5,7 @@ import { use_label_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
-  zIndex: 1,
+  padding: 0,
   '& .MuiSlider-track': { color: theme.palette.info.main },
   '& .MuiSlider-rail': { height: 4, backgroundColor: '#fff', opacity: 1 },
   '& .MuiSlider-valueLabel': {
@@ -76,7 +76,6 @@ export function WidgetLabelSlider(props: Props) {
   return (
     <>
       <LabelSlider
-        style={{ inset: 0, zIndex: 2 }}
         value={[from, to]}
         min={0}
         max={max}
