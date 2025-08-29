@@ -1,7 +1,7 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import { Box } from '@mui/material';
-import { use_labeled_rect_context } from '@/context/context_slider_label_list';
+import { use_label_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
@@ -39,15 +39,12 @@ type Props = {
 };
 
 function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  // strikte Überschneidung: [aFrom,aTo) mit [bFrom,bTo)
-  // passt gut für diskrete Frames; wenn Endpunkte als inklusiv gelten sollen,
-  // ändere die Vergleiche auf: aFrom <= bTo && aTo >= bFrom
   return aFrom < bTo && aTo > bFrom;
 }
 
 export function WidgetLabelSlider(props: Props) {
   const theme = useTheme();
-  const saved_labels = use_labeled_rect_context();
+  const saved_labels = use_label_cxt();
   const editing_id = use_editing_label_id_cxt();
 
   const max = Math.max(0, props.label_slider_framecount);
@@ -66,7 +63,7 @@ export function WidgetLabelSlider(props: Props) {
   const isRtl = theme.direction === 'rtl';
 
   const hasOverlap = saved_labels
-    .filter((m) => m.id !== editing_id) // eigenes Label beim Editieren ignorieren
+    .filter((m) => m.id !== editing_id)
     .some(({ from: vf, to: vt }) => {
       const vvFrom = clamp(Math.min(vf, vt));
       const vvTo = clamp(Math.max(vf, vt));
@@ -132,7 +129,6 @@ export function WidgetLabelSlider(props: Props) {
             transformOrigin: isRtl ? 'right center' : 'left center',
             transform: `scaleX(${scaleX})`,
             ...(isRtl ? { right: `${leftPct}%` } : { left: `${leftPct}%` }),
-            // background: theme.palette.primary.main,
             background: hasOverlap ? theme.palette.error.main : theme.palette.primary.main,
             pointerEvents: 'none',
           }}

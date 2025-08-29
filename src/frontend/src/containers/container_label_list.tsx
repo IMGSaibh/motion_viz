@@ -2,28 +2,30 @@ import { useCallback, useRef, useMemo } from 'react';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { PresenterSliderList } from '@/components/presenter/presenter_slider_list';
+import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 
 import {
-  use_slider_range_context,
-  use_add_slider_label_ctx,
-  use_remove_slider_label_cxt,
-  use_clear_slider_label_list_ctx,
-  use_labeled_rect_context,
+  use_slider_range_cxt,
+  use_add_label_ctx,
+  use_remove_label_cxt,
+  use_clear_label_list_ctx,
+  use_label_cxt,
 } from '@/context/context_slider_label_list';
 
 export type SliderLabel = { id: string; label: string; range: [number, number]; framecount: number };
 export const slider_lables: SliderLabel[] = [];
 
 export function ContainerSliderList() {
-  const slider_range = use_slider_range_context();
-  const markers = use_labeled_rect_context();
+  const { frame_count, current_frame, selected_motion } = useThreeJSEngine();
+  const slider_range = use_slider_range_cxt();
+  const markers = use_label_cxt();
   const slider_label_id = useRef<number>(slider_lables.length + 1);
 
-  const { frame_count, current_frame } = useThreeJSEngine();
+  const hook_save_labels = hook_save_labels_to_json();
 
-  const add_slider_label = use_add_slider_label_ctx();
-  const remove_slider_label = use_remove_slider_label_cxt();
-  const clear_slider_label_list = use_clear_slider_label_list_ctx();
+  const add_slider_label = use_add_label_ctx();
+  const remove_slider_label = use_remove_label_cxt();
+  const clear_slider_label_list = use_clear_label_list_ctx();
 
   const slider_list_on_click = useCallback(
     (id: string) => {
@@ -69,6 +71,21 @@ export function ContainerSliderList() {
     }));
   }, [markers, frame_count]);
 
+  // ===== Speichern-Handler: speichert aktuelle lable Liste ins Backend =====
+  const on_save_click = useCallback(() => {
+    if (!selected_motion) return;
+
+    const labels = markers.map((m) => {
+      const startframe = Math.min(m.from, m.to);
+      const endframe = Math.max(m.from, m.to);
+      return { startframe, endframe };
+    });
+
+    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
+
+    hook_save_labels.mutate({ motion_name, labels });
+  }, [markers, selected_motion, hook_save_labels]);
+
   return (
     <>
       <PresenterLabelButtons onAnyLabelClick={add_slider_label_on_click}></PresenterLabelButtons>
@@ -77,6 +94,7 @@ export function ContainerSliderList() {
         slider_lables={slider_labels}
         slider_list_on_click={slider_list_on_click}
         slider_list_clear_on_click={slider_list_on_click_clear_list}
+        save_labels_on_click={on_save_click}
       />
     </>
   );

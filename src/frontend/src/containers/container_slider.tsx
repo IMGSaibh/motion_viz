@@ -1,9 +1,9 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import {
-  use_set_range_context,
-  use_slider_range_context,
+  use_set_range_cxt,
+  use_slider_range_cxt,
   use_std_slider_value_cxt,
   use_set_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
@@ -19,11 +19,12 @@ export function ContainerSlider() {
     get_thumbnail_for_frame,
     reset,
   } = useThreeJSEngine();
-  const label_slider_range = use_slider_range_context();
-  const set_range = use_set_range_context();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const label_slider_reference = useRef<HTMLSpanElement | null>(null);
+
+  const label_slider_range = use_slider_range_cxt();
+  const set_range = use_set_range_cxt();
 
   const std_slider_value = use_std_slider_value_cxt();
   const set_std_slider_value = use_set_std_slider_value_cxt();
@@ -59,13 +60,30 @@ export function ContainerSlider() {
         reset();
         set_std_slider_value(0);
       }
-      if (e.code === 'KeyP') print_scene_components();
+      if (e.code === 'KeyD') print_scene_components();
+      if (e.code === 'Digit1' && e.location === 0) {
+        set_range([std_slider_value, label_slider_range[1]]);
+      }
+      if (e.code === 'Digit2' && e.location === 0) {
+        set_range([label_slider_range[0], std_slider_value]);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
 
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [go_to_frame, play_pause, stop, frame_count]);
+  }, [
+    play_pause,
+    stop,
+    go_to_frame,
+    reset,
+    print_scene_components,
+    frame_count,
+    std_slider_value,
+    label_slider_range,
+    set_range,
+    set_std_slider_value,
+  ]);
 
   const std_slider_on_mouse_leave = useCallback(() => {
     if (preview_render_img_ref.current) {
