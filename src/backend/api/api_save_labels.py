@@ -1,4 +1,3 @@
-# api_save_labels.py
 import json
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
@@ -18,20 +17,25 @@ class SaveLabelsRequest(BaseModel):
 @router.post("/save_labels")
 async def save_labels_to_json(payload: SaveLabelsRequest):
     if not payload.labels:
-        raise HTTPException(status_code=422, detail="labels must not be empty")
+        return {
+            "message": "", 
+            "warning": "file could not be saved",
+        }
 
-    # optional: sicherstellen, dass start<=end
+    # optional: make sure start <= end frame
     labels = []
     for item in payload.labels:
         a, b = sorted((item.startframe, item.endframe))
         labels.append({"startframe": a, "endframe": b})
 
-    safe_name = Path(payload.motion_name).name  # Pfadteile entfernen
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)
-    file_path = target_dir / f"{safe_name}.json"
+    file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
 
     # only label list
     file_path.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    return {"message": "saved json", "file": str(file_path)}
+    return {
+        "message": "saved labels", 
+        "warning": "",
+    }
