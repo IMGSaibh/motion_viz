@@ -8,7 +8,10 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
   zIndex: 1,
   '& .MuiSlider-track': { color: theme.palette.info.main },
   '& .MuiSlider-rail': { height: 4, backgroundColor: '#fff', opacity: 1 },
-  '& .MuiSlider-valueLabel': { background: theme.palette.info.main, transform: 'translateY(-140%) scale(1)' },
+  '& .MuiSlider-valueLabel': {
+    background: theme.palette.info.main,
+    transform: 'translateY(-140%) scale(1)',
+  },
   '& .MuiSlider-thumb': {
     width: 10,
     height: 28,

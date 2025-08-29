@@ -3,10 +3,14 @@ import Slider from '@mui/material/Slider';
 
 const StdSlider = styled(Slider)(({ theme }) => ({
   zIndex: 0,
-  color: 'transparent',
   '& .MuiSlider-track': {
     backgroundColor: 'transparent',
     border: 'none',
+  },
+  '& .MuiSlider-rail': { opacity: 0 },
+  '& .MuiSlider-valueLabel': {
+    background: theme.palette.secondary.main,
+    transform: 'translateY(-140%) scale(1)',
   },
   '& .MuiSlider-thumb': {
     width: 4,
@@ -16,10 +20,6 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     boxShadow: 'none',
     outline: 'none',
     transition: 'none',
-  },
-  '& .MuiSlider-valueLabel': {
-    background: theme.palette.secondary.main,
-    transform: 'translateY(-140%) scale(1)',
   },
 }));
 type Props = {

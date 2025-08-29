@@ -27,7 +27,7 @@ const LabelButtons = styled(ButtonBase)(({ theme }) => ({
 }));
 
 type Props = {
-  onAnyLabelClick?: (label?: string) => void;
+  onClick?: (label?: string) => void;
 };
 
 export function PresenterLabelButtons(props: Props) {
@@ -55,7 +55,7 @@ export function PresenterLabelButtons(props: Props) {
         })}
       >
         {buttons.map((imgButton, i) => (
-          <LabelButtons key={i} onClick={() => props.onAnyLabelClick?.(imgButton.label)} disabled={!canSave}>
+          <LabelButtons key={i} onClick={() => props.onClick?.(imgButton.label)} disabled={!canSave}>
             <Box
               sx={{
                 position: 'absolute',
