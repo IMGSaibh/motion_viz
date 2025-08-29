@@ -1,8 +1,8 @@
 import json
-from pathlib import Path
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
 from typing import List
+from pathlib import Path
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 

@@ -11,6 +11,7 @@ import {
   use_clear_label_list_ctx,
   use_label_cxt,
 } from '@/context/context_slider_label_list';
+import { use_snackbar_ctx } from '@/context/context_snackbar';
 
 export type SliderLabel = { id: string; label: string; range: [number, number]; framecount: number };
 export const slider_lables: SliderLabel[] = [];
@@ -19,8 +20,9 @@ export function ContainerSliderList() {
   const { frame_count, current_frame, selected_motion } = useThreeJSEngine();
   const slider_range = use_slider_range_cxt();
   const markers = use_label_cxt();
-  const slider_label_id = useRef<number>(slider_lables.length + 1);
+  const { success, error } = use_snackbar_ctx();
 
+  const slider_label_id = useRef<number>(slider_lables.length + 1);
   const hook_save_labels = hook_save_labels_to_json();
 
   const add_slider_label = use_add_label_ctx();
@@ -83,12 +85,22 @@ export function ContainerSliderList() {
 
     const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
 
-    hook_save_labels.mutate({ motion_name, labels });
+    // TODO: check hook and api function to implement them with same convention
+    hook_save_labels.mutate(
+      { motion_name, labels },
+      {
+        onSuccess: (respond: any) => {
+          if (respond.message) success(respond.message);
+          if (respond.warning) error(respond.warning);
+        },
+        onError: (err: any) => error(err?.message || 'Saving labels failed'),
+      },
+    );
   }, [markers, selected_motion, hook_save_labels]);
 
   return (
     <>
-      <PresenterLabelButtons onAnyLabelClick={add_slider_label_on_click}></PresenterLabelButtons>
+      <PresenterLabelButtons onClick={add_slider_label_on_click}></PresenterLabelButtons>
 
       <PresenterSliderList
         slider_lables={slider_labels}

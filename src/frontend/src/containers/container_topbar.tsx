@@ -1,6 +1,4 @@
 import { useRef, useState } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
@@ -18,10 +16,12 @@ import {
 } from '@/context/context_slider_label_list';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
+import { use_snackbar_ctx } from '@/context/context_snackbar';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
   const set_range = use_set_range_cxt();
+  const { success, warning, error } = use_snackbar_ctx();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
@@ -41,10 +41,6 @@ export function ContainerTopbar() {
     dimsize: useRef<HTMLInputElement>(null),
   } as const;
 
-  const [snackbar_open, set_snackbar_open] = useState(false);
-  const [success_message, set_success_message] = useState<string | null>(null);
-  const [warning_message, set_warning_message] = useState<string | null>(null);
-
   // --- React Query hooks ---
   const query_motion_files = select_motion_files({ enabled: false });
   const mutation_upload_files = upload_motion_files();
@@ -63,14 +59,10 @@ export function ContainerTopbar() {
     if (files.length === 0) return;
     try {
       const respond = await mutation_upload_files.mutateAsync(files);
-      const success = respond.message !== '' ? `${respond.message} Files Uploaded` : null;
-      const warning = respond.warning !== '' ? `${respond.warning} not supported` : null;
-      set_success_message(success);
-      set_warning_message(warning);
-      set_snackbar_open(Boolean(success || warning));
+      if (respond.message) success(`${respond.message} Files Uploaded`);
+      if (respond.warning) warning(`${respond.warning} not supported`);
     } catch (err: any) {
-      set_warning_message(err?.message || 'Upload failed');
-      set_snackbar_open(true);
+      error(err?.message || 'Upload failed');
     } finally {
       e.target.value = '';
     }
@@ -96,10 +88,8 @@ export function ContainerTopbar() {
     };
 
     mutation_create_descriptor.mutate(data, {
-      onSuccess: (respond: any) => {
-        set_success_message(respond?.message || 'Created descriptor file!');
-        set_snackbar_open(true);
-      },
+      onSuccess: (respond: any) => success(respond?.message || 'Created descriptor file!'),
+      onError: (err: any) => error(err?.message || 'Creation failed'),
     });
   }
 
@@ -116,44 +106,26 @@ export function ContainerTopbar() {
   async function handle_convert_with_pose_viewer() {
     try {
       const respond = await mutation_convert_pv.mutateAsync();
-      const success = respond.message !== '' ? `${respond.message}` : null;
-      const warning = respond.warning !== '' ? `${respond.warning}` : null;
-
-      set_success_message(success);
-      set_warning_message(warning);
-      set_snackbar_open(Boolean(success || warning));
-    } catch (error: any) {
-      set_warning_message(error?.message || 'Conversion failed');
-      set_snackbar_open(true);
+      if (respond.message) success(respond.message);
+      if (respond.warning) warning(`${respond.warning}`);
+    } catch (e: any) {
+      error(e?.message || 'Conversion failed');
     }
   }
 
   async function handle_convert_motion_file() {
     try {
       const respond = await mutation_convert_bvh.mutateAsync();
-
-      const success = respond.message !== '' ? `${respond.message}` : null;
-      const warning = respond.warning !== '' ? `${respond.warning}` : null;
-
-      set_success_message(success);
-      set_warning_message(warning);
-      set_snackbar_open(Boolean(success || warning));
-    } catch (error: any) {
-      set_warning_message(error?.message || 'Conversion failed');
-      set_snackbar_open(true);
+      if (respond.message) success(respond.message);
+      if (respond.warning) warning(`${respond.warning}`);
+    } catch (e: any) {
+      error(e?.message || 'Conversion failed');
     }
   }
 
   async function handle_motion_file_list_on_focus() {
     await query_motion_files.refetch();
   }
-
-  const handle_snack_close = (_?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') return;
-    set_snackbar_open(false);
-    set_success_message(null);
-    set_warning_message(null);
-  };
 
   return (
     <>
@@ -171,27 +143,6 @@ export function ContainerTopbar() {
         motion_file_list_on_focus={handle_motion_file_list_on_focus}
         motion_file_list_on_change={handle_motion_file_list_on_change}
       />
-      <Snackbar
-        className="snackbar-centered"
-        open={snackbar_open}
-        autoHideDuration={8000}
-        onClose={handle_snack_close}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        sx={{ zIndex: '1000' }}
-      >
-        <div>
-          {success_message && (
-            <Alert onClose={handle_snack_close} severity="success" variant="filled">
-              {success_message}
-            </Alert>
-          )}
-          {warning_message && (
-            <Alert onClose={handle_snack_close} severity="warning" variant="filled">
-              {warning_message}
-            </Alert>
-          )}
-        </div>
-      </Snackbar>
     </>
   );
 }
