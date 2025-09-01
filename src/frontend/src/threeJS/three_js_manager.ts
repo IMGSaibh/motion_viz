@@ -200,6 +200,7 @@ export class ThreeJSEngine {
   cleanup_loop() {
     this.loop.updatables = this.loop.updatables.filter((obj) => obj === this._orbitControls);
   }
+
   cleanup_thumbnail_render() {
     if (this.thumbnail_renderer) {
       this.thumbnail_renderer.dispose();

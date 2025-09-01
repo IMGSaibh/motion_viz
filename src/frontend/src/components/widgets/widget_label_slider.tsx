@@ -1,6 +1,6 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { use_label_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
