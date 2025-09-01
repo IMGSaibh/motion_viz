@@ -1,9 +1,10 @@
-import { WidgetLabelSlider } from '../widgets/widget_label_slider';
-import { Box, Grid, Slider, Typography } from '@mui/material';
-import { WidgetStdSlider } from '../widgets/widget_std_slider';
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
 import * as React from 'react';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
+import { Box, Grid, Typography } from '@mui/material';
+import { WidgetStdSlider } from '../widgets/widget_std_slider';
+import { WidgetLabelSlider } from '../widgets/widget_label_slider';
+import { WidgetLabelPreview } from '../widgets/widget_label_preview';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -33,7 +34,7 @@ export function PresenterSlider(props: Props) {
       <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, p: 1, mb: '1vw' }}>
         <Grid container alignItems="center" wrap="nowrap">
           <Grid size={1.5}>
-            <Typography sx={{ whiteSpace: 'nowrap' }}>
+            <Typography sx={{}}>
               Frame: {props.label_slider_range[0]} – {props.label_slider_range[1]} / {props.label_slider_framecount}
             </Typography>
           </Grid>
@@ -61,7 +62,9 @@ export function PresenterSlider(props: Props) {
               </Box>
             </Box>
           </Grid>
-          <Grid size={1.5} sx={{ display: 'grid', placeItems: 'center' }}></Grid>
+          <Grid size={1.5} sx={{ display: 'grid', placeItems: 'center' }}>
+            <WidgetLabelPreview />
+          </Grid>
         </Grid>
       </Box>
     </>

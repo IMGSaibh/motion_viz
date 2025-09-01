@@ -18,7 +18,6 @@ type ThreeJSEngineContext = {
   cleanup_thumbnail_render: () => void;
   print_scene_components: () => void;
   get_thumbnail_for_frame: (i: number) => Promise<string | null>;
-  reset: () => void;
 };
 
 const three_js_engine_context = createContext<ThreeJSEngineContext | null>(null);
@@ -79,16 +78,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
 
-  const reset = useCallback(() => {
-    threejs_mngr_ref.current?.stop?.();
-    threejs_mngr_ref.current?.go_to_frame?.(0);
-    set_current_frame(0);
-    set_frame_count(0);
-    threejs_mngr_ref.current?.cleanup_player?.();
-    threejs_mngr_ref.current?.cleanup_loop?.();
-    threejs_mngr_ref.current?.cleanup_thumbnail_render?.();
-  }, []);
-
   const value = useMemo<ThreeJSEngineContext>(
     () => ({
       threejs_scene_ref,
@@ -109,7 +98,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       cleanup_thumbnail_render,
       print_scene_components,
       get_thumbnail_for_frame,
-      reset,
     }),
     [
       selected_motion,
@@ -124,7 +112,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       cleanup_thumbnail_render,
       print_scene_components,
       get_thumbnail_for_frame,
-      reset,
     ],
   );
 

@@ -17,7 +17,9 @@ export function ContainerSlider() {
     play_pause,
     print_scene_components,
     get_thumbnail_for_frame,
-    reset,
+    cleanup_player,
+    cleanup_loop,
+    cleanup_thumbnail_render,
   } = useThreeJSEngine();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
@@ -56,8 +58,10 @@ export function ContainerSlider() {
       if (e.code === 'KeyR') {
         stop();
         go_to_frame(0);
+        cleanup_player();
+        cleanup_loop();
+        cleanup_thumbnail_render();
         set_range([0, 1]);
-        reset();
         set_std_slider_value(0);
       }
       if (e.code === 'KeyD') print_scene_components();
@@ -76,7 +80,6 @@ export function ContainerSlider() {
     play_pause,
     stop,
     go_to_frame,
-    reset,
     print_scene_components,
     frame_count,
     std_slider_value,
@@ -117,7 +120,6 @@ export function ContainerSlider() {
         set_range([value[0], value[1]]);
 
         if (preview_render_img_ref.current) {
-          console.log('preview ');
           preview_render_img_ref.current.style.display = 'block';
           preview_render_img_ref.current.style.left = `${css_style_left}px`;
         }
