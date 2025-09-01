@@ -30,7 +30,7 @@ type Props = {
 export function PresenterSlider(props: Props) {
   return (
     <>
-      <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, p: 1 }}>
+      <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, p: 1, mb: '1vw' }}>
         <Grid container alignItems="center" wrap="nowrap">
           <Grid size={1.5}>
             <Typography sx={{ whiteSpace: 'nowrap' }}>
