@@ -116,15 +116,6 @@ export function ContainerSlider() {
         // for storing values per saved label
         set_range([value[0], value[1]]);
 
-        // if (preview_render_img_ref.current) {
-        //   preview_render_img_ref.current.style.display = 'block';
-        //   preview_render_img_ref.current.style.position = 'absolute';
-        //   preview_render_img_ref.current.style.left = `${css_style_left}px`;
-        //   preview_render_img_ref.current.style.top = `-230px`;
-        //   preview_render_img_ref.current.style.zIndex = '0';
-        //   preview_render_img_ref.current.style.border = '1px solid #000';
-        // }
-
         if (preview_render_img_ref.current) {
           console.log('preview ');
           preview_render_img_ref.current.style.display = 'block';
