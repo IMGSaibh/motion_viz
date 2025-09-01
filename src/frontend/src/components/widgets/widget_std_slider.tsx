@@ -2,7 +2,6 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 
 const StdSlider = styled(Slider)(({ theme }) => ({
-  padding: 0,
   '& .MuiSlider-track': {
     backgroundColor: 'transparent',
     border: 'none',
@@ -11,6 +10,7 @@ const StdSlider = styled(Slider)(({ theme }) => ({
   '& .MuiSlider-valueLabel': {
     background: theme.palette.secondary.main,
     transform: 'translateY(-140%) scale(1)',
+    pointerEvents: 'none',
   },
   '& .MuiSlider-thumb': {
     width: 4,

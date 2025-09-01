@@ -1,10 +1,14 @@
 [
   {
-    "startframe": 7,
+    "startframe": 4,
+    "endframe": 10
+  },
+  {
+    "startframe": 21,
     "endframe": 23
   },
   {
-    "startframe": 3,
-    "endframe": 7
+    "startframe": 15,
+    "endframe": 18
   }
 ]
