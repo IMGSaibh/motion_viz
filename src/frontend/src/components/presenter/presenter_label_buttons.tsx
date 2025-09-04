@@ -1,16 +1,6 @@
 import { Box, ButtonBase, styled } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { use_label_assets_ctx } from '@/context/context_label_assets'; // << neu
-
-// import btn1 from '@/Assets/Label_1.png';
-// import btn2 from '@/Assets/Label_2.png';
-// import btn3 from '@/Assets/Label_3.png';
-// import btn4 from '@/Assets/Label_4.png';
-
-// type LabelButtonType = {
-//   src: string;
-//   label?: string;
-// };
+import { use_label_assets_ctx } from '@/context/context_label_assets';
 
 const LabelButton = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
@@ -32,15 +22,8 @@ type Props = {
 };
 
 export function PresenterLabelButtons(props: Props) {
-  // const label_buttons: LabelButtonType[] = [
-  //   { src: btn1, label: 'Button_1' },
-  //   { src: btn2, label: 'Button_2' },
-  //   { src: btn3, label: 'Button_3' },
-  //   { src: btn4, label: 'Button_4' },
-  // ];
-
   const canSave = use_can_save_label_cxt();
-  const label_buttons = use_label_assets_ctx(); // << aus Context
+  const label_buttons = use_label_assets_ctx();
   return (
     <>
       <Box
