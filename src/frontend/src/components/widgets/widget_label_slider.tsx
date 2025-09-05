@@ -1,6 +1,6 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { use_label_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
@@ -35,8 +35,6 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
 type Props = {
   label_slider_range: [number, number];
   label_slider_framecount: number;
-  label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
-  label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
 };
 
@@ -58,7 +56,7 @@ export function WidgetLabelSlider(props: Props) {
   const to = Math.max(a, b);
   const len = Math.max(0, to - from);
 
-  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0); // runde für stabile Pixel
+  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
   const leftPct = pct(from, max);
   const scaleX = max > 0 ? Math.max(0, Math.round((len / max) * 10000) / 10000) : 0;
 
@@ -81,8 +79,6 @@ export function WidgetLabelSlider(props: Props) {
         step={1}
         valueLabelDisplay="on"
         ref={props.label_slider_reference}
-        onChange={props.label_slider_on_change}
-        onMouseLeave={props.label_slider_on_mouse_leave}
       />
 
       {/* Layer underneath label slider: saved labels + current labels */}

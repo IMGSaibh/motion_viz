@@ -59,7 +59,7 @@ export class BVH_Player {
     }
   }
 
-  stop() {
+  pause() {
     this.is_playing = false;
     this.bvh_loader_object.mixer!.time = 0;
   }

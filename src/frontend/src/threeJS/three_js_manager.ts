@@ -147,10 +147,10 @@ export class ThreeJSEngine {
     else if (this.fbx_player) this.fbx_player.play_pause();
   }
 
-  stop() {
-    if (this.npy_player) this.npy_player.stop();
-    else if (this.bvh_player) this.bvh_player.stop();
-    else if (this.fbx_player) this.fbx_player.stop();
+  pause() {
+    if (this.npy_player) this.npy_player.pause();
+    else if (this.bvh_player) this.bvh_player.pause();
+    else if (this.fbx_player) this.fbx_player.pause();
   }
 
   go_to_frame(frame_index: number) {

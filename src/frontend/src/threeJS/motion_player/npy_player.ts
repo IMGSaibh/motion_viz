@@ -71,7 +71,7 @@ export class NPY_Player {
     }
   }
 
-  stop() {
+  pause() {
     this.is_playing = false;
   }
 

@@ -1,31 +1,27 @@
 import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import { styled } from '@mui/material/styles';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, SliderProps, Typography, Slider } from '@mui/material';
 import { WidgetStdSlider } from '../widgets/widget_std_slider';
 import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
+import { WidgetSliderMeasurments } from '../widgets/widget_slider_measurements';
 
 type Props = {
   std_slider_value: number;
   std_slider_framecount: number;
   std_slider_reference: React.RefObject<HTMLSpanElement | null>;
-  std_slider_on_change: (e: Event, value: number) => void;
-  std_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+  std_slider_on_change?: SliderProps['onChange'];
+  std_slider_on_mouse_leave: SliderProps['onMouseLeave'];
+  std_slider_on_pointer_move: SliderProps['onPointerMove'];
 
   label_slider_range: [number, number];
   label_slider_framecount: number;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
-  label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
-  label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
+
+  // NEU: Raster-Steuerung
+  gridMinorEvery: number;
+  gridMajorEvery: number;
+  onGridMinorChange: SliderProps['onChange'];
+  onGridMajorChange: SliderProps['onChange'];
 };
 
 export function PresenterSlider(props: Props) {
@@ -33,14 +29,40 @@ export function PresenterSlider(props: Props) {
     <>
       <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, p: 1, mb: '1vw' }}>
         <Grid container alignItems="center" wrap="nowrap">
-          <Grid size={1.5}>
+          <Grid size={1}>
             <Typography sx={{}}>
-              Frame: {props.label_slider_range[0]} – {props.label_slider_range[1]} / {props.label_slider_framecount}
+              Frame: {props.std_slider_value} / {props.label_slider_framecount}
+            </Typography>
+            <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              Raster&nbsp;<b>{props.gridMinorEvery ?? 10}</b>
+              <Slider
+                size="small"
+                value={props.gridMinorEvery ?? 10}
+                onChange={props.onGridMinorChange}
+                step={1}
+                min={1}
+                max={50}
+                sx={{ width: 140, mt: 0.5 }}
+                aria-label="Raster minor (Frames)"
+              />
+            </Typography>
+            <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              Hauptlinie&nbsp;<b>{props.gridMajorEvery ?? 50}</b>
+              <Slider
+                size="small"
+                value={props.gridMajorEvery ?? 50}
+                onChange={props.onGridMajorChange}
+                step={props.gridMinorEvery ?? 10}
+                min={props.gridMinorEvery ?? 10}
+                max={250}
+                sx={{ width: 140, mt: 0.5 }}
+                aria-label="Raster major (Frames)"
+              />
             </Typography>
           </Grid>
-          <Grid size={9}>
+          <Grid size={10}>
             <Box sx={{ position: 'relative', height: 56, width: '100%' }}>
-              <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+              <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
                 <WidgetStdSlider
                   {...{
                     std_slider_value: props.std_slider_value,
@@ -48,21 +70,27 @@ export function PresenterSlider(props: Props) {
                     std_slider_reference: props.std_slider_reference,
                     std_slider_on_change: props.std_slider_on_change,
                     std_slider_on_mouse_leave: props.std_slider_on_mouse_leave,
+                    std_slider_on_pointer_move: props.std_slider_on_pointer_move,
                   }}
                 />
               </Box>
-              <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+              <WidgetSliderMeasurments
+                {...{
+                  std_slider_framecount: props.std_slider_framecount,
+                  gridMinorEvery: props.gridMinorEvery,
+                  gridMajorEvery: props.gridMajorEvery,
+                }}
+              />
+              <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <WidgetLabelSlider
                   label_slider_range={props.label_slider_range}
                   label_slider_framecount={props.label_slider_framecount}
                   label_slider_reference={props.label_slider_reference}
-                  label_slider_on_change={props.label_slider_on_change}
-                  label_slider_on_mouse_leave={props.label_slider_on_mouse_leave}
                 />
               </Box>
             </Box>
           </Grid>
-          <Grid size={1.5} sx={{ display: 'grid', placeItems: 'center' }}>
+          <Grid size={1} sx={{ display: 'grid', placeItems: 'center' }}>
             <WidgetLabelPreview />
           </Grid>
         </Grid>

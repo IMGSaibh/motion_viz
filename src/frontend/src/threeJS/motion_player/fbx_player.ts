@@ -73,7 +73,7 @@ export class FBX_Player {
     }
   }
 
-  stop() {
+  pause() {
     this.is_playing = false;
     this.fbx_loader_object.mixer!.setTime(0);
   }

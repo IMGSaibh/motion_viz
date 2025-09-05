@@ -1,19 +1,20 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import {
   use_set_range_cxt,
   use_slider_range_cxt,
   use_std_slider_value_cxt,
   use_set_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
-
+import { Slider } from '@mui/material';
 export function ContainerSlider() {
   const {
     frame_count,
     current_frame,
     go_to_frame,
     stop,
+    pause,
     play_pause,
     print_scene_components,
     get_thumbnail_for_frame,
@@ -34,6 +35,9 @@ export function ContainerSlider() {
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
+
+  const [gridMinorEvery, setGridMinorEvery] = useState(10);
+  const [gridMajorEvery, setGridMajorEvery] = useState(50);
 
   useEffect(
     () => () => {
@@ -88,6 +92,47 @@ export function ContainerSlider() {
     set_std_slider_value,
   ]);
 
+  const std_slider_on_change = useCallback(
+    (e: Event, value: number | number[]) => {
+      if (!Array.isArray(value)) {
+        set_std_slider_value(value);
+        pause();
+        go_to_frame(value);
+      }
+    },
+    [pause, go_to_frame, set_std_slider_value],
+  );
+
+  const std_slider_on_pointer_move = useCallback(
+    (e: React.PointerEvent<HTMLSpanElement>) => {
+      const rect = std_slider_reference.current?.getBoundingClientRect();
+      if (!rect || !frame_count) return;
+
+      const x = e.clientX - rect.left;
+      const ratio = Math.min(1, Math.max(0, x / rect.width));
+      const idx = Math.round(ratio * Math.max(0, frame_count - 1));
+
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      const mySeq = ++seqRef.current;
+
+      rafRef.current = requestAnimationFrame(() => {
+        let css_left = ratio * rect.width + 50;
+        if (preview_render_img_ref.current) {
+          preview_render_img_ref.current.style.display = 'block';
+          preview_render_img_ref.current.style.left = `${css_left}px`;
+        }
+
+        get_thumbnail_for_frame(idx).then((data_url) => {
+          if (seqRef.current !== mySeq) return; // Race-Guard
+          if (preview_render_img_ref.current && data_url) {
+            preview_render_img_ref.current.src = data_url;
+          }
+        });
+      });
+    },
+    [frame_count, get_thumbnail_for_frame],
+  );
+
   const std_slider_on_mouse_leave = useCallback(() => {
     if (preview_render_img_ref.current) {
       preview_render_img_ref.current.style.display = 'none';
@@ -96,51 +141,25 @@ export function ContainerSlider() {
     seqRef.current++;
   }, []);
 
-  const std_slider_on_change = useCallback(
-    (e: Event, value: number) => {
-      stop();
-      go_to_frame(value);
-      set_std_slider_value(value);
-    },
-    [stop, go_to_frame],
-  );
-
-  const label_slider_on_change = useCallback(
-    (e: Event, value: number | number[], active_idx: number) => {
-      const rect = label_slider_reference.current?.getBoundingClientRect();
-      if (!rect || !frame_count) return;
-
-      if (Array.isArray(value) && value.length === 2) {
-        const idx = value[active_idx];
-        const percent = frame_count > 1 ? idx / (frame_count - 1) : 0;
-        let css_style_left = percent * rect.width;
-        css_style_left += 50;
-
-        // for storing values per saved label
-        set_range([value[0], value[1]]);
-
-        if (preview_render_img_ref.current) {
-          preview_render_img_ref.current.style.display = 'block';
-          preview_render_img_ref.current.style.left = `${css_style_left}px`;
-        }
-
-        const mySeq = ++seqRef.current;
-        get_thumbnail_for_frame(idx).then((data_url) => {
-          if (seqRef.current !== mySeq) return;
-          if (preview_render_img_ref.current && data_url) preview_render_img_ref.current.src = data_url;
-        });
-      }
-    },
-    [frame_count, get_thumbnail_for_frame],
-  );
-
-  const label_slider_on_mouse_leave = useCallback(() => {
-    if (preview_render_img_ref.current) {
-      preview_render_img_ref.current.style.display = 'none';
-      preview_render_img_ref.current.removeAttribute('src');
-    }
-    seqRef.current++;
+  // major auf Vielfaches von minor snappen
+  const snapMajor = useCallback((minor: number, major: number) => {
+    if (major < minor) return minor;
+    const k = Math.max(1, Math.round(major / minor));
+    return k * minor;
   }, []);
+
+  const onMinorChange: NonNullable<React.ComponentProps<typeof Slider>['onChange']> = (_e, v) => {
+    if (Array.isArray(v)) return;
+    const minor = Math.max(1, Math.floor(v));
+    setGridMinorEvery(minor);
+    setGridMajorEvery((prev) => snapMajor(minor, prev));
+  };
+
+  const onMajorChange: NonNullable<React.ComponentProps<typeof Slider>['onChange']> = (_e, v) => {
+    if (Array.isArray(v)) return;
+    const majorRaw = Math.max(1, Math.floor(v));
+    setGridMajorEvery(snapMajor(gridMinorEvery, majorRaw));
+  };
 
   const std_slider_props = useMemo(
     () => ({
@@ -149,8 +168,9 @@ export function ContainerSlider() {
       std_slider_reference,
       std_slider_on_change,
       std_slider_on_mouse_leave,
+      std_slider_on_pointer_move,
     }),
-    [std_slider_value, frame_count, std_slider_on_change, std_slider_on_mouse_leave],
+    [std_slider_value, frame_count, std_slider_on_change, std_slider_on_mouse_leave, std_slider_on_pointer_move],
   );
 
   const label_slider_props = useMemo(
@@ -158,15 +178,20 @@ export function ContainerSlider() {
       label_slider_range,
       label_slider_framecount: frame_count,
       label_slider_reference,
-      label_slider_on_change,
-      label_slider_on_mouse_leave,
     }),
-    [label_slider_range, frame_count, label_slider_on_change, label_slider_on_mouse_leave],
+    [label_slider_range, frame_count],
   );
 
   return (
     <>
-      <PresenterSlider {...label_slider_props} {...std_slider_props} />
+      <PresenterSlider
+        {...label_slider_props}
+        {...std_slider_props}
+        gridMinorEvery={gridMinorEvery}
+        gridMajorEvery={gridMajorEvery}
+        onGridMinorChange={onMinorChange}
+        onGridMajorChange={onMajorChange}
+      />
       <img
         ref={preview_render_img_ref}
         alt=""
