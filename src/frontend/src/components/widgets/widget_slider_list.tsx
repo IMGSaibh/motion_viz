@@ -10,7 +10,7 @@ import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
-import { SliderLabel } from '@/containers/container_label_list';
+import { Label } from '@/containers/container_label_list';
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -62,7 +62,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  slider_labels: SliderLabel[];
+  slider_labels: Label[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
@@ -86,7 +86,7 @@ export function WidgetSliderList({
         {/* Dropdown-Header */}
         <Button
           onClick={() => setOpen((v) => !v)}
-          endIcon={
+          startIcon={
             <ExpandMoreIcon
               sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
             />

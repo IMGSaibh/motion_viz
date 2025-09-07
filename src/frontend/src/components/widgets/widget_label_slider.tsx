@@ -50,15 +50,15 @@ export function WidgetLabelSlider(props: Props) {
   const max = Math.max(0, props.label_slider_framecount);
   const clamp = (n: number) => Math.max(0, Math.min(n, max));
 
-  const a = clamp(props.label_slider_range[0]);
-  const b = clamp(props.label_slider_range[1]);
-  const from = Math.min(a, b);
-  const to = Math.max(a, b);
-  const len = Math.max(0, to - from);
+  const thumb_idx_0 = clamp(props.label_slider_range[0]);
+  const thumb_idx_1 = clamp(props.label_slider_range[1]);
+  const from = Math.min(thumb_idx_0, thumb_idx_1);
+  const to = Math.max(thumb_idx_0, thumb_idx_1);
+  const length = Math.max(0, to - from);
 
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
   const leftPct = pct(from, max);
-  const scaleX = max > 0 ? Math.max(0, Math.round((len / max) * 10000) / 10000) : 0;
+  const scaleX = max > 0 ? Math.max(0, Math.round((length / max) * 10000) / 10000) : 0;
 
   const isRtl = theme.direction === 'rtl';
 

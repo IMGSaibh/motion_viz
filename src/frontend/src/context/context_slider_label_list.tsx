@@ -140,14 +140,14 @@ export function SliderSliderlistProvider({ children }: PropsWithChildren) {
 }
 
 // ===== Selektor-Hooks – minimal re-render =====
-export function use_slider_range_cxt() {
+export function use_range_slider_value_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_slider_range_cxt must be used within <SliderSliderlistProvider>');
     return v.range;
   });
 }
 
-export function use_set_range_cxt() {
+export function use_set_range_slider_value_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_set_range_cxt must be used within <SliderSliderlistProvider>');
     return v.set_slider_label_range;

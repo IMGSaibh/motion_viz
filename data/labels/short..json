@@ -1,10 +1,18 @@
 [
   {
-    "startframe": 79,
-    "endframe": 747
+    "startframe": 1,
+    "endframe": 65
   },
   {
-    "startframe": 747,
-    "endframe": 910
+    "startframe": 85,
+    "endframe": 137
+  },
+  {
+    "startframe": 244,
+    "endframe": 339
+  },
+  {
+    "startframe": 474,
+    "endframe": 532
   }
 ]

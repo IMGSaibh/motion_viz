@@ -1,6 +1,6 @@
 import { Box, ButtonBase, styled } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { use_label_assets_ctx } from '@/context/context_label_assets';
+import { use_label_image_ctx } from '@/context/context_label_buttons';
 
 const LabelButton = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
@@ -22,8 +22,8 @@ type Props = {
 };
 
 export function PresenterLabelButtons(props: Props) {
-  const canSave = use_can_save_label_cxt();
-  const label_buttons = use_label_assets_ctx();
+  const can_save = use_can_save_label_cxt();
+  const label_buttons = use_label_image_ctx();
   return (
     <>
       <Box
@@ -39,7 +39,7 @@ export function PresenterLabelButtons(props: Props) {
         })}
       >
         {label_buttons.map((imgButton, i) => (
-          <LabelButton key={i} onClick={() => props.onClick?.(imgButton.label)} disabled={!canSave}>
+          <LabelButton key={i} onClick={() => props.onClick?.(imgButton.label)} disabled={!can_save}>
             <Box
               sx={{
                 position: 'absolute',

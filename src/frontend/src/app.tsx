@@ -6,7 +6,7 @@ import { ContainerSliderList } from './containers/container_label_list';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import { SliderSliderlistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
-import { LabelAssetsProvider } from '@/context/context_label_assets';
+import { LabelImageProvider } from '@/context/context_label_buttons';
 
 export default function App() {
   return (
@@ -14,7 +14,7 @@ export default function App() {
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
-          <LabelAssetsProvider>
+          <LabelImageProvider>
             <SliderSliderlistProvider>
               <ContainerTopbar />
               {/* bottom ui  */}
@@ -31,7 +31,7 @@ export default function App() {
                 <ContainerSliderList></ContainerSliderList>
               </Box>
             </SliderSliderlistProvider>
-          </LabelAssetsProvider>
+          </LabelImageProvider>
         </ThreeJSEngineProvider>
       </SnackbarProvider>
     </>

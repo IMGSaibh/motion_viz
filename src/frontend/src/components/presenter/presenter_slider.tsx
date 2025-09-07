@@ -60,6 +60,9 @@ export function PresenterSlider(props: Props) {
               />
             </Typography>
           </Grid>
+          <Grid size={1} sx={{ display: 'grid', placeItems: 'center' }}>
+            <WidgetLabelPreview />
+          </Grid>
           <Grid size={10}>
             <Box sx={{ position: 'relative', height: 56, width: '100%' }}>
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
@@ -89,9 +92,6 @@ export function PresenterSlider(props: Props) {
                 />
               </Box>
             </Box>
-          </Grid>
-          <Grid size={1} sx={{ display: 'grid', placeItems: 'center' }}>
-            <WidgetLabelPreview />
           </Grid>
         </Grid>
       </Box>

@@ -1,8 +1,8 @@
 import { WidgetSliderList } from '@/components/widgets/widget_slider_list';
-import { SliderLabel } from '@/containers/container_label_list';
+import { Label } from '@/containers/container_label_list';
 
 type Props = {
-  slider_lables: SliderLabel[];
+  slider_lables: Label[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
