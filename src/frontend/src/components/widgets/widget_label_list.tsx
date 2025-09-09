@@ -10,7 +10,7 @@ import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
-import { Label } from '@/containers/container_label_list';
+import { Label } from '@/containers/container_bottom_ui';
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -68,7 +68,7 @@ type Props = {
   save_labels_on_click?: () => void;
 };
 
-export function WidgetSliderList({
+export function WidgetLabelList({
   slider_labels: slider_labels = [],
   slider_list_on_click,
   slider_list_clear_on_click,
@@ -113,7 +113,7 @@ export function WidgetSliderList({
             borderRadius: 2,
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
-            maxHeight: 4 * 56, // scroll list > 5 items
+            maxHeight: 4 * 56, // scroll list if 3 labels present
             overflowY: 'auto',
           }}
         >

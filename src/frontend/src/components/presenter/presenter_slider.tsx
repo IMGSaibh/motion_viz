@@ -3,7 +3,8 @@ import { Box, Grid, SliderProps, Typography, Slider } from '@mui/material';
 import { WidgetStdSlider } from '../widgets/widget_std_slider';
 import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
-import { WidgetSliderMeasurments } from '../widgets/widget_slider_measurements';
+import { WidgetSliderTicks } from '../widgets/widget_slider_ticks';
+import { WidgetTimelineStats } from '../widgets/widget_timeline_stats';
 
 type Props = {
   std_slider_value: number;
@@ -17,7 +18,6 @@ type Props = {
   label_slider_framecount: number;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
 
-  // NEU: Raster-Steuerung
   gridMinorEvery: number;
   gridMajorEvery: number;
   onGridMinorChange: SliderProps['onChange'];
@@ -30,9 +30,9 @@ export function PresenterSlider(props: Props) {
       <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, p: 1, mb: '1vw' }}>
         <Grid container alignItems="center" wrap="nowrap">
           <Grid size={1}>
-            <Typography sx={{}}>
-              Frame: {props.std_slider_value} / {props.label_slider_framecount}
-            </Typography>
+            <WidgetTimelineStats
+              {...{ std_slider_value: props.std_slider_value, std_slider_framecount: props.label_slider_framecount }}
+            ></WidgetTimelineStats>
             <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               Raster&nbsp;<b>{props.gridMinorEvery ?? 10}</b>
               <Slider
@@ -77,7 +77,7 @@ export function PresenterSlider(props: Props) {
                   }}
                 />
               </Box>
-              <WidgetSliderMeasurments
+              <WidgetSliderTicks
                 {...{
                   std_slider_framecount: props.std_slider_framecount,
                   gridMinorEvery: props.gridMinorEvery,

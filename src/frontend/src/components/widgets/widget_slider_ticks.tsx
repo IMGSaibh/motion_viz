@@ -6,7 +6,7 @@ type Props = {
   gridMajorEvery: number;
 };
 
-export function WidgetSliderMeasurments(props: Props) {
+export function WidgetSliderTicks(props: Props) {
   return (
     <Box
       sx={{

@@ -1,5 +1,5 @@
-import { WidgetSliderList } from '@/components/widgets/widget_slider_list';
-import { Label } from '@/containers/container_label_list';
+import { WidgetLabelList } from '@/components/widgets/widget_label_list';
+import { Label } from '@/containers/container_bottom_ui';
 
 type Props = {
   slider_lables: Label[];
@@ -8,10 +8,10 @@ type Props = {
   save_labels_on_click?: () => void;
 };
 
-export function PresenterSliderList(props: Props) {
+export function PresenterLabelListUI(props: Props) {
   return (
     <>
-      <WidgetSliderList
+      <WidgetLabelList
         slider_labels={props.slider_lables}
         slider_list_on_click={props.slider_list_on_click}
         slider_list_clear_on_click={props.slider_list_clear_on_click}
