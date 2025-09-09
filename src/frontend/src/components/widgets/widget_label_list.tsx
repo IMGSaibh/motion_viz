@@ -1,15 +1,13 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, Divider, IconButton } from '@mui/material';
+import { Box, Divider, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
 import { Label } from '@/containers/container_bottom_ui';
 
 import CheckIcon from '@mui/icons-material/Check';
@@ -25,7 +23,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
 
   '& .MuiSlider-track': {
-    color: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
   },
   '& .MuiSlider-rail': {
     height: 4,
@@ -66,15 +64,10 @@ type Props = {
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
+  toggle_list: boolean;
 };
 
-export function WidgetLabelList({
-  slider_labels: slider_labels = [],
-  slider_list_on_click,
-  slider_list_clear_on_click,
-  save_labels_on_click,
-}: Props) {
-  const [open, setOpen] = useState<boolean>(true);
+export function WidgetLabelList(props: Props) {
   const startEdit = use_start_edit_label_cxt();
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
@@ -82,30 +75,7 @@ export function WidgetLabelList({
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        {/* Dropdown-Header */}
-        <Button
-          onClick={() => setOpen((v) => !v)}
-          startIcon={
-            <ExpandMoreIcon
-              sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
-            />
-          }
-        >
-          {'Label-Liste'}
-        </Button>
-
-        <Button onClick={slider_list_clear_on_click}>
-          <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          {'Clear label list'}
-        </Button>
-        <Button onClick={() => save_labels_on_click?.()}>
-          <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          {'Save labels to json'}
-        </Button>
-      </Box>
-
-      <Collapse in={open && slider_labels.length > 0} timeout="auto" unmountOnExit>
+      <Collapse in={props.toggle_list && props.slider_labels.length > 0} timeout="auto" unmountOnExit>
         <List
           sx={{
             width: '100%',
@@ -117,7 +87,7 @@ export function WidgetLabelList({
             overflowY: 'auto',
           }}
         >
-          {slider_labels.map((slider_label, i) => (
+          {props.slider_labels.map((slider_label, i) => (
             <Fragment key={slider_label.id}>
               <ListItem>
                 <ListItemText
@@ -138,7 +108,7 @@ export function WidgetLabelList({
                   <IconButton
                     size="small"
                     sx={{ width: 40, height: 40, border: 1, borderRadius: 2 }}
-                    onClick={() => slider_list_on_click?.(slider_label.id)}
+                    onClick={() => props.slider_list_on_click?.(slider_label.id)}
                     aria-label="Delete label"
                   >
                     <DeleteIcon fontSize="small" />
@@ -176,7 +146,7 @@ export function WidgetLabelList({
                 </Box>
               </ListItem>
 
-              {i < slider_labels.length - 1 && <Divider component="li" />}
+              {i < props.slider_labels.length - 1 && <Divider component="li" />}
             </Fragment>
           ))}
         </List>

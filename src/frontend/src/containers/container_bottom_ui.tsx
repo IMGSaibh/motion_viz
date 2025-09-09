@@ -286,10 +286,10 @@ export function ContainerBottomUI() {
       <PresenterSlider
         {...range_slider_props}
         {...std_slider_props}
-        gridMinorEvery={gridMinorEvery}
-        gridMajorEvery={gridMajorEvery}
-        onGridMinorChange={onMinorChange}
-        onGridMajorChange={onMajorChange}
+        // gridMinorEvery={gridMinorEvery}
+        // gridMajorEvery={gridMajorEvery}
+        // onGridMinorChange={onMinorChange}
+        // onGridMajorChange={onMajorChange}
       />
       <img
         ref={preview_render_img_ref}

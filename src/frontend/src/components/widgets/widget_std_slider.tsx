@@ -13,7 +13,7 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     pointerEvents: 'none',
   },
   '& .MuiSlider-thumb': {
-    width: 4,
+    width: 3,
     height: 28,
     backgroundColor: theme.palette.secondary.main,
     borderRadius: 0,

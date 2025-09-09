@@ -110,7 +110,7 @@ export function WidgetLabelSlider(props: Props) {
                 transformOrigin: isRtl ? 'right center' : 'left center',
                 transform: `scaleX(${vScale})`,
                 ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                background: color ?? theme.palette.primary.main,
+                background: color ?? theme.palette.secondary.main,
                 pointerEvents: 'none',
               }}
             />
