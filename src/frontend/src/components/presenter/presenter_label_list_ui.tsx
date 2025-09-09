@@ -27,16 +27,16 @@ export function PresenterLabelListUI(props: Props) {
             />
           }
         >
-          {'Label-Liste'}
+          Label-Liste
         </Button>
 
         <Button onClick={props.slider_list_clear_on_click}>
           <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          {'Clear label list'}
+          Clear label list
         </Button>
         <Button onClick={() => props.save_labels_on_click?.()}>
           <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          {'Save labels to json'}
+          Save labels to json
         </Button>
       </Box>
       <WidgetLabelList

@@ -8,14 +8,14 @@ const StdSlider = styled(Slider)(({ theme }) => ({
   },
   '& .MuiSlider-rail': { opacity: 0 },
   '& .MuiSlider-valueLabel': {
-    background: theme.palette.secondary.main,
+    background: theme.palette.primary.main,
     transform: 'translateY(-140%) scale(1)',
     pointerEvents: 'none',
   },
   '& .MuiSlider-thumb': {
     width: 3,
     height: 28,
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.primary.main,
     borderRadius: 0,
     boxShadow: 'none',
     outline: 'none',

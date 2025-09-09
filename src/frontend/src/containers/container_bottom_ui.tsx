@@ -55,9 +55,6 @@ export function ContainerBottomUI() {
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
 
-  const [gridMinorEvery, setGridMinorEvery] = useState(10);
-  const [gridMajorEvery, setGridMajorEvery] = useState(50);
-
   const { success, error } = use_snackbar_ctx();
 
   useEffect(
@@ -252,25 +249,6 @@ export function ContainerBottomUI() {
     );
   }, [markers, selected_motion, hook_save_labels]);
 
-  const snapMajor = useCallback((minor: number, major: number) => {
-    if (major < minor) return minor;
-    const k = Math.max(1, Math.round(major / minor));
-    return k * minor;
-  }, []);
-
-  const onMinorChange: NonNullable<React.ComponentProps<typeof Slider>['onChange']> = (_e, v) => {
-    if (Array.isArray(v)) return;
-    const minor = Math.max(1, Math.floor(v));
-    setGridMinorEvery(minor);
-    setGridMajorEvery((prev) => snapMajor(minor, prev));
-  };
-
-  const onMajorChange: NonNullable<React.ComponentProps<typeof Slider>['onChange']> = (_e, v) => {
-    if (Array.isArray(v)) return;
-    const majorRaw = Math.max(1, Math.floor(v));
-    setGridMajorEvery(snapMajor(gridMinorEvery, majorRaw));
-  };
-
   return (
     <Box
       sx={(theme) => ({
@@ -283,14 +261,7 @@ export function ContainerBottomUI() {
     >
       <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
 
-      <PresenterSlider
-        {...range_slider_props}
-        {...std_slider_props}
-        // gridMinorEvery={gridMinorEvery}
-        // gridMajorEvery={gridMajorEvery}
-        // onGridMinorChange={onMinorChange}
-        // onGridMajorChange={onMajorChange}
-      />
+      <PresenterSlider {...range_slider_props} {...std_slider_props} />
       <img
         ref={preview_render_img_ref}
         alt=""

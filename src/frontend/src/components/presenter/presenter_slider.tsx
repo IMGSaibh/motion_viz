@@ -17,11 +17,6 @@ type Props = {
   label_slider_range: [number, number];
   label_slider_framecount: number;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
-
-  // gridMinorEvery: number;
-  // gridMajorEvery: number;
-  // onGridMinorChange: SliderProps['onChange'];
-  // onGridMajorChange: SliderProps['onChange'];
 };
 
 export function PresenterSlider(props: Props) {
@@ -54,8 +49,6 @@ export function PresenterSlider(props: Props) {
               <WidgetSliderTicks
                 {...{
                   std_slider_framecount: props.std_slider_framecount,
-                  // gridMinorEvery: props.gridMinorEvery,
-                  // gridMajorEvery: props.gridMajorEvery,
                 }}
               />
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
