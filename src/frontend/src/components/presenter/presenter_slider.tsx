@@ -3,7 +3,6 @@ import { Box, Grid, SliderProps } from '@mui/material';
 import { WidgetStdSlider } from '../widgets/widget_std_slider';
 import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
-import { WidgetSliderTicks } from '../widgets/widget_slider_ticks';
 import { WidgetTimelineStats } from '../widgets/widget_timeline_stats';
 
 type Props = {
@@ -22,17 +21,17 @@ type Props = {
 export function PresenterSlider(props: Props) {
   return (
     <>
-      <Box sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 0, p: 0, mb: '1vw' }}>
-        <Grid container alignItems="center" wrap="nowrap">
-          <Grid size={1}>
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={0} alignItems="center" wrap="nowrap">
+          <Grid size={{ md: 1 }}>
             <WidgetTimelineStats
               {...{ std_slider_value: props.std_slider_value, std_slider_framecount: props.label_slider_framecount }}
             ></WidgetTimelineStats>
           </Grid>
-          <Grid size={1} sx={{ display: 'grid', placeItems: 'center' }}>
+          <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <WidgetLabelPreview />
           </Grid>
-          <Grid size={10}>
+          <Grid size={{ md: 10 }}>
             <Box sx={{ position: 'relative', height: 64, width: '100%' }}>
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
                 <WidgetStdSlider
@@ -46,11 +45,6 @@ export function PresenterSlider(props: Props) {
                   }}
                 />
               </Box>
-              <WidgetSliderTicks
-                {...{
-                  std_slider_framecount: props.std_slider_framecount,
-                }}
-              />
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <WidgetLabelSlider
                   label_slider_range={props.label_slider_range}

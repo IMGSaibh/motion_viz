@@ -23,6 +23,13 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     '&::before, &::after': { content: '""', display: 'none' },
     '&:hover, &.Mui-active, &.Mui-focusVisible': { boxShadow: 'none' },
   },
+  '& .MuiSlider-mark': {
+    width: 1, // Liniendicke
+    height: 5, // Länge der Linie
+    borderRadius: 0,
+    backgroundColor: 'white',
+    top: -12, // Position unterhalb des Tracks
+  },
 }));
 type Props = {
   std_slider_value: number;
@@ -34,14 +41,36 @@ type Props = {
 };
 
 export function WidgetStdSlider(props: Props) {
+  const frames = Number(props.std_slider_framecount) || 0;
+  const hasFrames = frames > 0;
+
+  // Wertebereich
+  const min = 0;
+  const max = hasFrames ? frames : 100;
+
+  // nur jeden 5. Tick + Label
+  const marks = hasFrames
+    ? Array.from({ length: frames }, (_, i) => (i % 20 === 0 ? { value: i, label: String(i) } : { value: i }))
+    : [
+        { value: 0, label: '0' },
+        { value: 25, label: '25' },
+        { value: 50, label: '50' },
+        { value: 75, label: '75' },
+        { value: 100, label: '100' },
+      ];
+
+  // Wert sicher im Bereich halten (falls von außen größer/kleiner kommt)
+  const value = Math.min(Math.max(props.std_slider_value ?? 0, min), max);
+
   return (
     <>
       <StdSlider
         value={props.std_slider_value}
-        min={0}
-        max={props.std_slider_framecount}
+        min={min}
+        max={max}
         ref={props.std_slider_reference}
         step={1}
+        marks={marks}
         valueLabelDisplay="on"
         disableSwap={true}
         onChange={props.std_slider_on_change}

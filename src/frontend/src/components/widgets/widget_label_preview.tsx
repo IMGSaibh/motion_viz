@@ -24,7 +24,7 @@ export function WidgetLabelPreview() {
       sx={{
         width: 64,
         height: 64,
-        borderRadius: 1,
+        borderRadius: 2,
         bgcolor: 'background.paper',
         overflow: 'hidden',
         display: 'grid',

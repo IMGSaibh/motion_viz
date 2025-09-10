@@ -6,7 +6,7 @@ import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   '& .MuiSlider-track': { color: theme.palette.info.main },
-  '& .MuiSlider-rail': { height: 4, backgroundColor: '#fff', opacity: 1 },
+  '& .MuiSlider-rail': { height: 2, backgroundColor: '#fff', opacity: 1 },
   '& .MuiSlider-valueLabel': {
     background: theme.palette.info.main,
 

@@ -1,6 +1,6 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { PresenterSlider } from '@/components/presenter/presenter_slider';
-import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   use_set_range_slider_value_cxt,
   use_range_slider_value_cxt,
@@ -11,7 +11,7 @@ import {
   use_clear_label_list_ctx,
   use_label_cxt,
 } from '@/context/context_slider_label_list';
-import { Box, Slider } from '@mui/material';
+import { Box } from '@mui/material';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
