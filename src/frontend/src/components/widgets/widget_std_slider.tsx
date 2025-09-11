@@ -54,13 +54,12 @@ export function WidgetStdSlider(props: Props) {
   const frames = Number(props.std_slider_framecount) || 0;
   const hasFrames = frames > 0;
 
-  // Wertebereich
   const min = 0;
   const max = hasFrames ? frames : 100;
 
   const marks = hasFrames
     ? (() => {
-        const step = 100;
+        const step = 50;
         const out: { value: number; label?: string }[] = [];
         for (let valueText = 0; valueText <= max; valueText += step)
           out.push({ value: valueText, label: String(valueText) });
