@@ -98,7 +98,8 @@ export const theme = createTheme({
           },
         }),
         outlined: ({ theme }) => ({
-          borderColor: theme.palette.text.primary,
+          // borderColor: theme.palette.text.primary,
+          // borderColor: 'divider',
         }),
       },
     },
@@ -116,23 +117,22 @@ export const theme = createTheme({
     MuiSelect: {
       styleOverrides: {
         outlined: ({ theme }) => ({
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-
-          '& .MuiSelect-select': {
-            color: theme.palette.text.primary,
-            backgroundColor: 'transparent',
-          },
-          '& .MuiSelect-icon': {
-            color: theme.palette.text.primary,
-          },
+          // '& .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '&:hover .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '& .MuiSelect-select': {
+          //   color: theme.palette.text.primary,
+          //   backgroundColor: 'transparent',
+          // },
+          // '& .MuiSelect-icon': {
+          //   color: theme.palette.text.primary,
+          // },
         }),
       },
     },
@@ -154,8 +154,8 @@ export const theme = createTheme({
           },
         }),
         notchedOutline: ({ theme }) => ({
-          borderColor: theme.palette.text.primary,
-          borderWidth: '1px',
+          // borderColor: theme.palette.text.primary,
+          // borderWidth: '1px',
         }),
       },
     },
