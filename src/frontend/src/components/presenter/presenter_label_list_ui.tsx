@@ -5,12 +5,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
+import { LabelImage } from '@/context/context_label_buttons';
 
 type Props = {
-  slider_lables: Label[];
+  lables_list: Label[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
+  label_image: LabelImage | null;
 };
 
 export function PresenterLabelListUI(props: Props) {
@@ -40,7 +42,7 @@ export function PresenterLabelListUI(props: Props) {
         </Button>
       </Box>
       <WidgetLabelList
-        slider_labels={props.slider_lables}
+        labels={props.lables_list}
         slider_list_on_click={props.slider_list_on_click}
         slider_list_clear_on_click={props.slider_list_clear_on_click}
         save_labels_on_click={props.save_labels_on_click}

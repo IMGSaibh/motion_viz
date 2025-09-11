@@ -1,24 +1,11 @@
-import { useMemo } from 'react';
 import { Box } from '@mui/material';
-import { use_label_image_map_ctx } from '@/context/context_label_buttons';
-import { use_label_cxt, use_std_slider_value_cxt } from '@/context/context_slider_label_list';
+import { LabelImage } from '@/context/context_label_buttons';
 
-export function WidgetLabelPreview() {
-  const labels = use_label_cxt();
-  const frame = use_std_slider_value_cxt();
-  const label_image_map = use_label_image_map_ctx();
+type Props = {
+  label_image: LabelImage | null;
+};
 
-  //load all images at the beginning. check performances
-  const current_label_image = useMemo(() => {
-    const hit = labels.find((m) => {
-      const from = Math.min(m.from, m.to);
-      const to = Math.max(m.from, m.to);
-      return frame >= from && frame < to;
-    });
-    if (!hit?.label) return null;
-    return label_image_map.get(hit.label) ?? null;
-  }, [labels, frame, label_image_map]);
-
+export function WidgetLabelPreview(props: Props) {
   return (
     <Box
       sx={{
@@ -32,11 +19,11 @@ export function WidgetLabelPreview() {
       }}
       aria-label="Current label image preview"
     >
-      {current_label_image ? (
+      {props.label_image ? (
         <Box
           component="img"
-          src={current_label_image.src}
-          alt={current_label_image.label}
+          src={props.label_image.src}
+          alt={props.label_image.label}
           sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', backgroundColor: 'white' }}
         />
       ) : (

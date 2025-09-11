@@ -9,14 +9,22 @@ import {
   use_add_label_ctx,
   use_remove_label_cxt,
   use_clear_label_list_ctx,
-  use_label_cxt,
+  use_range_marker_cxt,
 } from '@/context/context_slider_label_list';
 import { Box } from '@mui/material';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
-export type Label = { id: string; label: string; range: [number, number]; framecount: number };
+import { LabelImage, use_label_image_map_ctx } from '@/context/context_label_buttons';
+
+export type Label = {
+  id: string;
+  label: string;
+  label_image: LabelImage | null;
+  range: [number, number];
+  framecount: number;
+};
 export const lable_list: Label[] = [];
 
 export function ContainerBottomUI() {
@@ -35,7 +43,7 @@ export function ContainerBottomUI() {
     cleanup_thumbnail_render,
   } = useThreeJSEngine();
 
-  const markers = use_label_cxt();
+  const markers = use_range_marker_cxt();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
   const std_slider_value = use_std_slider_value_cxt();
@@ -54,6 +62,10 @@ export function ContainerBottomUI() {
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
+
+  const range_markers = use_range_marker_cxt();
+  const frame = use_std_slider_value_cxt();
+  const label_image_map = use_label_image_map_ctx();
 
   const { success, error } = use_snackbar_ctx();
 
@@ -214,15 +226,35 @@ export function ContainerBottomUI() {
     clear_label_list();
   }, [clear_label_list]);
 
-  const labels_list: Label[] = useMemo(() => {
+  // const label_list: Label[] = useMemo(() => {
+  //   const fc = Math.max(0, frame_count ?? 0);
+  //   return markers.map((m) => ({
+  //     id: m.id,
+  //     label: m.label ?? `Label_${m.id}`,
+  //     range: [m.from, m.to] as [number, number],
+  //     framecount: fc,
+  //   }));
+  // }, [markers, frame_count]);
+
+  const label_list: Label[] = useMemo(() => {
     const fc = Math.max(0, frame_count ?? 0);
-    return markers.map((m) => ({
-      id: m.id,
-      label: m.label ?? `Label_${m.id}`,
-      range: [m.from, m.to] as [number, number],
-      framecount: fc,
-    }));
-  }, [markers, frame_count]);
+
+    return markers.map((m) => {
+      // Label-Name robust bestimmen (Fallback wie bei dir)
+      const name = m.label && m.label.trim() ? m.label : `Label_${m.id}`;
+
+      // Bild aus dem Kontext-Map holen (kann null sein)
+      const img = label_image_map.get(name) ?? null;
+
+      return {
+        id: m.id,
+        label: name,
+        label_image: img, // <- NEU
+        range: [m.from, m.to] as [number, number],
+        framecount: fc,
+      };
+    });
+  }, [markers, frame_count, label_image_map]); // <- Map als Dependency
 
   // saves lable list to backend
   const on_save_click = useCallback(() => {
@@ -249,6 +281,17 @@ export function ContainerBottomUI() {
     );
   }, [markers, selected_motion, hook_save_labels]);
 
+  //load all images at the beginning. check performances
+  const current_label_image = useMemo(() => {
+    const hit = range_markers.find((m) => {
+      const from = Math.min(m.from, m.to);
+      const to = Math.max(m.from, m.to);
+      return frame >= from && frame < to;
+    });
+    if (!hit?.label) return null;
+    return label_image_map.get(hit.label) ?? null;
+  }, [range_markers, frame, label_image_map]);
+
   return (
     <Box
       sx={(theme) => ({
@@ -261,7 +304,7 @@ export function ContainerBottomUI() {
     >
       <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
 
-      <PresenterSlider {...range_slider_props} {...std_slider_props} />
+      <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
       <img
         ref={preview_render_img_ref}
         alt=""
@@ -276,10 +319,11 @@ export function ContainerBottomUI() {
         }}
       />
       <PresenterLabelListUI
-        slider_lables={labels_list}
+        lables_list={label_list}
         slider_list_on_click={label_list_on_click}
         slider_list_clear_on_click={clear_label_list_on_click}
         save_labels_on_click={on_save_click}
+        label_image={current_label_image}
       />
     </Box>
   );

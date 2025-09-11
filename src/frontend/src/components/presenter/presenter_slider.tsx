@@ -4,6 +4,7 @@ import { WidgetStdSlider } from '../widgets/widget_std_slider';
 import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
 import { WidgetTimelineStats } from '../widgets/widget_timeline_stats';
+import { LabelImage } from '@/context/context_label_buttons';
 
 type Props = {
   std_slider_value: number;
@@ -16,6 +17,8 @@ type Props = {
   label_slider_range: [number, number];
   label_slider_framecount: number;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
+
+  label_image: LabelImage | null;
 };
 
 export function PresenterSlider(props: Props) {
@@ -29,7 +32,7 @@ export function PresenterSlider(props: Props) {
             ></WidgetTimelineStats>
           </Grid>
           <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <WidgetLabelPreview />
+            <WidgetLabelPreview label_image={props.label_image} />
           </Grid>
           <Grid size={{ md: 10 }}>
             <Box sx={{ position: 'relative', height: 64, width: '100%' }}>

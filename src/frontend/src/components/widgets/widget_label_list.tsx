@@ -17,6 +17,7 @@ import {
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
+import { LabelImage } from '@/context/context_label_buttons';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -58,7 +59,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  slider_labels: Label[];
+  labels: Label[];
   slider_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
@@ -73,7 +74,7 @@ export function WidgetLabelList(props: Props) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Collapse in={props.toggle_list && props.slider_labels.length > 0} timeout="auto" unmountOnExit>
+      <Collapse in={props.toggle_list && props.labels.length > 0} timeout="auto" unmountOnExit>
         <List
           sx={{
             width: '100%',
@@ -82,7 +83,7 @@ export function WidgetLabelList(props: Props) {
             overflowY: 'auto',
           }}
         >
-          {props.slider_labels.map((slider_label, i) => (
+          {props.labels.map((slider_label, i) => (
             <Fragment key={slider_label.id}>
               <ListItem disableGutters>
                 <Grid container spacing={0} alignItems="center" wrap="nowrap" sx={{ width: '100%' }}>
@@ -162,7 +163,7 @@ export function WidgetLabelList(props: Props) {
                   </Grid>
 
                   <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <WidgetLabelPreview />
+                    <WidgetLabelPreview label_image={slider_label.label_image} />
                   </Grid>
 
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -175,7 +176,7 @@ export function WidgetLabelList(props: Props) {
                   </Grid>
                 </Grid>
               </ListItem>
-              {i < props.slider_labels.length - 1 && <Divider component="li" />}
+              {i < props.labels.length - 1 && <Divider component="li" />}
             </Fragment>
           ))}
         </List>

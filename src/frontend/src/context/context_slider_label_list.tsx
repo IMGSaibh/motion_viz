@@ -154,7 +154,7 @@ export function use_set_range_slider_value_cxt() {
   });
 }
 
-export function use_label_cxt() {
+export function use_range_marker_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_label_cxt must be used within <SliderSliderlistProvider>');
     return v.range_marker;
