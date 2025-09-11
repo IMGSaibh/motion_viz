@@ -7,7 +7,7 @@ const LabelButton = styled(ButtonBase)(({ theme }) => ({
   width: '100%',
   aspectRatio: '1 / 1',
   fit: 'cover',
-  borderRadius: 8,
+  borderRadius: 2,
   overflow: 'hidden',
   color: theme.palette.primary.main,
   '& .MuiTouchRipple-root': { zIndex: 4 },
@@ -30,11 +30,10 @@ export function PresenterLabelButtons(props: Props) {
         sx={(theme) => ({
           display: 'grid',
           gridTemplateColumns: 'repeat(8, 64px)',
-          gap: 2,
+          gap: 1,
           width: '100%',
-          bgcolor: theme.palette.background.paper,
-          p: '0.75vw',
-          borderRadius: 2,
+          borderRadius: 1,
+          p: '0.2vw',
           mb: '1vw',
         })}
       >

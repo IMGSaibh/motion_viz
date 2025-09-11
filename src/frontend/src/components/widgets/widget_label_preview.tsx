@@ -11,7 +11,7 @@ export function WidgetLabelPreview(props: Props) {
       sx={{
         width: 64,
         height: 64,
-        borderRadius: 2,
+        borderRadius: 1,
         bgcolor: 'background.paper',
         overflow: 'hidden',
         display: 'grid',

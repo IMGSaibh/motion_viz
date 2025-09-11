@@ -226,35 +226,22 @@ export function ContainerBottomUI() {
     clear_label_list();
   }, [clear_label_list]);
 
-  // const label_list: Label[] = useMemo(() => {
-  //   const fc = Math.max(0, frame_count ?? 0);
-  //   return markers.map((m) => ({
-  //     id: m.id,
-  //     label: m.label ?? `Label_${m.id}`,
-  //     range: [m.from, m.to] as [number, number],
-  //     framecount: fc,
-  //   }));
-  // }, [markers, frame_count]);
-
   const label_list: Label[] = useMemo(() => {
     const fc = Math.max(0, frame_count ?? 0);
 
     return markers.map((m) => {
-      // Label-Name robust bestimmen (Fallback wie bei dir)
       const name = m.label && m.label.trim() ? m.label : `Label_${m.id}`;
-
-      // Bild aus dem Kontext-Map holen (kann null sein)
       const img = label_image_map.get(name) ?? null;
 
       return {
         id: m.id,
         label: name,
-        label_image: img, // <- NEU
+        label_image: img,
         range: [m.from, m.to] as [number, number],
         framecount: fc,
       };
     });
-  }, [markers, frame_count, label_image_map]); // <- Map als Dependency
+  }, [markers, frame_count, label_image_map]);
 
   // saves lable list to backend
   const on_save_click = useCallback(() => {
@@ -298,12 +285,10 @@ export function ContainerBottomUI() {
         position: 'absolute',
         width: '100%',
         bottom: '0vw',
-        p: '1rem',
+        p: '0.5rem',
         bgcolor: theme.palette.background.paper,
       })}
     >
-      <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
-
       <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
       <img
         ref={preview_render_img_ref}
@@ -318,6 +303,7 @@ export function ContainerBottomUI() {
           pointerEvents: 'none',
         }}
       />
+      <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
       <PresenterLabelListUI
         lables_list={label_list}
         slider_list_on_click={label_list_on_click}

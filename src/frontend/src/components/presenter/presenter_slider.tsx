@@ -24,7 +24,7 @@ type Props = {
 export function PresenterSlider(props: Props) {
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flexGrow: 1, pt: '1vw' }}>
         <Grid container spacing={0} alignItems="center" wrap="nowrap">
           <Grid size={{ md: 1 }}>
             <WidgetTimelineStats

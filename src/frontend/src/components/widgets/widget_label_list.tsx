@@ -17,7 +17,6 @@ import {
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
-import { LabelImage } from '@/context/context_label_buttons';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -147,7 +146,6 @@ export function WidgetLabelList(props: Props) {
                               <ModeEditIcon fontSize="inherit" />
                             </IconButton>
 
-                            {/* DELETE immer sichtbar */}
                             <IconButton
                               size="small"
                               onClick={() => props.slider_list_on_click?.(slider_label.id)}

@@ -24,11 +24,21 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     '&:hover, &.Mui-active, &.Mui-focusVisible': { boxShadow: 'none' },
   },
   '& .MuiSlider-mark': {
-    width: 1, // Liniendicke
-    height: 5, // Länge der Linie
+    width: 3, // Liniendicke
+    height: 20, // Länge der Linie
     borderRadius: 0,
     backgroundColor: 'white',
-    top: -12, // Position unterhalb des Tracks
+    top: 6, // Position unterhalb des Tracks
+  },
+  '& .MuiSlider-markLabel': {
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    fontSize: 12,
+    lineHeight: 2,
+    top: 2,
+    transform: 'translate(-50%, -140%)',
+    pointerEvents: 'none',
+    color: theme.palette.text.secondary,
   },
 }));
 type Props = {
@@ -48,9 +58,16 @@ export function WidgetStdSlider(props: Props) {
   const min = 0;
   const max = hasFrames ? frames : 100;
 
-  // nur jeden 5. Tick + Label
   const marks = hasFrames
-    ? Array.from({ length: frames }, (_, i) => (i % 20 === 0 ? { value: i, label: String(i) } : { value: i }))
+    ? (() => {
+        const step = 100;
+        const out: { value: number; label?: string }[] = [];
+        for (let valueText = 0; valueText <= max; valueText += step)
+          out.push({ value: valueText, label: String(valueText) });
+
+        if (max % step !== 0) out.push({ value: max, label: String(max) }); // last tick
+        return out;
+      })()
     : [
         { value: 0, label: '0' },
         { value: 25, label: '25' },
@@ -58,9 +75,6 @@ export function WidgetStdSlider(props: Props) {
         { value: 75, label: '75' },
         { value: 100, label: '100' },
       ];
-
-  // Wert sicher im Bereich halten (falls von außen größer/kleiner kommt)
-  const value = Math.min(Math.max(props.std_slider_value ?? 0, min), max);
 
   return (
     <>
