@@ -31,6 +31,13 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
     borderTop: '4px solid white',
     borderBottom: '4px solid white',
   },
+  '& .MuiSlider-mark': {
+    width: 1, // Liniendicke
+    height: 10, // Länge der Linie
+    borderRadius: 0,
+    backgroundColor: 'white',
+    top: 10, // Position unterhalb des Tracks
+  },
 }));
 
 type Props = {
@@ -71,6 +78,16 @@ export function WidgetLabelSlider(props: Props) {
       return overlaps(from, to, vvFrom, vvTo);
     });
 
+  const frames = Number(props.label_slider_framecount) || 0;
+
+  const marks = (() => {
+    const step = 10;
+    const out: { value: number }[] = [];
+    for (let valueText = 0; valueText <= max; valueText += step) out.push({ value: valueText });
+
+    if (max % step !== 0) out.push({ value: max }); // last tick
+    return out;
+  })();
   return (
     <>
       <LabelSlider
@@ -78,6 +95,7 @@ export function WidgetLabelSlider(props: Props) {
         min={0}
         max={max}
         step={1}
+        marks={marks}
         valueLabelDisplay="on"
         ref={props.label_slider_reference}
       />

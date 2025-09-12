@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import { LabelImage } from '@/context/context_label_buttons';
+import { LabelImage } from '@/Assets/label_images';
 
 type Props = {
   lables_list: Label[];

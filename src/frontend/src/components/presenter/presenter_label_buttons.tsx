@@ -1,6 +1,6 @@
 import { Box, ButtonBase, styled, FormControl, FormLabel, Grid } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { use_label_images_ctx } from '@/context/context_label_buttons';
+import { get_label_images_cat1, get_label_images_cat2, get_label_images_cat3 } from '@/Assets/label_images';
 
 const LabelButton = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
@@ -20,22 +20,21 @@ type Props = {
 
 export function PresenterLabelButtons({ onClick }: Props) {
   const can_save = use_can_save_label_cxt();
-  const label_images = use_label_images_ctx();
-
-  const cat1Count = 4;
-  const cat2Count = 4;
+  const label_images_cat1 = get_label_images_cat1();
+  const label_images_cat2 = get_label_images_cat2();
+  const label_images_cat3 = get_label_images_cat3();
 
   const cat1Title = 'Kategorie 1';
   const cat2Title = 'Kategorie 2';
+  const cat3Title = 'Kategorie 3';
 
-  const cat1 = label_images.slice(0, cat1Count);
-  const cat2 = label_images.slice(cat1Count, cat1Count + cat2Count);
-
-  const renderGrid = (items: typeof label_images) => (
+  const render_label_images = (
+    items: typeof label_images_cat1 | typeof label_images_cat2 | typeof label_images_cat3,
+  ) => (
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(8, 64px)', // wie bei dir; ggf. dynamisch machen
+        gridTemplateColumns: 'repeat(8, 64px)',
         gap: 1,
         width: '100%',
         p: '0.2vw',
@@ -62,7 +61,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
   return (
     <>
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 6 }}>
+        <Grid size={{ md: 4 }}>
           <FormControl
             component="fieldset"
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
@@ -70,10 +69,10 @@ export function PresenterLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {cat1Title}
             </FormLabel>
-            {renderGrid(cat1)}
+            {render_label_images(label_images_cat1)}
           </FormControl>
         </Grid>
-        <Grid size={{ md: 6 }}>
+        <Grid size={{ md: 4 }}>
           <FormControl
             component="fieldset"
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
@@ -81,7 +80,18 @@ export function PresenterLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {cat2Title}
             </FormLabel>
-            {renderGrid(cat2)}
+            {render_label_images(label_images_cat2)}
+          </FormControl>
+        </Grid>
+        <Grid size={{ md: 4 }}>
+          <FormControl
+            component="fieldset"
+            sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
+          >
+            <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
+              {cat3Title}
+            </FormLabel>
+            {render_label_images(label_images_cat3)}
           </FormControl>
         </Grid>
       </Grid>

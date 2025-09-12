@@ -4,7 +4,7 @@ import { ContainerTopbarUI } from '@/containers/container_topbar_ui';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import { SliderSliderlistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
-import { LabelImageProvider } from '@/context/context_label_buttons';
+// import { LabelImageProvider } from '@/context/context_label_buttons';
 
 export default function App() {
   return (
@@ -12,12 +12,12 @@ export default function App() {
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
-          <LabelImageProvider>
-            <SliderSliderlistProvider>
-              <ContainerTopbarUI />
-              <ContainerBottomUI></ContainerBottomUI>
-            </SliderSliderlistProvider>
-          </LabelImageProvider>
+          {/* <LabelImageProvider> */}
+          <SliderSliderlistProvider>
+            <ContainerTopbarUI />
+            <ContainerBottomUI></ContainerBottomUI>
+          </SliderSliderlistProvider>
+          {/* </LabelImageProvider> */}
         </ThreeJSEngineProvider>
       </SnackbarProvider>
     </>

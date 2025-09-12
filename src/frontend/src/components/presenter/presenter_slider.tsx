@@ -4,7 +4,7 @@ import { WidgetStdSlider } from '../widgets/widget_std_slider';
 import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
 import { WidgetTimelineStats } from '../widgets/widget_timeline_stats';
-import { LabelImage } from '@/context/context_label_buttons';
+import { LabelImage } from '@/Assets/label_images';
 
 type Props = {
   std_slider_value: number;

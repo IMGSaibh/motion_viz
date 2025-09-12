@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { LabelImage } from '@/context/context_label_buttons';
+import { LabelImage } from '@/Assets/label_images';
 
 type Props = {
   label_image: LabelImage | null;
