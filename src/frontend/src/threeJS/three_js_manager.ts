@@ -95,7 +95,7 @@ export class ThreeJSEngine {
         this.npy_loader = new NPY_loader(this.scene);
         await this.npy_loader.load_npy_animation(fileUrl);
 
-        const skeletonPath = fileUrl.replace('/npy/', '/json/').replace('.npy', '_skeleton.json');
+        const skeletonPath = fileUrl.replace('/npy/', '/json_skeleton/').replace('.npy', '_skeleton.json');
         await this.npy_loader.create_skeleton(skeletonPath);
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
@@ -147,10 +147,10 @@ export class ThreeJSEngine {
     else if (this.fbx_player) this.fbx_player.play_pause();
   }
 
-  stop() {
-    if (this.npy_player) this.npy_player.stop();
-    else if (this.bvh_player) this.bvh_player.stop();
-    else if (this.fbx_player) this.fbx_player.stop();
+  pause() {
+    if (this.npy_player) this.npy_player.pause();
+    else if (this.bvh_player) this.bvh_player.pause();
+    else if (this.fbx_player) this.fbx_player.pause();
   }
 
   go_to_frame(frame_index: number) {

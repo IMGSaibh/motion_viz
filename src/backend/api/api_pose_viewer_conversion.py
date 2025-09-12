@@ -11,7 +11,7 @@ async def convert_pv_style():
     mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
     numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
     numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    pv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
+    pv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json_skeleton")
 
     mvnx_files = list(mvnx_dir_path.glob("*.mvnx"))
 

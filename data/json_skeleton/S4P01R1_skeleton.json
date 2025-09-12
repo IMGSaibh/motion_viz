@@ -1,93 +1,70 @@
 {
   "joints": [
     "Hips",
-    "Pelvis",
-    "LeftUpLeg",
-    "LeftLeg",
-    "LeftFoot",
-    "LeftToeBase",
-    "LeftPantLeg",
-    "Left_Butt",
-    "RightUpLeg",
-    "RightLeg",
-    "RightFoot",
-    "RightToeBase",
-    "RightPantLeg",
-    "Right_Butt",
     "Spine",
     "Spine1",
     "Spine2",
+    "Spine3",
     "Neck",
     "Head",
-    "Visor",
-    "HairMidA",
-    "HairMidB",
-    "HairMidC",
-    "HairMidD",
-    "HairMidE",
-    "HairMidF",
-    "HairLeftA",
-    "HairLeftB",
-    "HairLeftC",
-    "HairLeftD",
-    "HairLeftE",
-    "HairLeftF",
-    "HairRightA",
-    "HairRightB",
-    "HairRightC",
-    "HairRightD",
-    "HairRightE",
-    "HairRightF",
     "LeftShoulder",
+    "LeftShoulder2",
     "LeftArm",
     "LeftForeArm",
     "LeftHand",
     "LeftHandThumb1",
     "LeftHandThumb2",
     "LeftHandThumb3",
+    "LeftHandIndex",
     "LeftHandIndex1",
     "LeftHandIndex2",
     "LeftHandIndex3",
+    "LeftHandMiddle",
     "LeftHandMiddle1",
     "LeftHandMiddle2",
     "LeftHandMiddle3",
+    "LeftHandRing",
     "LeftHandRing1",
     "LeftHandRing2",
     "LeftHandRing3",
+    "LeftHandPinky",
     "LeftHandPinky1",
     "LeftHandPinky2",
     "LeftHandPinky3",
-    "LeftSleeve",
     "RightShoulder",
+    "RightShoulder2",
     "RightArm",
     "RightForeArm",
     "RightHand",
     "RightHandThumb1",
     "RightHandThumb2",
     "RightHandThumb3",
+    "RightHandIndex",
     "RightHandIndex1",
     "RightHandIndex2",
     "RightHandIndex3",
+    "RightHandMiddle",
     "RightHandMiddle1",
     "RightHandMiddle2",
     "RightHandMiddle3",
+    "RightHandRing",
     "RightHandRing1",
     "RightHandRing2",
     "RightHandRing3",
+    "RightHandPinky",
     "RightHandPinky1",
     "RightHandPinky2",
     "RightHandPinky3",
-    "RightSleeve",
-    "Hood",
-    "Hood1",
-    "Hood2",
-    "Left_Breast",
-    "Right_Breast",
-    "Whistle",
-    "Whistle1",
-    "Whistle2",
-    "Belly",
-    "FitGrandmaFacialAnim_Joint"
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "LeftFootToe",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase",
+    "RightFootToe"
   ],
   "hierarchy": [
     [
@@ -116,15 +93,15 @@
     ],
     [
       6,
-      3
+      5
     ],
     [
       7,
-      2
+      4
     ],
     [
       8,
-      1
+      7
     ],
     [
       9,
@@ -140,19 +117,19 @@
     ],
     [
       12,
-      9
+      11
     ],
     [
       13,
-      8
+      12
     ],
     [
       14,
-      0
+      13
     ],
     [
       15,
-      14
+      11
     ],
     [
       16,
@@ -168,87 +145,87 @@
     ],
     [
       19,
-      18
+      11
     ],
     [
       20,
-      18
+      19
     ],
     [
       21,
-      18
+      20
     ],
     [
       22,
-      18
+      21
     ],
     [
       23,
-      18
+      11
     ],
     [
       24,
-      18
+      23
     ],
     [
       25,
-      18
+      24
     ],
     [
       26,
-      18
+      25
     ],
     [
       27,
-      18
+      11
     ],
     [
       28,
-      18
+      27
     ],
     [
       29,
-      18
+      28
     ],
     [
       30,
-      18
+      29
     ],
     [
       31,
-      18
+      4
     ],
     [
       32,
-      18
+      31
     ],
     [
       33,
-      18
+      32
     ],
     [
       34,
-      18
+      33
     ],
     [
       35,
-      18
+      34
     ],
     [
       36,
-      18
+      35
     ],
     [
       37,
-      18
+      36
     ],
     [
       38,
-      16
+      37
     ],
     [
       39,
-      38
+      35
     ],
     [
       40,
@@ -264,7 +241,7 @@
     ],
     [
       43,
-      42
+      35
     ],
     [
       44,
@@ -272,7 +249,7 @@
     ],
     [
       45,
-      41
+      44
     ],
     [
       46,
@@ -280,11 +257,11 @@
     ],
     [
       47,
-      46
+      35
     ],
     [
       48,
-      41
+      47
     ],
     [
       49,
@@ -296,7 +273,7 @@
     ],
     [
       51,
-      41
+      35
     ],
     [
       52,
@@ -308,11 +285,11 @@
     ],
     [
       54,
-      41
+      53
     ],
     [
       55,
-      54
+      0
     ],
     [
       56,
@@ -320,11 +297,11 @@
     ],
     [
       57,
-      40
+      56
     ],
     [
       58,
-      16
+      57
     ],
     [
       59,
@@ -332,7 +309,7 @@
     ],
     [
       60,
-      59
+      0
     ],
     [
       61,
@@ -349,98 +326,6 @@
     [
       64,
       63
-    ],
-    [
-      65,
-      61
-    ],
-    [
-      66,
-      65
-    ],
-    [
-      67,
-      66
-    ],
-    [
-      68,
-      61
-    ],
-    [
-      69,
-      68
-    ],
-    [
-      70,
-      69
-    ],
-    [
-      71,
-      61
-    ],
-    [
-      72,
-      71
-    ],
-    [
-      73,
-      72
-    ],
-    [
-      74,
-      61
-    ],
-    [
-      75,
-      74
-    ],
-    [
-      76,
-      75
-    ],
-    [
-      77,
-      60
-    ],
-    [
-      78,
-      16
-    ],
-    [
-      79,
-      78
-    ],
-    [
-      80,
-      79
-    ],
-    [
-      81,
-      16
-    ],
-    [
-      82,
-      16
-    ],
-    [
-      83,
-      16
-    ],
-    [
-      84,
-      83
-    ],
-    [
-      85,
-      84
-    ],
-    [
-      86,
-      14
-    ],
-    [
-      87,
-      0
     ]
   ]
 }

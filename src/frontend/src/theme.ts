@@ -26,7 +26,7 @@ export const theme = createTheme({
     },
     background: {
       default: '#000000',
-      paper: 'rgba(0,0,0,0.5)',
+      paper: 'rgba(0,0,0,0.8)',
     },
   },
 
@@ -84,7 +84,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           color: theme.palette.text.primary,
-          borderColor: theme.palette.text.primary,
+          borderColor: theme.palette.divider,
           transition: 'all 0.3s',
           '&:hover': {
             backgroundColor: 'rgba(255,255,255,0.15)',
@@ -98,7 +98,7 @@ export const theme = createTheme({
           },
         }),
         outlined: ({ theme }) => ({
-          borderColor: theme.palette.text.primary,
+          borderColor: theme.palette.divider,
         }),
       },
     },
@@ -116,23 +116,22 @@ export const theme = createTheme({
     MuiSelect: {
       styleOverrides: {
         outlined: ({ theme }) => ({
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-          },
-
-          '& .MuiSelect-select': {
-            color: theme.palette.text.primary,
-            backgroundColor: 'transparent',
-          },
-          '& .MuiSelect-icon': {
-            color: theme.palette.text.primary,
-          },
+          // '& .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '&:hover .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          // },
+          // '& .MuiSelect-select': {
+          //   color: theme.palette.text.primary,
+          //   backgroundColor: 'transparent',
+          // },
+          // '& .MuiSelect-icon': {
+          //   color: theme.palette.text.primary,
+          // },
         }),
       },
     },
@@ -140,22 +139,23 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: ({ theme }) => ({
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-            borderWidth: '1px',
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
-            borderWidth: '1px',
-          },
+          // '& .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          //   borderWidth: '1px',
+          // },
+          // '&:hover .MuiOutlinedInput-notchedOutline': {
+          //   borderColor: theme.palette.text.primary,
+          //   borderWidth: '1px',
+          // },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.text.primary,
+            borderColor: theme.palette.divider,
             borderWidth: '1px',
           },
         }),
         notchedOutline: ({ theme }) => ({
-          borderColor: theme.palette.text.primary,
-          borderWidth: '1px',
+          // borderColor: theme.palette.text.primary,
+          // borderWidth: '1px'
+          borderColor: theme.palette.divider,
         }),
       },
     },

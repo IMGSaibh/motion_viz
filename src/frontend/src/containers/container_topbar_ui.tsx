@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
+import { PresenterTopbar } from '@/components/presenter/presenter_topbar_ui';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
@@ -10,7 +10,7 @@ import { upload_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 import {
-  use_set_range_cxt,
+  use_set_range_slider_value_cxt,
   use_set_std_slider_value_cxt,
   use_std_slider_value_cxt,
 } from '@/context/context_slider_label_list';
@@ -18,9 +18,9 @@ import {
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 
-export function ContainerTopbar() {
+export function ContainerTopbarUI() {
   const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
-  const set_range = use_set_range_cxt();
+  const set_range = use_set_range_slider_value_cxt();
   const { success, warning, error } = use_snackbar_ctx();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);

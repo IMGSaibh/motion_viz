@@ -11,7 +11,7 @@ async def convert_bvh_to_npy():
     bvh_dir_path = Path.joinpath(workspacefolder, "data/bvh/")
     numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
     numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    bvh_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json")
+    bvh_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json_skeleton")
 
     bvh_files = list(bvh_dir_path.glob("*.bvh"))
 

@@ -3,19 +3,19 @@ from pathlib import Path
 import numpy as np
 from pymotion.io.bvh import BVH
 from pymotion.ops.skeleton import fk
-from mocap_loader import MotionDataReader
+# from mocap_loader import MotionDataReader
 
 class PVParser:
     def __init__(self, file_path: str):
         workspacefolder = Path.cwd()
         mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/descriptor_files/mvnx.json")
 
-        reader = MotionDataReader(file_path, mvnx_descriptor_file)
+        # reader = MotionDataReader(file_path, mvnx_descriptor_file)
 
-        self.positions = reader.positions * 100
-        self.r_hierarchy = reader.generateJointHierarchyArray()
+        # self.positions = reader.positions * 100
+        # self.r_hierarchy = reader.generateJointHierarchyArray()
 
-        self.joint_names = reader.generateNameList()
+        # self.joint_names = reader.generateNameList()
 
     def save_npy(self, out_path: str):
         arr = self.positions

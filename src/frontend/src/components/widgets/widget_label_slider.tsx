@@ -1,14 +1,15 @@
 import { styled, useTheme } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
-import { Box, Typography } from '@mui/material';
-import { use_label_cxt } from '@/context/context_slider_label_list';
+import { Box } from '@mui/material';
+import { use_range_marker_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
   '& .MuiSlider-track': { color: theme.palette.info.main },
-  '& .MuiSlider-rail': { height: 4, backgroundColor: '#fff', opacity: 1 },
+  '& .MuiSlider-rail': { height: 2, backgroundColor: '#fff', opacity: 1 },
   '& .MuiSlider-valueLabel': {
     background: theme.palette.info.main,
+
     transform: 'translateY(-140%) scale(1)',
   },
   '& .MuiSlider-thumb': {
@@ -30,13 +31,18 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
     borderTop: '4px solid white',
     borderBottom: '4px solid white',
   },
+  '& .MuiSlider-mark': {
+    width: 1, // Liniendicke
+    height: 10, // Länge der Linie
+    borderRadius: 0,
+    backgroundColor: 'white',
+    top: 10, // Position unterhalb des Tracks
+  },
 }));
 
 type Props = {
   label_slider_range: [number, number];
   label_slider_framecount: number;
-  label_slider_on_change: (e: Event, value: number | number[], active_slider_hndl_idx: number) => void;
-  label_slider_on_mouse_leave: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   label_slider_reference: React.RefObject<HTMLSpanElement | null>;
 };
 
@@ -46,21 +52,21 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 
 export function WidgetLabelSlider(props: Props) {
   const theme = useTheme();
-  const saved_labels = use_label_cxt();
+  const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
 
   const max = Math.max(0, props.label_slider_framecount);
   const clamp = (n: number) => Math.max(0, Math.min(n, max));
 
-  const a = clamp(props.label_slider_range[0]);
-  const b = clamp(props.label_slider_range[1]);
-  const from = Math.min(a, b);
-  const to = Math.max(a, b);
-  const len = Math.max(0, to - from);
+  const thumb_idx_0 = clamp(props.label_slider_range[0]);
+  const thumb_idx_1 = clamp(props.label_slider_range[1]);
+  const from = Math.min(thumb_idx_0, thumb_idx_1);
+  const to = Math.max(thumb_idx_0, thumb_idx_1);
+  const length = Math.max(0, to - from);
 
-  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0); // runde für stabile Pixel
+  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
   const leftPct = pct(from, max);
-  const scaleX = max > 0 ? Math.max(0, Math.round((len / max) * 10000) / 10000) : 0;
+  const scaleX = max > 0 ? Math.max(0, Math.round((length / max) * 10000) / 10000) : 0;
 
   const isRtl = theme.direction === 'rtl';
 
@@ -72,6 +78,16 @@ export function WidgetLabelSlider(props: Props) {
       return overlaps(from, to, vvFrom, vvTo);
     });
 
+  const frames = Number(props.label_slider_framecount) || 0;
+
+  const marks = (() => {
+    const step = 10;
+    const out: { value: number }[] = [];
+    for (let valueText = 0; valueText <= max; valueText += step) out.push({ value: valueText });
+
+    if (max % step !== 0) out.push({ value: max }); // last tick
+    return out;
+  })();
   return (
     <>
       <LabelSlider
@@ -79,10 +95,9 @@ export function WidgetLabelSlider(props: Props) {
         min={0}
         max={max}
         step={1}
+        marks={marks}
         valueLabelDisplay="on"
         ref={props.label_slider_reference}
-        onChange={props.label_slider_on_change}
-        onMouseLeave={props.label_slider_on_mouse_leave}
       />
 
       {/* Layer underneath label slider: saved labels + current labels */}
@@ -114,7 +129,7 @@ export function WidgetLabelSlider(props: Props) {
                 transformOrigin: isRtl ? 'right center' : 'left center',
                 transform: `scaleX(${vScale})`,
                 ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                background: color ?? theme.palette.primary.main,
+                background: color ?? theme.palette.secondary.main,
                 pointerEvents: 'none',
               }}
             />

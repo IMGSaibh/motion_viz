@@ -12,6 +12,8 @@ type ThreeJSEngineContext = {
   go_to_frame: (frame_idx: number) => void;
   play_pause: () => void;
   stop: () => void;
+  pause: () => void;
+
   load_motion_file: (file: string) => Promise<void>;
   cleanup_player: () => void;
   cleanup_loop: () => void;
@@ -65,12 +67,15 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
   );
-  const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
   const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
+  const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
   const stop = useCallback(() => {
-    threejs_mngr_ref.current?.stop?.();
+    threejs_mngr_ref.current?.pause?.();
     threejs_mngr_ref.current?.go_to_frame?.(0);
     set_current_frame(0);
+  }, []);
+  const pause = useCallback(() => {
+    threejs_mngr_ref.current?.pause?.();
   }, []);
 
   const cleanup_player = useCallback(() => threejs_mngr_ref.current?.cleanup_player?.(), []);
@@ -92,6 +97,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       go_to_frame,
       play_pause,
       stop,
+      pause,
 
       cleanup_player,
       cleanup_loop,
@@ -107,6 +113,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       go_to_frame,
       play_pause,
       stop,
+      pause,
       cleanup_player,
       cleanup_loop,
       cleanup_thumbnail_render,
