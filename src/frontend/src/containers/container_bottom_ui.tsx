@@ -64,8 +64,6 @@ export function ContainerBottomUI() {
 
   const range_markers = use_range_marker_cxt();
   const frame = use_std_slider_value_cxt();
-  // const label_image_map = use_label_image_map_ctx();
-  // const label_image_map = new Map(get_label_images_cat1().map((x) => [x.label, x]));
   const label_image_map = get_label_all_label_images();
 
   const { success, error } = use_snackbar_ctx();
