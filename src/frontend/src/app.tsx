@@ -12,12 +12,10 @@ export default function App() {
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
-          {/* <LabelImageProvider> */}
           <SliderSliderlistProvider>
             <ContainerTopbarUI />
             <ContainerBottomUI></ContainerBottomUI>
           </SliderSliderlistProvider>
-          {/* </LabelImageProvider> */}
         </ThreeJSEngineProvider>
       </SnackbarProvider>
     </>
