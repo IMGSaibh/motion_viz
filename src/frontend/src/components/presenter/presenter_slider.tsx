@@ -5,6 +5,7 @@ import { WidgetLabelSlider } from '../widgets/widget_label_slider';
 import { WidgetLabelPreview } from '../widgets/widget_label_preview';
 import { WidgetTimelineStats } from '../widgets/widget_timeline_stats';
 import { LabelImage } from '@/Assets/label_images';
+import { WidgetLabelBar } from '../widgets/widget_label_bar';
 
 type Props = {
   std_slider_value: number;
@@ -24,8 +25,8 @@ type Props = {
 export function PresenterSlider(props: Props) {
   return (
     <>
-      <Box sx={{ flexGrow: 1, pt: '1vw' }}>
-        <Grid container spacing={0} alignItems="center" wrap="nowrap">
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={0} alignItems="center" mb={2}>
           <Grid size={{ md: 1 }}>
             <WidgetTimelineStats
               {...{ std_slider_value: props.std_slider_value, std_slider_framecount: props.label_slider_framecount }}
@@ -35,7 +36,7 @@ export function PresenterSlider(props: Props) {
             <WidgetLabelPreview label_image={props.label_image} />
           </Grid>
           <Grid size={{ md: 10 }}>
-            <Box sx={{ position: 'relative', height: 64, width: '100%' }}>
+            <Box sx={{ position: 'relative', width: '100%' }}>
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
                 <WidgetStdSlider
                   {...{
@@ -55,6 +56,16 @@ export function PresenterSlider(props: Props) {
                   label_slider_reference={props.label_slider_reference}
                 />
               </Box>
+            </Box>
+          </Grid>
+          <Grid size={{ md: 1 }}></Grid>
+          <Grid size={{ md: 1 }}></Grid>
+          <Grid size={{ md: 10 }}>
+            <Box sx={{ mt: -1.6 }}>
+              <WidgetLabelBar
+                label_slider_range={props.label_slider_range}
+                label_slider_framecount={props.label_slider_framecount}
+              />
             </Box>
           </Grid>
         </Grid>
