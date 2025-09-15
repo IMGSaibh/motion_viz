@@ -24,11 +24,11 @@ const StdSlider = styled(Slider)(({ theme }) => ({
     '&:hover, &.Mui-active, &.Mui-focusVisible': { boxShadow: 'none' },
   },
   '& .MuiSlider-mark': {
-    width: 3, // Liniendicke
-    height: 20, // Länge der Linie
+    width: 3, // line thickness
+    height: 20, // line length
     borderRadius: 0,
     backgroundColor: 'white',
-    top: 6, // Position unterhalb des Tracks
+    top: 6, // position under the track
   },
   '& .MuiSlider-markLabel': {
     position: 'absolute',
