@@ -47,27 +47,6 @@ export function PresenterLabelListUI(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
-      {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Button
-          onClick={() => setOpen((v) => !v)}
-          startIcon={
-            <ExpandMoreIcon
-              sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
-            />
-          }
-        >
-          Label-Liste
-        </Button>
-
-        <Button onClick={props.slider_list_clear_on_click}>
-          <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          Clear label list
-        </Button>
-        <Button onClick={() => props.save_labels_on_click?.()}>
-          <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
-          Save labels to json
-        </Button>
-      </Box> */}
       <WidgetLabelList
         labels={props.lables_list}
         slider_list_on_click={props.slider_list_on_click}

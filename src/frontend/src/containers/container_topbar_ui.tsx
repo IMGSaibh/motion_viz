@@ -94,6 +94,8 @@ export function ContainerTopbarUI() {
   }
 
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
+    const filename = e.target.value;
+    set_motion_file_selected(filename);
     set_selected_motion(e.target.value);
     await load_motion_file(e.target.value);
     stop();
