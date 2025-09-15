@@ -1,4 +1,5 @@
 export const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
+
 export type FetchOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers?: Record<string, string>;
@@ -80,4 +81,11 @@ export async function fetch_form<T>(path: string, form: FormData, opts: Omit<Fet
   } finally {
     if (timeout_id) clearTimeout(timeout_id);
   }
+}
+
+// builds a URL für DEV (localhost:8000) und PROD (same-origin/Nginx)
+export function apiUrl(path: string): string {
+  const base = BASE_URL || window.location.origin; // PROD: same Origin
+  const p = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${p}`;
 }

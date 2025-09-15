@@ -13,6 +13,7 @@ import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Utils from '@/threeJS/utils';
+import { apiUrl } from '@/api/api_client';
 
 export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;
@@ -75,7 +76,8 @@ export class ThreeJSEngine {
       return;
     }
     const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
-    const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
+    // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
+    const fileUrl = apiUrl(`/data/${file_extension}/${filename}`);
     switch (file_extension) {
       case 'bvh':
         this.bvh_loader = new BVH_loader(this.scene);
@@ -95,7 +97,8 @@ export class ThreeJSEngine {
         this.npy_loader = new NPY_loader(this.scene);
         await this.npy_loader.load_npy_animation(fileUrl);
 
-        const skeletonPath = fileUrl.replace('/npy/', '/json_skeleton/').replace('.npy', '_skeleton.json');
+        // const skeletonPath = fileUrl.replace('/npy/', '/json_skeleton/').replace('.npy', '_skeleton.json');
+        const skeletonPath = fileUrl.replace('/data/npy/', '/data/json_skeleton/').replace(/\.npy$/i, '_skeleton.json');
         await this.npy_loader.create_skeleton(skeletonPath);
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
