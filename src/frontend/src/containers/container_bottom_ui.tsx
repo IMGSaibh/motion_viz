@@ -23,6 +23,7 @@ export type Label = {
   label_image: LabelImage | null;
   range: [number, number];
   framecount: number;
+  category: string;
 };
 export const lable_list: Label[] = [];
 
@@ -238,6 +239,7 @@ export function ContainerBottomUI() {
         label_image: img,
         range: [m.from, m.to] as [number, number],
         framecount: fc,
+        category: 'Uncategorized',
       };
     });
   }, [markers, frame_count, label_image_map]);
@@ -267,7 +269,7 @@ export function ContainerBottomUI() {
     );
   }, [markers, selected_motion, hook_save_labels]);
 
-  //load all images at the beginning. check performances
+  //TODO: load all images at the beginning. check performances
   const current_label_image = useMemo(() => {
     const hit = range_markers.find((m) => {
       const from = Math.min(m.from, m.to);
@@ -288,7 +290,9 @@ export function ContainerBottomUI() {
         bgcolor: theme.palette.background.paper,
       })}
     >
-      <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
+      <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
+        <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
+      </Box>
       <img
         ref={preview_render_img_ref}
         alt=""

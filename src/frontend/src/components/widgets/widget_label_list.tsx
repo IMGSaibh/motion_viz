@@ -91,30 +91,28 @@ export function WidgetLabelList(props: Props) {
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        minWidth: 0, // verhindert Layout-Push bei langen Labels
+                        minWidth: 0,
                       }}
                     >
-                      {/* 2 Zeilen Text */}
                       <Typography variant="body2" noWrap>
                         {slider_label.label}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
                       </Typography>
-                      {/* Buttons unter dem Text, bleiben in der Zelle */}
+                      {/* Buttons underneath text */}
                       <Box
                         sx={{
                           mt: 0.5,
                           display: 'flex',
                           gap: 0.5,
-                          flexWrap: 'wrap', // bleibt innerhalb der Grid-Zelle
+                          flexWrap: 'wrap',
                           maxWidth: '100%',
                           alignItems: 'center',
                         }}
                       >
                         {editingId === slider_label.id ? (
                           <>
-                            {/* SAVE sichtbar im Edit-Modus */}
                             <IconButton
                               size="small"
                               onClick={saveEdit}
@@ -124,7 +122,6 @@ export function WidgetLabelList(props: Props) {
                               <CheckIcon fontSize="inherit" />
                             </IconButton>
 
-                            {/* DELETE immer sichtbar */}
                             <IconButton
                               size="small"
                               onClick={() => props.slider_list_on_click?.(slider_label.id)}
@@ -136,7 +133,6 @@ export function WidgetLabelList(props: Props) {
                           </>
                         ) : (
                           <>
-                            {/* EDIT sichtbar im Normal-Modus */}
                             <IconButton
                               size="small"
                               onClick={() => startEdit(slider_label.id)}

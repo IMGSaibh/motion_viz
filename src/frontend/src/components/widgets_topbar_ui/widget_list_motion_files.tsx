@@ -12,12 +12,17 @@ type Props = {
 };
 
 export function WidgetListFiles(props: Props) {
+  const labelText = props.motion_file_selected || 'Select file';
+  const labelId = 'motion-file-select-label';
+  const selectId = 'motion-file-select';
   return (
     <FormControl fullWidth size="small">
-      <InputLabel>Select file</InputLabel>
+      <InputLabel id={labelId} shrink>
+        {'Selected file'}
+      </InputLabel>
       <Select
         value={props.motion_file_selected || ''}
-        label="Select file"
+        label={labelText}
         onFocus={props.motion_file_list_on_focus}
         onChange={props.motion_file_list_on_change}
       >

@@ -73,7 +73,7 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
   return aFrom < bTo && aTo > bFrom;
 }
 
-export function SliderSliderlistProvider({ children }: PropsWithChildren) {
+export function SliderLabelListProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
   const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
