@@ -36,6 +36,6 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     file_path.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {
-        "message": "saved labels", 
+        "message": "saved labels to " + str(file_path.resolve()), 
         "warning": "",
     }
