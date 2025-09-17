@@ -12,6 +12,13 @@ const LabelButton = styled(ButtonBase)(({ theme }) => ({
   color: theme.palette.primary.main,
   '& .MuiTouchRipple-root': { zIndex: 4 },
   '& .MuiTouchRipple-child': { backgroundColor: 'currentColor', opacity: 1 },
+  // ▼ Disabled-state: desaturate
+  '&.Mui-disabled': {
+    // desaturate image
+    '& .btn-img': {
+      filter: 'grayscale(1) contrast(0.15)',
+    },
+  },
 }));
 
 type Props = {
@@ -19,7 +26,7 @@ type Props = {
 };
 
 export function PresenterLabelButtons({ onClick }: Props) {
-  const can_save = use_can_save_label_cxt();
+  const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1();
   const label_images_cat2 = get_label_images_cat2();
   const label_images_cat3 = get_label_images_cat3();
@@ -41,8 +48,13 @@ export function PresenterLabelButtons({ onClick }: Props) {
       }}
     >
       {items.map((imgButton, i) => (
-        <LabelButton key={i} onClick={() => onClick?.(imgButton.label, imgButton.category)} disabled={!can_save}>
+        <LabelButton
+          key={i}
+          onClick={() => onClick?.(imgButton.label, imgButton.category)}
+          disabled={!can_save_label(imgButton.category)}
+        >
           <Box
+            className="btn-img"
             sx={{
               position: 'absolute',
               inset: 0,

@@ -10,12 +10,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Label } from '@/containers/container_bottom_ui';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import {
   use_start_edit_label_cxt,
   use_save_edit_label_cxt,
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
+  use_can_save_label_cxt,
 } from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
@@ -70,6 +72,7 @@ export function WidgetLabelList(props: Props) {
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
+  const can_save_label = use_can_save_label_cxt();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -132,6 +135,14 @@ export function WidgetLabelList(props: Props) {
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
                               <DeleteIcon fontSize="inherit" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={cancelEdit}
+                              aria-label="Cancel label"
+                              sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                            >
+                              <ClearIcon fontSize="inherit" />
                             </IconButton>
                           </>
                         ) : (

@@ -2,14 +2,14 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 
 export type Range = [number, number];
-export type RangeBar = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
+export type Label_CTX = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
 
 type SliderSliderlistContext = {
   range: Range;
   set_slider_label_range: (r: Range) => void;
 
-  range_marker: RangeBar[];
-  add_slider_label: (m: RangeBar) => void;
+  label_CTX: Label_CTX[];
+  add_slider_label: (m: Label_CTX) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -25,19 +25,19 @@ type SliderSliderlistContext = {
 const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
 
 type MarkerAction =
-  | { type: 'add'; range_bar: RangeBar }
+  | { type: 'add'; range_bar: Label_CTX }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
   | { type: 'update'; id: string; from: number; to: number };
 
-function normalize(range_bar: RangeBar): RangeBar {
+function normalize(range_bar: Label_CTX): Label_CTX {
   if (Number.isNaN(range_bar.from) || Number.isNaN(range_bar.to)) return range_bar;
   const from = Math.min(range_bar.from, range_bar.to);
   const to = Math.max(range_bar.from, range_bar.to);
   return { ...range_bar, from, to };
 }
 
-function markerReducer(state: RangeBar[], action: MarkerAction): RangeBar[] {
+function markerReducer(state: Label_CTX[], action: MarkerAction): Label_CTX[] {
   switch (action.type) {
     case 'add': {
       const range_bar_normalized = normalize(action.range_bar);
@@ -75,21 +75,21 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 
 export function SliderLabelListProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
-  const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeBar[]);
+  const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_CTX[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
-  const add_label_rect = useCallback((m: RangeBar) => dispatch({ type: 'add', range_bar: m }), []);
+  const add_label_rect = useCallback((m: Label_CTX) => dispatch({ type: 'add', range_bar: m }), []);
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
   const start_editing_label = useCallback(
     (id: string) => {
-      const m = range_marker.find((x) => x.id === id);
+      const m = label_ctx.find((x) => x.id === id);
       if (!m) return;
       set_range([m.from, m.to]);
       set_editing_id(id);
     },
-    [range_marker],
+    [label_ctx],
   );
 
   const save_current_edited_label = useCallback(() => {
@@ -109,7 +109,7 @@ export function SliderLabelListProvider({ children }: PropsWithChildren) {
     () => ({
       range,
       set_slider_label_range: set_range,
-      range_marker,
+      label_CTX: label_ctx,
       add_slider_label: add_label_rect,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
@@ -122,7 +122,7 @@ export function SliderLabelListProvider({ children }: PropsWithChildren) {
     }),
     [
       range,
-      range_marker,
+      label_ctx,
       add_label_rect,
       remove_label_rect,
       clear_label_rects,
@@ -157,7 +157,7 @@ export function use_set_range_slider_value_cxt() {
 export function use_range_marker_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_label_cxt must be used within <SliderSliderlistProvider>');
-    return v.range_marker;
+    return v.label_CTX;
   });
 }
 
@@ -226,10 +226,25 @@ export function use_set_std_slider_value_cxt() {
 export function use_can_save_label_cxt() {
   return useContextSelector(slider_sliderlist_context, (v) => {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <SliderSliderlistProvider>');
-    const [fromRaw, toRaw] = v.range;
-    const from = Math.min(fromRaw, toRaw);
-    const to = Math.max(fromRaw, toRaw);
-    const has_overlap = v.range_marker.some((m) => overlaps(from, to, Math.min(m.from, m.to), Math.max(m.from, m.to)));
-    return !has_overlap;
+
+    return (category?: string) => {
+      const [fromRaw, toRaw] = v.range;
+      const from = Math.min(fromRaw, toRaw);
+      const to = Math.max(fromRaw, toRaw);
+
+      const editingMarker = v.editing_id ? v.label_CTX.find((m) => m.id === v.editing_id) : null;
+      const targetCategory = (category ?? editingMarker?.category ?? 'Uncategorized').trim() || 'Uncategorized';
+
+      const has_overlap_same_category = v.label_CTX.some((m) => {
+        if (editingMarker && m.id === editingMarker.id) return false; // ignore own marker
+        const mCat = (m.category ?? 'Uncategorized').trim() || 'Uncategorized';
+        if (mCat !== targetCategory) return false; // check only same category
+        const mf = Math.min(m.from, m.to);
+        const mt = Math.max(m.from, m.to);
+        return from < mt && to > mf;
+      });
+
+      return !has_overlap_same_category;
+    };
   });
 }
