@@ -193,7 +193,7 @@ export function ContainerBottomUI() {
   );
 
   const add_label_on_click = useCallback(
-    (label_button?: string) => {
+    (label_button?: string, category?: string) => {
       const id = String(label_id.current++);
       const label = label_button ?? `Label_${id}`;
 
@@ -209,7 +209,7 @@ export function ContainerBottomUI() {
       const value: [number, number] =
         a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
 
-      add_label({ id, from: value[0], to: value[1], label });
+      add_label({ id, from: value[0], to: value[1], label, category });
     },
     [range_slider_value, frame_count, current_frame, add_label],
   );
@@ -239,7 +239,7 @@ export function ContainerBottomUI() {
         label_image: img,
         range: [m.from, m.to] as [number, number],
         framecount: fc,
-        category: 'Uncategorized',
+        category: m.category || 'Uncategorized',
       };
     });
   }, [markers, frame_count, label_image_map]);
