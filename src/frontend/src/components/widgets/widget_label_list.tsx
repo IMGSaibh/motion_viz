@@ -98,6 +98,9 @@ export function WidgetLabelList(props: Props) {
                         {slider_label.label}
                       </Typography>
                       <Typography variant="caption" noWrap>
+                        {`Kategorie ${slider_label.category}`}
+                      </Typography>
+                      <Typography variant="caption" noWrap>
                         {`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
                       </Typography>
                       {/* Buttons underneath text */}

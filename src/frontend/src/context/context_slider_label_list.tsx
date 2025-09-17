@@ -2,14 +2,14 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 
 export type Range = [number, number];
-export type RangeLabel = { id: string; from: number; to: number; color?: string; label?: string };
+export type RangeBar = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
 
 type SliderSliderlistContext = {
   range: Range;
   set_slider_label_range: (r: Range) => void;
 
-  range_marker: RangeLabel[];
-  add_slider_label: (m: RangeLabel) => void;
+  range_marker: RangeBar[];
+  add_slider_label: (m: RangeBar) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -25,25 +25,25 @@ type SliderSliderlistContext = {
 const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
 
 type MarkerAction =
-  | { type: 'add'; range_label: RangeLabel }
+  | { type: 'add'; range_bar: RangeBar }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
   | { type: 'update'; id: string; from: number; to: number };
 
-function normalize(label: RangeLabel): RangeLabel {
-  if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
-  const from = Math.min(label.from, label.to);
-  const to = Math.max(label.from, label.to);
-  return { ...label, from, to };
+function normalize(range_bar: RangeBar): RangeBar {
+  if (Number.isNaN(range_bar.from) || Number.isNaN(range_bar.to)) return range_bar;
+  const from = Math.min(range_bar.from, range_bar.to);
+  const to = Math.max(range_bar.from, range_bar.to);
+  return { ...range_bar, from, to };
 }
 
-function markerReducer(state: RangeLabel[], action: MarkerAction): RangeLabel[] {
+function markerReducer(state: RangeBar[], action: MarkerAction): RangeBar[] {
   switch (action.type) {
     case 'add': {
-      const label = normalize(action.range_label);
-      if (!label.id) return state;
-      if (state.some((x) => x.id === label.id)) return state;
-      return [...state, label];
+      const range_bar_normalized = normalize(action.range_bar);
+      if (!range_bar_normalized.id) return state;
+      if (state.some((x) => x.id === range_bar_normalized.id)) return state;
+      return [...state, range_bar_normalized];
     }
     case 'remove': {
       const next = state.filter((x) => x.id !== action.id);
@@ -75,10 +75,10 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 
 export function SliderLabelListProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
-  const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeLabel[]);
+  const [range_marker, dispatch] = useReducer(markerReducer, [] as RangeBar[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
-  const add_label_rect = useCallback((m: RangeLabel) => dispatch({ type: 'add', range_label: m }), []);
+  const add_label_rect = useCallback((m: RangeBar) => dispatch({ type: 'add', range_bar: m }), []);
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
@@ -229,7 +229,7 @@ export function use_can_save_label_cxt() {
     const [fromRaw, toRaw] = v.range;
     const from = Math.min(fromRaw, toRaw);
     const to = Math.max(fromRaw, toRaw);
-    const hasOverlap = v.range_marker.some((m) => overlaps(from, to, Math.min(m.from, m.to), Math.max(m.from, m.to)));
-    return !hasOverlap;
+    const has_overlap = v.range_marker.some((m) => overlaps(from, to, Math.min(m.from, m.to), Math.max(m.from, m.to)));
+    return !has_overlap;
   });
 }

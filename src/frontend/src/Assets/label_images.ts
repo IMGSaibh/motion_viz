@@ -2,6 +2,7 @@ import btn1 from '@/Assets/images/Label_1.png';
 import btn2 from '@/Assets/images/Label_2.png';
 import btn3 from '@/Assets/images/Label_3.png';
 import btn4 from '@/Assets/images/Label_4.png';
+
 import btn5 from '@/Assets/images/Label_5.png';
 import btn6 from '@/Assets/images/Label_6.png';
 import btn7 from '@/Assets/images/Label_7.png';
@@ -13,25 +14,26 @@ import btn10 from '@/Assets/images/Label_10.png';
 export type LabelImage = {
   label: string;
   src: string;
+  category: string;
 };
 
 const LABEL_IMAGES_CAT1: ReadonlyArray<LabelImage> = [
-  { label: 'Button_1', src: btn1 },
-  { label: 'Button_2', src: btn2 },
-  { label: 'Button_3', src: btn3 },
-  { label: 'Button_4', src: btn4 },
+  { label: 'Button_1', src: btn1, category: 'Kategorie 1' },
+  { label: 'Button_2', src: btn2, category: 'Kategorie 1' },
+  { label: 'Button_3', src: btn3, category: 'Kategorie 1' },
+  { label: 'Button_4', src: btn4, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2: ReadonlyArray<LabelImage> = [
-  { label: 'Button_5', src: btn5 },
-  { label: 'Button_6', src: btn6 },
-  { label: 'Button_7', src: btn7 },
-  { label: 'Button_8', src: btn8 },
+  { label: 'Button_5', src: btn5, category: 'Kategorie 2' },
+  { label: 'Button_6', src: btn6, category: 'Kategorie 2' },
+  { label: 'Button_7', src: btn7, category: 'Kategorie 2' },
+  { label: 'Button_8', src: btn8, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3: ReadonlyArray<LabelImage> = [
-  { label: 'Button_9', src: btn9 },
-  { label: 'Button_10', src: btn10 },
+  { label: 'Button_9', src: btn9, category: 'Kategorie 3' },
+  { label: 'Button_10', src: btn10, category: 'Kategorie 3' },
 ];
 
 export function get_label_images_cat1(): ReadonlyArray<LabelImage> {

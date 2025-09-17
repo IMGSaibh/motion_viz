@@ -15,7 +15,7 @@ const LabelButton = styled(ButtonBase)(({ theme }) => ({
 }));
 
 type Props = {
-  onClick?: (label?: string) => void;
+  onClick?: (label: string, category: string) => void;
 };
 
 export function PresenterLabelButtons({ onClick }: Props) {
@@ -24,9 +24,9 @@ export function PresenterLabelButtons({ onClick }: Props) {
   const label_images_cat2 = get_label_images_cat2();
   const label_images_cat3 = get_label_images_cat3();
 
-  const cat1Title = 'Kategorie 1';
-  const cat2Title = 'Kategorie 2';
-  const cat3Title = 'Kategorie 3';
+  const category_1 = 'Kategorie 1';
+  const category_2 = 'Kategorie 2';
+  const category_3 = 'Kategorie 3';
 
   const render_label_images = (
     items: typeof label_images_cat1 | typeof label_images_cat2 | typeof label_images_cat3,
@@ -41,7 +41,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
       }}
     >
       {items.map((imgButton, i) => (
-        <LabelButton key={i} onClick={() => onClick?.(imgButton.label)} disabled={!can_save}>
+        <LabelButton key={i} onClick={() => onClick?.(imgButton.label, imgButton.category)} disabled={!can_save}>
           <Box
             sx={{
               position: 'absolute',
@@ -67,7 +67,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
           >
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {cat1Title}
+              {category_1}
             </FormLabel>
             {render_label_images(label_images_cat1)}
           </FormControl>
@@ -78,7 +78,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
           >
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {cat2Title}
+              {category_2}
             </FormLabel>
             {render_label_images(label_images_cat2)}
           </FormControl>
@@ -89,7 +89,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
           >
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {cat3Title}
+              {category_3}
             </FormLabel>
             {render_label_images(label_images_cat3)}
           </FormControl>
