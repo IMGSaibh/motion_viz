@@ -1,5 +1,6 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
+import { Text } from 'troika-three-text';
 import { JointCoordsystemLocal } from '@/threeJS/components/JointCoordSystemLocal';
 
 type HierarchyTuple = [number, number];
@@ -22,6 +23,9 @@ export class NPY_loader {
   fps: number;
   joint_size: number;
   scene: THREE.Scene;
+  joint_indices_names: Text[] = [];
+  joint_indices_names_text = new THREE.Group();
+
   // joint_coordsystem_local: JointCoordsystemLocal | null;
   // joint_orientations: any[];
 
@@ -40,6 +44,8 @@ export class NPY_loader {
     this.fps = 60;
     this.joint_size = 0.2;
     this.scene = scene;
+    this.joint_indices_names = [];
+    this.joint_indices_names_text = new THREE.Group();
     // this.joint_coordsystem_local = null;
     // this.joint_orientations = [];
   }
@@ -55,6 +61,8 @@ export class NPY_loader {
     const [frameCount, jointCount, _] = parsed_npy.shape;
     this.frameCount = frameCount;
     this.jointCount = jointCount;
+
+    this.joint_indices_names = Array.from({ length: jointCount }, () => new Text());
 
     // // TODO: uncomment to use this
     // this.joint_orientations = Array.from({ length: this.jointCount }, () => ({
@@ -79,7 +87,18 @@ export class NPY_loader {
       const sphere = new THREE.Mesh(geom, material);
       this.npy_motion.add(sphere);
       this.joints.push(sphere);
+
+      this.joint_indices_names[i].text = String(i);
+      this.joint_indices_names[i].fontSize = 3.0;
+      this.joint_indices_names[i].anchorX = 'center';
+      this.joint_indices_names[i].anchorY = 'middle';
+      this.joint_indices_names[i].color = 0x000000;
+      this.joint_indices_names[i].sync(); // <— wichtig
+      this.joint_indices_names_text.add(this.joint_indices_names[i] as unknown as THREE.Object3D);
+      this.joint_indices_names_text.name = 'joint_indices_text';
     }
+
+    this.scene.add(this.joint_indices_names_text);
 
     // this.joint_coordsystem_local = new JointCoordsystemLocal(this.scene, this.jointCount, { axesSize: 10 });
   }
@@ -88,23 +107,25 @@ export class NPY_loader {
     const boneGeometry = new THREE.CylinderGeometry(
       1.0, // radiusTop
       1.0, // radiusBottom
-      1, // height
+      0.7, // height
       8, // radialSegments
     );
 
     // const boneMaterial = new THREE.MeshBasicMaterial({
     //   color: 0xff0000,
-    //   wireframe: false
+    //   wireframe: true,
     // });
 
-    const boneMaterial = new THREE.MeshNormalMaterial();
+    const boneMaterial = new THREE.MeshNormalMaterial({
+      // wireframe: true,
+    });
 
     for (const [childIdx, parentIdx] of skeleton.hierarchy) {
       const childJoint = skeleton.joints[childIdx];
       const parentJoint = skeleton.joints[parentIdx];
-
       const bone = new THREE.Mesh(boneGeometry, boneMaterial);
       bone.matrixAutoUpdate = false;
+
       this.npy_motion.add(bone);
 
       this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone });
@@ -123,6 +144,7 @@ export class NPY_loader {
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
 
+      this.joint_indices_names[i].position.set(x, y + this.joint_size * 2.2, z);
       // // jointAxisPoint is a reference to the position of the joint axis orientation
       // // TODO: uncomment to use this
       // const jointAxisPoint = this.joint_orientations[i].position;
@@ -180,6 +202,7 @@ export class NPY_loader {
 
     this.npy_motion.clear();
     this.scene.remove(this.npy_motion);
+    this.scene.remove(this.joint_indices_names_text);
 
     // // TODO: uncomment to use this
     // this.joint_coordsystem_local!.dispose();
