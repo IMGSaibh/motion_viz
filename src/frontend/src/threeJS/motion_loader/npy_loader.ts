@@ -89,7 +89,7 @@ export class NPY_loader {
       this.joints.push(sphere);
 
       this.joint_indices_names[i].text = String(i);
-      this.joint_indices_names[i].fontSize = 3.0;
+      this.joint_indices_names[i].fontSize = 2.2;
       this.joint_indices_names[i].anchorX = 'center';
       this.joint_indices_names[i].anchorY = 'middle';
       this.joint_indices_names[i].color = 0x000000;
