@@ -51,8 +51,6 @@ export async function convertBvh(opts?: { signal?: AbortSignal }) {
   );
 }
 
-/** ===== Labels speichern ===== */
-
 export async function save_labels_to_json(motion_name: string, labels: { startframe: number; endframe: number }[]) {
   return fetch_json('/api_save_labels/save_labels', {
     method: 'POST',
