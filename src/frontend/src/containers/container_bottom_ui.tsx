@@ -16,7 +16,7 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
-import { LabelImage, get_label_all_label_images } from '@/Assets/label_images';
+import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
 export type Label = {
   id: string;
   label: string;
@@ -65,7 +65,7 @@ export function ContainerBottomUI() {
 
   const range_markers = use_range_marker_cxt();
   const frame = use_std_slider_value_cxt();
-  const label_image_map = get_label_all_label_images();
+  const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();
 
