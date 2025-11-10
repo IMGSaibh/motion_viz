@@ -35,9 +35,9 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
   const label_images_cat2 = get_label_images_cat2_rula();
   const label_images_cat3 = get_label_images_cat3_rula();
 
-  const category_1_rula = 'Kategorie A (Arm/Hand)';
-  const category_2_rula = 'Kategorie B (Nacken/Rumpf/Beine)';
-  const category_3_rula = 'Kategorie C (sonstige)';
+  const category_1_rula = 'Kategorie Arm/Hand';
+  const category_2_rula = 'Kategorie Nacken/Rumpf/Beine';
+  const category_3_rula = 'Kategorie Zusatzfaktoren';
 
   const render_rula_label_images = (
     items: typeof label_images_cat1 | typeof label_images_cat2 | typeof label_images_cat3,

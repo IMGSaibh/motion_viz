@@ -15,6 +15,17 @@ import btn10_rula from '@/Assets/rula_images/Label_10.png';
 import btn1_owas from '@/Assets/owas_images/Label_1.png';
 import btn2_owas from '@/Assets/owas_images/Label_2.png';
 import btn3_owas from '@/Assets/owas_images/Label_3.png';
+import btn4_owas from '@/Assets/owas_images/Label_4.png';
+import btn5_owas from '@/Assets/owas_images/Label_5.png';
+import btn6_owas from '@/Assets/owas_images/Label_6.png';
+import btn7_owas from '@/Assets/owas_images/Label_7.png';
+import btn8_owas from '@/Assets/owas_images/Label_8.png';
+import btn9_owas from '@/Assets/owas_images/Label_9.png';
+import btn10_owas from '@/Assets/owas_images/Label_10.png';
+import btn11_owas from '@/Assets/owas_images/Label_11.png';
+import btn12_owas from '@/Assets/owas_images/Label_12.png';
+import btn13_owas from '@/Assets/owas_images/Label_13.png';
+import btn14_owas from '@/Assets/owas_images/Label_14.png';
 
 // llm images
 import btn1_llm from '@/Assets/llm_images/Label_1.png';
@@ -74,23 +85,58 @@ const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
   { label: 'Button_1', src: btn1_owas, category: 'Kategorie 1' },
   { label: 'Button_2', src: btn2_owas, category: 'Kategorie 1' },
   { label: 'Button_3', src: btn3_owas, category: 'Kategorie 1' },
+  { label: 'Button_4', src: btn4_owas, category: 'Kategorie 1' },
+];
+
+const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
+  { label: 'Button_5', src: btn5_owas, category: 'Kategorie 2' },
+  { label: 'Button_6', src: btn6_owas, category: 'Kategorie 2' },
+  { label: 'Button_7', src: btn7_owas, category: 'Kategorie 2' },
+];
+
+const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
+  { label: 'Button_8', src: btn8_owas, category: 'Kategorie 3' },
+  { label: 'Button_9', src: btn9_owas, category: 'Kategorie 3' },
+  { label: 'Button_10', src: btn10_owas, category: 'Kategorie 3' },
+  { label: 'Button_11', src: btn11_owas, category: 'Kategorie 3' },
+  { label: 'Button_12', src: btn12_owas, category: 'Kategorie 3' },
+  { label: 'Button_13', src: btn13_owas, category: 'Kategorie 3' },
+  { label: 'Button_14', src: btn14_owas, category: 'Kategorie 3' },
+];
+
+const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
+  { label: 'Button_15', src: btn5_owas, category: 'Kategorie 4' },
+  { label: 'Button_16', src: btn6_owas, category: 'Kategorie 4' },
+  { label: 'Button_17', src: btn7_owas, category: 'Kategorie 4' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {
-  return LABEL_IMAGES_CAT1_RULA;
+  return LABEL_IMAGES_CAT1_OWAS;
+}
+
+export function get_label_images_cat2_owas(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_CAT2_OWAS;
+}
+
+export function get_label_images_cat3_owas(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_CAT3_OWAS;
+}
+
+export function get_label_images_cat4_owas(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_CAT4_OWAS;
 }
 
 export function get_label_all_label_images_owas(): ReadonlyMap<string, LabelImage> {
   const map = new Map<string, LabelImage>();
 
   for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.label, item);
-
+  for (const item of LABEL_IMAGES_CAT2_OWAS) map.set(item.label, item);
+  for (const item of LABEL_IMAGES_CAT3_OWAS) map.set(item.label, item);
+  for (const item of LABEL_IMAGES_CAT4_OWAS) map.set(item.label, item);
   return map;
 }
 
-// OWAS IMAGES
+// LLM IMAGES
 const LABEL_IMAGES_CAT1_LLM: ReadonlyArray<LabelImage> = [
   { label: 'Button_1', src: btn1_llm, category: 'Kategorie 1' },
   { label: 'Button_2', src: btn2_llm, category: 'Kategorie 1' },
@@ -98,7 +144,7 @@ const LABEL_IMAGES_CAT1_LLM: ReadonlyArray<LabelImage> = [
 ];
 
 export function get_label_images_cat1_llm(): ReadonlyArray<LabelImage> {
-  return LABEL_IMAGES_CAT1_RULA;
+  return LABEL_IMAGES_CAT1_LLM;
 }
 
 export function get_label_all_label_images_llm(): ReadonlyMap<string, LabelImage> {
