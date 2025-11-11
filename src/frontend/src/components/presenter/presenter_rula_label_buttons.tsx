@@ -45,7 +45,7 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(8, 64px)',
+        gridTemplateColumns: 'repeat(8, 32px)',
         gap: 1,
         width: '100%',
         p: '0.2vw',

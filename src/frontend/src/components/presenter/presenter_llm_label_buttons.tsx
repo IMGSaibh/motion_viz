@@ -1,4 +1,4 @@
-import { Box, ButtonBase, styled, FormControl, FormLabel, Grid } from '@mui/material';
+import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, Select, MenuItem, InputLabel } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { get_label_images_cat1_llm } from '@/Assets/label_images';
 
@@ -30,14 +30,14 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
   const label_images_cat1 = get_label_images_cat1_llm();
 
   const category_1_llm = 'Kategorie LLM A (Arm/Hand)';
-  const category_2_llm = 'Kategorie LLM B (Nacken/Rumpf/Beine)';
+  const category_2_llm = 'Bestimmung der Wichtungen der weiteren Merkmale';
   const category_3_llm = 'Kategorie LLM C (sonstige)';
 
   const render_rula_label_images = (items: typeof label_images_cat1) => (
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(8, 64px)',
+        gridTemplateColumns: 'repeat(8, 32px)',
         gap: 1,
         width: '100%',
         p: '0.2vw',
@@ -69,18 +69,39 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
   return (
     <>
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 4 }}>
-          <FormControl
-            component="fieldset"
-            sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
-          >
-            <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {category_1_llm}
-            </FormLabel>
-            {/* {render_rula_label_images(label_images_cat1)} */}
+        <Grid size={{ md: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel id="scroll-select-label">Bestimmung der Zeitwichtung</InputLabel>
+            <Select
+              labelId="scroll-select-label"
+              value={'value'}
+              label="Bestimmung der Zeitwichtung"
+              // onChange={handleChange}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 200, // <== Scrollbar ab hier
+                  },
+                },
+              }}
+            >
+              <MenuItem value="1">5</MenuItem>
+              <MenuItem value="1.5">20</MenuItem>
+              <MenuItem value="2">50</MenuItem>
+              <MenuItem value="2.5">100</MenuItem>
+              <MenuItem value="3">150</MenuItem>
+              <MenuItem value="3.5">220</MenuItem>
+              <MenuItem value="4">300</MenuItem>
+              <MenuItem value="5">500</MenuItem>
+              <MenuItem value="6">750</MenuItem>
+              <MenuItem value="7">1000</MenuItem>
+              <MenuItem value="8">1500</MenuItem>
+              <MenuItem value="9">2000</MenuItem>
+              <MenuItem value="10">2500</MenuItem>
+            </Select>
           </FormControl>
         </Grid>
-        <Grid size={{ md: 4 }}>
+        <Grid size={{ md: 5 }}>
           <FormControl
             component="fieldset"
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
@@ -91,7 +112,7 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
             {/* {render_rula_label_images(label_images_cat2)} */}
           </FormControl>
         </Grid>
-        <Grid size={{ md: 4 }}>
+        <Grid size={{ md: 5 }}>
           <FormControl
             component="fieldset"
             sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
