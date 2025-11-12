@@ -6,7 +6,7 @@ authors = [
     { name = "mathias gewissen", email = "mathias.gewissen@htw-dresden.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10,<3.11.dev0"
 
 dependencies = [
     "fastapi>=0.110.0",
@@ -24,7 +24,7 @@ dependencies = [
     "tqdm (>=4.67.1,<5.0.0)",
     "h5py (>=3.14.0,<4.0.0)",
     "mat73 (>=0.65,<0.66)",
-    # "mocap-loader @ git+https://github.com/edscher/mocap_loader",
+    "mocap-loader @ git+ssh://git@github.com/edscher/mocap_loader.git",
     "bvhtoolbox (>=0.1.3,<0.2.0)",
 ]
 
