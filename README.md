@@ -21,7 +21,7 @@ npm install
 ## Backend
 
 ```bash
-cd src/motion_viz
+cd src/backend
 poetry install
 ```
 

@@ -29,7 +29,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
             >
               <MenuItem value="RULA">RULA</MenuItem>
               <MenuItem value="OWAS">OWA</MenuItem>
-              <MenuItem value="LLM">LLM</MenuItem>
+              <MenuItem value="LLM">LMM</MenuItem>
             </Select>
           </FormControl>
         </Grid>
