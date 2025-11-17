@@ -1,12 +1,14 @@
 import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
+import zIndex from '@mui/material/styles/zIndex';
 
 const LabelSlider = styled(Slider)(({ theme }) => ({
-  '& .MuiSlider-track': { color: theme.palette.info.main },
+  // '& .MuiSlider-track': { color: theme.palette.info.main },
+  '& .MuiSlider-track': { display: 'none' },
   '& .MuiSlider-rail': { height: 2, backgroundColor: '#fff', opacity: 1 },
   '& .MuiSlider-valueLabel': {
-    background: theme.palette.info.main,
-
+    background: theme.palette.wip_color_theme[700],
+    zIndex: 2,
     transform: 'translateY(-140%) scale(1)',
   },
   '& .MuiSlider-thumb': {
@@ -19,14 +21,14 @@ const LabelSlider = styled(Slider)(({ theme }) => ({
     '&::before, &::after': { content: '""', display: 'none' },
   },
   '& .MuiSlider-thumb[data-index="0"]': {
-    borderLeft: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderLeft: `4px solid ${theme.palette.wip_color_theme[700]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[700]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[700]}`,
   },
   '& .MuiSlider-thumb[data-index="1"]': {
-    borderRight: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderRight: `4px solid ${theme.palette.wip_color_theme[700]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[700]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[700]}`,
   },
   '& .MuiSlider-mark': {
     width: 1, // Liniendicke

@@ -23,7 +23,7 @@ import {
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
   '& .MuiSlider-track': {
-    color: theme.palette.secondary.main,
+    color: theme.palette.wip_color_theme[800],
   },
   '& .MuiSlider-rail': {
     height: 2,
@@ -48,14 +48,14 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
     },
   },
   '& .MuiSlider-thumb[data-index="0"]': {
-    borderLeft: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderLeft: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[800]}`,
   },
   '& .MuiSlider-thumb[data-index="1"]': {
-    borderRight: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderRight: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[800]}`,
   },
 }));
 

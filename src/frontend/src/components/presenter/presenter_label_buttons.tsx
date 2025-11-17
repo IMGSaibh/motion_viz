@@ -1,112 +1,45 @@
-import { Box, ButtonBase, styled, FormControl, FormLabel, Grid } from '@mui/material';
-import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { get_label_images_cat1, get_label_images_cat2, get_label_images_cat3 } from '@/Assets/label_images';
-
-const LabelButton = styled(ButtonBase)(({ theme }) => ({
-  position: 'relative',
-  width: '100%',
-  aspectRatio: '1 / 1',
-  fit: 'cover',
-  borderRadius: 2,
-  overflow: 'hidden',
-  color: theme.palette.primary.main,
-  '& .MuiTouchRipple-root': { zIndex: 4 },
-  '& .MuiTouchRipple-child': { backgroundColor: 'currentColor', opacity: 1 },
-  // ▼ Disabled-state: desaturate
-  '&.Mui-disabled': {
-    // desaturate image
-    '& .btn-img': {
-      filter: 'grayscale(1) contrast(0.15)',
-    },
-  },
-}));
+import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, InputLabel, Select, MenuItem } from '@mui/material';
+import { PresenterRulaLabelButtons } from './presenter_rula_label_buttons';
+import { PresenterOwasLabelButtons } from './presenter_owas_label_buttons';
+import { PresenterLlmLabelButtons } from './presenter_llm_label_buttons';
+import { useState } from 'react';
 
 type Props = {
   onClick?: (label: string, category: string) => void;
 };
 
 export function PresenterLabelButtons({ onClick }: Props) {
-  const can_save_label = use_can_save_label_cxt();
-  const label_images_cat1 = get_label_images_cat1();
-  const label_images_cat2 = get_label_images_cat2();
-  const label_images_cat3 = get_label_images_cat3();
+  const [method, setMethod] = useState<string>('RULA');
 
-  const category_1 = 'Kategorie 1';
-  const category_2 = 'Kategorie 2';
-  const category_3 = 'Kategorie 3';
-
-  const render_label_images = (
-    items: typeof label_images_cat1 | typeof label_images_cat2 | typeof label_images_cat3,
-  ) => (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(8, 64px)',
-        gap: 1,
-        width: '100%',
-        p: '0.2vw',
-      }}
-    >
-      {items.map((imgButton, i) => (
-        <LabelButton
-          key={i}
-          onClick={() => onClick?.(imgButton.label, imgButton.category)}
-          disabled={!can_save_label(imgButton.category)}
-        >
-          <Box
-            className="btn-img"
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 0,
-              backgroundImage: `url(${imgButton.src})`,
-              backgroundColor: 'white',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-        </LabelButton>
-      ))}
-    </Box>
-  );
-
+  const handleChange = (event: any) => {
+    setMethod(event.target.value);
+  };
   return (
     <>
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 4 }}>
-          <FormControl
-            component="fieldset"
-            sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
-          >
-            <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {category_1}
-            </FormLabel>
-            {render_label_images(label_images_cat1)}
+          <FormControl sx={{ m: 0, minWidth: 220 }}>
+            <InputLabel id="demo-simple-select-helper-label">Ergonomie Methode</InputLabel>
+            <Select
+              labelId="demo-simple-select-helper-label"
+              id="demo-simple-select-helper"
+              value={method}
+              label="Ergonomie Methode"
+              onChange={handleChange}
+            >
+              <MenuItem value="RULA">RULA</MenuItem>
+              <MenuItem value="OWAS">OWA</MenuItem>
+              <MenuItem value="LLM">LMM</MenuItem>
+            </Select>
           </FormControl>
         </Grid>
-        <Grid size={{ md: 4 }}>
-          <FormControl
-            component="fieldset"
-            sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
-          >
-            <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {category_2}
-            </FormLabel>
-            {render_label_images(label_images_cat2)}
-          </FormControl>
-        </Grid>
-        <Grid size={{ md: 4 }}>
-          <FormControl
-            component="fieldset"
-            sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
-          >
-            <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
-              {category_3}
-            </FormLabel>
-            {render_label_images(label_images_cat3)}
-          </FormControl>
-        </Grid>
+        <Grid size={{ md: 4 }}></Grid>
+        <Grid size={{ md: 4 }}></Grid>
       </Grid>
+      {/* Conditional Rendering */}
+      {method === 'RULA' && <PresenterRulaLabelButtons onClick={onClick} />}
+      {method === 'OWAS' && <PresenterOwasLabelButtons onClick={onClick} />}
+      {method === 'LLM' && <PresenterLlmLabelButtons onClick={onClick} />}
     </>
   );
 }

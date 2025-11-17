@@ -73,7 +73,7 @@ export function WidgetLabelBar(props: Props) {
                 transformOrigin: isRtl ? 'right center' : 'left center',
                 transform: `scaleX(${vScale})`,
                 ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                background: color ?? theme.palette.secondary.main,
+                background: color ?? theme.palette.wip_color_theme[800],
                 pointerEvents: 'none',
               }}
             />
