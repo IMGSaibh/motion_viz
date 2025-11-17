@@ -12,7 +12,6 @@ class PVParser:
 
         reader = MotionDataReader(file_path, mvnx_descriptor_file)
 
-        # TODO: Edgar: attribute positions was in pose viewer parser??, check if this is correct
         if reader.positions is None:
             raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
         self.positions = reader.positions * 100 # Convert to mm
