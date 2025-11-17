@@ -83,7 +83,7 @@ export async function fetch_form<T>(path: string, form: FormData, opts: Omit<Fet
   }
 }
 
-// builds a URL für DEV (localhost:8000) und PROD (same-origin/Nginx)
+// builds a URL for DEV (localhost:8000) und PROD (same-origin/Nginx)
 export function apiUrl(path: string): string {
   const base = BASE_URL || window.location.origin; // PROD: same Origin
   const p = path.startsWith('/') ? path : `/${path}`;

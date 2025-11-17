@@ -33,7 +33,7 @@ export function WidgetLabelBar(props: Props) {
       : 0;
 
   const has_overlap = saved_labels
-    .filter((m) => m.id !== editing_id)
+    .filter((label) => label.id !== editing_id)
     .some(({ from: vf, to: vt }) => {
       const vvFrom = clamp(Math.min(vf, vt));
       const vvTo = clamp(Math.max(vf, vt));
@@ -73,7 +73,7 @@ export function WidgetLabelBar(props: Props) {
                 transformOrigin: isRtl ? 'right center' : 'left center',
                 transform: `scaleX(${vScale})`,
                 ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                background: color ?? theme.palette.secondary.main,
+                background: color ?? theme.palette.wip_color_theme[800],
                 pointerEvents: 'none',
               }}
             />

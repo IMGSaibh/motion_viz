@@ -1,3 +1,36 @@
+// mui.d.ts
+import '@mui/material/styles';
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    wip_color_theme: {
+      100: string;
+      200: string;
+      300: string;
+      400: string;
+      500: string;
+
+      600: string;
+      700: string;
+      800: string;
+    };
+  }
+
+  interface PaletteOptions {
+    wip_color_theme?: {
+      100?: string;
+      200?: string;
+      300?: string;
+      400?: string;
+      500?: string;
+
+      600?: string;
+      700?: string;
+      800?: string;
+    };
+  }
+}
+
 // theme.ts (MUI v7)
 import { createTheme } from '@mui/material';
 
@@ -5,9 +38,20 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
 
+    wip_color_theme: {
+      100: '#F2F2F2',
+      200: '#BFBFBF',
+      300: '#737373',
+      400: '#404040',
+      500: '#0D0D0D',
+
+      600: '#0ea5e9',
+      700: '#45ab45',
+      800: '#f59e0b',
+    },
+
     primary: { main: '#45ab45' },
     secondary: { main: '#0ea5e9' },
-
     text: {
       primary: '#ffffff',
       secondary: 'rgba(255,255,255,0.7)',
@@ -113,48 +157,16 @@ export const theme = createTheme({
         }),
       },
     },
-    MuiSelect: {
-      styleOverrides: {
-        outlined: ({ theme }) => ({
-          // '& .MuiOutlinedInput-notchedOutline': {
-          //   borderColor: theme.palette.text.primary,
-          // },
-          // '&:hover .MuiOutlinedInput-notchedOutline': {
-          //   borderColor: theme.palette.text.primary,
-          // },
-          // '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          //   borderColor: theme.palette.text.primary,
-          // },
-          // '& .MuiSelect-select': {
-          //   color: theme.palette.text.primary,
-          //   backgroundColor: 'transparent',
-          // },
-          // '& .MuiSelect-icon': {
-          //   color: theme.palette.text.primary,
-          // },
-        }),
-      },
-    },
     // when select files is pressed
     MuiOutlinedInput: {
       styleOverrides: {
         root: ({ theme }) => ({
-          // '& .MuiOutlinedInput-notchedOutline': {
-          //   borderColor: theme.palette.text.primary,
-          //   borderWidth: '1px',
-          // },
-          // '&:hover .MuiOutlinedInput-notchedOutline': {
-          //   borderColor: theme.palette.text.primary,
-          //   borderWidth: '1px',
-          // },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             borderColor: theme.palette.divider,
             borderWidth: '1px',
           },
         }),
         notchedOutline: ({ theme }) => ({
-          // borderColor: theme.palette.text.primary,
-          // borderWidth: '1px'
           borderColor: theme.palette.divider,
         }),
       },

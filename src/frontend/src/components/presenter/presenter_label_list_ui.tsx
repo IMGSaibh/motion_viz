@@ -1,6 +1,6 @@
 import { WidgetLabelList } from '@/components/widgets/widget_label_list';
 import { Label } from '@/containers/container_bottom_ui';
-import { Box, Button, Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';

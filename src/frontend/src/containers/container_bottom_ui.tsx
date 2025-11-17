@@ -16,7 +16,7 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
-import { LabelImage, get_label_all_label_images } from '@/Assets/label_images';
+import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
 export type Label = {
   id: string;
   label: string;
@@ -65,7 +65,7 @@ export function ContainerBottomUI() {
 
   const range_markers = use_range_marker_cxt();
   const frame = use_std_slider_value_cxt();
-  const label_image_map = get_label_all_label_images();
+  const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();
 
@@ -193,7 +193,7 @@ export function ContainerBottomUI() {
   );
 
   const add_label_on_click = useCallback(
-    (label_button?: string) => {
+    (label_button?: string, category?: string) => {
       const id = String(label_id.current++);
       const label = label_button ?? `Label_${id}`;
 
@@ -209,7 +209,7 @@ export function ContainerBottomUI() {
       const value: [number, number] =
         a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
 
-      add_label({ id, from: value[0], to: value[1], label });
+      add_label({ id, from: value[0], to: value[1], label, category });
     },
     [range_slider_value, frame_count, current_frame, add_label],
   );
@@ -239,7 +239,7 @@ export function ContainerBottomUI() {
         label_image: img,
         range: [m.from, m.to] as [number, number],
         framecount: fc,
-        category: 'Uncategorized',
+        category: m.category || 'Uncategorized',
       };
     });
   }, [markers, frame_count, label_image_map]);

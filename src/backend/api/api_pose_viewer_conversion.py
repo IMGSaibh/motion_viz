@@ -24,10 +24,10 @@ async def convert_pv_style():
     for mvnx_file in mvnx_files:
         pv_parser = PVParser(str(mvnx_file))
         save_npy_path = Path.joinpath(numpy_converted_dir, f"{mvnx_file.name[:-4]}")  # Remove file extension
-        pv_parser.save_npy(save_npy_path)
+        pv_parser.save_npy(str(save_npy_path))
 
         save_json_skeleton_path = Path.joinpath(pv_json_skeleton_dir, f"{mvnx_file.name[:-4]}_skeleton.json")
-        pv_parser.export_skeleton_groundtruth(save_json_skeleton_path)
+        pv_parser.export_skeleton_converted(save_json_skeleton_path)
 
     return {
         "message": "pose viewer compatible files converted",

@@ -10,18 +10,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Label } from '@/containers/container_bottom_ui';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import {
   use_start_edit_label_cxt,
   use_save_edit_label_cxt,
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
+  use_can_save_label_cxt,
 } from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
   '& .MuiSlider-track': {
-    color: theme.palette.secondary.main,
+    color: theme.palette.wip_color_theme[800],
   },
   '& .MuiSlider-rail': {
     height: 2,
@@ -46,14 +48,14 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
     },
   },
   '& .MuiSlider-thumb[data-index="0"]': {
-    borderLeft: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderLeft: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[800]}`,
   },
   '& .MuiSlider-thumb[data-index="1"]': {
-    borderRight: '4px solid white',
-    borderTop: '4px solid white',
-    borderBottom: '4px solid white',
+    borderRight: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderTop: `4px solid ${theme.palette.wip_color_theme[800]}`,
+    borderBottom: `4px solid ${theme.palette.wip_color_theme[800]}`,
   },
 }));
 
@@ -70,6 +72,7 @@ export function WidgetLabelList(props: Props) {
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
+  const can_save_label = use_can_save_label_cxt();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -96,6 +99,9 @@ export function WidgetLabelList(props: Props) {
                     >
                       <Typography variant="body2" noWrap>
                         {slider_label.label}
+                      </Typography>
+                      <Typography variant="caption" noWrap>
+                        {`Kategorie ${slider_label.category}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
@@ -129,6 +135,14 @@ export function WidgetLabelList(props: Props) {
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
                               <DeleteIcon fontSize="inherit" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={cancelEdit}
+                              aria-label="Cancel label"
+                              sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                            >
+                              <ClearIcon fontSize="inherit" />
                             </IconButton>
                           </>
                         ) : (
