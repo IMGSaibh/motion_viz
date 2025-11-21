@@ -39,3 +39,6 @@ ehthumbs.db
 node_modules/
 dist/
 .vscode/
+
+# === motion-viz files ===
+/data/
