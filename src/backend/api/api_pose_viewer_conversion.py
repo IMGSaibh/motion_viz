@@ -10,9 +10,14 @@ async def convert_pv_style():
     workspacefolder = Path.cwd()
     mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
     numpy_converted_dir = Path.joinpath(workspacefolder, "data/npy")
-    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
-    pv_json_skeleton_dir = Path.joinpath(workspacefolder, "data/json_skeleton")
+    # json_skeleton_dir = Path.joinpath(workspacefolder, "data/json_skeleton")
+    json_dir = Path.joinpath(workspacefolder, "data/json")
 
+
+    mvnx_dir_path.mkdir(parents=True, exist_ok=True)
+    json_dir.mkdir(parents=True, exist_ok=True)
+    numpy_converted_dir.mkdir(parents=True, exist_ok=True)
+    
     mvnx_files = list(mvnx_dir_path.glob("*.mvnx"))
 
     if not mvnx_files:
@@ -26,7 +31,7 @@ async def convert_pv_style():
         save_npy_path = Path.joinpath(numpy_converted_dir, f"{mvnx_file.name[:-4]}")  # Remove file extension
         pv_parser.save_npy(str(save_npy_path))
 
-        save_json_skeleton_path = Path.joinpath(pv_json_skeleton_dir, f"{mvnx_file.name[:-4]}_skeleton.json")
+        save_json_skeleton_path = Path.joinpath(json_skeleton_dir, f"{mvnx_file.name[:-4]}_skeleton.json")
         pv_parser.export_skeleton_converted(save_json_skeleton_path)
 
     return {
