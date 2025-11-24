@@ -13,21 +13,14 @@ class BvhParser:
         self.bvh.load(str(bvh_path))
         self.joint_names = self.bvh.data["names"]
         self.n_joints = len(self.joint_names)
-        self._prepare_data()
 
-    def _prepare_data(self):
-        workspacefolder = Path.cwd()
-        bvh_descriptor_file = Path.joinpath(workspacefolder, "data/descriptor_files/bvh.json")
-        config = JsonLoader(bvh_descriptor_file)
-        self.bvh.set_scale(config.get("scale"))
+
+    def compute_global_positions(self) -> np.ndarray:
 
         self.local_rots, self.local_pos, self.parents, self.offsets, *_ = self.bvh.get_data()
         # local_pos shape: (frames, joints, 3)
         self.n_frames = self.local_rots.shape[0]
 
-
-
-    def compute_global_positions(self) -> np.ndarray:
         # calculate global positions via forward kinematics
         root_pos = self.local_pos[:, 0, :]
         global_positions, _ = fk(self.local_rots, root_pos, self.offsets, self.parents)
@@ -39,19 +32,35 @@ class BvhParser:
         np.save(out_path, arr)
 
 
-
-
     def export_skeleton_converted(self, output_path: Path):
-        joint_hierarchy = []
+
+        joint_graph = []
 
         for joint_idx, parent_idx in enumerate(self.parents):
-            if parent_idx != -1:
-                joint_hierarchy.append([int(joint_idx), int(parent_idx)])
+            joint_graph.append({
+                "id": int(joint_idx),
+                "pid": int(parent_idx),
+                "name": self.joint_names[joint_idx]
+            })
 
         skeleton = {
-            "joints": list(self.joint_names),
-            "hierarchy": joint_hierarchy
+            "systemname": "BVH General",
+            "format": "bvh",
+            "abbrev": "bvh",
+            "positions": "none",
+            "rotations": "absolute",
+            "rotation-representation": "euler_yxz",
+            "fps": 30,
+            "offset-type": "relative",
+            "dim-order": [0, 1, 2],
+            "scale": 0.5,
+            "joint-graph": joint_graph
         }
 
         with open(output_path, "w") as f:
             json.dump(skeleton, f, indent=2)
+
+
+    def scale_data(self, skeleton_path: Path):
+        config = JsonLoader(skeleton_path)
+        self.bvh.set_scale(config.get("scale"))

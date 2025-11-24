@@ -103,32 +103,46 @@ export class NPY_loader {
     // this.joint_coordsystem_local = new JointCoordsystemLocal(this.scene, this.jointCount, { axesSize: 10 });
   }
 
-  _create_bones(skeleton: SkeletonData, renderer: THREE.WebGLRenderer | null = null) {
-    const boneGeometry = new THREE.CylinderGeometry(
-      1.0, // radiusTop
-      1.0, // radiusBottom
-      0.7, // height
-      8, // radialSegments
-    );
+  _create_bones(skeleton: any, renderer: THREE.WebGLRenderer | null = null) {
+    const boneGeometry = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 8);
+    const boneMaterial = new THREE.MeshNormalMaterial({
+      // wireframe: true,
+    });
 
     // const boneMaterial = new THREE.MeshBasicMaterial({
     //   color: 0xff0000,
     //   wireframe: true,
     // });
 
-    const boneMaterial = new THREE.MeshNormalMaterial({
-      // wireframe: true,
-    });
+    const jointGraph = skeleton['joint-graph'];
+    if (!jointGraph) {
+      console.error("ERROR: Skeleton JSON besitzt kein 'joint-graph'!");
+      return;
+    }
 
-    for (const [childIdx, parentIdx] of skeleton.hierarchy) {
-      const childJoint = skeleton.joints[childIdx];
-      const parentJoint = skeleton.joints[parentIdx];
+    // npy_skeleton neu aufbauen
+    this.npy_skeleton = [];
+
+    for (const joint of jointGraph) {
+      const childIdx = joint.id;
+      const parentIdx = joint.pid;
+
+      // Parent -1? → Root, diesen überspringen wir für Bones
+      if (parentIdx === -1) continue;
+
       const bone = new THREE.Mesh(boneGeometry, boneMaterial);
       bone.matrixAutoUpdate = false;
 
       this.npy_motion.add(bone);
 
-      this.npy_skeleton.push({ childIdx, parentIdx, parentJoint, childJoint, bone });
+      // wir speichern exakt das, was die update_skeleton() erwartet
+      this.npy_skeleton.push({
+        childIdx,
+        parentIdx,
+        parentJoint: null, // brauchst du nicht mehr
+        childJoint: null, // brauchst du nicht mehr
+        bone,
+      });
     }
   }
 
