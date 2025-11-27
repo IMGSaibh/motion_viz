@@ -7,7 +7,7 @@ from mocap_loader import MotionDataReader
 class PVParser:
     def __init__(self, file_path: str):
         workspacefolder = Path.cwd()
-        mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/json/short_skeleton.json")
+        mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/json/short.json")
 
         reader = MotionDataReader(file_path, mvnx_descriptor_file)
 

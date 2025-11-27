@@ -13,6 +13,8 @@ async def upload(files: List[UploadFile] = File(...)):
         ".fbx": Path("data/fbx"),
         ".json": Path("data/json"),
         ".mvnx": Path("data/mvnx"),
+        ".pkl": Path("data/pkl"),
+        ".csv": Path("data/csv"),
     }
     # make sure all target directories exist
     for target in target_dirs.values():

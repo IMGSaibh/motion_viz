@@ -28,7 +28,7 @@ async def convert_bvh_to_npy():
         save_npy_path = Path.joinpath(numpy_converted_dir, f"{bvh_file.name[:-4]}")  # Remove .bvh extension
         bvh_parser.save_npy(save_npy_path)
 
-        save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}_skeleton.json")
+        save_json_skeleton_path = Path.joinpath(bvh_json_skeleton_dir, f"{bvh_file.name[:-4]}.json")
         bvh_parser.export_skeleton_converted(save_json_skeleton_path)
         bvh_parser.scale_data(save_json_skeleton_path)
 
