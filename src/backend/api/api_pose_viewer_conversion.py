@@ -26,8 +26,11 @@ async def convert_pv_style():
         }
     
 
-    descriptor_file = Path.joinpath(workspacefolder, "data/json/short.json")
-    mocap_file = Path.joinpath(workspacefolder, "data/mvnx/short.mvnx")
+    # descriptor_file = Path.joinpath(workspacefolder, "data/json/short.json")
+    # mocap_file = Path.joinpath(workspacefolder, "data/mvnx/short.mvnx")
+
+    descriptor_file = Path.joinpath(workspacefolder, "data/json/3dpw.json")
+    mocap_file = Path.joinpath(workspacefolder, "data/pkl/downtown_arguing_00.pkl")
 
     # descriptor_file = Path.joinpath(workspacefolder, "data/json/3dpw.json")
     # mocap_file = Path.joinpath(workspacefolder, "data/mvnx/downtown_arguing_00.pkl")
