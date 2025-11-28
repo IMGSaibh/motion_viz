@@ -5,11 +5,12 @@ backend and ThreeJS Engine frontend.
 
 # Requirements
 
-- Python 3.12+
+- Python 3.10
 - Node.js 18+ (npm)
 - Poetry (für Python-Env-Management)
+- Visual Studio Build Tools 2022
 
-# Installation
+# Installation (using vs code editor is recommended)
 
 ## Frontend
 

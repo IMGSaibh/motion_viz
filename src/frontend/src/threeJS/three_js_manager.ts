@@ -97,8 +97,7 @@ export class ThreeJSEngine {
         this.npy_loader = new NPY_loader(this.scene);
         await this.npy_loader.load_npy_animation(fileUrl);
 
-        // const skeletonPath = fileUrl.replace('/npy/', '/json_skeleton/').replace('.npy', '_skeleton.json');
-        const skeletonPath = fileUrl.replace('/data/npy/', '/data/json_skeleton/').replace(/\.npy$/i, '_skeleton.json');
+        const skeletonPath = fileUrl.replace('/data/npy/', '/data/json/').replace(/\.npy$/i, '.json');
         await this.npy_loader.create_skeleton(skeletonPath);
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
