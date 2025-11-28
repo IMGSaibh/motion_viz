@@ -24,11 +24,27 @@ async def convert_pv_style():
             "message": "",
             "warning": "no pose viewer compatible files found.",
         }
+    
 
-    for mvnx_file in mvnx_files:
-        pv_parser = PVParser(str(mvnx_file))
-        save_npy_path = Path.joinpath(npy_dir_path, f"{mvnx_file.name[:-5]}")  # Remove file extension
-        pv_parser.save_npy(str(save_npy_path))
+    # descriptor_file = Path.joinpath(workspacefolder, "data/json/short.json")
+    # mocap_file = Path("C:\\Users\\Mathias\\Documents\\Dev\\motion_viz\\data\\mvnx\\short.mvnx")
+
+    descriptor_file = Path.joinpath(workspacefolder, "data/json/3dpw.json")
+    mocap_file = Path("C:\\Users\\Mathias\\Documents\\Dev\\motion_viz\\data\\mvnx\\downtown_arguing_00.pkl")
+
+
+    pv_parser = PVParser(str(mocap_file), descriptor_file)
+    save_npy_path = Path.joinpath(npy_dir_path, f"{mocap_file.name[:-5]}")  # Remove file extension
+    pv_parser.save_npy(str(save_npy_path))
+
+
+
+    # for mvnx_file in mvnx_files:
+    #     print(f"processing {mvnx_file}")
+    #     print(f"processing {mvnx_descriptor_file}")
+    #     pv_parser = PVParser(str(mvnx_file), mvnx_descriptor_file)
+    #     save_npy_path = Path.joinpath(npy_dir_path, f"{mvnx_file.name[:-5]}")  # Remove file extension
+    #     pv_parser.save_npy(str(save_npy_path))
 
     return {
         "message": "pose viewer compatible files converted",

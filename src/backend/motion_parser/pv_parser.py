@@ -5,12 +5,9 @@ from pymotion.ops.skeleton import fk
 from mocap_loader import MotionDataReader
 
 class PVParser:
-    def __init__(self, file_path: str):
-        workspacefolder = Path.cwd()
-        mvnx_descriptor_file = Path.joinpath(workspacefolder, "data/json/short.json")
-
-        reader = MotionDataReader(file_path, mvnx_descriptor_file)
-
+    def __init__(self, file_path: str, descriptor_file: Path):
+        
+        reader = MotionDataReader(file_path, descriptor_file)
         if reader.positions is None:
             raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
         self.positions = reader.positions * 100 # Convert from centimeters to meters
