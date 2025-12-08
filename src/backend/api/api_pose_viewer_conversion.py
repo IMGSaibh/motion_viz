@@ -26,28 +26,90 @@ async def convert_pv_style():
         }
     
 
-    # descriptor_file = Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json")
-    # mocap_file = Path.joinpath(workspacefolder, "data/mvnx/short.mvnx")
+    # pairs of descriptor_file und mocap_file
+    file_pairs = [
+        (Path.joinpath(workspacefolder, "data/json/common/bvh_pos_100.json"),
+        Path.joinpath(workspacefolder, "data/bvh/movement3_OvercomeObstacle_var1.bvh")), # 3dmotaas
 
-    # descriptor_file = Path.joinpath(workspacefolder, "data/json/3dpw.json")
-    # mocap_file = Path.joinpath(workspacefolder, "data/pkl/downtown_arguing_00.pkl")
+        # (Path.joinpath(workspacefolder, "data/json/3dpw.json"),                   # 3dpw
+        # Path.joinpath(workspacefolder, "data/pkl/downtown_arguing_00.pkl")),
+        
+        (Path.joinpath(workspacefolder, "data/json/100style.json"),
+        Path.joinpath(workspacefolder, "data/bvh/BentForward_SR.bvh")),                     # 100style
 
-    descriptor_file = Path.joinpath(workspacefolder, "data/json/lara.json")
-    mocap_file = Path.joinpath(workspacefolder, "data/csv/L02_S01_R04_A17_N01_norm_data.csv")
+        (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
+        Path.joinpath(workspacefolder, "data/bvh/Female1_D3_ConversationGestures.bvh")),             # accad
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
+        Path.joinpath(workspacefolder, "data/bvh/F01A0V1.bvh")),                                # actors
+
+        (Path.joinpath(workspacefolder, "data/json/aimove.json"),
+        Path.joinpath(workspacefolder, "data/bvh/S3P03R3.bvh")),                               # aimove
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                  # amass
+        Path.joinpath(workspacefolder, "data/npy/26_02_stageii.npy")),   
+        
+        (Path.joinpath(workspacefolder, "data/json/amass.json"),                            # amass
+        Path.joinpath(workspacefolder, "data/npy/A1 - Stand_poses.npy")),   
+
+        (Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json"),                            # andy
+        Path.joinpath(workspacefolder, "data/npy/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx")), 
 
 
-    pv_parser = PVParser(str(mocap_file), descriptor_file)
-    save_npy_path = Path.joinpath(npy_dir_path, f"{mocap_file.name[:-5]}")  # Remove file extension
-    pv_parser.save_npy(str(save_npy_path))
+        (Path.joinpath(workspacefolder, "data/json/carda.json"),                            # carda
+        Path.joinpath(workspacefolder, "data/npy/xsens_003_WS10_2023_09_21_cropped.bvh")), 
+
+        # (Path.joinpath(workspacefolder, "data/json/carda.json"),                            # cip ??? json
+        # Path.joinpath(workspacefolder, "data/xlsx/subject09_task_rep1.xlsx")), 
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # circle
+        Path.joinpath(workspacefolder, "data/bvh/002_reaching.bvh")),
 
 
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # cmcd
+        Path.joinpath(workspacefolder, "data/bvh/Take_2019-01-09_E_Hindernis.bvh")),
 
-    # for mvnx_file in mvnx_files:
-    #     print(f"processing {mvnx_file}")
-    #     print(f"processing {mvnx_descriptor_file}")
-    #     pv_parser = PVParser(str(mvnx_file), mvnx_descriptor_file)
-    #     save_npy_path = Path.joinpath(npy_dir_path, f"{mvnx_file.name[:-5]}")  # Remove file extension
-    #     pv_parser.save_npy(str(save_npy_path))
+        (Path.joinpath(workspacefolder, "data/json/cmu_kitchen.json"),                            # cmu
+        Path.joinpath(workspacefolder, "data/cmu/13_01_short.amc")),
+
+        # (Path.joinpath(workspacefolder, "data/json/cmu_kitchen.json"),                            # cmu_pano ?????
+        # Path.joinpath(workspacefolder, "data/cmu_pano/hdPose3d_stage1_coco19/")),
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # crea3d
+        Path.joinpath(workspacefolder, "data/bvh/U009_RWLV_CI1V_motion.bvh")),
+
+
+        (Path.joinpath(workspacefolder, "data/json/dag.json"),                                      # dag
+        Path.joinpath(workspacefolder, "data/mat/allWalks.mat")),
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # dance
+        Path.joinpath(workspacefolder, "data/bvh/Clio_Haniotikos_short.bvh")),
+
+        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # dance 2
+        Path.joinpath(workspacefolder, "data/bvh/Clio_Haniotikos.bvh")),
+
+        (Path.joinpath(workspacefolder, "data/json/dyad.json"),                                      # dyad
+        Path.joinpath(workspacefolder, "data/csv/dyad2_round2_participant2.csv")),
+
+
+        (Path.joinpath(workspacefolder, "data/json/lara.json"),
+        Path.joinpath(workspacefolder, "data/csv/L02_S01_R04_A17_N01_norm_data.csv")),              # lara
+
+        (Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json"),                               # mvnx
+        Path.joinpath(workspacefolder, "data/mvnx/short.mvnx")),
+
+
+    ]
+
+    for descriptor_file, mocap_file in file_pairs:
+        print(f"processing {mocap_file}")
+        print(f"processing {descriptor_file}")
+
+        pv_parser = PVParser(str(mocap_file), descriptor_file)
+        # save_npy_path = Path.joinpath(npy_dir_path, f"{mocap_file.name[:-5]}")
+        save_npy_path = Path.joinpath(npy_dir_path, f"{mocap_file.stem}")  # Remove file extension
+        pv_parser.save_npy(str(save_npy_path))
+        print(f"Datei gespeichert: {save_npy_path}")
 
     return {
         "message": "pose viewer compatible files converted",
