@@ -36,7 +36,7 @@ export function PresenterSlider(props: Props) {
             <WidgetLabelPreview label_image={props.label_image} />
           </Grid>
           <Grid size={{ md: 10 }}>
-            <Box sx={{ position: 'relative', width: '100%' }}>
+            {/* <Box sx={{ position: 'relative', width: '100%' }}>
               <Box sx={{ position: 'absolute', inset: 0, zIndex: 1 }}>
                 <WidgetStdSlider
                   {...{
@@ -56,7 +56,7 @@ export function PresenterSlider(props: Props) {
                   label_slider_reference={props.label_slider_reference}
                 />
               </Box>
-            </Box>
+            </Box> */}
           </Grid>
           <Grid size={{ md: 1 }}></Grid>
           <Grid size={{ md: 1 }}></Grid>

@@ -17,6 +17,8 @@ import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
 import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
+import { SyncSketchSlider } from '@/components/presenter/syncsketch_slider';
+
 export type Label = {
   id: string;
   label: string;
@@ -281,39 +283,42 @@ export function ContainerBottomUI() {
   }, [range_markers, frame, label_image_map]);
 
   return (
-    <Box
-      sx={(theme) => ({
-        position: 'absolute',
-        width: '100%',
-        bottom: '0vw',
-        p: '0.5rem',
-        bgcolor: theme.palette.background.paper,
-      })}
-    >
-      <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
-        <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
-      </Box>
-      <img
-        ref={preview_render_img_ref}
-        alt=""
-        style={{
+    <>
+      <Box
+        sx={(theme) => ({
           position: 'absolute',
-          display: 'none',
-          top: -230,
-          left: 0,
-          zIndex: 1,
-          border: '1px solid #000',
-          pointerEvents: 'none',
-        }}
-      />
-      <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
-      <PresenterLabelListUI
-        lables_list={label_list}
-        slider_list_on_click={label_list_on_click}
-        slider_list_clear_on_click={clear_label_list_on_click}
-        save_labels_on_click={on_save_click}
-        label_image={current_label_image}
-      />
-    </Box>
+          width: '100%',
+          bottom: '0vw',
+          bgcolor: theme.palette.background.paper,
+        })}
+      >
+        <SyncSketchSlider label_slider_framecount={1000} />
+
+        <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
+          <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
+        </Box>
+        <img
+          ref={preview_render_img_ref}
+          alt=""
+          style={{
+            position: 'absolute',
+            display: 'none',
+            top: -230,
+            left: 0,
+            zIndex: 1,
+            border: '1px solid #000',
+            pointerEvents: 'none',
+          }}
+        />
+        <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
+        <PresenterLabelListUI
+          lables_list={label_list}
+          slider_list_on_click={label_list_on_click}
+          slider_list_clear_on_click={clear_label_list_on_click}
+          save_labels_on_click={on_save_click}
+          label_image={current_label_image}
+        />
+      </Box>
+    </>
   );
 }
