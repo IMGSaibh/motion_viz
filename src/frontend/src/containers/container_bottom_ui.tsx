@@ -292,7 +292,7 @@ export function ContainerBottomUI() {
           bgcolor: theme.palette.background.paper,
         })}
       >
-        <SyncSketchSlider label_slider_framecount={1000} />
+        <SyncSketchSlider label_slider_framecount={100} />
 
         <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
           <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
