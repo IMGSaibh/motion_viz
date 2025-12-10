@@ -13,6 +13,7 @@ class PVParser:
         self.positions = reader.positions * 100 # Convert from centimeters to meters
         self.r_hierarchy = reader.generateJointHierarchyArray()
         self.joint_names = reader.generateNameList()
+        self.joint_graph = reader.joint_graph
 
     def save_npy(self, out_path: str):
         arr = self.positions

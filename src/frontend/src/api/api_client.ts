@@ -22,7 +22,7 @@ export class HttpError extends Error {
 }
 
 export async function fetch_json<T>(path: string, opts: FetchOptions = {}): Promise<T> {
-  const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 15000 } = opts;
+  const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 150000 } = opts;
   const controller = new AbortController();
   const timeout_id = timeoutMs
     ? setTimeout(() => controller.abort(new DOMException('Request timeout', 'AbortError')), timeoutMs)
