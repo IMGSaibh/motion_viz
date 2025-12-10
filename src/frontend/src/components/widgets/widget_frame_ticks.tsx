@@ -1,67 +1,67 @@
 import { Box, Grid } from '@mui/material';
 
-function computeTickInterval(frameCount: number): number {
-  if (frameCount <= 50) return 1;
-  if (frameCount <= 150) return 5;
-  if (frameCount <= 400) return 10;
-  if (frameCount <= 1000) return 20;
-  if (frameCount <= 3000) return 50;
-  return 100;
-}
-
 type Props = {
   frame_count: number;
 };
 
+function computeTickInterval(frameCount: number): number {
+  if (frameCount <= 50) return 10;
+  if (frameCount <= 150) return 20;
+  if (frameCount <= 400) return 50;
+  if (frameCount <= 1000) return 100;
+  if (frameCount <= 3000) return 200;
+  return 300;
+}
+
 export function WidgetFrameTicks(props: Props) {
-  const tickEvery = computeTickInterval(props.frame_count);
+  const frameCount = props.frame_count;
+  const ticks: number[] = [];
+  const interval = computeTickInterval(frameCount);
+  const last_frame = frameCount - 1;
+
+  // nothings to show
+  if (!frameCount || frameCount <= 0) return null;
+
+  for (let i = 0; i < frameCount; i += interval) {
+    ticks.push(i);
+  }
+  if (ticks.length === 0 || ticks[ticks.length - 1] !== last_frame) {
+    ticks.push(last_frame);
+  }
+
   return (
-    <Grid container spacing={0} alignItems="center">
-      <Grid size={{ md: 1 }}></Grid>
-      <Grid size={{ md: 10 }} sx={{ position: 'relative' }}>
+    <Grid container spacing={0} justifyContent="center" alignItems="center">
+      <Grid size={{ md: 10, xs: 12 }} sx={{ position: 'relative' }}>
         <Box
-          sx={{
+          sx={(theme) => ({
             width: '100%',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${props.frame_count}, 1fr)`,
-            alignItems: 'center',
-          }}
+            height: 40,
+            position: 'relative',
+          })}
         >
-          {Array.from({ length: props.frame_count }).map((_, index) => {
-            const showTick = index % tickEvery === 0;
+          {ticks.map((frame) => {
+            const pct = ((frame + 0.5) / frameCount) * 100;
 
             return (
               <Box
-                className={`frame-tick-${index}`}
-                key={index}
-                sx={(theme) => ({
-                  height: 40,
-                  bgcolor: theme.palette.wip_color_theme[400],
-                  position: 'relative',
-                })}
+                key={frame}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: `${pct}%`,
+                  transform: 'translateX(-50%)',
+                  fontSize: 10,
+                  color: 'white',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                }}
               >
-                {showTick && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: -18,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      fontSize: 10,
-                      color: 'black',
-                      pointerEvents: 'none',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {index}
-                  </Box>
-                )}
+                {frame}
               </Box>
             );
           })}
         </Box>
       </Grid>
-      <Grid size={{ md: 1 }}></Grid>
     </Grid>
   );
 }

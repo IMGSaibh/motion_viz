@@ -297,7 +297,6 @@ export function ContainerBottomUI() {
           position: 'absolute',
           width: '100%',
           bottom: '0vw',
-          bgcolor: theme.palette.background.paper,
         })}
       >
         <PresenterFrameSlider
@@ -323,7 +322,7 @@ export function ContainerBottomUI() {
             pointerEvents: 'none',
           }}
         />
-        {/* <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons> */}
+        <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
         <PresenterLabelListUI
           lables_list={label_list}
           slider_list_on_click={label_list_on_click}

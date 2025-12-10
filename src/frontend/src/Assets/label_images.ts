@@ -33,8 +33,8 @@ import btn2_llm from '@/Assets/llm_images/Label_2.png';
 import btn3_llm from '@/Assets/llm_images/Label_3.png';
 
 // play / pause button images
-import play_button from '@/Assets/play-button.png';
-import pause_button from '@/Assets/pause-button.png';
+import play_button from '@/Assets/play-button.svg';
+import pause_button from '@/Assets/pause-button.svg';
 
 export type LabelImage = {
   label: string;
