@@ -32,6 +32,10 @@ import btn1_llm from '@/Assets/llm_images/Label_1.png';
 import btn2_llm from '@/Assets/llm_images/Label_2.png';
 import btn3_llm from '@/Assets/llm_images/Label_3.png';
 
+// play / pause button images
+import play_button from '@/Assets/play-button.png';
+import pause_button from '@/Assets/pause-button.png';
+
 export type LabelImage = {
   label: string;
   src: string;
@@ -153,3 +157,16 @@ export function get_label_all_label_images_llm(): ReadonlyMap<string, LabelImage
   for (const item of LABEL_IMAGES_CAT1_LLM) map.set(item.label, item);
   return map;
 }
+
+// PLAYER IMAGES
+export const PLAY_BUTTON_IMAGE: LabelImage = {
+  label: 'Play_Button',
+  src: play_button,
+  category: 'Control',
+};
+
+export const PAUSE_BUTTON_IMAGE: LabelImage = {
+  label: 'Pause_Button',
+  src: pause_button,
+  category: 'Control',
+};

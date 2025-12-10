@@ -1,5 +1,5 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { PresenterSlider } from '@/components/presenter/presenter_slider';
+import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   use_set_range_slider_value_cxt,
@@ -17,7 +17,6 @@ import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
 import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
-import { SyncSketchSlider } from '@/components/presenter/syncsketch_slider';
 
 export type Label = {
   id: string;
@@ -247,7 +246,7 @@ export function ContainerBottomUI() {
   }, [markers, frame_count, label_image_map]);
 
   // saves lable list to backend
-  const on_save_click = useCallback(() => {
+  const on_click_save = useCallback(() => {
     if (!selected_motion) return;
 
     const labels_map = markers.map((m) => {
@@ -282,6 +281,15 @@ export function ContainerBottomUI() {
     return label_image_map.get(hit.label) ?? null;
   }, [range_markers, frame, label_image_map]);
 
+  const on_click_frame = useCallback(
+    (frame: number) => {
+      set_std_slider_value(frame); // Context updaten
+      pause(); // Player pausieren (optional, je nach gewünschtem Verhalten)
+      go_to_frame(frame); // Frame im ThreeJS-Player setzen
+    },
+    [set_std_slider_value, pause, go_to_frame],
+  );
+
   return (
     <>
       <Box
@@ -292,7 +300,12 @@ export function ContainerBottomUI() {
           bgcolor: theme.palette.background.paper,
         })}
       >
-        <SyncSketchSlider label_slider_framecount={100} />
+        <PresenterFrameSlider
+          {...range_slider_props}
+          {...std_slider_props}
+          frame_count={frame_count}
+          on_click_frame={on_click_frame}
+        ></PresenterFrameSlider>
 
         {/* <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
           <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
@@ -310,12 +323,12 @@ export function ContainerBottomUI() {
             pointerEvents: 'none',
           }}
         />
-        <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
+        {/* <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons> */}
         <PresenterLabelListUI
           lables_list={label_list}
           slider_list_on_click={label_list_on_click}
           slider_list_clear_on_click={clear_label_list_on_click}
-          save_labels_on_click={on_save_click}
+          save_labels_on_click={on_click_save}
           label_image={current_label_image}
         />
       </Box>
