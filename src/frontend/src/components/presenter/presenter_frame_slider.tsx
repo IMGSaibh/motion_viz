@@ -18,6 +18,8 @@ type Props = {
   on_mouse_move_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
   on_mouse_up_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
   on_mouse_leave_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  is_playing: boolean;
+  on_click_play_toggle?: () => void;
 
   // Label-Bar-Infos
   // label_slider_range: [number, number];
@@ -44,6 +46,8 @@ export function PresenterFrameSlider(props: Props) {
         on_mouse_move_slider_track={props.on_mouse_move_slider_track}
         on_mouse_up_slider_track={props.on_mouse_up_slider_track}
         on_mouse_leave_slider_track={props.on_mouse_leave_slider_track}
+        is_playing={props.is_playing}
+        on_click_play_toggle={props.on_click_play_toggle}
       />
 
       {/* Label-Bar darunter */}

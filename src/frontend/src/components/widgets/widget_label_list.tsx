@@ -78,17 +78,28 @@ export function WidgetLabelList(props: Props) {
     <Box sx={{ flexGrow: 1 }}>
       <Collapse in={props.toggle_list && props.labels.length > 0} timeout="auto" unmountOnExit>
         <List
-          sx={{
+          sx={(theme) => ({
             width: '100%',
-            bgcolor: 'background.paper',
             maxHeight: 4 * 56, // scroll list if 3 labels present
             overflowY: 'auto',
-          }}
+          })}
         >
           {props.labels.map((slider_label, i) => (
             <Fragment key={slider_label.id}>
               <ListItem disableGutters>
                 <Grid container spacing={0} alignItems="center" wrap="nowrap" sx={{ width: '100%' }}>
+                  <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <WidgetLabelPreview label_image={slider_label.label_image} />
+                  </Grid>
+
+                  <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <LabelSliderTemplate
+                      disabled={true}
+                      value={slider_label.range}
+                      min={0}
+                      max={slider_label.framecount}
+                    />
+                  </Grid>
                   <Grid size={{ md: 1 }}>
                     <Box
                       sx={{
@@ -168,19 +179,6 @@ export function WidgetLabelList(props: Props) {
                         )}
                       </Box>
                     </Box>
-                  </Grid>
-
-                  <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <WidgetLabelPreview label_image={slider_label.label_image} />
-                  </Grid>
-
-                  <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <LabelSliderTemplate
-                      disabled={true}
-                      value={slider_label.range}
-                      min={0}
-                      max={slider_label.framecount}
-                    />
                   </Grid>
                 </Grid>
               </ListItem>

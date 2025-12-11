@@ -13,9 +13,9 @@ import {
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
-import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
+import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
 import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
-import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
+// import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 
 export type Label = {
   id: string;
@@ -389,7 +389,7 @@ export function ContainerBottomUI() {
 
       <PresenterLabelButtons onClick={add_label_on_click} />
 
-      <PresenterLabelListUI
+      <PresenterLabelList
         lables_list={label_list}
         slider_list_on_click={label_list_on_click}
         slider_list_clear_on_click={clear_label_list_on_click}

@@ -211,8 +211,6 @@ export class ThreeJSEngine {
     if (this.thumbnail_renderer) {
       this.thumbnail_renderer.dispose();
       this.thumbnail_renderer = null as any;
-      console.log('Thumbnail renderer disposed.');
-      console.log(this.thumbnail_renderer);
     }
   }
 

@@ -24,6 +24,8 @@ export function ContainerFrameSlider() {
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
 
+  const [isPlayingUi, setIsPlayingUi] = useState(false);
+
   const {
     frame_count,
     current_frame,
@@ -39,14 +41,24 @@ export function ContainerFrameSlider() {
     cleanup_thumbnail_render,
   } = useThreeJSEngine();
 
+  const handleTogglePlay = useCallback(() => {
+    setIsPlayingUi((prev) => !prev);
+    play_pause();
+  }, [play_pause]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') play_pause();
+      if (e.code === 'Space') {
+        play_pause();
+        setIsPlayingUi((prev) => !prev); // UI-State mit togglen
+      }
+
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
         // set_range([0, 1]);
         set_slider_frame(0);
+        setIsPlayingUi(false);
       }
       if (e.code === 'KeyR') {
         stop();
@@ -56,6 +68,25 @@ export function ContainerFrameSlider() {
         cleanup_thumbnail_render();
         // set_range([0, 1]);
         set_slider_frame(0);
+        setIsPlayingUi(false);
+      }
+      if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        if (!frame_count) return;
+        const maxIdx = Math.max(0, frame_count - 1);
+        const nextFrame = Math.min(maxIdx, slider_frame_ctx + 1);
+        pause();
+        set_slider_frame(nextFrame);
+        go_to_frame(nextFrame);
+      }
+
+      if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        if (!frame_count) return;
+        const prevFrame = Math.max(0, slider_frame_ctx - 1);
+        pause();
+        set_slider_frame(prevFrame);
+        go_to_frame(prevFrame);
       }
       if (e.code === 'KeyD') print_scene_components();
     };
@@ -76,6 +107,7 @@ export function ContainerFrameSlider() {
     cleanup_loop,
     cleanup_player,
     cleanup_thumbnail_render,
+    setIsPlayingUi,
   ]);
 
   const compute_slider_track_frame = useCallback(
@@ -150,6 +182,7 @@ export function ContainerFrameSlider() {
 
   const on_mouse_up_slider_track = useCallback(() => {
     frame_slider_track_scrubbing_reference.current = false;
+    setIsPlayingUi(false);
   }, []);
 
   const on_mouse_leave_slider_track = useCallback(() => {
@@ -172,6 +205,9 @@ export function ContainerFrameSlider() {
       on_mouse_move_slider_track: on_mouse_move_slider_track,
       on_mouse_up_slider_track: on_mouse_up_slider_track,
       on_mouse_leave_slider_track: on_mouse_leave_slider_track,
+
+      is_playing: isPlayingUi,
+      on_click_play_toggle: handleTogglePlay,
     }),
     [
       slider_frame_ctx,
@@ -181,6 +217,8 @@ export function ContainerFrameSlider() {
       on_mouse_move_slider_track,
       on_mouse_up_slider_track,
       on_mouse_leave_slider_track,
+      isPlayingUi,
+      handleTogglePlay,
     ],
   );
 

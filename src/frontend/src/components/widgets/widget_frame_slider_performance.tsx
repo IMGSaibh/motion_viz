@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
+import { PAUSE_BUTTON_IMAGE } from '@/Assets/label_images';
 
 type Props = {
   slider_frame: number;
@@ -12,6 +13,9 @@ type Props = {
   on_mouse_move_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
   on_mouse_up_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
   on_mouse_leave_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
+
+  is_playing: boolean;
+  on_click_play_toggle?: () => void;
 };
 
 export function WidgetFrameSliderPerformance(props: Props) {
@@ -24,6 +28,8 @@ export function WidgetFrameSliderPerformance(props: Props) {
     on_mouse_move_slider_track: on_mouse_move,
     on_mouse_up_slider_track: on_mouse_up,
     on_mouse_leave_slider_track: on_mouse_leave,
+    is_playing,
+    on_click_play_toggle,
   } = props;
 
   const hasFrames = frame_count > 0;
@@ -55,14 +61,16 @@ export function WidgetFrameSliderPerformance(props: Props) {
       {/* Play Button (nur Anzeige – Logik bleibt im Container) */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Box
-          sx={{
+          onClick={on_click_play_toggle}
+          sx={(theme) => ({
             width: 40,
             height: 40,
-            backgroundImage: `url(${PLAY_BUTTON_IMAGE.src})`,
+            cursor: 'pointer',
+            backgroundImage: `url(${is_playing ? PAUSE_BUTTON_IMAGE.src : PLAY_BUTTON_IMAGE.src})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
             backgroundPosition: 'center',
-          }}
+          })}
         />
       </Grid>
 

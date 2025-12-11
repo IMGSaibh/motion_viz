@@ -15,7 +15,7 @@ type Props = {
   label_image: LabelImage | null;
 };
 
-export function PresenterLabelListUI(props: Props) {
+export function PresenterLabelList(props: Props) {
   const [open, setOpen] = useState<boolean>(true);
   return (
     <Box
