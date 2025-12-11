@@ -1,9 +1,11 @@
 import ThreeJSScene from '@/threeJS/three_js_scene';
-import { ContainerBottomUI } from './containers/container_bottom_ui';
 import { ContainerTopbarUI } from '@/containers/container_topbar_ui';
+import { ContainerFrameSlider } from './containers/container_frame_slider';
+import { ContainerBottomUI } from './containers/container_bottom_ui';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
-import { SliderLabelListProvider } from '@/context/context_slider_label_list';
+import { FrameSliderLabellistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
+import { Box } from '@mui/material';
 
 export default function App() {
   return (
@@ -11,10 +13,19 @@ export default function App() {
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
-          <SliderLabelListProvider>
+          <FrameSliderLabellistProvider>
             <ContainerTopbarUI />
-            <ContainerBottomUI />
-          </SliderLabelListProvider>
+            <Box
+              sx={(theme) => ({
+                position: 'absolute',
+                width: '100%',
+                bottom: '0vw',
+              })}
+            >
+              <ContainerFrameSlider />
+              <ContainerBottomUI />
+            </Box>
+          </FrameSliderLabellistProvider>
         </ThreeJSEngineProvider>
       </SnackbarProvider>
     </>

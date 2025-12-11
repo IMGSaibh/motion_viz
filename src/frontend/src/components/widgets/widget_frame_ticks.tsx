@@ -19,9 +19,6 @@ export function WidgetFrameTicks(props: Props) {
   const interval = computeTickInterval(frameCount);
   const last_frame = frameCount - 1;
 
-  // nothings to show
-  if (!frameCount || frameCount <= 0) return null;
-
   for (let i = 0; i < frameCount; i += interval) {
     ticks.push(i);
   }

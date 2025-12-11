@@ -3,72 +3,43 @@ import { Box, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
 
 type Props = {
-  std_slider_value: number;
+  slider_frame: number;
   frame_count: number;
-  on_click_frame?: (frame: number) => void;
-  on_mouse_move?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  hover_frame: number | null;
+  slider_track_ref: React.RefObject<HTMLDivElement | null>;
+
+  on_mouse_down_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  on_mouse_move_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  on_mouse_up_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  on_mouse_leave_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 export function WidgetFrameSliderPerformance(props: Props) {
-  const { std_slider_value, frame_count, on_click_frame } = props;
+  const {
+    slider_frame: slider_frame,
+    frame_count,
+    hover_frame,
+    slider_track_ref: track_ref,
+    on_mouse_down_slider_track: on_mouse_down,
+    on_mouse_move_slider_track: on_mouse_move,
+    on_mouse_up_slider_track: on_mouse_up,
+    on_mouse_leave_slider_track: on_mouse_leave,
+  } = props;
 
-  const trackRef = React.useRef<HTMLDivElement | null>(null);
   const hasFrames = frame_count > 0;
-  if (frame_count < 0) {
-    return null;
-  }
+  const clamped_frame = hasFrames ? Math.min(Math.max(slider_frame, 0), frame_count - 1) : 0;
 
-  const clampedValue = hasFrames ? Math.min(Math.max(std_slider_value, 0), frame_count - 1) : 0;
+  const markerPct = hasFrames ? ((clamped_frame + 0.5) / frame_count) * 100 : 0;
+  const hoverPct = hasFrames && hover_frame !== null ? ((hover_frame + 0.5) / frame_count) * 100 : null;
 
-  // Markerposition:
-  const markerPct = hasFrames ? ((clampedValue + 0.5) / frame_count) * 100 : 0;
+  // internes Ref für das Track-DOM-Element, wird in das Ref vom Container gespiegelt
+  const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
-  // NEW: Hover-Frame speichern
-  const [hoverFrame, setHoverFrame] = React.useState<number | null>(null);
-  const hoverPct = hoverFrame !== null ? ((hoverFrame + 0.5) / frame_count) * 100 : null;
-
-  // Scrubbing
-  const isDragging = React.useRef(false);
-
-  const computeFrameFromClientX = React.useCallback(
-    (clientX: number) => {
-      if (!trackRef.current || !hasFrames) return 0;
-      const rect = trackRef.current.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const width = rect.width || 1;
-      const ratio = Math.min(1, Math.max(0, x / width));
-      return Math.round(ratio * (frame_count - 1));
-    },
-    [frame_count, hasFrames],
-  );
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!on_click_frame) return;
-    isDragging.current = true;
-    const frame = computeFrameFromClientX(e.clientX);
-    on_click_frame(frame);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const frame = computeFrameFromClientX(e.clientX);
-
-    // Hover aktiv aktualisieren
-    setHoverFrame(frame);
-
-    // Scrubbing
-    if (isDragging.current && on_click_frame) {
-      on_click_frame(frame);
-    }
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
-  };
-
-  const handleMouseLeave = () => {
-    isDragging.current = false;
-    setHoverFrame(null); // remove hover effect
-  };
+  // TODO: remove useEffect
+  React.useEffect(() => {
+    if (!track_ref) return;
+    track_ref.current = innerTrackRef.current;
+  }, [track_ref]);
 
   return (
     <Grid
@@ -81,7 +52,7 @@ export function WidgetFrameSliderPerformance(props: Props) {
         borderRadius: 0,
       })}
     >
-      {/* Play Button */}
+      {/* Play Button (nur Anzeige – Logik bleibt im Container) */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Box
           sx={{
@@ -95,44 +66,41 @@ export function WidgetFrameSliderPerformance(props: Props) {
         />
       </Grid>
 
-      {/* Slider */}
+      {/* Slider-Track */}
       <Grid size={{ md: 10 }} sx={{ position: 'relative' }}>
-        {/* current frame rect */}
+        {/* Bubble über aktuellem Frame */}
         <Box
-          sx={{
+          sx={(theme) => ({
             position: 'absolute',
             top: -25,
             left: `${markerPct}%`,
             transform: 'translateX(-50%)',
-            bgcolor: 'grey.900',
+            bgcolor: `${theme.palette.wip_color_theme[500]}`,
             color: 'white',
             px: 1,
             py: 0.3,
             fontSize: 12,
             borderRadius: 1,
             pointerEvents: 'none',
-          }}
+          })}
         >
-          {clampedValue}
+          {clamped_frame}
         </Box>
 
-        {/* track */}
+        {/* Track mit Streifen pro Frame */}
         <Box
-          ref={trackRef}
-          onMouseDown={handleMouseDown}
-          // onMouseMove={handleMouseMove}
-          onMouseMove={props.on_mouse_move}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
+          ref={innerTrackRef}
+          onMouseDown={on_mouse_down}
+          onMouseMove={on_mouse_move}
+          onMouseUp={on_mouse_up}
+          onMouseLeave={on_mouse_leave}
           sx={(theme) => ({
             width: '100%',
             height: 40,
             position: 'relative',
-            cursor: 'pointer',
+            cursor: hasFrames ? 'pointer' : 'default',
             overflow: 'hidden',
-
-            // frame stripes
-            ...{
+            ...(hasFrames && {
               background: `
                 repeating-linear-gradient(
                   90deg,
@@ -140,25 +108,27 @@ export function WidgetFrameSliderPerformance(props: Props) {
                   ${theme.palette.grey[700]} calc(100% / ${frame_count}) calc(200% / ${frame_count})
                 )
               `,
-            },
+            }),
           })}
         >
-          {/* marker-line */}
-          <Box
-            sx={(theme) => ({
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              width: 2,
-              left: `${markerPct}%`,
-              transform: 'translateX(-50%)',
-              bgcolor: theme.palette.primary.main,
-              pointerEvents: 'none',
-            })}
-          />
+          {/* Marker-Linie (aktueller Frame) */}
+          {hasFrames && (
+            <Box
+              sx={(theme) => ({
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                width: 2,
+                left: `${markerPct}%`,
+                transform: 'translateX(-50%)',
+                bgcolor: theme.palette.primary.main,
+                pointerEvents: 'none',
+              })}
+            />
+          )}
 
-          {/* hover-line for each frame */}
-          {hoverPct !== null && (
+          {/* Hover-Linie */}
+          {hasFrames && hoverPct !== null && (
             <Box
               sx={(theme) => ({
                 position: 'absolute',
@@ -175,10 +145,10 @@ export function WidgetFrameSliderPerformance(props: Props) {
         </Box>
       </Grid>
 
-      {/* grid cell right */}
+      {/* Info rechts */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="body2" noWrap>
-          Frame: {clampedValue} [0 – {frame_count}]
+          Frame: {clamped_frame} [0 – {frame_count}]
         </Typography>
       </Grid>
     </Grid>

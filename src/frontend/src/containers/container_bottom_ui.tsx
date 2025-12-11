@@ -1,22 +1,21 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import {
   use_set_range_slider_value_cxt,
   use_range_slider_value_cxt,
-  use_std_slider_value_cxt,
-  use_set_std_slider_value_cxt,
+  use_slider_frame_cxt,
+  use_set_slider_frame_cxt,
   use_add_label_ctx,
   use_remove_label_cxt,
   use_clear_label_list_ctx,
   use_range_marker_cxt,
 } from '@/context/context_slider_label_list';
-import { Box } from '@mui/material';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelListUI } from '@/components/presenter/presenter_label_list_ui';
 import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
+import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 
 export type Label = {
   id: string;
@@ -47,8 +46,8 @@ export function ContainerBottomUI() {
   const markers = use_range_marker_cxt();
 
   const std_slider_reference = useRef<HTMLSpanElement | null>(null);
-  const std_slider_value = use_std_slider_value_cxt();
-  const set_std_slider_value = use_set_std_slider_value_cxt();
+  const std_slider_value = use_slider_frame_cxt();
+  const set_std_slider_value = use_set_slider_frame_cxt();
 
   const range_slider_reference = useRef<HTMLSpanElement | null>(null);
   const range_slider_value = use_range_slider_value_cxt();
@@ -65,10 +64,15 @@ export function ContainerBottomUI() {
   const seqRef = useRef(0);
 
   const range_markers = use_range_marker_cxt();
-  const frame = use_std_slider_value_cxt();
+  const frame = use_slider_frame_cxt();
   const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();
+
+  // // ==== Frame-Slider-Track State ====
+  // const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
+  // const frame_slider_track_dragging_reference = useRef(false);
+  // const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
 
   useEffect(
     () => () => {
@@ -83,7 +87,7 @@ export function ContainerBottomUI() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') play_pause();
+      // if (e.code === 'Space') play_pause();
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
@@ -99,7 +103,7 @@ export function ContainerBottomUI() {
         set_range([0, 1]);
         set_std_slider_value(0);
       }
-      if (e.code === 'KeyD') print_scene_components();
+      // if (e.code === 'KeyD') print_scene_components();
       if (e.code === 'Digit1' && e.location === 0) {
         set_range([std_slider_value, range_slider_value[1]]);
       }
@@ -121,8 +125,12 @@ export function ContainerBottomUI() {
     range_slider_value,
     set_range,
     set_std_slider_value,
+    cleanup_loop,
+    cleanup_player,
+    cleanup_thumbnail_render,
   ]);
 
+  // ===== std-Slider (MUI) Logik für Thumbnail-Preview – unverändert =====
   const std_slider_on_change = useCallback(
     (e: Event, value: number | number[]) => {
       if (!Array.isArray(value)) {
@@ -147,7 +155,7 @@ export function ContainerBottomUI() {
       const mySeq = ++seqRef.current;
 
       rafRef.current = requestAnimationFrame(() => {
-        let css_left = ratio * rect.width + 50;
+        const css_left = ratio * rect.width + 50;
         if (preview_render_img_ref.current) {
           preview_render_img_ref.current.style.display = 'block';
           preview_render_img_ref.current.style.left = `${css_left}px`;
@@ -193,6 +201,89 @@ export function ContainerBottomUI() {
     [range_slider_value, frame_count],
   );
 
+  // ===== Slider-Track-Frames Logic =====
+
+  // const compute_slider_track_frames = useCallback(
+  //   (clientX: number) => {
+  //     const rect = frame_slider_track_reference.current?.getBoundingClientRect();
+  //     if (!rect || !frame_count) return 0;
+  //     const x = clientX - rect.left;
+  //     const width = rect.width || 1;
+  //     const ratio = Math.min(1, Math.max(0, x / width));
+  //     return Math.round(ratio * Math.max(0, frame_count));
+  //   },
+  //   [frame_count],
+  // );
+
+  // const update_slider_track_frame_tick = useCallback(
+  //   (frameIdx: number) => {
+  //     const maxIdx = Math.max(0, (frame_count ?? 0) - 1);
+  //     const clamped_frame = Math.max(0, Math.min(frameIdx, maxIdx));
+  //     set_std_slider_value(clamped_frame);
+  //     pause();
+  //     go_to_frame(clamped_frame);
+  //   },
+  //   [frame_count, pause, go_to_frame, set_std_slider_value],
+  // );
+
+  // const on_mouse_down_slider_track = useCallback(
+  //   (e: React.MouseEvent<HTMLDivElement>) => {
+  //     if (!frame_count) return;
+  //     frame_slider_track_dragging_reference.current = true;
+  //     const f = compute_slider_track_frames(e.clientX);
+  //     update_slider_track_frame_tick(f);
+  //   },
+  //   [frame_count, compute_slider_track_frames, update_slider_track_frame_tick],
+  // );
+
+  // const on_mouse_move_slider_track = useCallback(
+  //   (e: React.MouseEvent<HTMLDivElement>) => {
+  //     if (!frame_count) return;
+  //     const frame_idx = compute_slider_track_frames(e.clientX);
+  //     set_frame_slider_track_hovered_frame(frame_idx);
+  //     if (frame_slider_track_dragging_reference.current) {
+  //       update_slider_track_frame_tick(frame_idx);
+  //     }
+  //   },
+  //   [frame_count, compute_slider_track_frames, update_slider_track_frame_tick],
+  // );
+
+  // const on_mouse_up_slider_track = useCallback(() => {
+  //   frame_slider_track_dragging_reference.current = false;
+  // }, []);
+
+  // const on_mouse_leave_slider_track = useCallback(() => {
+  //   frame_slider_track_dragging_reference.current = false;
+  //   set_frame_slider_track_hovered_frame(null);
+  // }, []);
+
+  // const frame_slider_track_props = useMemo(
+  //   () => ({
+  //     std_slider_value,
+  //     frame_count: frame_count ?? 0,
+  //     hover_frame: frame_slider_track_hovered_frame,
+  //     slider_track_ref: frame_slider_track_reference,
+  //     on_mouse_down_slider_track: on_mouse_down_slider_track,
+  //     on_mouse_move_slider_track: on_mouse_move_slider_track,
+  //     on_mouse_up_slider_track: on_mouse_up_slider_track,
+  //     on_mouse_leave_slider_track: on_mouse_leave_slider_track,
+  //     label_slider_range: range_slider_value,
+  //     label_slider_framecount: frame_count ?? 0,
+  //   }),
+  //   [
+  //     std_slider_value,
+  //     frame_count,
+  //     frame_slider_track_hovered_frame,
+  //     on_mouse_down_slider_track,
+  //     on_mouse_move_slider_track,
+  //     on_mouse_up_slider_track,
+  //     on_mouse_leave_slider_track,
+  //     range_slider_value,
+  //   ],
+  // );
+
+  // ===== Label-Kram wie gehabt =====
+
   const add_label_on_click = useCallback(
     (label_button?: string, category?: string) => {
       const id = String(label_id.current++);
@@ -206,7 +297,6 @@ export function ContainerBottomUI() {
       b = clamp(b);
       if (a > b) [a, b] = [b, a];
 
-      // TODO:  Fallback: wenn Range noch [0,0] und wir einen aktuellen Frame haben, nimm den
       const value: [number, number] =
         a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
 
@@ -229,48 +319,23 @@ export function ContainerBottomUI() {
 
   const label_list: Label[] = useMemo(() => {
     const fc = Math.max(0, frame_count ?? 0);
-
     return markers.map((m) => {
-      const name = m.label && m.label.trim() ? m.label : `Label_${m.id}`;
+      const from = Math.min(m.from, m.to);
+      const to = Math.max(m.from, m.to);
+      const name = m.label ? m.label : `Label_${m.id}`;
       const img = label_image_map.get(name) ?? null;
 
       return {
         id: m.id,
         label: name,
         label_image: img,
-        range: [m.from, m.to] as [number, number],
+        range: [from, to] as [number, number],
         framecount: fc,
         category: m.category || 'Uncategorized',
       };
     });
   }, [markers, frame_count, label_image_map]);
 
-  // saves lable list to backend
-  const on_click_save = useCallback(() => {
-    if (!selected_motion) return;
-
-    const labels_map = markers.map((m) => {
-      const startframe = Math.min(m.from, m.to);
-      const endframe = Math.max(m.from, m.to);
-      return { startframe, endframe };
-    });
-
-    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
-
-    // TODO: check hook and api function to implement them with same convention
-    hook_save_labels.mutate(
-      { motion_name, labels: labels_map },
-      {
-        onSuccess: (respond: any) => {
-          if (respond.message) success(respond.message);
-          if (respond.warning) error(respond.warning);
-        },
-        onError: (err: any) => error(err?.message || 'Saving labels failed'),
-      },
-    );
-  }, [markers, selected_motion, hook_save_labels]);
-
-  //TODO: load all images at the beginning. check performances
   const current_label_image = useMemo(() => {
     const hit = range_markers.find((m) => {
       const from = Math.min(m.from, m.to);
@@ -281,56 +346,58 @@ export function ContainerBottomUI() {
     return label_image_map.get(hit.label) ?? null;
   }, [range_markers, frame, label_image_map]);
 
-  const on_click_frame = useCallback(
-    (frame: number) => {
-      set_std_slider_value(frame); // Context updaten
-      pause(); // Player pausieren (optional, je nach gewünschtem Verhalten)
-      go_to_frame(frame); // Frame im ThreeJS-Player setzen
-    },
-    [set_std_slider_value, pause, go_to_frame],
-  );
+  const on_save_click = useCallback(() => {
+    if (!selected_motion) return;
+
+    const labels_map = markers.map((m) => {
+      const startframe = Math.min(m.from, m.to);
+      const endframe = Math.max(m.from, m.to);
+      return { startframe, endframe };
+    });
+
+    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
+
+    hook_save_labels.mutate(
+      { motion_name, labels: labels_map },
+      {
+        onSuccess: (respond: any) => {
+          if (respond.message) success(respond.message);
+          if (respond.warning) error(respond.warning);
+        },
+        onError: (err: any) => error(err?.message || 'Saving labels failed'),
+      },
+    );
+  }, [markers, selected_motion, hook_save_labels, success, error]);
 
   return (
     <>
-      <Box
-        sx={(theme) => ({
-          position: 'absolute',
-          width: '100%',
-          bottom: '0vw',
-        })}
-      >
-        <PresenterFrameSlider
-          {...range_slider_props}
-          {...std_slider_props}
-          frame_count={frame_count}
-          on_click_frame={on_click_frame}
-        ></PresenterFrameSlider>
+      {/* Neuer Frame-/Label-Slider mit Logik im Container */}
+      {/* <PresenterFrameSlider {...frame_slider_track_props} /> */}
 
-        {/* <Box sx={{ width: '100%', border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }}>
-          <PresenterSlider {...range_slider_props} {...std_slider_props} label_image={current_label_image} />
-        </Box> */}
-        <img
-          ref={preview_render_img_ref}
-          alt=""
-          style={{
-            position: 'absolute',
-            display: 'none',
-            top: -230,
-            left: 0,
-            zIndex: 1,
-            border: '1px solid #000',
-            pointerEvents: 'none',
-          }}
-        />
-        <PresenterLabelButtons onClick={add_label_on_click}></PresenterLabelButtons>
-        <PresenterLabelListUI
-          lables_list={label_list}
-          slider_list_on_click={label_list_on_click}
-          slider_list_clear_on_click={clear_label_list_on_click}
-          save_labels_on_click={on_click_save}
-          label_image={current_label_image}
-        />
-      </Box>
+      {/* Thumbnail-Preview-Bild für den Std-Slider (kannst du später wieder einblenden) */}
+      <img
+        ref={preview_render_img_ref}
+        alt=""
+        style={{
+          position: 'absolute',
+          display: 'none',
+          top: -230,
+          left: 0,
+          zIndex: 1,
+          border: '1px solid #000',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <PresenterLabelButtons onClick={add_label_on_click} />
+
+      <PresenterLabelListUI
+        lables_list={label_list}
+        slider_list_on_click={label_list_on_click}
+        slider_list_clear_on_click={clear_label_list_on_click}
+        save_labels_on_click={on_save_click}
+        label_image={current_label_image}
+      />
     </>
   );
 }
