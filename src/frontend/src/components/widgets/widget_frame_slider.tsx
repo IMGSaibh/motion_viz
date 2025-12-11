@@ -73,7 +73,7 @@ export function WidgetFrameSlider(props: Props) {
 
       {/* Slider-Track */}
       <Grid size={{ md: 10 }} sx={{ position: 'relative' }}>
-        {/* Bubble über aktuellem Frame */}
+        {/* Bubble above current frame */}
         <Box
           sx={(theme) => ({
             position: 'absolute',
@@ -91,7 +91,7 @@ export function WidgetFrameSlider(props: Props) {
           {clamped_frame}
         </Box>
 
-        {/* Track mit Streifen pro Frame */}
+        {/* Track with stripe per frame */}
         <Box
           ref={innerTrackRef}
           onMouseDown={on_mouse_down}
@@ -115,7 +115,7 @@ export function WidgetFrameSlider(props: Props) {
             }),
           })}
         >
-          {/* Marker-Linie (aktueller Frame) */}
+          {/* mark-line for current frame */}
           {hasFrames && (
             <Box
               sx={(theme) => ({
@@ -131,7 +131,7 @@ export function WidgetFrameSlider(props: Props) {
             />
           )}
 
-          {/* Hover-Linie */}
+          {/* hover-line */}
           {hasFrames && hoverPct !== null && (
             <Box
               sx={(theme) => ({
@@ -149,7 +149,7 @@ export function WidgetFrameSlider(props: Props) {
         </Box>
       </Grid>
 
-      {/* Info rechts */}
+      {/* Info right */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="body2" noWrap>
           Frame: {clamped_frame} [0 – {frame_count}]

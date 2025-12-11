@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
 import { WidgetFrameTicks } from '@/components/widgets/widget_frame_ticks';
-import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
 import { WidgetFrameSlider } from '@/components/widgets/widget_frame_slider';
 
 type Props = {
