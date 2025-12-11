@@ -113,6 +113,10 @@ export class ThreeJSEngine {
   }
 
   async get_thumbnail_for_frame(frame_index: number) {
+    if (!this.thumbnail_renderer) {
+      this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
+      this.thumbnail_renderer.setSize(260, 190, false);
+    }
     if (this.npy_player)
       return await this.npy_player.render_thumbnail(
         frame_index,
@@ -206,6 +210,9 @@ export class ThreeJSEngine {
   cleanup_thumbnail_render() {
     if (this.thumbnail_renderer) {
       this.thumbnail_renderer.dispose();
+      this.thumbnail_renderer = null as any;
+      console.log('Thumbnail renderer disposed.');
+      console.log(this.thumbnail_renderer);
     }
   }
 

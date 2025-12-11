@@ -14,7 +14,7 @@ import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_sli
 
 export function ContainerFrameSlider() {
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
-  const frame_slider_track_dragging_reference = useRef(false);
+  const frame_slider_track_scrubbing_reference = useRef(false);
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
 
   const slider_frame_ctx = use_slider_frame_cxt();
@@ -104,7 +104,7 @@ export function ContainerFrameSlider() {
   const on_mouse_down_slider_track = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!frame_count) return;
-      frame_slider_track_dragging_reference.current = true;
+      frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
       update_slider_track_frame_tick(frame);
     },
@@ -116,7 +116,7 @@ export function ContainerFrameSlider() {
       if (!frame_count) return;
       const frame_idx = compute_slider_track_frame(e.clientX);
       set_frame_slider_track_hovered_frame(frame_idx);
-      if (frame_slider_track_dragging_reference.current) {
+      if (frame_slider_track_scrubbing_reference.current) {
         update_slider_track_frame_tick(frame_idx);
       }
 
@@ -149,12 +149,17 @@ export function ContainerFrameSlider() {
   );
 
   const on_mouse_up_slider_track = useCallback(() => {
-    frame_slider_track_dragging_reference.current = false;
+    frame_slider_track_scrubbing_reference.current = false;
   }, []);
 
   const on_mouse_leave_slider_track = useCallback(() => {
-    frame_slider_track_dragging_reference.current = false;
+    frame_slider_track_scrubbing_reference.current = false;
     set_frame_slider_track_hovered_frame(null);
+    if (preview_render_img_ref.current) {
+      preview_render_img_ref.current.style.display = 'none';
+      preview_render_img_ref.current.removeAttribute('src');
+    }
+    seqRef.current++;
   }, []);
 
   const frame_slider_track_props = useMemo(

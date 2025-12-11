@@ -130,67 +130,67 @@ export function ContainerBottomUI() {
     cleanup_thumbnail_render,
   ]);
 
-  // ===== std-Slider (MUI) Logik für Thumbnail-Preview – unverändert =====
-  const std_slider_on_change = useCallback(
-    (e: Event, value: number | number[]) => {
-      if (!Array.isArray(value)) {
-        set_std_slider_value(value);
-        pause();
-        go_to_frame(value);
-      }
-    },
-    [pause, go_to_frame, set_std_slider_value],
-  );
+  // // ===== std-Slider (MUI) Logik für Thumbnail-Preview – unverändert =====
+  // const std_slider_on_change = useCallback(
+  //   (e: Event, value: number | number[]) => {
+  //     if (!Array.isArray(value)) {
+  //       set_std_slider_value(value);
+  //       pause();
+  //       go_to_frame(value);
+  //     }
+  //   },
+  //   [pause, go_to_frame, set_std_slider_value],
+  // );
 
-  const std_slider_on_pointer_move = useCallback(
-    (e: React.PointerEvent<HTMLSpanElement>) => {
-      const rect = std_slider_reference.current?.getBoundingClientRect();
-      if (!rect || !frame_count) return;
+  // const std_slider_on_pointer_move = useCallback(
+  //   (e: React.PointerEvent<HTMLSpanElement>) => {
+  //     const rect = std_slider_reference.current?.getBoundingClientRect();
+  //     if (!rect || !frame_count) return;
 
-      const x = e.clientX - rect.left;
-      const ratio = Math.min(1, Math.max(0, x / rect.width));
-      const idx = Math.round(ratio * Math.max(0, frame_count - 1));
+  //     const x = e.clientX - rect.left;
+  //     const ratio = Math.min(1, Math.max(0, x / rect.width));
+  //     const idx = Math.round(ratio * Math.max(0, frame_count - 1));
 
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      const mySeq = ++seqRef.current;
+  //     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  //     const mySeq = ++seqRef.current;
 
-      rafRef.current = requestAnimationFrame(() => {
-        const css_left = ratio * rect.width + 50;
-        if (preview_render_img_ref.current) {
-          preview_render_img_ref.current.style.display = 'block';
-          preview_render_img_ref.current.style.left = `${css_left}px`;
-        }
+  //     rafRef.current = requestAnimationFrame(() => {
+  //       const css_left = ratio * rect.width + 50;
+  //       if (preview_render_img_ref.current) {
+  //         preview_render_img_ref.current.style.display = 'block';
+  //         preview_render_img_ref.current.style.left = `${css_left}px`;
+  //       }
 
-        get_thumbnail_for_frame(idx).then((data_url) => {
-          if (seqRef.current !== mySeq) return;
-          if (preview_render_img_ref.current && data_url) {
-            preview_render_img_ref.current.src = data_url;
-          }
-        });
-      });
-    },
-    [frame_count, get_thumbnail_for_frame],
-  );
+  //       get_thumbnail_for_frame(idx).then((data_url) => {
+  //         if (seqRef.current !== mySeq) return;
+  //         if (preview_render_img_ref.current && data_url) {
+  //           preview_render_img_ref.current.src = data_url;
+  //         }
+  //       });
+  //     });
+  //   },
+  //   [frame_count, get_thumbnail_for_frame],
+  // );
 
-  const std_slider_on_mouse_leave = useCallback(() => {
-    if (preview_render_img_ref.current) {
-      preview_render_img_ref.current.style.display = 'none';
-      preview_render_img_ref.current.removeAttribute('src');
-    }
-    seqRef.current++;
-  }, []);
+  // const std_slider_on_mouse_leave = useCallback(() => {
+  //   if (preview_render_img_ref.current) {
+  //     preview_render_img_ref.current.style.display = 'none';
+  //     preview_render_img_ref.current.removeAttribute('src');
+  //   }
+  //   seqRef.current++;
+  // }, []);
 
-  const std_slider_props = useMemo(
-    () => ({
-      std_slider_value,
-      std_slider_framecount: frame_count,
-      std_slider_reference,
-      std_slider_on_change,
-      std_slider_on_mouse_leave,
-      std_slider_on_pointer_move,
-    }),
-    [std_slider_value, frame_count, std_slider_on_change, std_slider_on_mouse_leave, std_slider_on_pointer_move],
-  );
+  // const std_slider_props = useMemo(
+  //   () => ({
+  //     std_slider_value,
+  //     std_slider_framecount: frame_count,
+  //     std_slider_reference,
+  //     std_slider_on_change,
+  //     std_slider_on_mouse_leave,
+  //     std_slider_on_pointer_move,
+  //   }),
+  //   [std_slider_value, frame_count, std_slider_on_change, std_slider_on_mouse_leave, std_slider_on_pointer_move],
+  // );
 
   const range_slider_props = useMemo(
     () => ({
@@ -371,10 +371,8 @@ export function ContainerBottomUI() {
 
   return (
     <>
-      {/* Neuer Frame-/Label-Slider mit Logik im Container */}
-      {/* <PresenterFrameSlider {...frame_slider_track_props} /> */}
+      {/* <PresenterFrameSlider {...frame_slider_track_props} />
 
-      {/* Thumbnail-Preview-Bild für den Std-Slider (kannst du später wieder einblenden) */}
       <img
         ref={preview_render_img_ref}
         alt=""
@@ -387,7 +385,7 @@ export function ContainerBottomUI() {
           border: '1px solid #000',
           pointerEvents: 'none',
         }}
-      />
+      /> */}
 
       <PresenterLabelButtons onClick={add_label_on_click} />
 
