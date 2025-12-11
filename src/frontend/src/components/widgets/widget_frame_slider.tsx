@@ -18,7 +18,7 @@ type Props = {
   on_click_play_toggle?: () => void;
 };
 
-export function WidgetFrameSliderPerformance(props: Props) {
+export function WidgetFrameSlider(props: Props) {
   const {
     slider_frame: slider_frame,
     frame_count,
@@ -38,7 +38,6 @@ export function WidgetFrameSliderPerformance(props: Props) {
   const markerPct = hasFrames ? ((clamped_frame + 0.5) / frame_count) * 100 : 0;
   const hoverPct = hasFrames && hover_frame !== null ? ((hover_frame + 0.5) / frame_count) * 100 : null;
 
-  // internes Ref für das Track-DOM-Element, wird in das Ref vom Container gespiegelt
   const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
   // TODO: remove useEffect
@@ -55,10 +54,8 @@ export function WidgetFrameSliderPerformance(props: Props) {
       sx={(theme) => ({
         borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
         borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
-        borderRadius: 0,
       })}
     >
-      {/* Play Button (nur Anzeige – Logik bleibt im Container) */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Box
           onClick={on_click_play_toggle}
@@ -83,12 +80,11 @@ export function WidgetFrameSliderPerformance(props: Props) {
             top: -25,
             left: `${markerPct}%`,
             transform: 'translateX(-50%)',
-            bgcolor: `${theme.palette.wip_color_theme[500]}`,
+            bgcolor: theme.palette.wip_color_theme[700],
             color: 'white',
             px: 1,
             py: 0.3,
             fontSize: 12,
-            borderRadius: 1,
             pointerEvents: 'none',
           })}
         >
@@ -112,8 +108,8 @@ export function WidgetFrameSliderPerformance(props: Props) {
               background: `
                 repeating-linear-gradient(
                   90deg,
-                  ${theme.palette.grey[600]} 0 calc(100% / ${frame_count}),
-                  ${theme.palette.grey[700]} calc(100% / ${frame_count}) calc(200% / ${frame_count})
+                  ${theme.palette.wip_color_theme[300]} 0 calc(100% / ${frame_count}),
+                  ${theme.palette.wip_color_theme[400]} calc(100% / ${frame_count}) calc(200% / ${frame_count})
                 )
               `,
             }),
@@ -129,7 +125,7 @@ export function WidgetFrameSliderPerformance(props: Props) {
                 width: 2,
                 left: `${markerPct}%`,
                 transform: 'translateX(-50%)',
-                bgcolor: theme.palette.primary.main,
+                bgcolor: theme.palette.wip_color_theme[700],
                 pointerEvents: 'none',
               })}
             />

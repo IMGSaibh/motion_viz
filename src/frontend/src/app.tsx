@@ -1,5 +1,5 @@
 import ThreeJSScene from '@/threeJS/three_js_scene';
-import { ContainerTopbarUI } from '@/containers/container_topbar_ui';
+import { ContainerTopbar } from '@/containers/container_topbar';
 import { ContainerFrameSlider } from './containers/container_frame_slider';
 import { ContainerBottomUI } from './containers/container_bottom_ui';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
@@ -14,7 +14,7 @@ export default function App() {
         <ThreeJSEngineProvider>
           <ThreeJSScene />
           <FrameSliderLabellistProvider>
-            <ContainerTopbarUI />
+            <ContainerTopbar />
             <Box
               sx={(theme) => ({
                 position: 'absolute',

@@ -8,14 +8,14 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 }
 
 type Props = {
-  label_slider_framecount: number;
+  frame_count: number;
   label_slider_range: [number, number];
 };
 export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
 
-  const clamp = (n: number) => Math.max(0, Math.min(n, props.label_slider_framecount));
+  const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
 
   const thumb_idx_0 = clamp(props.label_slider_range[0]);
   const thumb_idx_1 = clamp(props.label_slider_range[1]);
@@ -23,14 +23,11 @@ export function WidgetFrameLabelBar(props: Props) {
   const isRtl = theme.direction === 'rtl';
   const from = Math.min(thumb_idx_0, thumb_idx_1);
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
-  const leftPct = pct(from, props.label_slider_framecount);
+  const leftPct = pct(from, props.frame_count);
   const to = Math.max(thumb_idx_0, thumb_idx_1);
   const length = Math.max(0, to - from);
 
-  const scaleX =
-    props.label_slider_framecount > 0
-      ? Math.max(0, Math.round((length / props.label_slider_framecount) * 10000) / 10000)
-      : 0;
+  const scaleX = props.frame_count > 0 ? Math.max(0, Math.round((length / props.frame_count) * 10000) / 10000) : 0;
 
   const has_overlap = saved_labels
     .filter((label) => label.id !== editing_id)
@@ -57,11 +54,9 @@ export function WidgetFrameLabelBar(props: Props) {
           const vvTo = clamp(Math.max(vf, vt));
           const vvLen = Math.max(0, vvTo - vvFrom);
 
-          const vLeft = pct(vvFrom, props.label_slider_framecount);
+          const vLeft = pct(vvFrom, props.frame_count);
           const vScale =
-            props.label_slider_framecount > 0
-              ? Math.max(0, Math.round((vvLen / props.label_slider_framecount) * 10000) / 10000)
-              : 0;
+            props.frame_count > 0 ? Math.max(0, Math.round((vvLen / props.frame_count) * 10000) / 10000) : 0;
 
           return (
             <Box

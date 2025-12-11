@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { WidgetFrameTicks } from '@/components/widgets/widget_frame_ticks';
 import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
-import { WidgetFrameSliderPerformance } from '@/components/widgets/widget_frame_slider_performance';
+import { WidgetFrameSlider } from '@/components/widgets/widget_frame_slider';
 
 type Props = {
   // current frame
@@ -37,7 +37,7 @@ export function PresenterFrameSlider(props: Props) {
       <WidgetFrameTicks frame_count={props.frame_count} />
 
       {/* eigentlicher Frame-Slider */}
-      <WidgetFrameSliderPerformance
+      <WidgetFrameSlider
         slider_frame={props.slider_frame}
         frame_count={props.frame_count}
         hover_frame={props.hover_frame}
@@ -50,11 +50,7 @@ export function PresenterFrameSlider(props: Props) {
         on_click_play_toggle={props.on_click_play_toggle}
       />
 
-      {/* Label-Bar darunter */}
-      {/* <WidgetFrameLabelBar
-        label_slider_range={props.label_slider_range}
-        label_slider_framecount={props.label_slider_framecount}
-      /> */}
+      {/* <WidgetFrameLabelBar label_slider_range={props.label_slider_range} frame_count={props.frame_count} /> */}
     </Box>
   );
 }

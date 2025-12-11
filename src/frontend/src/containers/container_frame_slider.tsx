@@ -139,6 +139,7 @@ export function ContainerFrameSlider() {
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
       update_slider_track_frame_tick(frame);
+      setIsPlayingUi(false);
     },
     [frame_count, compute_slider_track_frame, update_slider_track_frame_tick],
   );
@@ -182,7 +183,6 @@ export function ContainerFrameSlider() {
 
   const on_mouse_up_slider_track = useCallback(() => {
     frame_slider_track_scrubbing_reference.current = false;
-    setIsPlayingUi(false);
   }, []);
 
   const on_mouse_leave_slider_track = useCallback(() => {

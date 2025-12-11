@@ -75,7 +75,13 @@ export function WidgetLabelList(props: Props) {
   const can_save_label = use_can_save_label_cxt();
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box
+      sx={(theme) => ({
+        flexGrow: 1,
+        borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
+        borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
+      })}
+    >
       <Collapse in={props.toggle_list && props.labels.length > 0} timeout="auto" unmountOnExit>
         <List
           sx={(theme) => ({
