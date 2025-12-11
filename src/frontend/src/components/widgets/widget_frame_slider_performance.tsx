@@ -13,6 +13,9 @@ export function WidgetFrameSliderPerformance(props: Props) {
 
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const hasFrames = frame_count > 0;
+  if (frame_count < 0) {
+    return;
+  }
 
   const clampedValue = hasFrames ? Math.min(Math.max(std_slider_value, 0), frame_count - 1) : 0;
 
@@ -63,7 +66,7 @@ export function WidgetFrameSliderPerformance(props: Props) {
 
   const handleMouseLeave = () => {
     isDragging.current = false;
-    setHoverFrame(null); // Hover verschwindet
+    setHoverFrame(null); // remove hover effect
   };
 
   return (
@@ -93,29 +96,26 @@ export function WidgetFrameSliderPerformance(props: Props) {
 
       {/* Slider */}
       <Grid size={{ md: 10 }} sx={{ position: 'relative' }}>
-        {/* Bubble über aktuellem Frame */}
-        {hasFrames && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -22,
-              left: `${markerPct}%`,
-              transform: 'translateX(-50%)',
-              bgcolor: 'grey.900',
-              color: 'white',
-              px: 1,
-              py: 0.3,
-              fontSize: 12,
-              borderRadius: 1,
-              pointerEvents: 'none',
-              boxShadow: 2,
-            }}
-          >
-            {clampedValue}
-          </Box>
-        )}
+        {/* current frame rect */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -25,
+            left: `${markerPct}%`,
+            transform: 'translateX(-50%)',
+            bgcolor: 'grey.900',
+            color: 'white',
+            px: 1,
+            py: 0.3,
+            fontSize: 12,
+            borderRadius: 1,
+            pointerEvents: 'none',
+          }}
+        >
+          {clampedValue}
+        </Box>
 
-        {/* TRACK */}
+        {/* track */}
         <Box
           ref={trackRef}
           onMouseDown={handleMouseDown}
@@ -126,11 +126,11 @@ export function WidgetFrameSliderPerformance(props: Props) {
             width: '100%',
             height: 40,
             position: 'relative',
-            cursor: hasFrames ? 'pointer' : 'default',
+            cursor: 'pointer',
             overflow: 'hidden',
 
-            // alternierende Streifen pro Frame
-            ...(hasFrames && {
+            // frame stripes
+            ...{
               background: `
                 repeating-linear-gradient(
                   90deg,
@@ -138,27 +138,25 @@ export function WidgetFrameSliderPerformance(props: Props) {
                   ${theme.palette.grey[700]} calc(100% / ${frame_count}) calc(200% / ${frame_count})
                 )
               `,
-            }),
+            },
           })}
         >
-          {/* Marker-Linie */}
-          {hasFrames && (
-            <Box
-              sx={(theme) => ({
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                width: 2,
-                left: `${markerPct}%`,
-                transform: 'translateX(-50%)',
-                bgcolor: theme.palette.primary.main,
-                pointerEvents: 'none',
-              })}
-            />
-          )}
+          {/* marker-line */}
+          <Box
+            sx={(theme) => ({
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              width: 2,
+              left: `${markerPct}%`,
+              transform: 'translateX(-50%)',
+              bgcolor: theme.palette.primary.main,
+              pointerEvents: 'none',
+            })}
+          />
 
-          {/* Hover-Linie über dem Frame */}
-          {hasFrames && hoverPct !== null && (
+          {/* hover-line for each frame */}
+          {hoverPct !== null && (
             <Box
               sx={(theme) => ({
                 position: 'absolute',
@@ -175,7 +173,7 @@ export function WidgetFrameSliderPerformance(props: Props) {
         </Box>
       </Grid>
 
-      {/* Info rechts */}
+      {/* grid cell right */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="body2" noWrap>
           Frame: {clampedValue} [0 – {frame_count}]

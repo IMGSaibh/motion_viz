@@ -40,15 +40,14 @@ export function WidgetFrameTicks(props: Props) {
           })}
         >
           {ticks.map((frame) => {
-            const pct = ((frame + 0.5) / frameCount) * 100;
-
+            const percent = ((frame + 0.5) / frameCount) * 100;
             return (
               <Box
                 key={frame}
                 sx={{
                   position: 'absolute',
-                  top: 0,
-                  left: `${pct}%`,
+                  top: 20,
+                  left: `${percent}%`,
                   transform: 'translateX(-50%)',
                   fontSize: 10,
                   color: 'white',
@@ -56,7 +55,26 @@ export function WidgetFrameTicks(props: Props) {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {frame}
+                {/* frame number */}
+                <Box
+                  sx={{
+                    fontSize: 10,
+                    color: 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  {frame}
+                </Box>
+
+                {/* tick line under number frame number */}
+                <Box
+                  sx={{
+                    width: '2px',
+                    height: '10px',
+                    bgcolor: 'white',
+                    margin: '2px auto 0 auto',
+                  }}
+                />
               </Box>
             );
           })}

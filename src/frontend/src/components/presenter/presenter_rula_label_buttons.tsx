@@ -48,7 +48,6 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
         gridTemplateColumns: 'repeat(8, 32px)',
         gap: 1,
         width: '100%',
-        p: '0.2vw',
       }}
     >
       {items.map((imgButton, i) => (

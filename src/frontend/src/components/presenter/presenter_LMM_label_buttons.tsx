@@ -2,7 +2,7 @@ import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, Select, MenuItem
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { get_label_images_cat1_llm } from '@/Assets/label_images';
 
-const LabelButtonLlm = styled(ButtonBase)(({ theme }) => ({
+const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
   width: '100%',
   aspectRatio: '1 / 1',
@@ -25,7 +25,7 @@ type Props = {
   onClick?: (label: string, category: string) => void;
 };
 
-export function PresenterLlmLabelButtons({ onClick }: Props) {
+export function PresenterLMMLabelButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_llm();
 
@@ -44,7 +44,7 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
       }}
     >
       {items.map((imgButton, i) => (
-        <LabelButtonLlm
+        <LabelButtonLMM
           key={i}
           onClick={() => onClick?.(imgButton.label, imgButton.category)}
           disabled={!can_save_label(imgButton.category)}
@@ -61,14 +61,13 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
               backgroundPosition: 'center',
             }}
           />
-        </LabelButtonLlm>
+        </LabelButtonLMM>
       ))}
     </Box>
   );
-
   return (
     <>
-      <Grid container spacing={0} alignItems="center" wrap="nowrap">
+      {/* <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="scroll-select-label">Bestimmung der Zeitwichtung</InputLabel>
@@ -76,7 +75,6 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
               labelId="scroll-select-label"
               value={'value'}
               label="Bestimmung der Zeitwichtung"
-              // onChange={handleChange}
               MenuProps={{
                 PaperProps: {
                   style: {
@@ -109,7 +107,6 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_2_llm}
             </FormLabel>
-            {/* {render_rula_label_images(label_images_cat2)} */}
           </FormControl>
         </Grid>
         <Grid size={{ md: 5 }}>
@@ -123,6 +120,9 @@ export function PresenterLlmLabelButtons({ onClick }: Props) {
             {render_rula_label_images(label_images_cat1)}
           </FormControl>
         </Grid>
+      </Grid> */}
+      <Grid container spacing={0} alignItems="center" wrap="nowrap">
+        <Grid size={{ md: 12 }}>Not implemented yet</Grid>
       </Grid>
     </>
   );
