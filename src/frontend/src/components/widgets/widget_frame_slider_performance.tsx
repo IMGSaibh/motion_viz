@@ -6,6 +6,7 @@ type Props = {
   std_slider_value: number;
   frame_count: number;
   on_click_frame?: (frame: number) => void;
+  on_mouse_move?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 export function WidgetFrameSliderPerformance(props: Props) {
@@ -14,7 +15,7 @@ export function WidgetFrameSliderPerformance(props: Props) {
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const hasFrames = frame_count > 0;
   if (frame_count < 0) {
-    return;
+    return null;
   }
 
   const clampedValue = hasFrames ? Math.min(Math.max(std_slider_value, 0), frame_count - 1) : 0;
@@ -119,7 +120,8 @@ export function WidgetFrameSliderPerformance(props: Props) {
         <Box
           ref={trackRef}
           onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
+          // onMouseMove={handleMouseMove}
+          onMouseMove={props.on_mouse_move}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           sx={(theme) => ({

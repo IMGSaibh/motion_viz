@@ -11,7 +11,7 @@ type Props = {
   label_slider_framecount: number;
   label_slider_range: [number, number];
 };
-export function WidgetLabelBar(props: Props) {
+export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
 

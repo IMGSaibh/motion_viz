@@ -3,6 +3,7 @@ import { PresenterRulaLabelButtons } from './presenter_rula_label_buttons';
 import { PresenterOwasLabelButtons } from './presenter_owas_label_buttons';
 import { PresenterLMMLabelButtons } from './presenter_LMM_label_buttons';
 import { useState } from 'react';
+import { theme } from '@/theme';
 
 type Props = {
   onClick?: (label: string, category: string) => void;
@@ -20,8 +21,6 @@ export function PresenterLabelButtons({ onClick }: Props) {
       sx={(theme) => ({
         width: '100%',
         bgcolor: theme.palette.wip_color_theme[500],
-        borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
-        borderRadius: 0,
       })}
     >
       {/* TAB MENU */}
@@ -41,9 +40,30 @@ export function PresenterLabelButtons({ onClick }: Props) {
               },
             })}
           >
-            <Tab value="RULA" label="RULA" />
-            <Tab value="OWAS" label="OWAS" />
-            <Tab value="LLM" label="LLM" />
+            <Tab
+              value="RULA"
+              label="RULA"
+              sx={(theme) => ({
+                borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
+              })}
+            />
+            <Tab
+              value="OWAS"
+              label="OWAS"
+              sx={(theme) => ({
+                borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
+              })}
+            />
+            <Tab
+              value="LLM"
+              label="LLM"
+              sx={(theme) => ({
+                borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
+              })}
+            />
           </Tabs>
         </Grid>
         <Grid size={{ md: 4 }}></Grid>

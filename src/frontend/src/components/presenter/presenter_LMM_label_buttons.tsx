@@ -122,7 +122,9 @@ export function PresenterLMMLabelButtons({ onClick }: Props) {
         </Grid>
       </Grid> */}
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 12 }}>Not implemented yet</Grid>
+        <Grid size={{ md: 12 }}>
+          <Box sx={{ height: '63px', fontSize: 14 }}>Not implemented yet</Box>
+        </Grid>
       </Grid>
     </>
   );
