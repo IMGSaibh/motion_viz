@@ -9,7 +9,7 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
 
 type Props = {
   frame_count: number;
-  // label_slider_range: [number, number];
+  frame_slider_range: [number, number];
 };
 export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
@@ -17,11 +17,8 @@ export function WidgetFrameLabelBar(props: Props) {
 
   const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
 
-  // const thumb_idx_0 = clamp(props.label_slider_range[0]);
-  // const thumb_idx_1 = clamp(props.label_slider_range[1]);
-
-  const thumb_idx_0 = 0;
-  const thumb_idx_1 = 100;
+  const thumb_idx_0 = clamp(props.frame_slider_range[0]);
+  const thumb_idx_1 = clamp(props.frame_slider_range[1]);
 
   const isRtl = theme.direction === 'rtl';
   const from = Math.min(thumb_idx_0, thumb_idx_1);
@@ -81,16 +78,16 @@ export function WidgetFrameLabelBar(props: Props) {
 
         {/* current labels */}
         <Box
-          sx={{
+          sx={(theme) => ({
             position: 'absolute',
             inset: 0,
             width: '100%',
             transformOrigin: isRtl ? 'right center' : 'left center',
             transform: `scaleX(${scaleX})`,
             ...(isRtl ? { right: `${leftPct}%` } : { left: `${leftPct}%` }),
-            background: has_overlap ? theme.palette.error.main : theme.palette.primary.main,
+            background: has_overlap ? theme.palette.error.main : theme.palette.wip_color_theme[600],
             pointerEvents: 'none',
-          }}
+          })}
         />
       </Box>
     </>

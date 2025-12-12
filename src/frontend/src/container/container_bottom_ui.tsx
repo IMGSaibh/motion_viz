@@ -104,12 +104,12 @@ export function ContainerBottomUI() {
         set_std_slider_value(0);
       }
       // if (e.code === 'KeyD') print_scene_components();
-      if (e.code === 'Digit1' && e.location === 0) {
-        set_range([std_slider_value, range_slider_value[1]]);
-      }
-      if (e.code === 'Digit2' && e.location === 0) {
-        set_range([range_slider_value[0], std_slider_value]);
-      }
+      // if (e.code === 'Digit1' && e.location === 0) {
+      //   set_range([std_slider_value, range_slider_value[1]]);
+      // }
+      // if (e.code === 'Digit2' && e.location === 0) {
+      //   set_range([range_slider_value[0], std_slider_value]);
+      // }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -192,14 +192,14 @@ export function ContainerBottomUI() {
   //   [std_slider_value, frame_count, std_slider_on_change, std_slider_on_mouse_leave, std_slider_on_pointer_move],
   // );
 
-  const range_slider_props = useMemo(
-    () => ({
-      label_slider_range: range_slider_value,
-      label_slider_framecount: frame_count,
-      label_slider_reference: range_slider_reference,
-    }),
-    [range_slider_value, frame_count],
-  );
+  // const range_slider_props = useMemo(
+  //   () => ({
+  //     label_slider_range: range_slider_value,
+  //     label_slider_framecount: frame_count,
+  //     label_slider_reference: range_slider_reference,
+  //   }),
+  //   [range_slider_value, frame_count],
+  // );
 
   // ===== Slider-Track-Frames Logic =====
 
