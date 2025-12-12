@@ -138,8 +138,9 @@ export function ContainerFrameSlider() {
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
       update_slider_track_frame_tick(frame);
+      pause();
     },
-    [frame_count, compute_slider_track_frame, update_slider_track_frame_tick],
+    [frame_count, compute_slider_track_frame, update_slider_track_frame_tick, is_playing, pause],
   );
 
   const on_mouse_move_slider_track = useCallback(

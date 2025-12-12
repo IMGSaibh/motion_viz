@@ -32,7 +32,7 @@ export function WidgetFrameSlider(props: Props) {
     is_playing,
     on_click_play_toggle,
   } = props;
-
+  console.log(is_playing);
   const hasFrames = frame_count > 0;
   const clamped_frame = hasFrames ? Math.min(Math.max(slider_frame, 0), frame_count - 1) : 0;
 
