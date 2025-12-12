@@ -22,8 +22,6 @@ export function ContainerFrameSlider() {
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
 
-  const [isPlayingUi, setIsPlayingUi] = useState(false);
-
   const {
     frame_count,
     current_frame,
@@ -41,7 +39,6 @@ export function ContainerFrameSlider() {
   } = useThreeJSEngine();
 
   const handleTogglePlay = useCallback(() => {
-    setIsPlayingUi((prev) => !prev);
     play_pause();
   }, [play_pause]);
 
@@ -49,14 +46,12 @@ export function ContainerFrameSlider() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         play_pause();
-        setIsPlayingUi((prev) => !prev); //  togglen ui-State
       }
 
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
         set_slider_frame(0);
-        setIsPlayingUi(false);
       }
       if (e.code === 'KeyR') {
         stop();
@@ -65,7 +60,6 @@ export function ContainerFrameSlider() {
         cleanup_loop();
         cleanup_thumbnail_render();
         set_slider_frame(0);
-        setIsPlayingUi(false);
       }
       if (e.code === 'ArrowRight') {
         e.preventDefault();
@@ -98,25 +92,22 @@ export function ContainerFrameSlider() {
     print_scene_components,
     frame_count,
     slider_frame_ctx,
-    // range_slider_value,
-    // set_range,
     set_slider_frame,
     cleanup_loop,
     cleanup_player,
     cleanup_thumbnail_render,
-    setIsPlayingUi,
   ]);
+
   useEffect(() => {
     if (!frame_count) return;
 
-    // während Scrubbing nicht überschreiben
+    // do not override during scrubbing
     if (frame_slider_track_scrubbing_reference.current) return;
 
-    // nur wenn UI auf "playing" steht (sonst überschreibt es Pfeiltasten etc.)
-    if (!isPlayingUi) return;
+    if (!is_playing) return;
 
     set_slider_frame(current_frame);
-  }, [current_frame, frame_count, isPlayingUi, set_slider_frame]);
+  }, [current_frame, frame_count, is_playing, set_slider_frame]);
 
   const compute_slider_track_frame = useCallback(
     (clientX: number) => {
@@ -147,7 +138,6 @@ export function ContainerFrameSlider() {
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
       update_slider_track_frame_tick(frame);
-      setIsPlayingUi(false);
     },
     [frame_count, compute_slider_track_frame, update_slider_track_frame_tick],
   );
@@ -213,8 +203,7 @@ export function ContainerFrameSlider() {
       on_mouse_move_slider_track: on_mouse_move_slider_track,
       on_mouse_up_slider_track: on_mouse_up_slider_track,
       on_mouse_leave_slider_track: on_mouse_leave_slider_track,
-
-      is_playing: isPlayingUi,
+      is_playing: is_playing(),
       on_click_play_toggle: handleTogglePlay,
     }),
     [
@@ -225,7 +214,7 @@ export function ContainerFrameSlider() {
       on_mouse_move_slider_track,
       on_mouse_up_slider_track,
       on_mouse_leave_slider_track,
-      isPlayingUi,
+      is_playing,
       handleTogglePlay,
     ],
   );
