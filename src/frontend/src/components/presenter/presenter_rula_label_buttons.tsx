@@ -16,7 +16,7 @@ const LabelButtonRula = styled(ButtonBase)(({ theme }) => ({
   color: theme.palette.primary.main,
   '& .MuiTouchRipple-root': { zIndex: 4 },
   '& .MuiTouchRipple-child': { backgroundColor: 'currentColor', opacity: 1 },
-  // ▼ Disabled-state: desaturate
+  // Disabled-state: desaturate
   '&.Mui-disabled': {
     // desaturate image
     '& .btn-img': {
@@ -48,7 +48,6 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
         gridTemplateColumns: 'repeat(8, 32px)',
         gap: 1,
         width: '100%',
-        p: '0.2vw',
       }}
     >
       {items.map((imgButton, i) => (

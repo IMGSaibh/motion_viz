@@ -2,14 +2,14 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 
 export type Range = [number, number];
-export type Label_CTX = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
+export type Label_ctx = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
 
-type SliderSliderlistContext = {
+type FrameSliderLabellistContext = {
   range: Range;
   set_slider_label_range: (r: Range) => void;
 
-  label_CTX: Label_CTX[];
-  add_slider_label: (m: Label_CTX) => void;
+  label_CTX: Label_ctx[];
+  add_slider_label: (m: Label_ctx) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -18,26 +18,26 @@ type SliderSliderlistContext = {
   save_current_edited_label: () => void;
   cancel_current_edit_label: () => void;
 
-  std_slider_value: number;
-  set_std_slider_value: (n: number) => void;
+  slider_frame: number;
+  set_slider_frame: (n: number) => void;
 };
 
-const slider_sliderlist_context = createContext<SliderSliderlistContext | null>(null);
+const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
 type MarkerAction =
-  | { type: 'add'; range_bar: Label_CTX }
+  | { type: 'add'; range_bar: Label_ctx }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
   | { type: 'update'; id: string; from: number; to: number };
 
-function normalize(range_bar: Label_CTX): Label_CTX {
+function normalize(range_bar: Label_ctx): Label_ctx {
   if (Number.isNaN(range_bar.from) || Number.isNaN(range_bar.to)) return range_bar;
   const from = Math.min(range_bar.from, range_bar.to);
   const to = Math.max(range_bar.from, range_bar.to);
   return { ...range_bar, from, to };
 }
 
-function markerReducer(state: Label_CTX[], action: MarkerAction): Label_CTX[] {
+function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
   switch (action.type) {
     case 'add': {
       const range_bar_normalized = normalize(action.range_bar);
@@ -73,12 +73,12 @@ function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
   return aFrom < bTo && aTo > bFrom;
 }
 
-export function SliderLabelListProvider({ children }: PropsWithChildren) {
+export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
-  const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_CTX[]);
+  const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_ctx[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
-  const add_label_rect = useCallback((m: Label_CTX) => dispatch({ type: 'add', range_bar: m }), []);
+  const add_label_rect = useCallback((m: Label_ctx) => dispatch({ type: 'add', range_bar: m }), []);
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
@@ -103,9 +103,9 @@ export function SliderLabelListProvider({ children }: PropsWithChildren) {
     set_editing_id(null);
   }, [editing_id]);
 
-  const [std_slider_value, set_std_slider_value] = useState(0);
+  const [slider_frame, set_slider_frame] = useState(0);
 
-  const value = useMemo<SliderSliderlistContext>(
+  const frame_slider_label_list_ctx_memo_ctx = useMemo<FrameSliderLabellistContext>(
     () => ({
       range,
       set_slider_label_range: set_range,
@@ -117,8 +117,8 @@ export function SliderLabelListProvider({ children }: PropsWithChildren) {
       start_editing_label: start_editing_label,
       save_current_edited_label: save_current_edited_label,
       cancel_current_edit_label: cancel_current_edit_label,
-      std_slider_value,
-      set_std_slider_value,
+      slider_frame: slider_frame,
+      set_slider_frame: set_slider_frame,
     }),
     [
       range,
@@ -131,101 +131,100 @@ export function SliderLabelListProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      std_slider_value,
-      set_std_slider_value,
+      slider_frame,
+      set_slider_frame,
     ],
   );
 
-  return <slider_sliderlist_context.Provider value={value}>{children}</slider_sliderlist_context.Provider>;
+  return (
+    <frame_slider_label_list_context.Provider value={frame_slider_label_list_ctx_memo_ctx}>
+      {children}
+    </frame_slider_label_list_context.Provider>
+  );
 }
+
+/* =================================================================
+                            frame slider range ctx  
+==================================================================*/
 
 // ===== Selektor-Hooks – minimal re-render =====
 export function use_range_slider_value_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_slider_range_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_slider_range_cxt must be used within <FrameSliderLabellistProvider>');
     return v.range;
   });
 }
 
 export function use_set_range_slider_value_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_set_range_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_set_range_cxt must be used within <FrameSliderLabellistProvider>');
     return v.set_slider_label_range;
   });
 }
 
 export function use_range_marker_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.label_CTX;
   });
 }
 
+/* =================================================================
+                            label ctx  
+==================================================================*/
+
 export function use_add_label_ctx() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_add_label_ctx must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_add_label_ctx must be used within <FrameSliderLabellistProvider>');
     return v.add_slider_label;
   });
 }
 
 export function use_remove_label_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_remove_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_remove_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.remove_slider_label;
   });
 }
 
 export function use_clear_label_list_ctx() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_clear_label_list_ctx must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_clear_label_list_ctx must be used within <FrameSliderLabellistProvider>');
     return v.clear_slider_label_list;
   });
 }
 
 export function use_editing_label_id_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_editing_label_id_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_editing_label_id_cxt must be used within <FrameSliderLabellistProvider>');
     return v.editing_id;
   });
 }
 
 export function use_start_edit_label_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_start_edit_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_start_edit_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.start_editing_label;
   });
 }
 
 export function use_save_edit_label_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_save_edit_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_save_edit_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.save_current_edited_label;
   });
 }
 
 export function use_cancel_edit_label_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_cancel_edit_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_cancel_edit_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.cancel_current_edit_label;
   });
 }
 
-export function use_std_slider_value_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_std_slider_value_cxt must be used within <SliderSliderlistProvider>');
-    return v.std_slider_value;
-  });
-}
-export function use_set_std_slider_value_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_set_std_slider_value_cxt must be used within <SliderSliderlistProvider>');
-    return v.set_std_slider_value;
-  });
-}
-
 export function use_can_save_label_cxt() {
-  return useContextSelector(slider_sliderlist_context, (v) => {
-    if (!v) throw new Error('use_can_save_label_cxt must be used within <SliderSliderlistProvider>');
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
     return (category?: string) => {
       const [fromRaw, toRaw] = v.range;
@@ -246,5 +245,22 @@ export function use_can_save_label_cxt() {
 
       return !has_overlap_same_category;
     };
+  });
+}
+
+/* =================================================================
+                            frame slider ctx  
+==================================================================*/
+
+export function use_slider_frame_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_std_slider_value_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.slider_frame;
+  });
+}
+export function use_set_slider_frame_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_set_std_slider_value_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.set_slider_frame;
   });
 }

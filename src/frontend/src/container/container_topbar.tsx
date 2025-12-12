@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { PresenterTopbar } from '@/components/presenter/presenter_topbar_ui';
+import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
@@ -11,14 +11,14 @@ import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descri
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 import {
   use_set_range_slider_value_cxt,
-  use_set_std_slider_value_cxt,
-  use_std_slider_value_cxt,
+  use_set_slider_frame_cxt,
+  use_slider_frame_cxt,
 } from '@/context/context_slider_label_list';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 
-export function ContainerTopbarUI() {
+export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
   const set_range = use_set_range_slider_value_cxt();
   const { success, warning, error } = use_snackbar_ctx();
@@ -48,8 +48,8 @@ export function ContainerTopbarUI() {
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  const std_slider_value = use_std_slider_value_cxt();
-  const set_std_slider_value = use_set_std_slider_value_cxt();
+  const std_slider_value = use_slider_frame_cxt();
+  const set_std_slider_value = use_set_slider_frame_cxt();
 
   const clear_slider_label_list = use_clear_label_list_ctx();
 

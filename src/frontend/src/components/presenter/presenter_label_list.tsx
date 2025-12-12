@@ -1,6 +1,6 @@
 import { WidgetLabelList } from '@/components/widgets/widget_label_list';
-import { Label } from '@/containers/container_bottom_ui';
-import { Button, Grid } from '@mui/material';
+import { Label } from '@/container/container_bottom_ui';
+import { Box, Button, Grid } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,10 +15,14 @@ type Props = {
   label_image: LabelImage | null;
 };
 
-export function PresenterLabelListUI(props: Props) {
+export function PresenterLabelList(props: Props) {
   const [open, setOpen] = useState<boolean>(true);
   return (
-    <>
+    <Box
+      sx={(theme) => ({
+        bgcolor: theme.palette.wip_color_theme[500],
+      })}
+    >
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignItems: 'center' }}>
           {/* Dropdown-Header */}
@@ -54,6 +58,6 @@ export function PresenterLabelListUI(props: Props) {
         save_labels_on_click={props.save_labels_on_click}
         toggle_list={open}
       />
-    </>
+    </Box>
   );
 }
