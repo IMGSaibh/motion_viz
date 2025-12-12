@@ -1,20 +1,34 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Box, Grid } from '@mui/material';
 import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { LabelImage } from '@/Assets/label_images';
 import {
+  use_add_label_ctx,
   use_range_slider_value_cxt,
   use_set_range_slider_value_cxt,
   use_slider_frame_cxt,
 } from '@/context/context_slider_label_list';
 
-export function ContainerLabels() {
-  const { frame_count } = useThreeJSEngine();
+export type Label = {
+  id: string;
+  label: string;
+  label_image: LabelImage | null;
+  range: [number, number];
+  framecount: number;
+  category: string;
+};
+export const lable_list: Label[] = [];
 
+export function ContainerLabels() {
+  const { frame_count, current_frame: three_js_current_frame } = useThreeJSEngine();
   const slider_frame = use_slider_frame_cxt();
   const frame_slider_range = use_range_slider_value_cxt();
   const set_range = use_set_range_slider_value_cxt();
+  const add_label = use_add_label_ctx();
+
+  const label_id = useRef<number>(lable_list.length + 1);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,6 +57,28 @@ export function ContainerLabels() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [frame_count, frame_slider_range, set_range, slider_frame]);
 
+  const on_click_add_label = useCallback(
+    (label_button?: string, category?: string) => {
+      const id = String(label_id.current++);
+      const label = label_button ?? `Label_${id}`;
+
+      const fc = Math.max(0, frame_count ?? 0);
+      const clamp = (v: number) => Math.max(0, Math.min(v, Math.max(0, fc)));
+
+      let [a, b] = frame_slider_range;
+      a = clamp(a);
+      b = clamp(b);
+      if (a > b) [a, b] = [b, a];
+
+      const value: [number, number] =
+        a === 0 && b === 0 && (three_js_current_frame ?? 0) > 0
+          ? [clamp(three_js_current_frame!), clamp(three_js_current_frame!)]
+          : [a, b];
+
+      add_label({ id, from: value[0], to: value[1], label, category });
+    },
+    [frame_slider_range, frame_count, three_js_current_frame, add_label],
+  );
   const label_bar_props = useMemo(
     () => ({
       frame_count: frame_count ?? 0,
@@ -51,21 +87,22 @@ export function ContainerLabels() {
     [frame_count, frame_slider_range],
   );
   return (
-    <Box
-      sx={(theme) => ({
-        bgcolor: theme.palette.wip_color_theme[500],
-      })}
-    >
-      {/* <WidgetFrameLabelBar {...label_bar_props} /> */}
-      {/* <PresenterLabelButtons onClick={add_label_on_click} /> */}
-
-      <Grid container spacing={0} alignItems="center">
-        <Grid size={{ md: 1 }} />
-        <Grid size={{ md: 10 }}>
-          <WidgetFrameLabelBar {...label_bar_props} />
+    <>
+      <Box
+        sx={(theme) => ({
+          bgcolor: theme.palette.wip_color_theme[500],
+        })}
+      >
+        <Grid container spacing={0} alignItems="center">
+          <Grid size={{ md: 1 }} />
+          <Grid size={{ md: 10 }}>
+            <WidgetFrameLabelBar {...label_bar_props} />
+          </Grid>
+          <Grid size={{ md: 1 }} />
         </Grid>
-        <Grid size={{ md: 1 }} />
-      </Grid>
-    </Box>
+      </Box>
+
+      <PresenterLabelButtons onClick={on_click_add_label} />
+    </>
   );
 }

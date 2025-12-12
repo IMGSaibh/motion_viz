@@ -59,9 +59,9 @@ export function ContainerBottomUI() {
   const remove_label = use_remove_label_cxt();
   const clear_label_list = use_clear_label_list_ctx();
 
-  const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const seqRef = useRef(0);
+  // const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
+  // const rafRef = useRef<number | null>(null);
+  // const seqRef = useRef(0);
 
   const range_markers = use_range_marker_cxt();
   const frame = use_slider_frame_cxt();
@@ -74,12 +74,12 @@ export function ContainerBottomUI() {
   // const frame_slider_track_dragging_reference = useRef(false);
   // const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
 
-  useEffect(
-    () => () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    },
-    [],
-  );
+  // useEffect(
+  //   () => () => {
+  //     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  //   },
+  //   [],
+  // );
 
   useEffect(() => {
     set_std_slider_value(current_frame ?? 0);
@@ -282,28 +282,28 @@ export function ContainerBottomUI() {
   //   ],
   // );
 
-  // ===== Label-Kram wie gehabt =====
+  // // ===== Label-Kram wie gehabt =====
 
-  const add_label_on_click = useCallback(
-    (label_button?: string, category?: string) => {
-      const id = String(label_id.current++);
-      const label = label_button ?? `Label_${id}`;
+  // const add_label_on_click = useCallback(
+  //   (label_button?: string, category?: string) => {
+  //     const id = String(label_id.current++);
+  //     const label = label_button ?? `Label_${id}`;
 
-      const fc = Math.max(0, frame_count ?? 0);
-      const clamp = (v: number) => Math.max(0, Math.min(v, Math.max(0, fc)));
+  //     const fc = Math.max(0, frame_count ?? 0);
+  //     const clamp = (v: number) => Math.max(0, Math.min(v, Math.max(0, fc)));
 
-      let [a, b] = range_slider_value;
-      a = clamp(a);
-      b = clamp(b);
-      if (a > b) [a, b] = [b, a];
+  //     let [a, b] = range_slider_value;
+  //     a = clamp(a);
+  //     b = clamp(b);
+  //     if (a > b) [a, b] = [b, a];
 
-      const value: [number, number] =
-        a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
+  //     const value: [number, number] =
+  //       a === 0 && b === 0 && (current_frame ?? 0) > 0 ? [clamp(current_frame!), clamp(current_frame!)] : [a, b];
 
-      add_label({ id, from: value[0], to: value[1], label, category });
-    },
-    [range_slider_value, frame_count, current_frame, add_label],
-  );
+  //     add_label({ id, from: value[0], to: value[1], label, category });
+  //   },
+  //   [range_slider_value, frame_count, current_frame, add_label],
+  // );
 
   const label_list_on_click = useCallback(
     (id: string) => {
@@ -387,15 +387,15 @@ export function ContainerBottomUI() {
         }}
       /> */}
 
-      <PresenterLabelButtons onClick={add_label_on_click} />
+      {/* <PresenterLabelButtons onClick={add_label_on_click} /> */}
 
-      <PresenterLabelList
+      {/* <PresenterLabelList
         lables_list={label_list}
         slider_list_on_click={label_list_on_click}
         slider_list_clear_on_click={clear_label_list_on_click}
         save_labels_on_click={on_save_click}
         label_image={current_label_image}
-      />
+      /> */}
     </>
   );
 }

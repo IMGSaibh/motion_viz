@@ -1,8 +1,6 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import {
-  use_set_range_slider_value_cxt,
-  use_range_slider_value_cxt,
   use_slider_frame_cxt,
   use_set_slider_frame_cxt,
   use_add_label_ctx,
@@ -50,13 +48,12 @@ export function ContainerFrameSlider() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         play_pause();
-        setIsPlayingUi((prev) => !prev); // UI-State mit togglen
+        setIsPlayingUi((prev) => !prev); //  togglen ui-State
       }
 
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
-        // set_range([0, 1]);
         set_slider_frame(0);
         setIsPlayingUi(false);
       }
@@ -66,7 +63,6 @@ export function ContainerFrameSlider() {
         cleanup_player();
         cleanup_loop();
         cleanup_thumbnail_render();
-        // set_range([0, 1]);
         set_slider_frame(0);
         setIsPlayingUi(false);
       }

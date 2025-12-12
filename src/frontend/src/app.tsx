@@ -25,7 +25,7 @@ export default function App() {
             >
               <ContainerFrameSlider />
               <ContainerLabels />
-              <ContainerBottomUI />
+              {/* <ContainerBottomUI /> */}
             </Box>
           </FrameSliderLabellistProvider>
         </ThreeJSEngineProvider>
