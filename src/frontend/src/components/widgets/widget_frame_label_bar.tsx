@@ -1,11 +1,11 @@
 import { theme } from '@/theme';
 import { Box } from '@mui/material';
-import { use_range_marker_cxt } from '@/context/context_slider_label_list';
+import {
+  overlaps,
+  use_current_label_range_geometry_cxt,
+  use_range_marker_cxt,
+} from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
-
-function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  return aFrom < bTo && aTo > bFrom;
-}
 
 type Props = {
   frame_count: number;
@@ -15,17 +15,25 @@ export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
 
-  const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
-
-  const thumb_idx_0 = clamp(props.frame_slider_range[0]);
-  const thumb_idx_1 = clamp(props.frame_slider_range[1]);
-
   const isRtl = theme.direction === 'rtl';
-  const from = Math.min(thumb_idx_0, thumb_idx_1);
+
+  // ✅ ersetzt: clamp/thumb_idx/from/to/leftPct/scaleX-Berechnung
+  const currentGeom = use_current_label_range_geometry_cxt(props.frame_count);
+
+  // clamp nur noch für saved labels / overlap nötig
+  const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
-  const leftPct = pct(from, props.frame_count);
-  const to = Math.max(thumb_idx_0, thumb_idx_1);
-  const length = Math.max(0, to - from);
+
+  // const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
+
+  // const thumb_idx_0 = clamp(props.frame_slider_range[0]);
+  // const thumb_idx_1 = clamp(props.frame_slider_range[1]);
+
+  // const from = Math.min(thumb_idx_0, thumb_idx_1);
+  // const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
+  // const leftPct = pct(from, props.frame_count);
+  // const to = Math.max(thumb_idx_0, thumb_idx_1);
+  // const length = Math.max(0, to - from);
 
   const scaleX = props.frame_count > 0 ? Math.max(0, Math.round((length / props.frame_count) * 10000) / 10000) : 0;
 
@@ -34,7 +42,7 @@ export function WidgetFrameLabelBar(props: Props) {
     .some(({ from: vf, to: vt }) => {
       const vvFrom = clamp(Math.min(vf, vt));
       const vvTo = clamp(Math.max(vf, vt));
-      return overlaps(from, to, vvFrom, vvTo);
+      return overlaps(currentGeom.from, currentGeom.to, vvFrom, vvTo);
     });
 
   return (
@@ -84,7 +92,7 @@ export function WidgetFrameLabelBar(props: Props) {
             width: '100%',
             transformOrigin: isRtl ? 'right center' : 'left center',
             transform: `scaleX(${scaleX})`,
-            ...(isRtl ? { right: `${leftPct}%` } : { left: `${leftPct}%` }),
+            ...(isRtl ? { right: `${currentGeom.leftPct}%` } : { left: `${currentGeom.leftPct}%` }),
             background: has_overlap ? theme.palette.error.main : theme.palette.wip_color_theme[600],
             pointerEvents: 'none',
           })}

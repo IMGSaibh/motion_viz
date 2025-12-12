@@ -4,13 +4,13 @@ import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 
 export class NPY_Player {
   public npy_player_object: Updatable;
+  public is_playing: boolean = false;
   private npy_loader_object: NPY_loader;
   private fps: number = 0;
   private frame_index: number = 0;
   private frame_count: number = 0;
   private elapsedTime: number = 0;
   private frameDuration: number = 0;
-  private is_playing: boolean = false;
 
   private on_frame_changed_callback?: (frameIndex: number) => void;
 

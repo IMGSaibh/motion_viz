@@ -147,6 +147,12 @@ export class ThreeJSEngine {
     return null;
   }
 
+  is_playing() {
+    if (this.npy_player) return this.npy_player.is_playing;
+    else if (this.bvh_player) return this.bvh_player.is_playing;
+    else if (this.fbx_player) return this.fbx_player.is_playing;
+  }
+
   play_pause() {
     if (this.npy_player) this.npy_player.play_pause();
     else if (this.bvh_player) this.bvh_player.play_pause();

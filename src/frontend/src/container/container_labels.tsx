@@ -29,7 +29,6 @@ export function ContainerLabels() {
   const add_label = use_add_label_ctx();
 
   const label_id = useRef<number>(lable_list.length + 1);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!frame_count || frame_count <= 0) return;

@@ -69,8 +69,39 @@ function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
   }
 }
 
-function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
+export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
   return aFrom < bTo && aTo > bFrom;
+}
+
+export type RangeGeometry = {
+  from: number;
+  to: number;
+  leftPct: number;
+  scaleX: number;
+};
+
+export function use_current_label_range_geometry_cxt(frame_count: number): RangeGeometry {
+  const range = use_range_slider_value_cxt();
+
+  return useMemo(() => {
+    const fc = Math.max(0, frame_count ?? 0);
+    const maxIdx = Math.max(0, fc - 1);
+    const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
+    const pct = (n: number, d: number) => (d > 0 ? (n / d) * 100 : 0);
+
+    const a = clamp(range[0]);
+    const b = clamp(range[1]);
+    const from = Math.min(a, b);
+    const to = Math.max(a, b);
+    const length = Math.max(0, to - from);
+
+    return {
+      from,
+      to,
+      leftPct: pct(from, fc),
+      scaleX: fc > 0 ? Math.max(0, length / fc) : 0,
+    };
+  }, [frame_count, range]);
 }
 
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
