@@ -37,6 +37,7 @@ export function ContainerFrameSlider() {
     cleanup_player,
     cleanup_loop,
     cleanup_thumbnail_render,
+    is_playing,
   } = useThreeJSEngine();
 
   const handleTogglePlay = useCallback(() => {
@@ -105,6 +106,17 @@ export function ContainerFrameSlider() {
     cleanup_thumbnail_render,
     setIsPlayingUi,
   ]);
+  useEffect(() => {
+    if (!frame_count) return;
+
+    // während Scrubbing nicht überschreiben
+    if (frame_slider_track_scrubbing_reference.current) return;
+
+    // nur wenn UI auf "playing" steht (sonst überschreibt es Pfeiltasten etc.)
+    if (!isPlayingUi) return;
+
+    set_slider_frame(current_frame);
+  }, [current_frame, frame_count, isPlayingUi, set_slider_frame]);
 
   const compute_slider_track_frame = useCallback(
     (clientX: number) => {

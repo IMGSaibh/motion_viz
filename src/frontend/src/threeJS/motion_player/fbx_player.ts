@@ -4,9 +4,9 @@ import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
 
 export class FBX_Player {
   public fbx_player_object: Updatable;
+  public is_playing: boolean = false;
   private fbx_loader_object: FBX_Loader;
   private frame_count: number;
-  private is_playing: boolean = false;
   private frame_index: number = 0;
 
   private on_frame_changed_callback?: (frameIndex: number) => void;

@@ -3,11 +3,11 @@ import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 
 export class BVH_Player {
+  public is_playing: boolean;
   public bvh_player_object: Updatable;
   private bvh_loader_object: BVH_loader;
   private currentTime: number;
   private frame_count: number;
-  private is_playing: boolean;
   private frame_index: number;
 
   private on_frame_changed_callback?: (frameIndex: number) => void;

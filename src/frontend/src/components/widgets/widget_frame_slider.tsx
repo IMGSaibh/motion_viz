@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
 import { PAUSE_BUTTON_IMAGE } from '@/Assets/label_images';
+import { use_current_label_range_geometry_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
   slider_frame: number;
@@ -37,6 +38,7 @@ export function WidgetFrameSlider(props: Props) {
 
   const markerPct = hasFrames ? ((clamped_frame + 0.5) / frame_count) * 100 : 0;
   const hoverPct = hasFrames && hover_frame !== null ? ((hover_frame + 0.5) / frame_count) * 100 : null;
+  const currentLabelGeom = use_current_label_range_geometry_cxt(frame_count);
 
   const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -115,6 +117,24 @@ export function WidgetFrameSlider(props: Props) {
             }),
           })}
         >
+          {/* transparent overlay for the current (unsaved) label-range */}
+          {hasFrames && currentLabelGeom.scaleX > 0 && (
+            <Box
+              sx={(theme) => ({
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                transformOrigin: theme.direction === 'rtl' ? 'right center' : 'left center',
+                transform: `scaleX(${currentLabelGeom.scaleX})`,
+                ...(theme.direction === 'rtl'
+                  ? { right: `${currentLabelGeom.leftPct}%` }
+                  : { left: `${currentLabelGeom.leftPct}%` }),
+                backgroundColor: theme.palette.wip_color_theme[800],
+                opacity: 0.4,
+                pointerEvents: 'none',
+              })}
+            />
+          )}
           {/* mark-line for current frame */}
           {hasFrames && (
             <Box
