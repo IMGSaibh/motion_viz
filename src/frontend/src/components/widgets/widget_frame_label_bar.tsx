@@ -1,11 +1,7 @@
 import { theme } from '@/theme';
 import { Box } from '@mui/material';
-import { use_range_marker_cxt } from '@/context/context_slider_label_list';
+import { overlaps, use_range_marker_cxt } from '@/context/context_slider_label_list';
 import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
-
-function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  return aFrom < bTo && aTo > bFrom;
-}
 
 type Props = {
   frame_count: number;

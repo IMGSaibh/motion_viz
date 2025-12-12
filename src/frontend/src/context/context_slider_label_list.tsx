@@ -69,7 +69,7 @@ function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
   }
 }
 
-function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
+export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
   return aFrom < bTo && aTo > bFrom;
 }
 
