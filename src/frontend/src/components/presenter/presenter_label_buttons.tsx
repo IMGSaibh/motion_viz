@@ -3,7 +3,6 @@ import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import { theme } from '@/theme';
 
 type Props = {
   onClick?: (label: string, category: string) => void;
@@ -44,6 +43,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
               value="RULA"
               label="RULA"
               sx={(theme) => ({
+                borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
               })}
@@ -52,6 +52,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
               value="OWAS"
               label="OWAS"
               sx={(theme) => ({
+                borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
               })}
@@ -60,6 +61,7 @@ export function PresenterLabelButtons({ onClick }: Props) {
               value="LLM"
               label="LLM"
               sx={(theme) => ({
+                borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
               })}
