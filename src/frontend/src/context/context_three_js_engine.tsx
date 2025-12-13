@@ -20,7 +20,8 @@ type ThreeJSEngineContext = {
   cleanup_thumbnail_render: () => void;
   print_scene_components: () => void;
   get_thumbnail_for_frame: (i: number) => Promise<string | null>;
-  is_playing: () => boolean;
+  // is_playing: () => boolean;
+  is_playing: boolean;
 };
 
 const three_js_engine_context = createContext<ThreeJSEngineContext | null>(null);
@@ -31,6 +32,11 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   const [selected_motion, set_selected_motion] = useState<string | null>(null);
   const [frame_count, set_frame_count] = useState(0);
   const [current_frame, set_current_frame] = useState(0);
+  const [is_playing, set_is_playing] = useState(false);
+
+  const sync_is_playing = useCallback(() => {
+    set_is_playing(threejs_mngr_ref.current?.is_playing?.() ?? false);
+  }, []);
 
   // start engine at App-Start
   useEffect(() => {
@@ -46,45 +52,55 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     };
   }, []);
 
-  const load_motion_file = useCallback(async (file: string) => {
-    if (!threejs_mngr_ref.current) return; // Engine not ready
+  const load_motion_file = useCallback(
+    async (file: string) => {
+      if (!threejs_mngr_ref.current) return; // Engine not ready
 
-    threejs_mngr_ref.current.cleanup_player?.();
-    threejs_mngr_ref.current.cleanup_loop?.();
-    threejs_mngr_ref.current.cleanup_thumbnail_render?.();
+      threejs_mngr_ref.current.cleanup_player?.();
+      threejs_mngr_ref.current.cleanup_loop?.();
+      threejs_mngr_ref.current.cleanup_thumbnail_render?.();
 
-    await threejs_mngr_ref.current.load_motionfile_and_player(file);
+      await threejs_mngr_ref.current.load_motionfile_and_player(file);
 
-    const framecount = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
-    set_frame_count(framecount);
+      const framecount = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
+      set_frame_count(framecount);
 
-    const player = threejs_mngr_ref.current.get_current_player?.();
-    player?.set_on_frame_changed_callback?.((idx: number) => {
-      set_current_frame(idx);
-    });
-  }, []);
+      const player = threejs_mngr_ref.current.get_current_player?.();
+      player?.set_on_frame_changed_callback?.((idx: number) => {
+        set_current_frame(idx);
+      });
+      sync_is_playing();
+    },
+    [sync_is_playing],
+  );
 
   const get_thumbnail_for_frame = useCallback(
     (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
   );
-  const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
+  // const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
+  const play_pause = useCallback(() => {
+    threejs_mngr_ref.current?.play_pause?.();
+    sync_is_playing();
+  }, [sync_is_playing]);
   const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
   const stop = useCallback(() => {
     threejs_mngr_ref.current?.pause?.();
     threejs_mngr_ref.current?.go_to_frame?.(0);
     set_current_frame(0);
-  }, []);
+    sync_is_playing();
+  }, [sync_is_playing]);
   const pause = useCallback(() => {
     threejs_mngr_ref.current?.pause?.();
-  }, []);
+    sync_is_playing();
+  }, [sync_is_playing]);
 
   const cleanup_player = useCallback(() => threejs_mngr_ref.current?.cleanup_player?.(), []);
   const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
 
-  const is_playing = useCallback(() => threejs_mngr_ref.current?.is_playing?.() ?? false, []);
+  // const is_playing = useCallback(() => threejs_mngr_ref.current?.is_playing?.() ?? false, []);
 
   const value = useMemo<ThreeJSEngineContext>(
     () => ({

@@ -67,7 +67,7 @@ export function WidgetLmmButtons({ onClick }: Props) {
   );
   return (
     <>
-      <Grid container spacing={0} alignItems="center" wrap="nowrap">
+      {/* <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="scroll-select-label">Bestimmung der Zeitwichtung</InputLabel>
@@ -120,7 +120,7 @@ export function WidgetLmmButtons({ onClick }: Props) {
             {render_lmm_images(label_images_cat1)}
           </FormControl>
         </Grid>
-      </Grid>
+      </Grid> */}
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 12 }}>
           <Box sx={{ height: '63px', fontSize: 14 }}>Not implemented yet</Box>

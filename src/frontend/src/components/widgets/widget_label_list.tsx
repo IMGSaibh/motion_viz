@@ -94,7 +94,15 @@ export function WidgetLabelList(props: Props) {
             <Fragment key={slider_label.id}>
               <ListItem disableGutters>
                 <Grid container spacing={0} alignItems="center" wrap="nowrap" sx={{ width: '100%' }}>
-                  <Grid size={{ md: 1 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Grid
+                    size={{ md: 1 }}
+                    sx={(theme) => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                    })}
+                  >
                     <WidgetLabelPreview label_image={slider_label.label_image} />
                   </Grid>
 
@@ -108,11 +116,14 @@ export function WidgetLabelList(props: Props) {
                   </Grid>
                   <Grid size={{ md: 1 }}>
                     <Box
-                      sx={{
+                      sx={(theme) => ({
                         display: 'flex',
                         flexDirection: 'column',
                         minWidth: 0,
-                      }}
+                        alignItems: 'center', // vertikal
+                        justifyContent: 'center', // optional horizontal
+                        borderLeft: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                      })}
                     >
                       <Typography variant="body2" noWrap>
                         {slider_label.label}
