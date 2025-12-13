@@ -29,7 +29,7 @@ type Props = {
   onClick?: (label: string, category: string) => void;
 };
 
-export function PresenterRulaLabelButtons({ onClick }: Props) {
+export function WidgetRulaButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_rula();
   const label_images_cat2 = get_label_images_cat2_rula();
@@ -39,7 +39,7 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
   const category_2_rula = 'Kategorie Nacken/Rumpf/Beine';
   const category_3_rula = 'Kategorie Zusatzfaktoren';
 
-  const render_rula_label_images = (
+  const render_rula_images = (
     items: typeof label_images_cat1 | typeof label_images_cat2 | typeof label_images_cat3,
   ) => (
     <Box
@@ -84,7 +84,7 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_1_rula}
             </FormLabel>
-            {render_rula_label_images(label_images_cat1)}
+            {render_rula_images(label_images_cat1)}
           </FormControl>
         </Grid>
         <Grid size={{ md: 4 }}>
@@ -95,7 +95,7 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_2_rula}
             </FormLabel>
-            {render_rula_label_images(label_images_cat2)}
+            {render_rula_images(label_images_cat2)}
           </FormControl>
         </Grid>
         <Grid size={{ md: 4 }}>
@@ -106,7 +106,7 @@ export function PresenterRulaLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_3_rula}
             </FormLabel>
-            {render_rula_label_images(label_images_cat3)}
+            {render_rula_images(label_images_cat3)}
           </FormControl>
         </Grid>
       </Grid>

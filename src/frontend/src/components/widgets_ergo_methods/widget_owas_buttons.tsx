@@ -30,7 +30,7 @@ type Props = {
   onClick?: (label: string, category: string) => void;
 };
 
-export function PresenterOwasLabelButtons({ onClick }: Props) {
+export function WidgetOwasButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_owas();
   const label_images_cat2 = get_label_images_cat2_owas();
@@ -42,7 +42,7 @@ export function PresenterOwasLabelButtons({ onClick }: Props) {
   const category_3_owas = 'Kategorie Beine';
   const category_4_owas = 'Kategorie Last';
 
-  const render_rula_label_images = (items: typeof label_images_cat1) => (
+  const render_owas_images = (items: typeof label_images_cat1) => (
     <Box
       sx={{
         display: 'grid',
@@ -85,7 +85,7 @@ export function PresenterOwasLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_1_owas}
             </FormLabel>
-            {render_rula_label_images(label_images_cat1)}
+            {render_owas_images(label_images_cat1)}
           </FormControl>
         </Grid>
         <Grid size={{ md: 3 }}>
@@ -96,7 +96,7 @@ export function PresenterOwasLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_2_owas}
             </FormLabel>
-            {render_rula_label_images(label_images_cat2)}
+            {render_owas_images(label_images_cat2)}
           </FormControl>
         </Grid>
         <Grid size={{ md: 3 }}>
@@ -107,7 +107,7 @@ export function PresenterOwasLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_3_owas}
             </FormLabel>
-            {render_rula_label_images(label_images_cat3)}
+            {render_owas_images(label_images_cat3)}
           </FormControl>
         </Grid>
         <Grid size={{ md: 3 }}>
@@ -118,7 +118,7 @@ export function PresenterOwasLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_4_owas}
             </FormLabel>
-            {render_rula_label_images(label_images_cat4)}
+            {render_owas_images(label_images_cat4)}
           </FormControl>
         </Grid>
       </Grid>

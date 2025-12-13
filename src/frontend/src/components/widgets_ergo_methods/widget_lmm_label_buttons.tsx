@@ -25,7 +25,7 @@ type Props = {
   onClick?: (label: string, category: string) => void;
 };
 
-export function PresenterLMMLabelButtons({ onClick }: Props) {
+export function WidgetLmmButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_llm();
 
@@ -33,7 +33,7 @@ export function PresenterLMMLabelButtons({ onClick }: Props) {
   const category_2_llm = 'Bestimmung der Wichtungen der weiteren Merkmale';
   const category_3_llm = 'Kategorie LLM C (sonstige)';
 
-  const render_rula_label_images = (items: typeof label_images_cat1) => (
+  const render_lmm_images = (items: typeof label_images_cat1) => (
     <Box
       sx={{
         display: 'grid',
@@ -67,7 +67,7 @@ export function PresenterLMMLabelButtons({ onClick }: Props) {
   );
   return (
     <>
-      {/* <Grid container spacing={0} alignItems="center" wrap="nowrap">
+      <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="scroll-select-label">Bestimmung der Zeitwichtung</InputLabel>
@@ -117,10 +117,10 @@ export function PresenterLMMLabelButtons({ onClick }: Props) {
             <FormLabel component="legend" sx={{ px: 0.75, ml: 1, lineHeight: 1.1, fontSize: 12 }}>
               {category_3_llm}
             </FormLabel>
-            {render_rula_label_images(label_images_cat1)}
+            {render_lmm_images(label_images_cat1)}
           </FormControl>
         </Grid>
-      </Grid> */}
+      </Grid>
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 12 }}>
           <Box sx={{ height: '63px', fontSize: 14 }}>Not implemented yet</Box>

@@ -1,7 +1,7 @@
 import { Box, Grid, Tabs, Tab } from '@mui/material';
-import { PresenterRulaLabelButtons } from './presenter_rula_label_buttons';
-import { PresenterOwasLabelButtons } from './presenter_owas_label_buttons';
-import { PresenterLMMLabelButtons } from './presenter_LMM_label_buttons';
+import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
+import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
+import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
 import { theme } from '@/theme';
 
@@ -70,9 +70,9 @@ export function PresenterLabelButtons({ onClick }: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <PresenterRulaLabelButtons onClick={onClick} />}
-      {method === 'OWAS' && <PresenterOwasLabelButtons onClick={onClick} />}
-      {method === 'LLM' && <PresenterLMMLabelButtons onClick={onClick} />}
+      {method === 'RULA' && <WidgetRulaButtons onClick={onClick} />}
+      {method === 'OWAS' && <WidgetOwasButtons onClick={onClick} />}
+      {method === 'LLM' && <WidgetLmmButtons onClick={onClick} />}
     </Box>
   );
 }

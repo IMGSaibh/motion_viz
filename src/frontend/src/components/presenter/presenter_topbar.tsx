@@ -1,7 +1,7 @@
-import { WidgetFileUpload } from '@/components/widgets_topbar_ui/widget_file_upload';
-import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar_ui/widget_motion_descriptor';
-import { WidgetConvertMotionFile } from '@/components/widgets_topbar_ui/widget_motion_file_conversion';
-import { WidgetListFiles } from '@/components/widgets_topbar_ui/widget_list_motion_files';
+import { WidgetFileUpload } from '@/components/widgets_topbar/widget_file_upload';
+import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_motion_descriptor';
+import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
+import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 
