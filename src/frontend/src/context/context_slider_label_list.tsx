@@ -25,6 +25,10 @@ type FrameSliderLabellistContext = {
   set_rula_selected: (next: Record<string, string | null>) => void;
   clear_rula_selected: () => void;
 
+  owas_selected: Record<string, string | null>;
+  set_owas_selected: (next: Record<string, string | null>) => void;
+  clear_owas_selected: () => void;
+
   update_label_meta: (id: string, patch: Partial<Pick<Label_ctx, 'label' | 'category' | 'color'>>) => void;
 };
 
@@ -170,6 +174,17 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     CAT3: null,
   });
 
+  const [owas_selected, set_owas_selected] = useState<Record<string, string | null>>({
+    CAT1: null,
+    CAT2: null,
+    CAT3: null,
+    CAT4: null,
+  });
+
+  const clear_owas_selected = useCallback(() => {
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+  }, []);
+
   const add_label_rect = useCallback(
     (m: Label_ctx) => {
       const ok = canSaveForRange({
@@ -209,6 +224,17 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         // optional: wenn kein RULA-Label editiert wird → zurücksetzen
         set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
       }
+
+      // ✅ OWAS-Label beim Edit korrekt in die Buttons laden
+      if (normalizeCategory(m.category) === 'OWAS' && typeof m.label === 'string') {
+        const parts = m.label.split('|').map((s: string) => s.trim());
+        set_owas_selected({
+          CAT1: parts[0] ?? null,
+          CAT2: parts[1] ?? null,
+          CAT3: parts[2] ?? null,
+          CAT4: parts[3] ?? null,
+        });
+      }
     },
     [label_ctx],
   );
@@ -243,16 +269,19 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
     // ✅ optional aber sinnvoll: nach Edit-Ende RULA-Auswahl leeren
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id, range, label_ctx, rula_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id]);
 
   const clear_rula_selected = useCallback(() => {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, []);
 
   const update_label_meta = useCallback(
@@ -289,6 +318,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_rula_selected,
       clear_rula_selected,
       update_label_meta,
+
+      owas_selected,
+      set_owas_selected,
+      clear_owas_selected,
     }),
     [
       range,
@@ -308,6 +341,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_rula_selected,
       clear_rula_selected,
       update_label_meta,
+
+      owas_selected,
+      set_owas_selected,
+      clear_owas_selected,
     ],
   );
 
@@ -462,5 +499,30 @@ export function use_update_label_meta_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
     return v.update_label_meta;
+  });
+}
+
+/* =================================================================
+                            owas buttons ctx  
+==================================================================*/
+
+export function use_owas_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_owas_selected_cxt must be used within <Provider>');
+    return v.owas_selected;
+  });
+}
+
+export function use_set_owas_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_set_owas_selected_cxt must be used within <Provider>');
+    return v.set_owas_selected;
+  });
+}
+
+export function use_clear_owas_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <Provider>');
+    return v.clear_owas_selected;
   });
 }

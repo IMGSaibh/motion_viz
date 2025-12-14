@@ -44,7 +44,7 @@ function CategoryGrid({
         flexDirection: 'column',
       })}
     >
-      <Box sx={{ fontSize: 12, pb: 1, pt: 1 }}>{title}</Box>
+      <Box sx={{ fontSize: 12, pb: 1, pt: 1, textAlign: 'center' }}>{title}</Box>
 
       <Box
         sx={{
