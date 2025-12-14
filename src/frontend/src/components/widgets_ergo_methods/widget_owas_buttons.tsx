@@ -1,4 +1,4 @@
-import { Box, ButtonBase, styled, FormControl, FormLabel, Grid } from '@mui/material';
+import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import {
   get_label_images_cat1_owas,
@@ -6,6 +6,11 @@ import {
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
 } from '@/Assets/label_images';
+import ModeEditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ClearIcon from '@mui/icons-material/Clear';
+import SaveIcon from '@mui/icons-material/Save';
+import { useState } from 'react';
 
 type Props = {
   onClick?: (label: string, category: string) => void;
@@ -29,6 +34,7 @@ function CategoryGrid({
   isLast?: boolean;
 }) {
   const items = getItems();
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
   return (
     <Box
@@ -50,15 +56,26 @@ function CategoryGrid({
         {items.map((item, i) => (
           <ButtonBase
             key={`${item.category}-${item.label}-${i}`}
-            onClick={() => onClick?.(item.label, item.category)}
+            onClick={() => {
+              if (selectedLabel) return;
+              setSelectedLabel(item.label);
+              onClick?.(item.label, item.category);
+            }}
             disabled={!canSave(item.category)}
-            sx={{
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
+            sx={(theme) => {
+              const isSelected = selectedLabel === item.label;
+              const isdisbaled = selectedLabel !== null && !isSelected;
+
+              return {
+                border: 1,
+                borderColor: theme.palette.wip_color_theme[300],
+                borderRadius: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                opacity: isdisbaled ? 0.4 : 1,
+                pointerEvents: isdisbaled ? 'none' : 'auto',
+              };
             }}
           >
             {/* Image */}
@@ -105,7 +122,7 @@ export function WidgetOwasButtons({ onClick }: Props) {
       })}
     >
       <Grid container spacing={0} wrap="nowrap">
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 2 }}>
           <CategoryGrid
             title="Kategorie Rücken"
             getItems={get_label_images_cat1_owas}
@@ -114,7 +131,7 @@ export function WidgetOwasButtons({ onClick }: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 2 }}>
           <CategoryGrid
             title="Kategorie Arme"
             getItems={get_label_images_cat2_owas}
@@ -137,8 +154,64 @@ export function WidgetOwasButtons({ onClick }: Props) {
             getItems={get_label_images_cat4_owas}
             canSave={can_save_label}
             onClick={onClick}
-            isLast
           />
+        </Grid>
+        <Grid size={{ md: 2 }}>
+          <Box
+            sx={{
+              mt: 0.5,
+              display: 'flex',
+              gap: 0.5,
+              flexWrap: 'wrap',
+              maxWidth: '100%',
+              alignItems: 'center',
+            }}
+          >
+            {2 === 2 ? (
+              <>
+                <IconButton
+                  size="small"
+                  aria-label="Save label"
+                  sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                >
+                  <SaveIcon fontSize="inherit" />
+                </IconButton>
+
+                <IconButton
+                  size="small"
+                  aria-label="Delete label"
+                  sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                >
+                  <DeleteIcon fontSize="inherit" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  aria-label="Cancel label"
+                  sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                >
+                  <ClearIcon fontSize="inherit" />
+                </IconButton>
+              </>
+            ) : (
+              <>
+                <IconButton
+                  size="small"
+                  aria-label="Edit label"
+                  sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                >
+                  <ModeEditIcon fontSize="inherit" />
+                </IconButton>
+
+                <IconButton
+                  size="small"
+                  aria-label="Delete label"
+                  sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                >
+                  <DeleteIcon fontSize="inherit" />
+                </IconButton>
+              </>
+            )}
+          </Box>
         </Grid>
       </Grid>
     </Box>

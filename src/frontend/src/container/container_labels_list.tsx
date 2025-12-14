@@ -1,16 +1,11 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import {
-  use_set_range_slider_value_cxt,
-  use_range_slider_value_cxt,
   use_slider_frame_cxt,
-  use_set_slider_frame_cxt,
-  use_add_label_ctx,
   use_remove_label_cxt,
   use_clear_label_list_ctx,
   use_range_marker_cxt,
 } from '@/context/context_slider_label_list';
-import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
