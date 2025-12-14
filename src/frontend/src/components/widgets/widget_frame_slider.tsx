@@ -41,7 +41,9 @@ export function WidgetFrameSlider(props: Props) {
   const currentLabelGeom = use_current_label_range_geometry_cxt(frame_count);
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
-  const hasOverlap = !canSaveRula;
+  const canSaveOwas = can_save_label('OWAS');
+  const hasOverlap = !canSaveRula || !canSaveOwas;
+
   const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
   // TODO: remove useEffect
