@@ -73,6 +73,33 @@ export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number)
   return aFrom < bTo && aTo > bFrom;
 }
 
+function normalizeCategory(c?: string) {
+  return (c ?? 'Uncategorized').trim() || 'Uncategorized';
+}
+
+function canSaveForRange(args: {
+  label_ctx: Label_ctx[];
+  category?: string;
+  from: number;
+  to: number;
+  ignoreId?: string | null;
+}) {
+  const fromN = Math.min(args.from, args.to);
+  const toN = Math.max(args.from, args.to);
+  const targetCategory = normalizeCategory(args.category);
+
+  const hasOverlapSameCategory = args.label_ctx.some((m) => {
+    if (args.ignoreId && m.id === args.ignoreId) return false;
+    const mCat = normalizeCategory(m.category);
+    if (mCat !== targetCategory) return false;
+    const mf = Math.min(m.from, m.to);
+    const mt = Math.max(m.from, m.to);
+    return fromN < mt && toN > mf;
+  });
+
+  return !hasOverlapSameCategory;
+}
+
 export type RangeGeometry = {
   from: number;
   to: number;
@@ -109,7 +136,23 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_ctx[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
-  const add_label_rect = useCallback((m: Label_ctx) => dispatch({ type: 'add', range_bar: m }), []);
+  // const add_label_rect = useCallback((m: Label_ctx) => dispatch({ type: 'add', range_bar: m }), []);
+
+  const add_label_rect = useCallback(
+    (m: Label_ctx) => {
+      const ok = canSaveForRange({
+        label_ctx,
+        category: m.category,
+        from: m.from,
+        to: m.to,
+        ignoreId: null,
+      });
+      if (!ok) return; // ❗ blockiert Speichern im Context
+      dispatch({ type: 'add', range_bar: m });
+    },
+    [label_ctx],
+  );
+
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
 
@@ -125,9 +168,21 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
+
+    const editingMarker = label_ctx.find((m) => m.id === editing_id);
+    const ok = canSaveForRange({
+      label_ctx,
+      category: editingMarker?.category,
+      from: range[0],
+      to: range[1],
+      ignoreId: editing_id,
+    });
+
+    if (!ok) return; // ❗ blockiert Speichern (und bleibt im Edit-Mode)
+
     dispatch({ type: 'update', id: editing_id, from: range[0], to: range[1] });
     set_editing_id(null);
-  }, [editing_id, range]);
+  }, [editing_id, range, label_ctx]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
@@ -258,23 +313,16 @@ export function use_can_save_label_cxt() {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
     return (category?: string) => {
-      const [fromRaw, toRaw] = v.range;
-      const from = Math.min(fromRaw, toRaw);
-      const to = Math.max(fromRaw, toRaw);
-
       const editingMarker = v.editing_id ? v.label_CTX.find((m) => m.id === v.editing_id) : null;
-      const targetCategory = (category ?? editingMarker?.category ?? 'Uncategorized').trim() || 'Uncategorized';
+      const targetCategory = category ?? editingMarker?.category;
 
-      const has_overlap_same_category = v.label_CTX.some((m) => {
-        if (editingMarker && m.id === editingMarker.id) return false; // ignore own marker
-        const mCat = (m.category ?? 'Uncategorized').trim() || 'Uncategorized';
-        if (mCat !== targetCategory) return false; // check only same category
-        const mf = Math.min(m.from, m.to);
-        const mt = Math.max(m.from, m.to);
-        return from < mt && to > mf;
+      return canSaveForRange({
+        label_ctx: v.label_CTX,
+        category: targetCategory,
+        from: v.range[0],
+        to: v.range[1],
+        ignoreId: v.editing_id,
       });
-
-      return !has_overlap_same_category;
     };
   });
 }

@@ -3,6 +3,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
 import { PAUSE_BUTTON_IMAGE } from '@/Assets/label_images';
 import { use_current_label_range_geometry_cxt } from '@/context/context_slider_label_list';
+import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
   slider_frame: number;
@@ -38,7 +39,9 @@ export function WidgetFrameSlider(props: Props) {
   const markerPct = hasFrames ? ((clamped_frame + 0.5) / frame_count) * 100 : 0;
   const hoverPct = hasFrames && hover_frame !== null ? ((hover_frame + 0.5) / frame_count) * 100 : null;
   const currentLabelGeom = use_current_label_range_geometry_cxt(frame_count);
-
+  const can_save_label = use_can_save_label_cxt();
+  const canSaveRula = can_save_label('RULA');
+  const hasOverlap = !canSaveRula;
   const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
   // TODO: remove useEffect
@@ -128,7 +131,7 @@ export function WidgetFrameSlider(props: Props) {
                 ...(theme.direction === 'rtl'
                   ? { right: `${currentLabelGeom.leftPct}%` }
                   : { left: `${currentLabelGeom.leftPct}%` }),
-                backgroundColor: theme.palette.wip_color_theme[800],
+                backgroundColor: hasOverlap ? theme.palette.error.main : theme.palette.wip_color_theme[800],
                 opacity: 0.4,
                 pointerEvents: 'none',
               })}

@@ -24,17 +24,6 @@ export function WidgetFrameLabelBar(props: Props) {
   const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
 
-  // const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
-
-  // const thumb_idx_0 = clamp(props.frame_slider_range[0]);
-  // const thumb_idx_1 = clamp(props.frame_slider_range[1]);
-
-  // const from = Math.min(thumb_idx_0, thumb_idx_1);
-  // const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
-  // const leftPct = pct(from, props.frame_count);
-  // const to = Math.max(thumb_idx_0, thumb_idx_1);
-  // const length = Math.max(0, to - from);
-
   const scaleX = props.frame_count > 0 ? Math.max(0, Math.round((length / props.frame_count) * 10000) / 10000) : 0;
 
   const has_overlap = saved_labels
