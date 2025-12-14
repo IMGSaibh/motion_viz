@@ -5,7 +5,7 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { LabelImage } from '@/Assets/label_images';
 import {
-  use_add_label_ctx,
+  use_add_slider_label_ctx,
   use_range_slider_value_cxt,
   use_set_range_slider_value_cxt,
   use_slider_frame_cxt,
@@ -26,7 +26,7 @@ export function ContainerLabels() {
   const slider_frame = use_slider_frame_cxt();
   const frame_slider_range = use_range_slider_value_cxt();
   const set_range = use_set_range_slider_value_cxt();
-  const add_label = use_add_label_ctx();
+  const add_label = use_add_slider_label_ctx();
 
   const label_id = useRef<number>(lable_list.length + 1);
   useEffect(() => {

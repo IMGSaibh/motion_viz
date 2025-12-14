@@ -11,10 +11,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import SaveIcon from '@mui/icons-material/Save';
 
-type Props = {
-  onClick?: (label: string, category: string) => void;
-};
-
 function CategoryGrid({
   title,
   getItems,
@@ -109,8 +105,10 @@ function CategoryGrid({
     </Box>
   );
 }
-
-export function WidgetRulaButtons({ onClick }: Props) {
+type Props = {
+  onClick?: (label: string, category: string) => void;
+};
+export function WidgetRulaButtons(props: Props) {
   const can_save_label = use_can_save_label_cxt();
 
   return (
@@ -126,7 +124,7 @@ export function WidgetRulaButtons({ onClick }: Props) {
             title="Kategorie Arm/Hand"
             getItems={get_label_images_cat1_rula}
             canSave={can_save_label}
-            onClick={onClick}
+            onClick={props.onClick}
           />
         </Grid>
 
@@ -135,7 +133,7 @@ export function WidgetRulaButtons({ onClick }: Props) {
             title="Kategorie Nacken/Rumpf/Beine"
             getItems={get_label_images_cat2_rula}
             canSave={can_save_label}
-            onClick={onClick}
+            onClick={props.onClick}
           />
         </Grid>
 
@@ -144,7 +142,7 @@ export function WidgetRulaButtons({ onClick }: Props) {
             title="Kategorie Zusatzfaktoren"
             getItems={get_label_images_cat3_rula}
             canSave={can_save_label}
-            onClick={onClick}
+            onClick={props.onClick}
           />
         </Grid>
         <Grid size={{ md: 3 }}>

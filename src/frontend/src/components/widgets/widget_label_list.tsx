@@ -17,7 +17,7 @@ import {
   use_save_edit_label_cxt,
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
-  use_can_save_label_cxt,
+  // use_can_save_label_cxt,
 } from '@/context/context_slider_label_list';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
@@ -72,7 +72,7 @@ export function WidgetLabelList(props: Props) {
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
-  const can_save_label = use_can_save_label_cxt();
+  // const can_save_label = use_can_save_label_cxt();
 
   return (
     <Box

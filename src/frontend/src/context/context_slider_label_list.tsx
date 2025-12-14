@@ -204,9 +204,9 @@ export function use_range_marker_cxt() {
                             label ctx  
 ==================================================================*/
 
-export function use_add_label_ctx() {
+export function use_add_slider_label_ctx() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_add_label_ctx must be used within <FrameSliderLabellistProvider>');
+    if (!v) throw new Error('use_add_slider_label_ctx must be used within <FrameSliderLabellistProvider>');
     return v.add_slider_label;
   });
 }
