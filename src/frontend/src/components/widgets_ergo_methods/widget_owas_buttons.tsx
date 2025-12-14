@@ -39,6 +39,7 @@ function CategoryGrid({
       sx={(theme) => ({
         borderRight: isLast ? 'none' : `1px solid ${theme.palette.wip_color_theme[200]}`,
         height: '100%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
       })}
@@ -168,8 +169,8 @@ export function WidgetOwasButtons(props: Props) {
         borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
       })}
     >
-      <Grid container spacing={0} wrap="nowrap">
-        <Grid size={{ md: 2 }}>
+      <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
+        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Rücken"
             items={cat1}
@@ -178,7 +179,7 @@ export function WidgetOwasButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 2 }}>
+        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Arme"
             items={cat2}
@@ -187,7 +188,7 @@ export function WidgetOwasButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Beine"
             items={cat3}
@@ -195,7 +196,7 @@ export function WidgetOwasButtons(props: Props) {
             onSelect={handleSelect}
           />
         </Grid>
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Last"
             items={cat4}
@@ -204,7 +205,7 @@ export function WidgetOwasButtons(props: Props) {
           />
         </Grid>
         {/* Actions */}
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 1 }}>
           <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
             <IconButton
               size="small"

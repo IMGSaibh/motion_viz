@@ -40,6 +40,7 @@ function CategoryGrid({
       sx={(theme) => ({
         borderRight: isLast ? 'none' : `1px solid ${theme.palette.wip_color_theme[200]}`,
         height: '100%',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
       })}
@@ -170,7 +171,7 @@ export function WidgetRulaButtons(props: Props) {
       })}
     >
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
-        <Grid size={{ md: 3 }} sx={{ height: '100%' }}>
+        <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Arm/Hand"
             items={cat1}
@@ -179,7 +180,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 3 }} sx={{ height: '100%' }}>
+        <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Nacken/Rumpf/Beine"
             items={cat2}
@@ -188,7 +189,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 3 }} sx={{ height: '100%' }}>
+        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Kategorie Zusatzfaktoren"
             items={cat3}
@@ -198,7 +199,7 @@ export function WidgetRulaButtons(props: Props) {
         </Grid>
 
         {/* Actions */}
-        <Grid size={{ md: 3 }}>
+        <Grid size={{ md: 1 }}>
           <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
             <IconButton
               size="small"
