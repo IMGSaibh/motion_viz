@@ -20,6 +20,12 @@ type FrameSliderLabellistContext = {
 
   slider_frame: number;
   set_slider_frame: (n: number) => void;
+
+  rula_selected: Record<string, string | null>;
+  set_rula_selected: (next: Record<string, string | null>) => void;
+  clear_rula_selected: () => void;
+
+  update_label_meta: (id: string, patch: Partial<Pick<Label_ctx, 'label' | 'category' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
@@ -28,7 +34,7 @@ type MarkerAction =
   | { type: 'add'; range_bar: Label_ctx }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
-  | { type: 'update'; id: string; from: number; to: number };
+  | { type: 'update'; id: string; from: number; to: number; label?: string; category?: string; color?: string };
 
 function normalize(range_bar: Label_ctx): Label_ctx {
   if (Number.isNaN(range_bar.from) || Number.isNaN(range_bar.to)) return range_bar;
@@ -56,12 +62,32 @@ function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
       const from = Math.min(action.from, action.to);
       const to = Math.max(action.from, action.to);
       let changed = false;
+
       const next = state.map((x) => {
         if (x.id !== action.id) return x;
-        if (x.from === from && x.to === to) return x;
-        changed = true;
-        return { ...x, from, to };
+
+        const patch: Partial<Label_ctx> = {};
+        if (x.from !== from || x.to !== to) {
+          patch.from = from;
+          patch.to = to;
+          changed = true;
+        }
+        if (action.label !== undefined && x.label !== action.label) {
+          patch.label = action.label;
+          changed = true;
+        }
+        if (action.category !== undefined && x.category !== action.category) {
+          patch.category = action.category;
+          changed = true;
+        }
+        if (action.color !== undefined && x.color !== action.color) {
+          patch.color = action.color;
+          changed = true;
+        }
+
+        return Object.keys(patch).length ? { ...x, ...patch } : x;
       });
+
       return changed ? next : state;
     }
     default:
@@ -136,7 +162,13 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_ctx[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
-  // const add_label_rect = useCallback((m: Label_ctx) => dispatch({ type: 'add', range_bar: m }), []);
+  const [slider_frame, set_slider_frame] = useState(0);
+
+  const [rula_selected, set_rula_selected] = useState<Record<string, string | null>>({
+    CAT1: null,
+    CAT2: null,
+    CAT3: null,
+  });
 
   const add_label_rect = useCallback(
     (m: Label_ctx) => {
@@ -160,8 +192,23 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     (id: string) => {
       const m = label_ctx.find((x) => x.id === id);
       if (!m) return;
+
       set_range([m.from, m.to]);
       set_editing_id(id);
+
+      // ✅ RULA-Label beim Edit korrekt in die Buttons laden
+      if (normalizeCategory(m.category) === 'RULA' && typeof m.label === 'string') {
+        const parts = m.label.split('|').map((s: string) => s.trim()); // ✅ s typisiert
+
+        set_rula_selected({
+          CAT1: parts[0] ?? null,
+          CAT2: parts[1] ?? null,
+          CAT3: parts[2] ?? null,
+        });
+      } else {
+        // optional: wenn kein RULA-Label editiert wird → zurücksetzen
+        set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+      }
     },
     [label_ctx],
   );
@@ -178,18 +225,50 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       ignoreId: editing_id,
     });
 
-    if (!ok) return; // ❗ blockiert Speichern (und bleibt im Edit-Mode)
+    if (!ok) return;
 
-    dispatch({ type: 'update', id: editing_id, from: range[0], to: range[1] });
+    const isRula = normalizeCategory(editingMarker?.category) === 'RULA';
+    const rulaLabel = `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`;
+
+    dispatch({
+      type: 'update',
+      id: editing_id,
+      from: range[0],
+      to: range[1],
+      // ✅ beim RULA-Edit auch die Konfiguration speichern
+      ...(isRula ? { label: rulaLabel, category: 'RULA' } : {}),
+    });
+
     set_editing_id(null);
-  }, [editing_id, range, label_ctx]);
+
+    // ✅ optional aber sinnvoll: nach Edit-Ende RULA-Auswahl leeren
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+  }, [editing_id, range, label_ctx, rula_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   }, [editing_id]);
 
-  const [slider_frame, set_slider_frame] = useState(0);
+  const clear_rula_selected = useCallback(() => {
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+  }, []);
+
+  const update_label_meta = useCallback(
+    (id: string, patch: Partial<Pick<Label_ctx, 'label' | 'category' | 'color'>>) => {
+      dispatch({
+        type: 'update',
+        id,
+        from: range[0],
+        to: range[1],
+        label: patch.label,
+        category: patch.category,
+        color: patch.color,
+      });
+    },
+    [range],
+  );
 
   const frame_slider_label_list_ctx_memo_ctx = useMemo<FrameSliderLabellistContext>(
     () => ({
@@ -205,6 +284,11 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       cancel_current_edit_label: cancel_current_edit_label,
       slider_frame: slider_frame,
       set_slider_frame: set_slider_frame,
+
+      rula_selected,
+      set_rula_selected,
+      clear_rula_selected,
+      update_label_meta,
     }),
     [
       range,
@@ -219,6 +303,11 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       slider_frame,
       set_slider_frame,
+
+      rula_selected,
+      set_rula_selected,
+      clear_rula_selected,
+      update_label_meta,
     ],
   );
 
@@ -341,5 +430,37 @@ export function use_set_slider_frame_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_set_std_slider_value_cxt must be used within <FrameSliderLabellistProvider>');
     return v.set_slider_frame;
+  });
+}
+
+/* =================================================================
+                            rula buttons ctx  
+==================================================================*/
+
+export function use_rula_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_rula_selected_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.rula_selected;
+  });
+}
+
+export function use_set_rula_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_set_rula_selected_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.set_rula_selected;
+  });
+}
+
+export function use_clear_rula_selected_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_clear_rula_selected_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.clear_rula_selected;
+  });
+}
+
+export function use_update_label_meta_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.update_label_meta;
   });
 }
