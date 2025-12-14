@@ -198,7 +198,6 @@ export function WidgetRulaButtons(props: Props) {
             selectedLabel={selected[cat3Key]?.label ?? null}
             isEditing={isEditing}
             onSelect={handleSelect}
-            isLast
           />
         </Grid>
 
