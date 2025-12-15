@@ -206,15 +206,15 @@ export function WidgetOwasButtons(props: Props) {
         </Grid>
         {/* Actions */}
         <Grid size={{ md: 1 }}>
-          <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <IconButton
               size="small"
               aria-label="Save label"
               onClick={handleSave}
               disabled={!allSelected || !canSaveOwas}
-              sx={{ width: 28, height: 28, border: 1, borderRadius: 0, flexShrink: 0 }}
+              sx={{ border: 1, borderRadius: 0 }}
             >
-              <SaveIcon fontSize="inherit" />
+              <SaveIcon fontSize="large" />
             </IconButton>
           </Box>
         </Grid>
