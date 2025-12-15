@@ -19,10 +19,6 @@ type Props = {
   on_mouse_leave_slider_track?: (e: React.MouseEvent<HTMLDivElement>) => void;
   is_playing: boolean;
   on_click_play_toggle?: () => void;
-
-  // Label-Bar-Infos
-  // label_slider_range: [number, number];
-  // label_slider_framecount: number;
 };
 
 export function PresenterFrameSlider(props: Props) {
@@ -48,8 +44,6 @@ export function PresenterFrameSlider(props: Props) {
         is_playing={props.is_playing}
         on_click_play_toggle={props.on_click_play_toggle}
       />
-
-      {/* <WidgetFrameLabelBar label_slider_range={props.label_slider_range} frame_count={props.frame_count} /> */}
     </Box>
   );
 }

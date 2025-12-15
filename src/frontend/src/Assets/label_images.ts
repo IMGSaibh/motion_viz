@@ -45,22 +45,22 @@ export type LabelImage = {
 
 // RULA IMAGES
 const LABEL_IMAGES_CAT1_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Button_1', src: btn1_rula, category: 'Kategorie 1' },
-  { label: 'Button_2', src: btn2_rula, category: 'Kategorie 1' },
-  { label: 'Button_3', src: btn3_rula, category: 'Kategorie 1' },
-  { label: 'Button_4', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm | 20\u00B0 - 20\u00B0 |', src: btn1_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm | > 20\u00B0 - 45\u00B0 |', src: btn2_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm | > 45\u00B0 -90\u00B0 |', src: btn3_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm | > 90\u00B0 |', src: btn4_rula, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Button_5', src: btn5_rula, category: 'Kategorie 2' },
-  { label: 'Button_6', src: btn6_rula, category: 'Kategorie 2' },
-  { label: 'Button_7', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Button_8', src: btn8_rula, category: 'Kategorie 2' },
+  { label: 'Nacken | 0\u00B0 - 10\u00B0 |', src: btn5_rula, category: 'Kategorie 2' },
+  { label: 'Nacken | > 10\u00B0 - 20\u00B0 |', src: btn6_rula, category: 'Kategorie 2' },
+  { label: 'Nacken | > 20\u00B0 |', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Nacken | in Extension |', src: btn8_rula, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Button_9', src: btn9_rula, category: 'Kategorie 3' },
-  { label: 'Button_10', src: btn10_rula, category: 'Kategorie 3' },
+  { label: 'statisch > 1 min', src: btn9_rula, category: 'Kategorie 3' },
+  { label: 'Kraft/Last | 2–10 kg |', src: btn10_rula, category: 'Kategorie 3' },
 ];
 
 export function get_label_images_cat1_rula(): ReadonlyArray<LabelImage> {
@@ -87,32 +87,32 @@ export function get_label_all_label_images_rula(): ReadonlyMap<string, LabelImag
 
 // OWAS IMAGES
 const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Button_1', src: btn1_owas, category: 'Kategorie 1' },
-  { label: 'Button_2', src: btn2_owas, category: 'Kategorie 1' },
-  { label: 'Button_3', src: btn3_owas, category: 'Kategorie 1' },
-  { label: 'Button_4', src: btn4_owas, category: 'Kategorie 1' },
+  { label: 'Code 1', src: btn1_owas, category: 'Kategorie 1' },
+  { label: 'Code 2', src: btn2_owas, category: 'Kategorie 1' },
+  { label: 'Code 3', src: btn3_owas, category: 'Kategorie 1' },
+  { label: 'Code 4', src: btn4_owas, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Button_5', src: btn5_owas, category: 'Kategorie 2' },
-  { label: 'Button_6', src: btn6_owas, category: 'Kategorie 2' },
-  { label: 'Button_7', src: btn7_owas, category: 'Kategorie 2' },
+  { label: 'Code 1', src: btn5_owas, category: 'Kategorie 2' },
+  { label: 'Code 2', src: btn6_owas, category: 'Kategorie 2' },
+  { label: 'Code 3', src: btn7_owas, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Button_8', src: btn8_owas, category: 'Kategorie 3' },
-  { label: 'Button_9', src: btn9_owas, category: 'Kategorie 3' },
-  { label: 'Button_10', src: btn10_owas, category: 'Kategorie 3' },
-  { label: 'Button_11', src: btn11_owas, category: 'Kategorie 3' },
-  { label: 'Button_12', src: btn12_owas, category: 'Kategorie 3' },
-  { label: 'Button_13', src: btn13_owas, category: 'Kategorie 3' },
-  { label: 'Button_14', src: btn14_owas, category: 'Kategorie 3' },
+  { label: 'Code 1', src: btn8_owas, category: 'Kategorie 3' },
+  { label: 'Code 2', src: btn9_owas, category: 'Kategorie 3' },
+  { label: 'Code 3', src: btn10_owas, category: 'Kategorie 3' },
+  { label: 'Code 4', src: btn11_owas, category: 'Kategorie 3' },
+  { label: 'Code 5', src: btn12_owas, category: 'Kategorie 3' },
+  { label: 'Code 6', src: btn13_owas, category: 'Kategorie 3' },
+  { label: 'Code 7', src: btn14_owas, category: 'Kategorie 3' },
 ];
 
 const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Button_15', src: btn5_owas, category: 'Kategorie 4' },
-  { label: 'Button_16', src: btn6_owas, category: 'Kategorie 4' },
-  { label: 'Button_17', src: btn7_owas, category: 'Kategorie 4' },
+  { label: 'Code 1', src: btn5_owas, category: 'Kategorie 4' },
+  { label: 'Code 2', src: btn6_owas, category: 'Kategorie 4' },
+  { label: 'Code 3', src: btn7_owas, category: 'Kategorie 4' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {

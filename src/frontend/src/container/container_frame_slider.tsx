@@ -1,13 +1,6 @@
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import {
-  use_slider_frame_cxt,
-  use_set_slider_frame_cxt,
-  use_add_label_ctx,
-  use_remove_label_cxt,
-  use_clear_label_list_ctx,
-  use_range_marker_cxt,
-} from '@/context/context_slider_label_list';
+import { use_slider_frame_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 
 export function ContainerFrameSlider() {
@@ -204,7 +197,7 @@ export function ContainerFrameSlider() {
       on_mouse_move_slider_track: on_mouse_move_slider_track,
       on_mouse_up_slider_track: on_mouse_up_slider_track,
       on_mouse_leave_slider_track: on_mouse_leave_slider_track,
-      is_playing: is_playing(),
+      is_playing,
       on_click_play_toggle: handleTogglePlay,
     }),
     [
