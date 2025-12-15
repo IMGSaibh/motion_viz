@@ -173,7 +173,7 @@ export function WidgetRulaButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            title="Kategorie Arm/Hand"
+            title="Gruppe: Arm | Hand"
             items={cat1}
             selectedLabel={rula_selected.CAT1}
             onSelect={handleSelect}
@@ -182,7 +182,7 @@ export function WidgetRulaButtons(props: Props) {
 
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            title="Kategorie Nacken/Rumpf/Beine"
+            title="Gruppe: Nacken | Rumpf | Beine"
             items={cat2}
             selectedLabel={rula_selected.CAT2}
             onSelect={handleSelect}
@@ -191,7 +191,7 @@ export function WidgetRulaButtons(props: Props) {
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            title="Kategorie Zusatzfaktoren"
+            title="Gruppe: Muskelarbeit | Kraft"
             items={cat3}
             selectedLabel={rula_selected.CAT3}
             onSelect={handleSelect}
