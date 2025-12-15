@@ -27,45 +27,29 @@ async def convert_pv_style():
     
 
     # pairs of descriptor_file und mocap_file
+    # ======================================= Arbeitstätigkeiten =======================================
     file_pairs = [
-        (Path.joinpath(workspacefolder, "data/json/common/bvh_pos_100.json"),
-        Path.joinpath(workspacefolder, "data/bvh/movement3_OvercomeObstacle_var1.bvh")),                # 3dmotaas
-        
-        (Path.joinpath(workspacefolder, "data/json/100style.json"),
-        Path.joinpath(workspacefolder, "data/bvh/BentForward_SR.bvh")),                                 # 100style
 
         (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
-        Path.joinpath(workspacefolder, "data/bvh/Female1_D3_ConversationGestures.bvh")),                # accad
-
-        (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
-        Path.joinpath(workspacefolder, "data/bvh/F01A0V1.bvh")),                                        # actors
-
-        (Path.joinpath(workspacefolder, "data/json/aimove.json"),
         Path.joinpath(workspacefolder, "data/bvh/S3P03R3.bvh")),                                        # aimove
 
-        (Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json"),                                   # andy
-        Path.joinpath(workspacefolder, "data/npy/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx")), 
+        (Path.joinpath(workspacefolder, "data/json/common/xsens_mvnx.json"),
+        Path.joinpath(workspacefolder, "data/bvh/Subj_01_Isokin_L_02kg_St.mvnx")),                      # mmhd
 
-        (Path.joinpath(workspacefolder, "data/json/carda.json"),                                        # carda
-        Path.joinpath(workspacefolder, "data/npy/xsens_003_WS10_2023_09_21_cropped.bvh")), 
+        (Path.joinpath(workspacefolder, "data/json/common/bvh_pos_1000.json"),
+        Path.joinpath(workspacefolder, "data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh")),               # carda
+        
+        (Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json"),
+        Path.joinpath(workspacefolder, "data/bvh/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx")),      # andy
 
-        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # circle
-        Path.joinpath(workspacefolder, "data/bvh/002_reaching.bvh")),
+        (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
+        Path.joinpath(workspacefolder, "data/bvh/P01_R01_short.bvh")),                                  # inhard
 
-        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # cmcd
-        Path.joinpath(workspacefolder, "data/bvh/Take_2019-01-09_E_Hindernis.bvh")),
+        (Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json"),
+        Path.joinpath(workspacefolder, "data/bvh/7-10-09-cleaning-002-suitA.bvh")),                  # Vicon Poeticon
 
-        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # crea3d
-        Path.joinpath(workspacefolder, "data/bvh/U009_RWLV_CI1V_motion.bvh")),
-
-        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # dance
-        Path.joinpath(workspacefolder, "data/bvh/Clio_Haniotikos_short.bvh")),
-
-        (Path.joinpath(workspacefolder, "data/json/bvh_pamasss_100.json"),                            # dance 2
-        Path.joinpath(workspacefolder, "data/bvh/Clio_Haniotikos.bvh")),
-
-        (Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json"),                               # mvnx
-        Path.joinpath(workspacefolder, "data/mvnx/short.mvnx")),
+        (Path.joinpath(workspacefolder, "data/json/lara.json"),
+        Path.joinpath(workspacefolder, "data/bvh/L02_S01_R04_A17_N01_norm_data.csv")),                  # Lara
 
 
     ]
