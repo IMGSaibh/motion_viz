@@ -5,7 +5,7 @@ from pymotion.ops.skeleton import fk
 from mocap_loader import MotionDataReader
 
 class PVParser:
-    def __init__(self, file_path: str, descriptor_file: Path):
+    def __init__(self, file_path: str, descriptor_file: str):
         
         reader = MotionDataReader(file_path, descriptor_file)
         if reader.positions is None:
