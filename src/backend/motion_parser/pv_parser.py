@@ -5,7 +5,7 @@ from pymotion.ops.skeleton import fk
 from mocap_loader import MotionDataReader
 
 class PVParser:
-    def __init__(self, file_path: str, descriptor_file: Path):
+    def __init__(self, file_path: str, descriptor_file: str):
         
         reader = MotionDataReader(file_path, descriptor_file)
         if reader.positions is None:
@@ -21,4 +21,5 @@ class PVParser:
             raise ValueError("self.positions ist None – es wurde keine Datenmatrix gesetzt.")
         a = np.ascontiguousarray(arr)
         np.save(out_path, a)
-        print(f"Saved global positions array with shape {arr.shape} to {out_path}.npy")
+        print(f"Saved global positions array with shape {arr.shape}")
+        print(f"Datei gespeichert: {out_path}")
