@@ -1,5 +1,6 @@
 from pathlib import Path
 from fastapi import APIRouter
+import numpy as np
 from backend.motion_parser.pv_parser import PVParser
 from mocap_loader import MotionDataReader
 
@@ -31,48 +32,37 @@ async def convert_pv_style():
     # ======================================= Arbeitstätigkeiten =======================================
     file_pairs = [
 
-        (f"{workspacefolder}data/bvh/S3P03R3.bvh",
-        "bvh_pos_100.json"),                                                                            # aimove
+        (f"{workspacefolder}/data/bvh/S3P03R3.bvh",
+        "bvh_pos_100"),                                                                            # aimove
 
-        # (Path.joinpath(workspacefolder, "data/bvh/Subj_01_Isokin_L_02kg_St.mvnx"),
-        #  Path.joinpath(workspacefolder, "data/json/common/xsens_mvnx.json")),                             # mmhd
+        (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
+          "xsens_mvnx"),                                                                                 # mmhd
 
-        # (Path.joinpath(workspacefolder, "data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh"),
-        #  Path.joinpath(workspacefolder, "data/json/common/bvh_pos_1000.json")),                        # carda
+        (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
+          "bvh_pos_1000"),                                                                          # carda
 
-        # (Path.joinpath(workspacefolder, "data/bvh/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx"),
-        #  Path.joinpath(workspacefolder, "data/json/xsens_mvnx.json")),                                  # andy
+        (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
+                       "xsens_mvnx"),                                                                   # andy
 
-        # (Path.joinpath(workspacefolder, "data/bvh/P01_R01_short.bvh"),
-        #  Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json")),                                  # inhard
+        (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
+        "bvh_pos_100"),                                                                                  # inhard
 
-        # (Path.joinpath(workspacefolder, "data/bvh/7-10-09-cleaning-002-suitA.bvh"),
-        #  Path.joinpath(workspacefolder, "data/json/bvh_pos_100.json")),                                 # Vicon Poeticon
+        (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",
+          "bvh_pos_100"),                                                                               # Vicon Poeticon
 
-        # (
-        # Path.joinpath(workspacefolder, "data/bvh/L02_S01_R04_A17_N01_norm_data.csv"),
-        # Path.joinpath(workspacefolder, "data/json/lara.json"),),                                    #  Lara
-
+        (f"{workspacefolder}/data/csv/L02_S01_R04_A17_N01_norm_data.csv",
+        "lara"),                                                                                        #  Lara
 
     ]
+    
+    for mocap_file, descriptor_file in file_pairs:
+        print(f"processing {mocap_file}")
+        print(f"processing {descriptor_file}")
 
-    # reader = MotionDataReader(f"{workspacefolder}data/bvh/S3P03R3.bvh","bvh_pos_100.json")
-
-    # if reader.positions is None:
-    #     raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
-    # positions = reader.positions * 100 # Convert from centimeters to meters
-    # r_hierarchy = reader.generateJointHierarchyArray()
-    # joint_names = reader.generateNameList()
-    # joint_graph = reader.joint_graph
-
-    # for mocap_file, descriptor_file in file_pairs:
-    #     print(f"processing {mocap_file}")
-    #     print(f"processing {descriptor_file}")
-
-    #     pv_parser = PVParser(mocap_file, descriptor_file)
-    #     save_npy_path = Path.joinpath(npy_dir_path, f"{mocap_file}")  # Remove file extension
-    #     pv_parser.save_npy(str(save_npy_path))
-    #     print(f"Datei gespeichert: {save_npy_path}")
+        pv_parser = PVParser(mocap_file, descriptor_file)
+        save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
+        pv_parser.save_npy(str(save_npy_path))
+        
 
     return {
         "message": "pose viewer compatible files converted",
