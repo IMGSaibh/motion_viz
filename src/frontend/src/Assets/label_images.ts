@@ -59,8 +59,8 @@ const LABEL_IMAGES_CAT2_RULA: ReadonlyArray<LabelImage> = [
 ];
 
 const LABEL_IMAGES_CAT3_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Button_9', src: btn9_rula, category: 'Kategorie 3' },
-  { label: 'Button_10', src: btn10_rula, category: 'Kategorie 3' },
+  { label: 'statisch > 1 min', src: btn9_rula, category: 'Kategorie 3' },
+  { label: 'Kraft/Last | 2–10 kg |', src: btn10_rula, category: 'Kategorie 3' },
 ];
 
 export function get_label_images_cat1_rula(): ReadonlyArray<LabelImage> {
