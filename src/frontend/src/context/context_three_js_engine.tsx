@@ -20,7 +20,6 @@ type ThreeJSEngineContext = {
   cleanup_thumbnail_render: () => void;
   print_scene_components: () => void;
   get_thumbnail_for_frame: (i: number) => Promise<string | null>;
-  // is_playing: () => boolean;
   is_playing: boolean;
 };
 
@@ -78,7 +77,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
   );
-  // const play_pause = useCallback(() => threejs_mngr_ref.current?.play_pause?.(), []);
   const play_pause = useCallback(() => {
     threejs_mngr_ref.current?.play_pause?.();
     sync_is_playing();
@@ -99,8 +97,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
-
-  // const is_playing = useCallback(() => threejs_mngr_ref.current?.is_playing?.() ?? false, []);
 
   const value = useMemo<ThreeJSEngineContext>(
     () => ({

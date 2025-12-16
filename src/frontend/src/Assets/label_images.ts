@@ -45,22 +45,40 @@ export type LabelImage = {
 
 // RULA IMAGES
 const LABEL_IMAGES_CAT1_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Oberarm | 20\u00B0 - 20\u00B0 |', src: btn1_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm | > 20\u00B0 - 45\u00B0 |', src: btn2_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm | > 45\u00B0 -90\u00B0 |', src: btn3_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm | > 90\u00B0 |', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm 20\u00B0 - 20\u00B0 ', src: btn1_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm > 20\u00B0 - 45\u00B0 ', src: btn2_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm > 45\u00B0 -90\u00B0 ', src: btn3_rula, category: 'Kategorie 1' },
+  { label: 'Oberarm > 90\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+
+  { label: 'Unterarm 60\u00B0 - 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Unterarm < 60\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Unterarm > 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+
+  { label: 'Handgelenk 0\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Handgelenk 15\u00B0 - 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Handgelenk > 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { label: 'Handgelenk < 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Nacken | 0\u00B0 - 10\u00B0 |', src: btn5_rula, category: 'Kategorie 2' },
-  { label: 'Nacken | > 10\u00B0 - 20\u00B0 |', src: btn6_rula, category: 'Kategorie 2' },
-  { label: 'Nacken | > 20\u00B0 |', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Nacken | in Extension |', src: btn8_rula, category: 'Kategorie 2' },
+  { label: 'Nacken 0\u00B0 - 10\u00B0', src: btn5_rula, category: 'Kategorie 2' },
+  { label: 'Nacken > 10\u00B0 - 20\u00B0', src: btn6_rula, category: 'Kategorie 2' },
+  { label: 'Nacken > 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Nacken in Extension', src: btn8_rula, category: 'Kategorie 2' },
+
+  { label: 'Rumpf 0\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Rumpf 0\u00B0 - 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Rumpf 20\u00B0 - 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Rumpf > 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+
+  { label: 'Beine - stabiler Stand / Sitzen ', src: btn7_rula, category: 'Kategorie 2' },
+  { label: 'Beine - instabil / asymmetrisch ', src: btn7_rula, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'statisch > 1 min', src: btn9_rula, category: 'Kategorie 3' },
-  { label: 'Kraft/Last | 2–10 kg |', src: btn10_rula, category: 'Kategorie 3' },
+  { label: 'Haltung > 1 min', src: btn9_rula, category: 'Kategorie 3' },
+  { label: 'Wdh. > 4 pro min', src: btn9_rula, category: 'Kategorie 3' },
+  { label: 'Kraft/Last 2–10 kg', src: btn10_rula, category: 'Kategorie 3' },
 ];
 
 export function get_label_images_cat1_rula(): ReadonlyArray<LabelImage> {
