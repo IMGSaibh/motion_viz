@@ -12,7 +12,7 @@ import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_moti
 import {
   use_set_range_slider_value_cxt,
   use_set_slider_frame_cxt,
-  use_slider_frame_cxt,
+  // use_slider_frame_cxt,
 } from '@/context/context_slider_label_list';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
@@ -48,9 +48,8 @@ export function ContainerTopbar() {
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  const std_slider_value = use_slider_frame_cxt();
+  // const std_slider_value = use_slider_frame_cxt();
   const set_std_slider_value = use_set_slider_frame_cxt();
-
   const clear_slider_label_list = use_clear_label_list_ctx();
 
   // ======================= Handler =======================

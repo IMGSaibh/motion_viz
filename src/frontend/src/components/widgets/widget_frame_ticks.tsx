@@ -10,7 +10,9 @@ function computeTickInterval(frameCount: number): number {
   if (frameCount <= 400) return 50;
   if (frameCount <= 1000) return 100;
   if (frameCount <= 3000) return 200;
-  return 300;
+  if (frameCount <= 5000) return 500;
+  if (frameCount <= 10000) return 800;
+  return 2000;
 }
 
 export function WidgetFrameTicks(props: Props) {
