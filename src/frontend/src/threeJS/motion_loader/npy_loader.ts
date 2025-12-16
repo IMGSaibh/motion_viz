@@ -75,7 +75,6 @@ export class NPY_loader {
   async create_skeleton(skeletonPath: string, renderer = null) {
     const response = await fetch(skeletonPath);
     const skeleton_json = await response.json();
-    console.log('Loaded skeleton JSON:', skeleton_json);
     this._create_joints();
     this._create_bones(skeleton_json);
   }
