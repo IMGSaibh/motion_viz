@@ -508,21 +508,21 @@ export function use_update_label_meta_cxt() {
 
 export function use_owas_selected_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_owas_selected_cxt must be used within <Provider>');
+    if (!v) throw new Error('use_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
     return v.owas_selected;
   });
 }
 
 export function use_set_owas_selected_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_owas_selected_cxt must be used within <Provider>');
+    if (!v) throw new Error('use_set_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
     return v.set_owas_selected;
   });
 }
 
 export function use_clear_owas_selected_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <Provider>');
+    if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
     return v.clear_owas_selected;
   });
 }

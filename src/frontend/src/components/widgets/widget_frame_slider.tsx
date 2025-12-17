@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, ButtonBase, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
 import { PAUSE_BUTTON_IMAGE } from '@/Assets/label_images';
 import { use_current_label_range_geometry_cxt } from '@/context/context_slider_label_list';
@@ -63,18 +63,30 @@ export function WidgetFrameSlider(props: Props) {
       })}
     >
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Box
+        <ButtonBase
           onClick={on_click_play_toggle}
-          sx={(theme) => ({
-            width: 40,
-            height: 40,
-            cursor: 'pointer',
-            backgroundImage: `url(${is_playing ? PAUSE_BUTTON_IMAGE.src : PLAY_BUTTON_IMAGE.src})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-          })}
-        />
+          sx={{
+            width: '100%',
+            height: '100%',
+            minHeight: 40, // gleiche Höhe wie Slider
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={(theme) => ({
+              pointerEvents: 'none',
+              width: 40,
+              height: 40,
+              cursor: 'pointer',
+              backgroundImage: `url(${is_playing ? PAUSE_BUTTON_IMAGE.src : PLAY_BUTTON_IMAGE.src})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+            })}
+          ></Box>
+        </ButtonBase>
       </Grid>
 
       {/* Slider-Track */}
