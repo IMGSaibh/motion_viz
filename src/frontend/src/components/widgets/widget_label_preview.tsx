@@ -9,8 +9,8 @@ export function WidgetLabelPreview(props: Props) {
   return (
     <Box
       sx={{
-        width: 64,
-        height: 64,
+        width: 32,
+        height: 32,
         borderRadius: 1,
         bgcolor: 'background.paper',
         overflow: 'hidden',

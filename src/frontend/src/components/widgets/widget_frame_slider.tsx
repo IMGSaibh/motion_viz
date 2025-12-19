@@ -21,24 +21,13 @@ type Props = {
 };
 
 export function WidgetFrameSlider(props: Props) {
-  const {
-    slider_frame: slider_frame,
-    frame_count,
-    hover_frame,
-    slider_track_ref: track_ref,
-    on_mouse_down_slider_track: on_mouse_down,
-    on_mouse_move_slider_track: on_mouse_move,
-    on_mouse_up_slider_track: on_mouse_up,
-    on_mouse_leave_slider_track: on_mouse_leave,
-    is_playing,
-    on_click_play_toggle,
-  } = props;
-  const hasFrames = frame_count > 0;
-  const clamped_frame = hasFrames ? Math.min(Math.max(slider_frame, 0), frame_count - 1) : 0;
+  const hasFrames = props.frame_count > 0;
+  const clamped_frame = hasFrames ? Math.min(Math.max(props.slider_frame, 0), props.frame_count - 1) : 0;
 
-  const markerPct = hasFrames ? ((clamped_frame + 0.5) / frame_count) * 100 : 0;
-  const hoverPct = hasFrames && hover_frame !== null ? ((hover_frame + 0.5) / frame_count) * 100 : null;
-  const currentLabelGeom = use_current_label_range_geometry_cxt(frame_count);
+  const markerPct = hasFrames ? ((clamped_frame + 0.5) / props.frame_count) * 100 : 0;
+  const hoverPct =
+    hasFrames && props.hover_frame !== null ? ((props.hover_frame + 0.5) / props.frame_count) * 100 : null;
+  const currentLabelGeom = use_current_label_range_geometry_cxt(props.frame_count);
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
   const canSaveOwas = can_save_label('OWAS');
@@ -48,9 +37,9 @@ export function WidgetFrameSlider(props: Props) {
 
   // TODO: remove useEffect
   React.useEffect(() => {
-    if (!track_ref) return;
-    track_ref.current = innerTrackRef.current;
-  }, [track_ref]);
+    if (!props.slider_track_ref) return;
+    props.slider_track_ref.current = innerTrackRef.current;
+  }, [props.slider_track_ref]);
 
   return (
     <Grid
@@ -64,11 +53,11 @@ export function WidgetFrameSlider(props: Props) {
     >
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <ButtonBase
-          onClick={on_click_play_toggle}
+          onClick={props.on_click_play_toggle}
           sx={{
             width: '100%',
             height: '100%',
-            minHeight: 40, // gleiche Höhe wie Slider
+            minHeight: 40, // same hight as slider
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -80,7 +69,7 @@ export function WidgetFrameSlider(props: Props) {
               width: 40,
               height: 40,
               cursor: 'pointer',
-              backgroundImage: `url(${is_playing ? PAUSE_BUTTON_IMAGE.src : PLAY_BUTTON_IMAGE.src})`,
+              backgroundImage: `url(${props.is_playing ? PAUSE_BUTTON_IMAGE.src : PLAY_BUTTON_IMAGE.src})`,
               backgroundRepeat: 'no-repeat',
               backgroundSize: 'contain',
               backgroundPosition: 'center',
@@ -112,10 +101,10 @@ export function WidgetFrameSlider(props: Props) {
         {/* Track with stripe per frame */}
         <Box
           ref={innerTrackRef}
-          onMouseDown={on_mouse_down}
-          onMouseMove={on_mouse_move}
-          onMouseUp={on_mouse_up}
-          onMouseLeave={on_mouse_leave}
+          onMouseDown={props.on_mouse_down_slider_track}
+          onMouseMove={props.on_mouse_move_slider_track}
+          onMouseUp={props.on_mouse_up_slider_track}
+          onMouseLeave={props.on_mouse_leave_slider_track}
           sx={(theme) => ({
             width: '100%',
             height: 40,
@@ -126,8 +115,8 @@ export function WidgetFrameSlider(props: Props) {
               background: `
                 repeating-linear-gradient(
                   90deg,
-                  ${theme.palette.wip_color_theme[300]} 0 calc(100% / ${frame_count}),
-                  ${theme.palette.wip_color_theme[400]} calc(100% / ${frame_count}) calc(200% / ${frame_count})
+                  ${theme.palette.wip_color_theme[300]} 0 calc(100% / ${props.frame_count}),
+                  ${theme.palette.wip_color_theme[400]} calc(100% / ${props.frame_count}) calc(200% / ${props.frame_count})
                 )
               `,
             }),
@@ -188,7 +177,7 @@ export function WidgetFrameSlider(props: Props) {
       {/* Info right */}
       <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="body2" noWrap>
-          Frame: {clamped_frame} [0 – {frame_count}]
+          Frame: {clamped_frame} [0 – {props.frame_count}]
         </Typography>
       </Grid>
     </Grid>

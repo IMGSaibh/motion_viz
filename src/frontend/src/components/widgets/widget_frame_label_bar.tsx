@@ -14,13 +14,9 @@ type Props = {
 export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
-
   const isRtl = theme.direction === 'rtl';
-
-  // ✅ ersetzt: clamp/thumb_idx/from/to/leftPct/scaleX-Berechnung
   const currentGeom = use_current_label_range_geometry_cxt(props.frame_count);
 
-  // clamp nur noch für saved labels / overlap nötig
   const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
 

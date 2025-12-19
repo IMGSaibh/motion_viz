@@ -81,7 +81,9 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     threejs_mngr_ref.current?.play_pause?.();
     sync_is_playing();
   }, [sync_is_playing]);
+
   const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
+
   const stop = useCallback(() => {
     threejs_mngr_ref.current?.pause?.();
     threejs_mngr_ref.current?.go_to_frame?.(0);

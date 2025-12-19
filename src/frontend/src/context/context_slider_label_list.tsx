@@ -2,14 +2,26 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 
 export type Range = [number, number];
-export type Label_ctx = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
+export type Label = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
+export type RectangleLabelBar = {
+  from: number;
+  to: number;
+  leftPct: number;
+  scaleX: number;
+};
+
+type MarkerAction =
+  | { type: 'add'; label: Label }
+  | { type: 'remove'; id: string }
+  | { type: 'clear' }
+  | { type: 'update'; id: string; from: number; to: number; label?: string; category?: string; color?: string };
 
 type FrameSliderLabellistContext = {
   range: Range;
   set_slider_label_range: (r: Range) => void;
 
-  label_CTX: Label_ctx[];
-  add_slider_label: (m: Label_ctx) => void;
+  label: Label[];
+  add_slider_label: (m: Label) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -29,31 +41,25 @@ type FrameSliderLabellistContext = {
   set_owas_selected: (next: Record<string, string | null>) => void;
   clear_owas_selected: () => void;
 
-  update_label_meta: (id: string, patch: Partial<Pick<Label_ctx, 'label' | 'category' | 'color'>>) => void;
+  update_label_meta: (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
-type MarkerAction =
-  | { type: 'add'; range_bar: Label_ctx }
-  | { type: 'remove'; id: string }
-  | { type: 'clear' }
-  | { type: 'update'; id: string; from: number; to: number; label?: string; category?: string; color?: string };
-
-function normalize(range_bar: Label_ctx): Label_ctx {
-  if (Number.isNaN(range_bar.from) || Number.isNaN(range_bar.to)) return range_bar;
-  const from = Math.min(range_bar.from, range_bar.to);
-  const to = Math.max(range_bar.from, range_bar.to);
-  return { ...range_bar, from, to };
+function normalize(label: Label): Label {
+  if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
+  const from = Math.min(label.from, label.to);
+  const to = Math.max(label.from, label.to);
+  return { ...label, from, to };
 }
 
-function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
+function markerReducer(state: Label[], action: MarkerAction): Label[] {
   switch (action.type) {
     case 'add': {
-      const range_bar_normalized = normalize(action.range_bar);
-      if (!range_bar_normalized.id) return state;
-      if (state.some((x) => x.id === range_bar_normalized.id)) return state;
-      return [...state, range_bar_normalized];
+      const label_bar_normalized = normalize(action.label);
+      if (!label_bar_normalized.id) return state;
+      if (state.some((x) => x.id === label_bar_normalized.id)) return state;
+      return [...state, label_bar_normalized];
     }
     case 'remove': {
       const next = state.filter((x) => x.id !== action.id);
@@ -70,7 +76,7 @@ function markerReducer(state: Label_ctx[], action: MarkerAction): Label_ctx[] {
       const next = state.map((x) => {
         if (x.id !== action.id) return x;
 
-        const patch: Partial<Label_ctx> = {};
+        const patch: Partial<Label> = {};
         if (x.from !== from || x.to !== to) {
           patch.from = from;
           patch.to = to;
@@ -108,7 +114,7 @@ function normalizeCategory(c?: string) {
 }
 
 function canSaveForRange(args: {
-  label_ctx: Label_ctx[];
+  labels: Label[];
   category?: string;
   from: number;
   to: number;
@@ -118,7 +124,7 @@ function canSaveForRange(args: {
   const toN = Math.max(args.from, args.to);
   const targetCategory = normalizeCategory(args.category);
 
-  const hasOverlapSameCategory = args.label_ctx.some((m) => {
+  const hasOverlapSameCategory = args.labels.some((m) => {
     if (args.ignoreId && m.id === args.ignoreId) return false;
     const mCat = normalizeCategory(m.category);
     if (mCat !== targetCategory) return false;
@@ -130,14 +136,7 @@ function canSaveForRange(args: {
   return !hasOverlapSameCategory;
 }
 
-export type RangeGeometry = {
-  from: number;
-  to: number;
-  leftPct: number;
-  scaleX: number;
-};
-
-export function use_current_label_range_geometry_cxt(frame_count: number): RangeGeometry {
+export function use_current_label_range_geometry_cxt(frame_count: number): RectangleLabelBar {
   const range = use_range_slider_value_cxt();
 
   return useMemo(() => {
@@ -163,7 +162,7 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Range
 
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
-  const [label_ctx, dispatch] = useReducer(markerReducer, [] as Label_ctx[]);
+  const [labels_marker_reducer, dispatch] = useReducer(markerReducer, [] as Label[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
 
   const [slider_frame, set_slider_frame] = useState(0);
@@ -181,23 +180,19 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     CAT4: null,
   });
 
-  const clear_owas_selected = useCallback(() => {
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
-  }, []);
-
   const add_label_rect = useCallback(
-    (m: Label_ctx) => {
+    (label: Label) => {
       const ok = canSaveForRange({
-        label_ctx,
-        category: m.category,
-        from: m.from,
-        to: m.to,
+        labels: labels_marker_reducer,
+        category: label.category,
+        from: label.from,
+        to: label.to,
         ignoreId: null,
       });
       if (!ok) return; // ❗ blockiert Speichern im Context
-      dispatch({ type: 'add', range_bar: m });
+      dispatch({ type: 'add', label: label });
     },
-    [label_ctx],
+    [labels_marker_reducer],
   );
 
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
@@ -205,7 +200,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const start_editing_label = useCallback(
     (id: string) => {
-      const m = label_ctx.find((x) => x.id === id);
+      const m = labels_marker_reducer.find((x) => x.id === id);
       if (!m) return;
 
       set_range([m.from, m.to]);
@@ -236,15 +231,15 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
     },
-    [label_ctx],
+    [labels_marker_reducer],
   );
 
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
 
-    const editingMarker = label_ctx.find((m) => m.id === editing_id);
+    const editingMarker = labels_marker_reducer.find((m) => m.id === editing_id);
     const ok = canSaveForRange({
-      label_ctx,
+      labels: labels_marker_reducer,
       category: editingMarker?.category,
       from: range[0],
       to: range[1],
@@ -270,7 +265,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     // ✅ optional aber sinnvoll: nach Edit-Ende RULA-Auswahl leeren
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
-  }, [editing_id, range, label_ctx, rula_selected]);
+  }, [editing_id, range, labels_marker_reducer, rula_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
@@ -281,11 +276,15 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const clear_rula_selected = useCallback(() => {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    // set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+  }, []);
+
+  const clear_owas_selected = useCallback(() => {
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, []);
 
   const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<Label_ctx, 'label' | 'category' | 'color'>>) => {
+    (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color'>>) => {
       dispatch({
         type: 'update',
         id,
@@ -303,7 +302,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     () => ({
       range,
       set_slider_label_range: set_range,
-      label_CTX: label_ctx,
+      label: labels_marker_reducer,
       add_slider_label: add_label_rect,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
@@ -325,7 +324,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     }),
     [
       range,
-      label_ctx,
+      labels_marker_reducer,
       add_label_rect,
       remove_label_rect,
       clear_label_rects,
@@ -377,7 +376,7 @@ export function use_set_range_slider_value_cxt() {
 export function use_range_marker_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_label_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.label_CTX;
+    return v.label;
   });
 }
 
@@ -439,11 +438,11 @@ export function use_can_save_label_cxt() {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
     return (category?: string) => {
-      const editingMarker = v.editing_id ? v.label_CTX.find((m) => m.id === v.editing_id) : null;
+      const editingMarker = v.editing_id ? v.label.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.category;
 
       return canSaveForRange({
-        label_ctx: v.label_CTX,
+        labels: v.label,
         category: targetCategory,
         from: v.range[0],
         to: v.range[1],
