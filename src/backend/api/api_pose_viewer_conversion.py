@@ -36,8 +36,8 @@ async def convert_pv_style():
         # (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
         #   "xsens_mvnx"),                                                                                 # mmhd
 
-        (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
-          "bvh_pos_1000"),                                                                          # carda notworking up-dir fehlt??
+        # (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
+        #   "bvh_pos_1000"),                                                                          # carda notworking up-dir fehlt??
 
         # (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
         #                "xsens_mvnx"),                                                                   # andy

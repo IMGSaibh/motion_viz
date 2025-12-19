@@ -27,10 +27,10 @@ import btn12_owas from '@/Assets/owas_images/Label_12.png';
 import btn13_owas from '@/Assets/owas_images/Label_13.png';
 import btn14_owas from '@/Assets/owas_images/Label_14.png';
 
-// llm images
-import btn1_llm from '@/Assets/llm_images/Label_1.png';
-import btn2_llm from '@/Assets/llm_images/Label_2.png';
-import btn3_llm from '@/Assets/llm_images/Label_3.png';
+// lmm images
+import btn1_lmm from '@/Assets/lmm_images/Label_1.png';
+import btn2_lmm from '@/Assets/lmm_images/Label_2.png';
+import btn3_lmm from '@/Assets/lmm_images/Label_3.png';
 
 // play / pause button images
 // TODO: load vite plugin for svg as react component
@@ -159,11 +159,11 @@ export function get_label_all_label_images_owas(): ReadonlyMap<string, LabelImag
   return map;
 }
 
-// LLM IMAGES
+// LMM IMAGES
 const LABEL_IMAGES_CAT1_LLM: ReadonlyArray<LabelImage> = [
-  { label: 'Button_1', src: btn1_llm, category: 'Kategorie 1' },
-  { label: 'Button_2', src: btn2_llm, category: 'Kategorie 1' },
-  { label: 'Button_3', src: btn3_llm, category: 'Kategorie 1' },
+  { label: 'Button_1', src: btn1_lmm, category: 'Kategorie 1' },
+  { label: 'Button_2', src: btn2_lmm, category: 'Kategorie 1' },
+  { label: 'Button_3', src: btn3_lmm, category: 'Kategorie 1' },
 ];
 
 export function get_label_images_cat1_llm(): ReadonlyArray<LabelImage> {
