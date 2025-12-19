@@ -104,7 +104,7 @@ export function ContainerLabelsList() {
     <>
       <PresenterLabelList
         lables_list={label_list}
-        slider_list_on_click={label_list_on_click}
+        label_list_on_click={label_list_on_click}
         slider_list_clear_on_click={clear_label_list_on_click}
         save_labels_on_click={on_save_click}
         label_image={current_label_image}
