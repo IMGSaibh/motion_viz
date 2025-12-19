@@ -58,8 +58,8 @@ export function PresenterLabelButtons({ onClick }: Props) {
               })}
             />
             <Tab
-              value="LLM"
-              label="LLM"
+              value="LMM"
+              label="LMM"
               sx={(theme) => ({
                 borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
                 borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
