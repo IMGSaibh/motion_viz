@@ -3,6 +3,7 @@ import {
   get_label_images_cat1_rula,
   get_label_images_cat2_rula,
   get_label_images_cat3_rula,
+  LabelImage,
 } from '@/Assets/label_images';
 import { useMemo } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
@@ -17,22 +18,21 @@ import {
 } from '@/context/context_slider_label_list';
 
 type Props = {
-  onClick?: (label: string, category: string) => void;
+  onClick?: (label: string, category: string, label_image?: LabelImage) => void;
+  on_click_add_label?: (label: string, category: string, label_image?: LabelImage) => void;
 };
-
-type Item = { src: string; label: string; category: string };
 
 function CategoryGrid({
   title,
-  items,
+  label_images,
   selectedLabel,
   onSelect,
   isLast,
 }: {
   title: string;
-  items: readonly Item[];
+  label_images: readonly LabelImage[];
   selectedLabel: string | null;
-  onSelect: (item: Item) => void;
+  onSelect: (item: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -56,7 +56,7 @@ function CategoryGrid({
           alignContent: 'start',
         }}
       >
-        {items.map((item, i) => {
+        {label_images.map((item, i) => {
           const isSelected = selectedLabel === item.label;
           const isDimmed = selectedLabel !== null && !isSelected;
           return (
@@ -119,14 +119,14 @@ export function WidgetRulaButtons(props: Props) {
   const add_slider_label = use_add_slider_label_ctx();
   const range = use_range_slider_value_cxt();
 
-  const cat1 = useMemo(() => get_label_images_cat1_rula(), []);
-  const cat2 = useMemo(() => get_label_images_cat2_rula(), []);
-  const cat3 = useMemo(() => get_label_images_cat3_rula(), []);
+  const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
+  const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
+  const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
 
   // category keys aus Items (stabil)
-  const cat1Key = cat1[0]?.category ?? 'CAT1';
-  const cat2Key = cat2[0]?.category ?? 'CAT2';
-  const cat3Key = cat3[0]?.category ?? 'CAT3';
+  const cat1Key = label_images_cat1[0]?.category ?? 'CAT1';
+  const cat2Key = label_images_cat2[0]?.category ?? 'CAT2';
+  const cat3Key = label_images_cat3[0]?.category ?? 'CAT3';
 
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
@@ -142,24 +142,25 @@ export function WidgetRulaButtons(props: Props) {
     if (cat === cat2Key) return 'CAT2' as const;
     return 'CAT3' as const;
   };
-  const handleSelect = (item: Item) => {
+  const handleSelect = (item: LabelImage) => {
     const slot = slotForCategory(item.category);
     set_rula_selected({ ...rula_selected, [slot]: item.label });
   };
 
-  const handleSave = () => {
+  const on_handle_save = () => {
     if (!allSelected) return;
     if (!canSaveRula) return;
 
-    add_slider_label({
-      id: uid(),
-      from: Math.min(range[0], range[1]),
-      to: Math.max(range[0], range[1]),
-      label: `${rula_selected.CAT1} | ${rula_selected.CAT2} | ${rula_selected.CAT3}`,
-      category: 'RULA',
-    });
+    // add_slider_label({
+    //   id: uid(),
+    //   from: Math.min(range[0], range[1]),
+    //   to: Math.max(range[0], range[1]),
+    //   label: `${rula_selected.CAT1} | ${rula_selected.CAT2} | ${rula_selected.CAT3}`,
+    //   category: 'RULA',
+    // });
 
-    // ✅ danach wieder von vorne beginnen
+    props.onClick?.(`${rula_selected.CAT1} | ${rula_selected.CAT2} | ${rula_selected.CAT3}`, 'RULA');
+
     clear_rula_selected();
   };
 
@@ -174,7 +175,7 @@ export function WidgetRulaButtons(props: Props) {
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Gruppe: Arm | Hand"
-            items={cat1}
+            label_images={label_images_cat1}
             selectedLabel={rula_selected.CAT1}
             onSelect={handleSelect}
           />
@@ -183,7 +184,7 @@ export function WidgetRulaButtons(props: Props) {
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Gruppe: Nacken | Rumpf | Beine"
-            items={cat2}
+            label_images={label_images_cat2}
             selectedLabel={rula_selected.CAT2}
             onSelect={handleSelect}
           />
@@ -192,19 +193,19 @@ export function WidgetRulaButtons(props: Props) {
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             title="Gruppe: Muskelarbeit | Kraft"
-            items={cat3}
+            label_images={label_images_cat3}
             selectedLabel={rula_selected.CAT3}
             onSelect={handleSelect}
           />
         </Grid>
 
-        {/* Actions */}
+        {/* Save Buttons */}
         <Grid size={{ md: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <IconButton
               size="small"
               aria-label="Save label"
-              onClick={handleSave}
+              onClick={on_handle_save}
               disabled={!allSelected || !canSaveRula}
               sx={{ border: 1, borderRadius: 0 }}
             >

@@ -1,8 +1,18 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
+import { LabelImage } from '@/Assets/label_images';
 
 export type Range = [number, number];
-export type Label = { id: string; from: number; to: number; color?: string; label?: string; category?: string };
+export type Label = {
+  id: string;
+  from: number;
+  to: number;
+  color?: string;
+  label?: string;
+  category?: string;
+  label_image?: LabelImage | null;
+  framecount?: number;
+};
 export type RectangleLabelBar = {
   from: number;
   to: number;
@@ -14,7 +24,17 @@ type MarkerAction =
   | { type: 'add'; label: Label }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
-  | { type: 'update'; id: string; from: number; to: number; label?: string; category?: string; color?: string };
+  | {
+      type: 'update';
+      id: string;
+      from: number;
+      to: number;
+      label?: string;
+      category?: string;
+      color?: string;
+      label_image?: LabelImage | null;
+      framecount?: number;
+    };
 
 type FrameSliderLabellistContext = {
   range: Range;
@@ -41,7 +61,10 @@ type FrameSliderLabellistContext = {
   set_owas_selected: (next: Record<string, string | null>) => void;
   clear_owas_selected: () => void;
 
-  update_label_meta: (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color'>>) => void;
+  update_label_meta: (
+    id: string,
+    patch: Partial<Pick<Label, 'label' | 'category' | 'color' | 'label_image' | 'framecount'>>,
+  ) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
@@ -92,6 +115,14 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
         }
         if (action.color !== undefined && x.color !== action.color) {
           patch.color = action.color;
+          changed = true;
+        }
+        if (action.label_image !== undefined && x.label_image !== action.label_image) {
+          patch.label_image = action.label_image;
+          changed = true;
+        }
+        if (action.framecount !== undefined && x.framecount !== action.framecount) {
+          patch.framecount = action.framecount;
           changed = true;
         }
 
@@ -189,7 +220,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         to: label.to,
         ignoreId: null,
       });
-      if (!ok) return; // ❗ blockiert Speichern im Context
+      if (!ok) return; // blockiert Speichern im Context
       dispatch({ type: 'add', label: label });
     },
     [labels_marker_reducer],
@@ -208,7 +239,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       // ✅ RULA-Label beim Edit korrekt in die Buttons laden
       if (normalizeCategory(m.category) === 'RULA' && typeof m.label === 'string') {
-        const parts = m.label.split('|').map((s: string) => s.trim()); // ✅ s typisiert
+        const parts = m.label.split('|').map((s: string) => s.trim());
 
         set_rula_selected({
           CAT1: parts[0] ?? null,
@@ -276,7 +307,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const clear_rula_selected = useCallback(() => {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
-    // set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, []);
 
   const clear_owas_selected = useCallback(() => {
@@ -284,18 +314,23 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   }, []);
 
   const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color'>>) => {
+    (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color' | 'label_image' | 'framecount'>>) => {
+      const current = labels_marker_reducer.find((m) => m.id === id);
+      if (!current) return;
+
       dispatch({
         type: 'update',
         id,
-        from: range[0],
-        to: range[1],
+        from: current.from,
+        to: current.to,
         label: patch.label,
         category: patch.category,
         color: patch.color,
+        label_image: patch.label_image,
+        framecount: patch.framecount,
       });
     },
-    [range],
+    [labels_marker_reducer],
   );
 
   const frame_slider_label_list_ctx_memo_ctx = useMemo<FrameSliderLabellistContext>(

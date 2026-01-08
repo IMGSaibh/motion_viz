@@ -3,12 +3,14 @@ import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
+import { LabelImage } from '@/Assets/label_images';
 
 type Props = {
   onClick?: (label: string, category: string) => void;
+  on_click_add_label?: (label: string, category: string, label_image?: LabelImage) => void;
 };
 
-export function PresenterLabelButtons({ onClick }: Props) {
+export function PresenterLabelButtons(props: Props) {
   const [method, setMethod] = useState<string>('RULA');
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -72,9 +74,9 @@ export function PresenterLabelButtons({ onClick }: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <WidgetRulaButtons onClick={onClick} />}
-      {method === 'OWAS' && <WidgetOwasButtons onClick={onClick} />}
-      {method === 'LLM' && <WidgetLmmButtons onClick={onClick} />}
+      {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} on_click_add_label={props.on_click_add_label} />}
+      {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />}
+      {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />}
     </Box>
   );
 }

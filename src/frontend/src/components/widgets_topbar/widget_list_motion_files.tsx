@@ -14,7 +14,7 @@ type Props = {
 export function WidgetListFiles(props: Props) {
   const labelText = props.motion_file_selected || 'Select file';
   const labelId = 'motion-file-select-label';
-  const selectId = 'motion-file-select';
+  // const selectId = 'motion-file-select';
   return (
     <FormControl fullWidth size="small">
       <InputLabel id={labelId} shrink>

@@ -3,23 +3,15 @@ import { Box, Grid } from '@mui/material';
 import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { LabelImage } from '@/Assets/label_images';
+
 import {
   use_add_slider_label_ctx,
   use_range_slider_value_cxt,
   use_set_range_slider_value_cxt,
   use_slider_frame_cxt,
+  use_range_marker_cxt,
 } from '@/context/context_slider_label_list';
-
-export type Label = {
-  id: string;
-  label: string;
-  label_image: LabelImage | null;
-  range: [number, number];
-  framecount: number;
-  category: string;
-};
-export const lable_list: Label[] = [];
+import { LabelImage } from '@/Assets/label_images';
 
 export function ContainerLabels() {
   const { frame_count, current_frame: three_js_current_frame } = useThreeJSEngine();
@@ -27,6 +19,7 @@ export function ContainerLabels() {
   const frame_slider_range = use_range_slider_value_cxt();
   const set_range = use_set_range_slider_value_cxt();
   const add_label = use_add_slider_label_ctx();
+  const lable_list = use_range_marker_cxt();
 
   const label_id = useRef<number>(lable_list.length + 1);
   useEffect(() => {
@@ -57,7 +50,7 @@ export function ContainerLabels() {
   }, [frame_count, frame_slider_range, set_range, slider_frame]);
 
   const on_click_add_label = useCallback(
-    (label_button?: string, category?: string) => {
+    (label_button?: string, category?: string, label_image?: LabelImage) => {
       const id = String(label_id.current++);
       const label = label_button ?? `Label_${id}`;
 
@@ -74,7 +67,8 @@ export function ContainerLabels() {
           ? [clamp(three_js_current_frame!), clamp(three_js_current_frame!)]
           : [a, b];
 
-      add_label({ id, from: value[0], to: value[1], label, category });
+      add_label({ id, from: value[0], to: value[1], label, category, label_image });
+      console.log('add label', { id, from: value[0], to: value[1], label, category, label_image });
     },
     [frame_slider_range, frame_count, three_js_current_frame, add_label],
   );

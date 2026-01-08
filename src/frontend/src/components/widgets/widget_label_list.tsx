@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Label } from '@/container/container_labels_list';
+import { Label } from '@/context/context_slider_label_list';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -101,15 +101,14 @@ export function WidgetLabelList(props: Props) {
                       borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                     })}
                   >
-                    <WidgetLabelPreview label_image={slider_label.label_image} />
+                    <WidgetLabelPreview label_image={slider_label.label_image ?? null} />
                   </Grid>
-
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
                       disabled={true}
-                      value={slider_label.range}
+                      value={[slider_label.from, slider_label.to]}
                       min={0}
-                      max={slider_label.framecount}
+                      max={slider_label.framecount ?? 0}
                     />
                   </Grid>
                   <Grid size={{ md: 1 }}>
@@ -130,7 +129,7 @@ export function WidgetLabelList(props: Props) {
                         {`Kategorie ${slider_label.category}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
+                        {`Frame: ${slider_label.from} – ${slider_label.to}`}
                       </Typography>
                       {/* Buttons underneath text */}
                       <Box

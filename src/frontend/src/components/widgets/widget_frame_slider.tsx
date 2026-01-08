@@ -175,9 +175,12 @@ export function WidgetFrameSlider(props: Props) {
       </Grid>
 
       {/* Info right */}
-      <Grid size={{ md: 1 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Typography variant="body2" noWrap>
-          Frame: {clamped_frame} [0 – {props.frame_count}]
+      <Grid
+        size={{ md: 1 }}
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'left' }}
+      >
+        <Typography variant="body2">
+          Frame: {clamped_frame} <br /> Total: [0 – {props.frame_count}]
         </Typography>
       </Grid>
     </Grid>

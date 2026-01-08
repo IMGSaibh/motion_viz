@@ -1,5 +1,5 @@
 import { WidgetLabelList } from '@/components/widgets/widget_label_list';
-import { Label } from '@/container/container_labels_list';
+import { Label } from '@/context/context_slider_label_list';
 import { Box, Button, Grid } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
