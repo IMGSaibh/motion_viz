@@ -60,7 +60,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 
 type Props = {
   labels: Label[];
-  label_list_on_click?: (id: string) => void;
+  delete_label_from_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
   toggle_list: boolean;
@@ -163,7 +163,7 @@ export function WidgetLabelList(props: Props) {
                             </IconButton>
                             <IconButton
                               size="small"
-                              onClick={() => props.label_list_on_click?.(slider_label.id)}
+                              onClick={() => props.delete_label_from_list_on_click?.(slider_label.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
@@ -183,7 +183,7 @@ export function WidgetLabelList(props: Props) {
 
                             <IconButton
                               size="small"
-                              onClick={() => props.label_list_on_click?.(slider_label.id)}
+                              onClick={() => props.delete_label_from_list_on_click?.(slider_label.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >

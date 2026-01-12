@@ -15,7 +15,7 @@ import { get_label_all_label_images_rula } from '@/Assets/label_images';
 export function ContainerLabelsList() {
   const { frame_count, selected_motion } = useThreeJSEngine();
 
-  const labels = use_range_marker_cxt(); // ✅ kommt direkt aus Context
+  const labels = use_range_marker_cxt();
   const update_label_meta = use_update_label_meta_cxt();
 
   const hook_save_labels = hook_save_labels_to_json();
@@ -42,7 +42,7 @@ export function ContainerLabelsList() {
     });
   }, [labels, frame_count, label_image_map, update_label_meta]);
 
-  const label_list_on_click = useCallback(
+  const delete_label_from_list_on_click = useCallback(
     (id: string) => {
       remove_label(id);
     },
@@ -88,7 +88,7 @@ export function ContainerLabelsList() {
   return (
     <PresenterLabelList
       lables_list={labels}
-      label_list_on_click={label_list_on_click}
+      delete_label_from_list_on_click={delete_label_from_list_on_click}
       slider_list_clear_on_click={clear_label_list_on_click}
       save_labels_on_click={on_save_click}
       label_image={current_label_image}

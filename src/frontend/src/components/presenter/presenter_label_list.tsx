@@ -9,7 +9,7 @@ import { LabelImage } from '@/Assets/label_images';
 
 type Props = {
   lables_list: Label[];
-  label_list_on_click?: (id: string) => void;
+  delete_label_from_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
   label_image: LabelImage | null;
@@ -53,7 +53,7 @@ export function PresenterLabelList(props: Props) {
       </Grid>
       <WidgetLabelList
         labels={props.lables_list}
-        label_list_on_click={props.label_list_on_click}
+        delete_label_from_list_on_click={props.delete_label_from_list_on_click}
         slider_list_clear_on_click={props.slider_list_clear_on_click}
         save_labels_on_click={props.save_labels_on_click}
         toggle_list={open}

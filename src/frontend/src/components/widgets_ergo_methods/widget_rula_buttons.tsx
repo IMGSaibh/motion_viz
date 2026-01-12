@@ -10,7 +10,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import {
   use_can_save_label_cxt,
-  use_clear_rula_selected_cxt,
+  use_unselected_rula_cxt,
   LabelCategory,
   use_set_rula_selected_cxt,
   use_rula_selected_cxt,
@@ -113,7 +113,7 @@ export function WidgetRulaButtons(props: Props) {
 
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
-  const clear_rula_selected = use_clear_rula_selected_cxt();
+  const unselected_rula = use_unselected_rula_cxt();
 
   const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
@@ -133,7 +133,7 @@ export function WidgetRulaButtons(props: Props) {
       { name: 'CAT2', image: rula_selected.CAT2! },
       { name: 'CAT3', image: rula_selected.CAT3! },
     ]);
-    clear_rula_selected();
+    unselected_rula();
   };
 
   return (
