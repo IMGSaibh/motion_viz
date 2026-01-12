@@ -4,10 +4,10 @@ import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
 import { LabelImage } from '@/Assets/label_images';
+import { LabelCategory } from '@/context/context_slider_label_list';
 
 type Props = {
-  onClick?: (label: string, category: string) => void;
-  on_click_add_label?: (label: string, category: string, label_image?: LabelImage) => void;
+  onClick?: (label_categorie: LabelCategory[]) => void;
 };
 
 export function PresenterLabelButtons(props: Props) {
@@ -74,7 +74,7 @@ export function PresenterLabelButtons(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} on_click_add_label={props.on_click_add_label} />}
+      {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} />}
       {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />}
       {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />}
     </Box>

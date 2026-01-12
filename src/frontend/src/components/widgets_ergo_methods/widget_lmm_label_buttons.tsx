@@ -1,5 +1,5 @@
 import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, Select, MenuItem, InputLabel } from '@mui/material';
-import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
+import { LabelCategory, use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { get_label_images_cat1_llm } from '@/Assets/label_images';
 
 const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
@@ -22,7 +22,7 @@ const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
 }));
 
 type Props = {
-  onClick?: (label: string, category: string) => void;
+  onClick?: (label_categorie: LabelCategory[]) => void;
 };
 
 export function WidgetLmmButtons({ onClick }: Props) {
@@ -46,7 +46,7 @@ export function WidgetLmmButtons({ onClick }: Props) {
       {items.map((imgButton, i) => (
         <LabelButtonLMM
           key={i}
-          onClick={() => onClick?.(imgButton.label, imgButton.category)}
+          // onClick={() => onClick?.(imgButton.label, imgButton.category)}
           disabled={!can_save_label(imgButton.category)}
         >
           <Box

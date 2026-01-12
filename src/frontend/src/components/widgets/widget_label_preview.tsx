@@ -23,7 +23,7 @@ export function WidgetLabelPreview(props: Props) {
         <Box
           component="img"
           src={props.label_image.src}
-          alt={props.label_image.label}
+          alt={props.label_image.name}
           sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', backgroundColor: 'white' }}
         />
       ) : (

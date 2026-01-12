@@ -38,47 +38,47 @@ import play_button from '@/Assets/play-button.svg';
 import pause_button from '@/Assets/pause-button.svg';
 
 export type LabelImage = {
-  label: string;
+  name: string;
   src: string;
   category: string;
 };
 
 // RULA IMAGES
 const LABEL_IMAGES_CAT1_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Oberarm 20\u00B0 - 20\u00B0 ', src: btn1_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm > 20\u00B0 - 45\u00B0 ', src: btn2_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm > 45\u00B0 -90\u00B0 ', src: btn3_rula, category: 'Kategorie 1' },
-  { label: 'Oberarm > 90\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Oberarm 20\u00B0 - 20\u00B0 ', src: btn1_rula, category: 'Kategorie 1' },
+  { name: 'Oberarm > 20\u00B0 - 45\u00B0 ', src: btn2_rula, category: 'Kategorie 1' },
+  { name: 'Oberarm > 45\u00B0 -90\u00B0 ', src: btn3_rula, category: 'Kategorie 1' },
+  { name: 'Oberarm > 90\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
 
-  { label: 'Unterarm 60\u00B0 - 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
-  { label: 'Unterarm < 60\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
-  { label: 'Unterarm > 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Unterarm 60\u00B0 - 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Unterarm < 60\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Unterarm > 100\u00B0 ', src: btn4_rula, category: 'Kategorie 1' },
 
-  { label: 'Handgelenk 0\u00B0', src: btn4_rula, category: 'Kategorie 1' },
-  { label: 'Handgelenk 15\u00B0 - 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
-  { label: 'Handgelenk > 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
-  { label: 'Handgelenk < 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Handgelenk 0\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Handgelenk 15\u00B0 - 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Handgelenk > 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
+  { name: 'Handgelenk < 15\u00B0', src: btn4_rula, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Nacken 0\u00B0 - 10\u00B0', src: btn5_rula, category: 'Kategorie 2' },
-  { label: 'Nacken > 10\u00B0 - 20\u00B0', src: btn6_rula, category: 'Kategorie 2' },
-  { label: 'Nacken > 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Nacken in Extension', src: btn8_rula, category: 'Kategorie 2' },
+  { name: 'Nacken 0\u00B0 - 10\u00B0', src: btn5_rula, category: 'Kategorie 2' },
+  { name: 'Nacken > 10\u00B0 - 20\u00B0', src: btn6_rula, category: 'Kategorie 2' },
+  { name: 'Nacken > 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Nacken in Extension', src: btn8_rula, category: 'Kategorie 2' },
 
-  { label: 'Rumpf 0\u00B0', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Rumpf 0\u00B0 - 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Rumpf 20\u00B0 - 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Rumpf > 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Rumpf 0\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Rumpf 0\u00B0 - 20\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Rumpf 20\u00B0 - 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Rumpf > 60\u00B0', src: btn7_rula, category: 'Kategorie 2' },
 
-  { label: 'Beine - stabiler Stand / Sitzen ', src: btn7_rula, category: 'Kategorie 2' },
-  { label: 'Beine - instabil / asymmetrisch ', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Beine - stabiler Stand / Sitzen ', src: btn7_rula, category: 'Kategorie 2' },
+  { name: 'Beine - instabil / asymmetrisch ', src: btn7_rula, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3_RULA: ReadonlyArray<LabelImage> = [
-  { label: 'Haltung > 1 min', src: btn9_rula, category: 'Kategorie 3' },
-  { label: 'Wdh. > 4 pro min', src: btn9_rula, category: 'Kategorie 3' },
-  { label: 'Kraft/Last 2–10 kg', src: btn10_rula, category: 'Kategorie 3' },
+  { name: 'Haltung > 1 min', src: btn9_rula, category: 'Kategorie 3' },
+  { name: 'Wdh. > 4 pro min', src: btn9_rula, category: 'Kategorie 3' },
+  { name: 'Kraft/Last 2–10 kg', src: btn10_rula, category: 'Kategorie 3' },
 ];
 
 export function get_label_images_cat1_rula(): ReadonlyArray<LabelImage> {
@@ -96,41 +96,41 @@ export function get_label_images_cat3_rula(): ReadonlyArray<LabelImage> {
 export function get_label_all_label_images_rula(): ReadonlyMap<string, LabelImage> {
   const map = new Map<string, LabelImage>();
 
-  for (const item of LABEL_IMAGES_CAT1_RULA) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT2_RULA) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT3_RULA) map.set(item.label, item);
+  for (const item of LABEL_IMAGES_CAT1_RULA) map.set(item.name, item);
+  for (const item of LABEL_IMAGES_CAT2_RULA) map.set(item.name, item);
+  for (const item of LABEL_IMAGES_CAT3_RULA) map.set(item.name, item);
 
   return map;
 }
 
 // OWAS IMAGES
 const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Code 1', src: btn1_owas, category: 'Kategorie 1' },
-  { label: 'Code 2', src: btn2_owas, category: 'Kategorie 1' },
-  { label: 'Code 3', src: btn3_owas, category: 'Kategorie 1' },
-  { label: 'Code 4', src: btn4_owas, category: 'Kategorie 1' },
+  { name: 'Code 1', src: btn1_owas, category: 'Kategorie 1' },
+  { name: 'Code 2', src: btn2_owas, category: 'Kategorie 1' },
+  { name: 'Code 3', src: btn3_owas, category: 'Kategorie 1' },
+  { name: 'Code 4', src: btn4_owas, category: 'Kategorie 1' },
 ];
 
 const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Code 1', src: btn5_owas, category: 'Kategorie 2' },
-  { label: 'Code 2', src: btn6_owas, category: 'Kategorie 2' },
-  { label: 'Code 3', src: btn7_owas, category: 'Kategorie 2' },
+  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 2' },
+  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 2' },
+  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 2' },
 ];
 
 const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Code 1', src: btn8_owas, category: 'Kategorie 3' },
-  { label: 'Code 2', src: btn9_owas, category: 'Kategorie 3' },
-  { label: 'Code 3', src: btn10_owas, category: 'Kategorie 3' },
-  { label: 'Code 4', src: btn11_owas, category: 'Kategorie 3' },
-  { label: 'Code 5', src: btn12_owas, category: 'Kategorie 3' },
-  { label: 'Code 6', src: btn13_owas, category: 'Kategorie 3' },
-  { label: 'Code 7', src: btn14_owas, category: 'Kategorie 3' },
+  { name: 'Code 1', src: btn8_owas, category: 'Kategorie 3' },
+  { name: 'Code 2', src: btn9_owas, category: 'Kategorie 3' },
+  { name: 'Code 3', src: btn10_owas, category: 'Kategorie 3' },
+  { name: 'Code 4', src: btn11_owas, category: 'Kategorie 3' },
+  { name: 'Code 5', src: btn12_owas, category: 'Kategorie 3' },
+  { name: 'Code 6', src: btn13_owas, category: 'Kategorie 3' },
+  { name: 'Code 7', src: btn14_owas, category: 'Kategorie 3' },
 ];
 
 const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { label: 'Code 1', src: btn5_owas, category: 'Kategorie 4' },
-  { label: 'Code 2', src: btn6_owas, category: 'Kategorie 4' },
-  { label: 'Code 3', src: btn7_owas, category: 'Kategorie 4' },
+  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 4' },
+  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 4' },
+  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 4' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {
@@ -152,18 +152,18 @@ export function get_label_images_cat4_owas(): ReadonlyArray<LabelImage> {
 export function get_label_all_label_images_owas(): ReadonlyMap<string, LabelImage> {
   const map = new Map<string, LabelImage>();
 
-  for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT2_OWAS) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT3_OWAS) map.set(item.label, item);
-  for (const item of LABEL_IMAGES_CAT4_OWAS) map.set(item.label, item);
+  for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.name, item);
+  for (const item of LABEL_IMAGES_CAT2_OWAS) map.set(item.name, item);
+  for (const item of LABEL_IMAGES_CAT3_OWAS) map.set(item.name, item);
+  for (const item of LABEL_IMAGES_CAT4_OWAS) map.set(item.name, item);
   return map;
 }
 
 // LMM IMAGES
 const LABEL_IMAGES_CAT1_LLM: ReadonlyArray<LabelImage> = [
-  { label: 'Button_1', src: btn1_lmm, category: 'Kategorie 1' },
-  { label: 'Button_2', src: btn2_lmm, category: 'Kategorie 1' },
-  { label: 'Button_3', src: btn3_lmm, category: 'Kategorie 1' },
+  { name: 'Button_1', src: btn1_lmm, category: 'Kategorie 1' },
+  { name: 'Button_2', src: btn2_lmm, category: 'Kategorie 1' },
+  { name: 'Button_3', src: btn3_lmm, category: 'Kategorie 1' },
 ];
 
 export function get_label_images_cat1_llm(): ReadonlyArray<LabelImage> {
@@ -173,19 +173,19 @@ export function get_label_images_cat1_llm(): ReadonlyArray<LabelImage> {
 export function get_label_all_label_images_llm(): ReadonlyMap<string, LabelImage> {
   const map = new Map<string, LabelImage>();
 
-  for (const item of LABEL_IMAGES_CAT1_LLM) map.set(item.label, item);
+  for (const item of LABEL_IMAGES_CAT1_LLM) map.set(item.name, item);
   return map;
 }
 
 // PLAYER IMAGES
 export const PLAY_BUTTON_IMAGE: LabelImage = {
-  label: 'Play_Button',
+  name: 'Play_Button',
   src: play_button,
   category: 'Control',
 };
 
 export const PAUSE_BUTTON_IMAGE: LabelImage = {
-  label: 'Pause_Button',
+  name: 'Pause_Button',
   src: pause_button,
   category: 'Control',
 };
