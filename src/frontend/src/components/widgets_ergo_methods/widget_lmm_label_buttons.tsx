@@ -1,6 +1,7 @@
 import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, Select, MenuItem, InputLabel } from '@mui/material';
-import { LabelCategory, use_can_save_label_cxt } from '@/context/context_slider_label_list';
+import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { get_label_images_cat1_llm } from '@/Assets/label_images';
+import type { LabelCategory } from '@/domain/datatypes';
 
 const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',

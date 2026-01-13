@@ -1,3 +1,10 @@
+// play / pause button images
+// TODO: load vite plugin for svg as react component
+import play_button from '@/Assets/play-button.svg';
+import pause_button from '@/Assets/pause-button.svg';
+
+import type { LabelImage } from '@/domain/datatypes';
+
 // rula images
 import btn1_rula from '@/Assets/rula_images/Label_1.png';
 import btn2_rula from '@/Assets/rula_images/Label_2.png';
@@ -31,17 +38,6 @@ import btn14_owas from '@/Assets/owas_images/Label_14.png';
 import btn1_lmm from '@/Assets/lmm_images/Label_1.png';
 import btn2_lmm from '@/Assets/lmm_images/Label_2.png';
 import btn3_lmm from '@/Assets/lmm_images/Label_3.png';
-
-// play / pause button images
-// TODO: load vite plugin for svg as react component
-import play_button from '@/Assets/play-button.svg';
-import pause_button from '@/Assets/pause-button.svg';
-
-export type LabelImage = {
-  name: string;
-  src: string;
-  category: string;
-};
 
 // RULA IMAGES
 const LABEL_IMAGES_CAT1_RULA: ReadonlyArray<LabelImage> = [

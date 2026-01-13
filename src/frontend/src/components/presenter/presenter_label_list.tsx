@@ -1,18 +1,16 @@
 import { WidgetLabelList } from '@/components/widgets/widget_label_list';
-import { Label } from '@/context/context_slider_label_list';
 import { Box, Button, Grid } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import { LabelImage } from '@/Assets/label_images';
+import type { LabelImage, Label } from '@/domain/datatypes';
 
 type Props = {
   lables_list: Label[];
   delete_label_from_list_on_click?: (id: string) => void;
   slider_list_clear_on_click?: () => void;
   save_labels_on_click?: () => void;
-  label_image: LabelImage | null;
 };
 
 export function PresenterLabelList(props: Props) {

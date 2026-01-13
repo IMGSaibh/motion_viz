@@ -53,14 +53,14 @@ export function ContainerLabelsList() {
     clear_label_list();
   }, [clear_label_list]);
 
-  const current_label_image = useMemo(() => {
-    const hit = labels.find((m) => {
-      const from = Math.min(m.from, m.to);
-      const to = Math.max(m.from, m.to);
-      return frame >= from && frame < to;
-    });
-    return hit?.label_image ?? null;
-  }, [labels, frame]);
+  // const current_label_image = useMemo(() => {
+  //   const hit = labels.find((m) => {
+  //     const from = Math.min(m.from, m.to);
+  //     const to = Math.max(m.from, m.to);
+  //     return frame >= from && frame < to;
+  //   });
+  //   return hit?.label_image ?? null;
+  // }, [labels, frame]);
 
   const on_save_click = useCallback(() => {
     if (!selected_motion) return;
@@ -91,7 +91,6 @@ export function ContainerLabelsList() {
       delete_label_from_list_on_click={delete_label_from_list_on_click}
       slider_list_clear_on_click={clear_label_list_on_click}
       save_labels_on_click={on_save_click}
-      label_image={current_label_image}
     />
   );
 }

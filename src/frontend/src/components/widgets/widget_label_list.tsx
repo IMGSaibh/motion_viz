@@ -7,10 +7,10 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Label } from '@/context/context_slider_label_list';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
 import ClearIcon from '@mui/icons-material/Clear';
+import type { Label } from '@/domain/datatypes';
 
 import {
   use_start_edit_label_cxt,

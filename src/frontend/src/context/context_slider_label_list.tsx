@@ -1,25 +1,10 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { LabelImage } from '@/Assets/label_images';
+import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
+import { uid } from '@/domain/label_logic';
 
 export type Range = [number, number];
 
-export type LabelCategory = {
-  name: string;
-  image: LabelImage | null;
-};
-
-export type Label = {
-  id: string;
-  from: number;
-  to: number;
-  color?: string;
-  label?: string;
-  category?: string;
-  categories: LabelCategory[];
-  label_image?: LabelImage | null;
-  framecount?: number;
-};
 export type RectangleLabelBar = {
   from: number;
   to: number;
@@ -41,7 +26,7 @@ type MarkerAction =
       color?: string;
       label_image?: LabelImage | null;
       framecount?: number;
-      categories?: LabelCategory[]; // ✅ NEU
+      categories?: LabelCategory[];
     };
 
 type FrameSliderLabellistContext = {
@@ -50,7 +35,7 @@ type FrameSliderLabellistContext = {
 
   label: Label[];
   add_slider_label: (m: Label) => void;
-  add_rula_cat_2: (rula_cat: LabelCategory[]) => void;
+  add_rula_cat: (rula_cat: LabelCategory[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -83,13 +68,6 @@ function normalize(label: Label): Label {
   const from = Math.min(label.from, label.to);
   const to = Math.max(label.from, label.to);
   return { ...label, from, to };
-}
-
-function uid() {
-  // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const c: any = typeof crypto !== 'undefined' ? crypto : null;
-  return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function markerReducer(state: Label[], action: MarkerAction): Label[] {
@@ -156,10 +134,6 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
   }
 }
 
-export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  return aFrom < bTo && aTo > bFrom;
-}
-
 function normalizeCategory(c?: string) {
   return (c ?? 'Uncategorized').trim() || 'Uncategorized';
 }
@@ -218,12 +192,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const [slider_frame, set_slider_frame] = useState(0);
 
-  // const [rula_selected, set_rula_selected] = useState<Record<string, string | null>>({
-  //   CAT1: null,
-  //   CAT2: null,
-  //   CAT3: null,
-  // });
-
   const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
     CAT1: null,
     CAT2: null,
@@ -252,7 +220,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [labels_marker_reducer],
   );
 
-  const add_rula_cat_2 = useCallback(
+  const add_rula_cat = useCallback(
     (rula_cat: LabelCategory[] | null) => {
       if (!rula_cat || rula_cat.length === 0) return;
 
@@ -399,18 +367,18 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_slider_label_range: set_range,
       label: labels_marker_reducer,
       add_slider_label: add_label_rect,
-      add_rula_cat_2,
+      add_rula_cat,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
-      start_editing_label: start_editing_label,
-      save_current_edited_label: save_current_edited_label,
-      cancel_current_edit_label: cancel_current_edit_label,
+      start_editing_label,
+      save_current_edited_label,
+      cancel_current_edit_label,
       slider_frame: slider_frame,
-      set_slider_frame: set_slider_frame,
+      set_slider_frame,
 
       rula_selected: rula_selected,
-      set_rula_selected: set_rula_selected,
+      set_rula_selected,
       unselected_rula,
       update_label_meta,
 
@@ -423,7 +391,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       labels_marker_reducer,
       add_label_rect,
       remove_label_rect,
-      add_rula_cat_2,
+      add_rula_cat,
       clear_label_rects,
       editing_id,
       start_editing_label,
@@ -491,7 +459,7 @@ export function use_add_slider_label_ctx() {
 export function use_add_rula_cat_ctx() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_add_slider_label_ctx must be used within <FrameSliderLabellistProvider>');
-    return v.add_rula_cat_2;
+    return v.add_rula_cat;
   });
 }
 

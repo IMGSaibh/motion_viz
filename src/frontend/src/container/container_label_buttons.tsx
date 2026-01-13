@@ -5,17 +5,16 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { useThreeJSEngine } from '@/context/context_three_js_engine';
 
 import {
-  // use_add_slider_label_ctx,
+  use_add_slider_label_ctx,
   use_range_slider_value_cxt,
   use_set_range_slider_value_cxt,
   use_slider_frame_cxt,
-  // use_range_marker_cxt,
+  use_range_marker_cxt,
   use_add_rula_cat_ctx,
-  LabelCategory,
 } from '@/context/context_slider_label_list';
-// import { LabelImage } from '@/Assets/label_images';
+import type { LabelCategory } from '@/domain/datatypes';
 
-export function ContainerLabels() {
+export function ContainerLabelButtons() {
   const { frame_count, current_frame: three_js_current_frame } = useThreeJSEngine();
   const slider_frame = use_slider_frame_cxt();
   const frame_slider_range = use_range_slider_value_cxt();
@@ -80,9 +79,10 @@ export function ContainerLabels() {
   //   [frame_slider_range, frame_count, three_js_current_frame, add_rula_category],
   // );
 
-  const on_click_add_ergo_label = useCallback(
+  const on_click_save_ergo_label = useCallback(
     (label_cat: LabelCategory[]) => {
       add_rula_category(label_cat);
+      console.log('add rula category label', label_cat);
     },
     [add_rula_category],
   );
@@ -110,7 +110,7 @@ export function ContainerLabels() {
         </Grid>
       </Box>
 
-      <PresenterLabelButtons onClick={on_click_add_ergo_label} />
+      <PresenterLabelButtons onClick={on_click_save_ergo_label} />
     </>
   );
 }

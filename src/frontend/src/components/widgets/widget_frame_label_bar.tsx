@@ -1,11 +1,11 @@
 import { theme } from '@/theme';
 import { Box } from '@mui/material';
+import { overlaps } from '@/domain/label_logic';
 import {
-  overlaps,
   use_current_label_range_geometry_cxt,
   use_range_marker_cxt,
+  use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
-import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
   frame_count: number;

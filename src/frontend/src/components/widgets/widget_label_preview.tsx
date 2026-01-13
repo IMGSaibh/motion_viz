@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { LabelImage } from '@/Assets/label_images';
+import type { LabelImage } from '@/domain/datatypes';
 
 type Props = {
   label_image: LabelImage | null;

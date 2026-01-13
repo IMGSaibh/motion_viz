@@ -4,8 +4,10 @@ import {
   get_label_images_cat2_owas,
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
-  LabelImage,
+  // LabelImage,
 } from '@/Assets/label_images';
+import type { LabelImage, LabelCategory } from '@/domain/datatypes';
+
 import SaveIcon from '@mui/icons-material/Save';
 import { useMemo, useState } from 'react';
 import {
@@ -15,7 +17,7 @@ import {
   use_owas_selected_cxt,
   use_set_owas_selected_cxt,
   use_clear_owas_selected_cxt,
-  LabelCategory,
+  // LabelCategory,
 } from '@/context/context_slider_label_list';
 // type Item = { src: string; label: string; category: string };
 

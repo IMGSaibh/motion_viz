@@ -6,7 +6,7 @@ import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import { FrameSliderLabellistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
 import { Box } from '@mui/material';
-import { ContainerLabels } from './container/container_labels';
+import { ContainerLabelButtons } from './container/container_label_buttons';
 
 export default function App() {
   return (
@@ -24,7 +24,7 @@ export default function App() {
               })}
             >
               <ContainerFrameSlider />
-              <ContainerLabels />
+              <ContainerLabelButtons />
               <ContainerLabelsList />
             </Box>
           </FrameSliderLabellistProvider>

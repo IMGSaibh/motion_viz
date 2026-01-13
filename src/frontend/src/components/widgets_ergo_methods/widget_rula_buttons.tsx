@@ -1,20 +1,20 @@
-import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import {
   get_label_images_cat1_rula,
   get_label_images_cat2_rula,
   get_label_images_cat3_rula,
-  LabelImage,
 } from '@/Assets/label_images';
-import { useMemo } from 'react';
-import SaveIcon from '@mui/icons-material/Save';
-
 import {
   use_can_save_label_cxt,
   use_unselected_rula_cxt,
-  LabelCategory,
   use_set_rula_selected_cxt,
   use_rula_selected_cxt,
 } from '@/context/context_slider_label_list';
+import { useMemo } from 'react';
+import { uid } from '@/domain/label_logic';
+import SaveIcon from '@mui/icons-material/Save';
+import type { LabelImage, LabelCategory } from '@/domain/datatypes';
+import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
+import { use_range_slider_value_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
   onClick?: (label_categorie: LabelCategory[]) => void;

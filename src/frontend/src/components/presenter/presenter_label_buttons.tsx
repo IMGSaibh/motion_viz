@@ -3,8 +3,7 @@ import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import { LabelImage } from '@/Assets/label_images';
-import { LabelCategory } from '@/context/context_slider_label_list';
+import type { LabelCategory } from '@/domain/datatypes';
 
 type Props = {
   onClick?: (label_categorie: LabelCategory[]) => void;
