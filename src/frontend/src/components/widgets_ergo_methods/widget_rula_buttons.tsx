@@ -116,7 +116,6 @@ export function WidgetRulaButtons(props: Props) {
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
   const unselected_rula = use_unselected_rula_cxt();
-
   const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
   const can_save_label = use_can_save_label_cxt();

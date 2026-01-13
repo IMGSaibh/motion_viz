@@ -74,8 +74,8 @@ export function PresenterLabelButtons(props: Props) {
       </Grid>
 
       {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} />}
-      {/* {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />} */}
-      {/* {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />} */}
+      {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />}
+      {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />}
     </Box>
   );
 }

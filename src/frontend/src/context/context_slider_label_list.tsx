@@ -35,7 +35,6 @@ type FrameSliderLabellistContext = {
 
   label: Label[];
   add_slider_label: (m: Label) => void;
-  // add_rula_cat: (rula_cat: LabelCategory[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -51,8 +50,8 @@ type FrameSliderLabellistContext = {
   set_rula_selected: (next: Record<string, LabelImage | null>) => void;
   unselected_rula: () => void;
 
-  owas_selected: Record<string, string | null>;
-  set_owas_selected: (next: Record<string, string | null>) => void;
+  owas_selected: Record<string, LabelImage | null>;
+  set_owas_selected: (next: Record<string, LabelImage | null>) => void;
   clear_owas_selected: () => void;
 
   update_label_meta: (
@@ -194,7 +193,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     CAT3: null,
   });
 
-  const [owas_selected, set_owas_selected] = useState<Record<string, string | null>>({
+  const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({
     CAT1: null,
     CAT2: null,
     CAT3: null,
@@ -239,13 +238,16 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
 
-      if (normalizeCategory(m.ergo_method) === 'OWAS' && typeof m.label === 'string') {
-        const parts = m.label.split('|').map((s: string) => s.trim());
+      if (normalizeCategory(m.ergo_method) === 'OWAS') {
+        const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
+          string,
+          LabelImage | null
+        >;
         set_owas_selected({
-          CAT1: parts[0] ?? null,
-          CAT2: parts[1] ?? null,
-          CAT3: parts[2] ?? null,
-          CAT4: parts[3] ?? null,
+          CAT1: by_name.CAT1 ?? null,
+          CAT2: by_name.CAT2 ?? null,
+          CAT3: by_name.CAT3 ?? null,
+          CAT4: by_name.CAT4 ?? null,
         });
       }
     },
@@ -254,7 +256,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+
     const editingMarker = labels_marker_reducer.find((m) => m.id === editing_id);
     const ok = canSaveForRange({
       labels: labels_marker_reducer,
@@ -276,11 +278,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       to: range[1],
       ...(isRula ? { label: rulaLabel, category: 'RULA' } : {}),
     });
-
+    console.log('Edited label:', editing_id, range);
     set_editing_id(null);
 
-    // ✅ optional aber sinnvoll: nach Edit-Ende RULA-Auswahl leeren
-    // set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id, range, labels_marker_reducer, rula_selected]);
 
@@ -333,7 +334,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       slider_frame: slider_frame,
       set_slider_frame,
 
-      rula_selected: rula_selected,
+      rula_selected,
       set_rula_selected,
       unselected_rula,
       update_label_meta,

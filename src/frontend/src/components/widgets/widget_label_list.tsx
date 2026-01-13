@@ -126,7 +126,7 @@ export function WidgetLabelList(props: Props) {
                         {slider_label.label}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Kategorie ${slider_label.ergo_method}`}
+                        {`Methode ${slider_label.ergo_method}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Frame: ${slider_label.from} – ${slider_label.to}`}

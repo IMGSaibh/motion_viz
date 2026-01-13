@@ -55,7 +55,7 @@ export function ContainerLabelButtons() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [frame_count, frame_slider_range, set_range, slider_frame]);
 
-  const on_click_save_ergo_label = useCallback(
+  const on_click_save_label = useCallback(
     (label: Label) => {
       add_label(label);
       console.log('Added label:', label);
@@ -86,7 +86,7 @@ export function ContainerLabelButtons() {
         </Grid>
       </Box>
 
-      <PresenterLabelButtons onClick={on_click_save_ergo_label} />
+      <PresenterLabelButtons onClick={on_click_save_label} />
     </>
   );
 }
