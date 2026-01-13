@@ -48,11 +48,11 @@ type FrameSliderLabellistContext = {
 
   rula_selected: Record<string, LabelImage | null>;
   set_rula_selected: (next: Record<string, LabelImage | null>) => void;
-  unselected_rula: () => void;
+  unselect_rula: () => void;
 
   owas_selected: Record<string, LabelImage | null>;
   set_owas_selected: (next: Record<string, LabelImage | null>) => void;
-  clear_owas_selected: () => void;
+  unselected_owas: () => void;
 
   update_label_meta: (
     id: string,
@@ -292,11 +292,11 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id]);
 
-  const unselected_rula = useCallback(() => {
+  const unselect_rula = useCallback(() => {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   }, []);
 
-  const clear_owas_selected = useCallback(() => {
+  const unselected_owas = useCallback(() => {
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, []);
 
@@ -336,12 +336,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       rula_selected,
       set_rula_selected,
-      unselected_rula,
+      unselect_rula,
       update_label_meta,
 
       owas_selected,
       set_owas_selected,
-      clear_owas_selected,
+      unselected_owas: unselected_owas,
     }),
     [
       range,
@@ -359,12 +359,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       rula_selected,
       set_rula_selected,
-      unselected_rula,
+      unselect_rula,
       update_label_meta,
 
       owas_selected,
       set_owas_selected,
-      clear_owas_selected,
+      unselected_owas,
     ],
   );
 
@@ -508,10 +508,10 @@ export function use_set_rula_selected_cxt() {
   });
 }
 
-export function use_unselected_rula_cxt() {
+export function use_unselect_rula_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_unselected_rula_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.unselected_rula;
+    return v.unselect_rula;
   });
 }
 
@@ -543,6 +543,6 @@ export function use_set_owas_selected_cxt() {
 export function use_clear_owas_selected_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.clear_owas_selected;
+    return v.unselected_owas;
   });
 }

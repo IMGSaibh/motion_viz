@@ -5,7 +5,7 @@ import {
 } from '@/Assets/label_images';
 import {
   use_can_save_label_cxt,
-  use_unselected_rula_cxt,
+  use_unselect_rula_cxt,
   use_set_rula_selected_cxt,
   use_rula_selected_cxt,
 } from '@/context/context_slider_label_list';
@@ -115,7 +115,7 @@ export function WidgetRulaButtons(props: Props) {
 
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
-  const unselected_rula = use_unselected_rula_cxt();
+  const unselect_rula = use_unselect_rula_cxt();
   const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
   const can_save_label = use_can_save_label_cxt();
@@ -149,7 +149,7 @@ export function WidgetRulaButtons(props: Props) {
     };
 
     props.onClick?.(label);
-    unselected_rula();
+    unselect_rula();
   };
 
   return (

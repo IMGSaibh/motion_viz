@@ -9,7 +9,7 @@ import {
   use_can_save_label_cxt,
   use_owas_selected_cxt,
   use_set_owas_selected_cxt,
-  use_clear_owas_selected_cxt,
+  use_clear_owas_selected_cxt as use_unselect_owas_cxt,
 } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
@@ -117,7 +117,7 @@ export function WidgetOwasButtons(props: Props) {
 
   const owas_selected = use_owas_selected_cxt();
   const set_owas_selected = use_set_owas_selected_cxt();
-  const clear_owas_selected = use_clear_owas_selected_cxt();
+  const unselect_owas = use_unselect_owas_cxt();
   const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
 
   const can_save_label = use_can_save_label_cxt();
@@ -152,7 +152,7 @@ export function WidgetOwasButtons(props: Props) {
     };
 
     props.onClick?.(label);
-    clear_owas_selected();
+    unselect_owas();
   };
 
   return (
