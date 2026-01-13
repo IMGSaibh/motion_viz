@@ -1,31 +1,51 @@
 import { Box } from '@mui/material';
-import type { LabelImage } from '@/domain/datatypes';
+import type { LabelCategory, LabelImage } from '@/domain/datatypes';
 
 type Props = {
-  label_image: LabelImage | null;
+  categories?: LabelCategory[];
+  label_image?: LabelImage | null; // optional fallback
 };
 
 export function WidgetLabelPreview(props: Props) {
+  const categoryImages = (props.categories ?? []).map((c) => c.image).filter(Boolean) as LabelImage[];
+
+  const imagesToShow =
+    categoryImages.length > 0 ? categoryImages.slice(0, 4) : props.label_image ? [props.label_image] : [];
+
   return (
     <Box
       sx={{
-        width: 32,
-        height: 32,
+        width: 64,
+        height: 64,
         borderRadius: 1,
         bgcolor: 'background.paper',
         overflow: 'hidden',
         display: 'grid',
-        placeItems: 'center',
+        placeItems: imagesToShow.length <= 1 ? 'center' : undefined,
+        gridTemplateColumns: imagesToShow.length > 1 ? 'repeat(2, 1fr)' : undefined,
+        gridAutoRows: imagesToShow.length > 1 ? '1fr' : undefined,
+        gap: imagesToShow.length > 1 ? 0.25 : 0,
+        p: imagesToShow.length > 1 ? 0.25 : 0,
       }}
       aria-label="Current label image preview"
     >
-      {props.label_image ? (
-        <Box
-          component="img"
-          src={props.label_image.src}
-          alt={props.label_image.name}
-          sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', backgroundColor: 'white' }}
-        />
+      {imagesToShow.length > 0 ? (
+        imagesToShow.map((img, idx) => (
+          <Box
+            key={`${img.name}-${idx}`}
+            component="img"
+            src={img.src}
+            alt={img.name}
+            sx={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: imagesToShow.length > 1 ? 'contain' : 'cover',
+              backgroundColor: 'white',
+              borderRadius: imagesToShow.length > 1 ? 0.5 : 0,
+            }}
+          />
+        ))
       ) : (
         <Box sx={{ fontSize: 12, opacity: 0.6 }}>—</Box>
       )}

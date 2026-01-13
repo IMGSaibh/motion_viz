@@ -16,8 +16,7 @@ export type Label = {
   to: number;
   color?: string;
   label?: string;
-  category?: string;
+  ergo_method?: string;
   categories: LabelCategory[];
-  label_image?: LabelImage | null;
   framecount?: number;
 };

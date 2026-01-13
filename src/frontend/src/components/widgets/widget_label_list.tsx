@@ -101,7 +101,7 @@ export function WidgetLabelList(props: Props) {
                       borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                     })}
                   >
-                    <WidgetLabelPreview label_image={slider_label.label_image ?? null} />
+                    <WidgetLabelPreview categories={slider_label.categories ?? null} />
                   </Grid>
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
@@ -126,7 +126,7 @@ export function WidgetLabelList(props: Props) {
                         {slider_label.label}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Kategorie ${slider_label.category}`}
+                        {`Kategorie ${slider_label.ergo_method}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Frame: ${slider_label.from} – ${slider_label.to}`}

@@ -36,8 +36,8 @@ export function ContainerLabelsList() {
       const img = label_image_map.get(name) ?? null;
 
       // nur patchen, wenn wirklich nötig (reduziert re-renders)
-      if (m.framecount !== fc || m.label_image !== img || m.label !== name) {
-        update_label_meta(m.id, { framecount: fc, label_image: img, label: name });
+      if (m.framecount !== fc || m.label !== name) {
+        update_label_meta(m.id, { framecount: fc, label: name });
       }
     });
   }, [labels, frame_count, label_image_map, update_label_meta]);

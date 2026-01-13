@@ -35,7 +35,7 @@ type FrameSliderLabellistContext = {
 
   label: Label[];
   add_slider_label: (m: Label) => void;
-  add_rula_cat: (rula_cat: LabelCategory[]) => void;
+  // add_rula_cat: (rula_cat: LabelCategory[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -57,7 +57,7 @@ type FrameSliderLabellistContext = {
 
   update_label_meta: (
     id: string,
-    patch: Partial<Pick<Label, 'label' | 'category' | 'color' | 'label_image' | 'framecount'>>,
+    patch: Partial<Pick<Label, 'label' | 'ergo_method' | 'color' | 'framecount'>>,
   ) => void;
 };
 
@@ -103,16 +103,12 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
           patch.label = action.label;
           changed = true;
         }
-        if (action.category !== undefined && x.category !== action.category) {
-          patch.category = action.category;
+        if (action.category !== undefined && x.ergo_method !== action.category) {
+          patch.ergo_method = action.category;
           changed = true;
         }
         if (action.color !== undefined && x.color !== action.color) {
           patch.color = action.color;
-          changed = true;
-        }
-        if (action.label_image !== undefined && x.label_image !== action.label_image) {
-          patch.label_image = action.label_image;
           changed = true;
         }
         if (action.framecount !== undefined && x.framecount !== action.framecount) {
@@ -151,7 +147,7 @@ function canSaveForRange(args: {
 
   const hasOverlapSameCategory = args.labels.some((m) => {
     if (args.ignoreId && m.id === args.ignoreId) return false;
-    const mCat = normalizeCategory(m.category);
+    const mCat = normalizeCategory(m.ergo_method);
     if (mCat !== targetCategory) return false;
     const mf = Math.min(m.from, m.to);
     const mt = Math.max(m.from, m.to);
@@ -209,7 +205,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     (label: Label) => {
       const ok = canSaveForRange({
         labels: labels_marker_reducer,
-        category: label.category,
+        category: label.ergo_method,
         from: label.from,
         to: label.to,
         ignoreId: null,
@@ -218,41 +214,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       dispatch({ type: 'add', label: label });
     },
     [labels_marker_reducer],
-  );
-
-  const add_rula_cat = useCallback(
-    (rula_cat: LabelCategory[] | null) => {
-      if (!rula_cat || rula_cat.length === 0) return;
-
-      const from = Math.min(range[0], range[1]);
-      const to = Math.max(range[0], range[1]);
-
-      const ok = canSaveForRange({
-        labels: labels_marker_reducer,
-        category: 'RULA',
-        from,
-        to,
-        ignoreId: null,
-      });
-      if (!ok) return;
-
-      // optional: kompakter Label-String aus den Images
-      const image_name = rula_cat.map((c) => c.image?.name ?? '').join(' | ');
-
-      dispatch({
-        type: 'add',
-        label: {
-          id: uid(),
-          from,
-          to,
-          category: 'RULA',
-          label: image_name,
-          categories: rula_cat,
-          label_image: null,
-        },
-      });
-    },
-    [range, labels_marker_reducer],
   );
 
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
@@ -266,8 +227,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_range([m.from, m.to]);
       set_editing_id(id);
 
-      //RULA-Label beim Edit korrekt in die Buttons laden
-      if (normalizeCategory(m.category) === 'RULA') {
+      if (normalizeCategory(m.ergo_method) === 'RULA') {
         const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
           string,
           LabelImage | null
@@ -279,8 +239,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
 
-      //OWAS-Label beim Edit korrekt in die Buttons laden
-      if (normalizeCategory(m.category) === 'OWAS' && typeof m.label === 'string') {
+      if (normalizeCategory(m.ergo_method) === 'OWAS' && typeof m.label === 'string') {
         const parts = m.label.split('|').map((s: string) => s.trim());
         set_owas_selected({
           CAT1: parts[0] ?? null,
@@ -299,7 +258,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const editingMarker = labels_marker_reducer.find((m) => m.id === editing_id);
     const ok = canSaveForRange({
       labels: labels_marker_reducer,
-      category: editingMarker?.category,
+      category: editingMarker?.ergo_method,
       from: range[0],
       to: range[1],
       ignoreId: editing_id,
@@ -307,7 +266,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
     if (!ok) return;
 
-    const isRula = normalizeCategory(editingMarker?.category) === 'RULA';
+    const isRula = normalizeCategory(editingMarker?.ergo_method) === 'RULA';
     const rulaLabel = `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`;
 
     dispatch({
@@ -315,7 +274,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       id: editing_id,
       from: range[0],
       to: range[1],
-      // ✅ beim RULA-Edit auch die Konfiguration speichern
       ...(isRula ? { label: rulaLabel, category: 'RULA' } : {}),
     });
 
@@ -342,7 +300,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   }, []);
 
   const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<Label, 'label' | 'category' | 'color' | 'label_image' | 'framecount'>>) => {
+    (id: string, patch: Partial<Pick<Label, 'label' | 'ergo_method' | 'color' | 'framecount'>>) => {
       const current = labels_marker_reducer.find((m) => m.id === id);
       if (!current) return;
 
@@ -352,9 +310,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         from: current.from,
         to: current.to,
         label: patch.label,
-        category: patch.category,
+        category: patch.ergo_method,
         color: patch.color,
-        label_image: patch.label_image,
         framecount: patch.framecount,
       });
     },
@@ -367,7 +324,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_slider_label_range: set_range,
       label: labels_marker_reducer,
       add_slider_label: add_label_rect,
-      add_rula_cat,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
@@ -391,7 +347,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       labels_marker_reducer,
       add_label_rect,
       remove_label_rect,
-      add_rula_cat,
       clear_label_rects,
       editing_id,
       start_editing_label,
@@ -456,13 +411,6 @@ export function use_add_slider_label_ctx() {
   });
 }
 
-export function use_add_rula_cat_ctx() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_add_slider_label_ctx must be used within <FrameSliderLabellistProvider>');
-    return v.add_rula_cat;
-  });
-}
-
 export function use_remove_label_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_remove_label_cxt must be used within <FrameSliderLabellistProvider>');
@@ -511,7 +459,7 @@ export function use_can_save_label_cxt() {
 
     return (category?: string) => {
       const editingMarker = v.editing_id ? v.label.find((m) => m.id === v.editing_id) : null;
-      const targetCategory = category ?? editingMarker?.category;
+      const targetCategory = category ?? editingMarker?.ergo_method;
 
       return canSaveForRange({
         labels: v.label,

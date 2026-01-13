@@ -3,10 +3,10 @@ import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import type { LabelCategory } from '@/domain/datatypes';
+import type { Label } from '@/domain/datatypes';
 
 type Props = {
-  onClick?: (label_categorie: LabelCategory[]) => void;
+  onClick?: (label: Label) => void;
 };
 
 export function PresenterLabelButtons(props: Props) {
@@ -74,8 +74,8 @@ export function PresenterLabelButtons(props: Props) {
       </Grid>
 
       {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} />}
-      {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />}
-      {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />}
+      {/* {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />} */}
+      {/* {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />} */}
     </Box>
   );
 }

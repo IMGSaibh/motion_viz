@@ -12,12 +12,12 @@ import {
 import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
-import type { LabelImage, LabelCategory } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_range_slider_value_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
-  onClick?: (label_categorie: LabelCategory[]) => void;
+  onClick?: (label: Label) => void;
 };
 
 function CategoryGrid({
@@ -111,6 +111,8 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
   const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
 
+  const range = use_range_slider_value_cxt();
+
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
   const unselected_rula = use_unselected_rula_cxt();
@@ -128,11 +130,26 @@ export function WidgetRulaButtons(props: Props) {
     if (!allSelected) return;
     if (!canSaveRula) return;
 
-    props.onClick?.([
+    const categories: LabelCategory[] = [
       { name: 'CAT1', image: rula_selected.CAT1! },
       { name: 'CAT2', image: rula_selected.CAT2! },
       { name: 'CAT3', image: rula_selected.CAT3! },
-    ]);
+    ];
+
+    const from = Math.min(range[0], range[1]);
+    const to = Math.max(range[0], range[1]);
+    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
+
+    const label: Label = {
+      id: uid(),
+      from,
+      to,
+      ergo_method: 'RULA',
+      label: labelText,
+      categories,
+    };
+
+    props.onClick?.(label);
     unselected_rula();
   };
 
