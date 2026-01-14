@@ -31,8 +31,8 @@ export function can_save_for_range(args: {
     if (args.ignore_id && label.id === args.ignore_id) return false;
     const mCat = normalize_category(label.ergo_method);
     if (mCat !== target_category) return false;
-    const mf = Math.min(label.from, label.to);
-    const mt = Math.max(label.from, label.to);
+    const mf = Math.min(label.start_frame, label.end_frame);
+    const mt = Math.max(label.start_frame, label.end_frame);
     return fromN < mt && toN > mf;
   });
 

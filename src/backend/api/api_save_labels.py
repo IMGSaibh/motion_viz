@@ -7,8 +7,10 @@ from pydantic import BaseModel, Field
 router = APIRouter()
 
 class LabelItem(BaseModel):
-    startframe: int = Field(..., ge=0)
-    endframe: int = Field(..., ge=0)
+    ergo_method: str 
+    start_frame: int = Field(..., ge=0)
+    end_frame: int = Field(..., ge=0)
+    button_text: str
 
 class SaveLabelsRequest(BaseModel):
     motion_name: str          
@@ -25,8 +27,8 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     # optional: make sure start <= end frame
     labels = []
     for item in payload.labels:
-        a, b = sorted((item.startframe, item.endframe))
-        labels.append({"startframe": a, "endframe": b})
+        a, b = sorted((item.start_frame, item.end_frame))
+        labels.append({"ergo_method": item.ergo_method,"startframe": a, "endframe": b,"button_text": item.button_text,})
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)

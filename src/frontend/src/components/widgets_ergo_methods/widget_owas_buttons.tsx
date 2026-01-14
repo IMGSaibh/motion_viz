@@ -144,10 +144,10 @@ export function WidgetOwasButtons(props: Props) {
 
     const label: Label = {
       id: uid(),
-      from,
-      to,
+      start_frame: from,
+      end_frame: to,
       ergo_method: 'OWAS',
-      label: labelText,
+      button_text: labelText,
       categories,
     };
 

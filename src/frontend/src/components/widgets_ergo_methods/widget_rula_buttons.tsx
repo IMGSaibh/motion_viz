@@ -141,10 +141,10 @@ export function WidgetRulaButtons(props: Props) {
 
     const label: Label = {
       id: uid(),
-      from,
-      to,
+      start_frame: from,
+      end_frame: to,
       ergo_method: 'RULA',
-      label: labelText,
+      button_text: labelText,
       categories,
     };
 

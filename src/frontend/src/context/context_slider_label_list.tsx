@@ -53,19 +53,16 @@ type FrameSliderLabellistContext = {
   set_owas_selected: (next: Record<string, LabelImage | null>) => void;
   unselected_owas: () => void;
 
-  update_label_meta: (
-    id: string,
-    patch: Partial<Pick<Label, 'label' | 'ergo_method' | 'color' | 'framecount'>>,
-  ) => void;
+  update_label_meta: (id: string, patch: Partial<Pick<Label, 'button_text' | 'ergo_method' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
 function normalize_label_data(label: Label): Label {
-  if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
-  const from = Math.min(label.from, label.to);
-  const to = Math.max(label.from, label.to);
-  return { ...label, from, to };
+  if (Number.isNaN(label.start_frame) || Number.isNaN(label.end_frame)) return label;
+  const from = Math.min(label.start_frame, label.end_frame);
+  const to = Math.max(label.start_frame, label.end_frame);
+  return { ...label, start_frame: from, end_frame: to };
 }
 
 function markerReducer(state: Label[], action: MarkerAction): Label[] {
@@ -92,13 +89,13 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
         if (x.id !== action.id) return x;
 
         const patch: Partial<Label> = {};
-        if (x.from !== from || x.to !== to) {
-          patch.from = from;
-          patch.to = to;
+        if (x.start_frame !== from || x.end_frame !== to) {
+          patch.start_frame = from;
+          patch.end_frame = to;
           changed = true;
         }
-        if (action.label !== undefined && x.label !== action.label) {
-          patch.label = action.label;
+        if (action.label !== undefined && x.button_text !== action.label) {
+          patch.button_text = action.label;
           changed = true;
         }
         if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
@@ -107,10 +104,6 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
         }
         if (action.color !== undefined && x.color !== action.color) {
           patch.color = action.color;
-          changed = true;
-        }
-        if (action.framecount !== undefined && x.framecount !== action.framecount) {
-          patch.framecount = action.framecount;
           changed = true;
         }
         if (action.categories !== undefined && x.categories !== action.categories) {
@@ -177,8 +170,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       const ok = can_save_for_range({
         labels: labels_marker_reducer,
         category: label.ergo_method,
-        from: label.from,
-        to: label.to,
+        from: label.start_frame,
+        to: label.end_frame,
         ignore_id: null,
       });
       if (!ok) return; // blockiert Speichern im Context
@@ -195,7 +188,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       const m = labels_marker_reducer.find((x) => x.id === id);
       if (!m) return;
 
-      set_range([m.from, m.to]);
+      set_range([m.start_frame, m.end_frame]);
       set_editing_id(id);
 
       if (normalize_category(m.ergo_method) === 'RULA') {
@@ -273,19 +266,18 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   }, []);
 
   const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<Label, 'label' | 'ergo_method' | 'color' | 'framecount'>>) => {
+    (id: string, patch: Partial<Pick<Label, 'button_text' | 'ergo_method' | 'color'>>) => {
       const current = labels_marker_reducer.find((m) => m.id === id);
       if (!current) return;
 
       dispatch({
         type: 'update',
         id,
-        from: current.from,
-        to: current.to,
-        label: patch.label,
+        from: current.start_frame,
+        to: current.end_frame,
+        label: patch.button_text,
         ergo_method: patch.ergo_method,
         color: patch.color,
-        framecount: patch.framecount,
       });
     },
     [labels_marker_reducer],

@@ -12,11 +12,17 @@ export type LabelCategory = {
 
 export type Label = {
   id: string;
-  from: number;
-  to: number;
+  start_frame: number;
+  end_frame: number;
   color?: string;
-  label?: string;
+  button_text?: string;
   ergo_method?: string;
   categories: LabelCategory[];
-  framecount?: number;
+};
+
+export type LabelML = {
+  ergo_method?: string;
+  start_frame: number;
+  end_frame: number;
+  button_text?: string;
 };

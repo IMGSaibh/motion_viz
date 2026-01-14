@@ -18,6 +18,7 @@ import {
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -61,8 +62,6 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 type Props = {
   labels: Label[];
   delete_label_from_list_on_click?: (id: string) => void;
-  slider_list_clear_on_click?: () => void;
-  save_labels_on_click?: () => void;
   toggle_list: boolean;
 };
 
@@ -71,6 +70,7 @@ export function WidgetLabelList(props: Props) {
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
+  const { frame_count } = use_three_js_engine_ctx();
 
   return (
     <Box
@@ -106,9 +106,9 @@ export function WidgetLabelList(props: Props) {
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
                       disabled={true}
-                      value={[slider_label.from, slider_label.to]}
+                      value={[slider_label.start_frame, slider_label.end_frame]}
                       min={0}
-                      max={slider_label.framecount ?? 0}
+                      max={frame_count ?? 0}
                     />
                   </Grid>
                   <Grid size={{ md: 1 }}>
@@ -123,13 +123,13 @@ export function WidgetLabelList(props: Props) {
                       })}
                     >
                       <Typography variant="body2" noWrap>
-                        {slider_label.label}
+                        {slider_label.button_text}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Methode ${slider_label.ergo_method}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Frame: ${slider_label.from} – ${slider_label.to}`}
+                        {`Frame: ${slider_label.start_frame} – ${slider_label.end_frame}`}
                       </Typography>
                       {/* Buttons underneath text */}
                       <Box

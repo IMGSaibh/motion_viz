@@ -24,7 +24,7 @@ export function WidgetFrameLabelBar(props: Props) {
 
   const has_overlap = saved_labels
     .filter((label) => label.id !== editing_id)
-    .some(({ from: vf, to: vt }) => {
+    .some(({ start_frame: vf, end_frame: vt }) => {
       const vvFrom = clamp(Math.min(vf, vt));
       const vvTo = clamp(Math.max(vf, vt));
       return overlaps(currentGeom.from, currentGeom.to, vvFrom, vvTo);
@@ -42,7 +42,7 @@ export function WidgetFrameLabelBar(props: Props) {
         aria-hidden
       >
         {/* saved labels */}
-        {saved_labels.map(({ id, from: vf, to: vt, color }) => {
+        {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
           const vvFrom = clamp(Math.min(vf, vt));
           const vvTo = clamp(Math.max(vf, vt));
           const vvLen = Math.max(0, vvTo - vvFrom);

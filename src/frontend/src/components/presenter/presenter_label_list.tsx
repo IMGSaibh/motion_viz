@@ -9,8 +9,8 @@ import type { LabelImage, Label } from '@/domain/datatypes';
 type Props = {
   lables_list: Label[];
   delete_label_from_list_on_click?: (id: string) => void;
-  slider_list_clear_on_click?: () => void;
-  save_labels_on_click?: () => void;
+  delete_label_list_on_click?: () => void;
+  save_label_list_on_click?: () => void;
 };
 
 export function PresenterLabelList(props: Props) {
@@ -37,11 +37,11 @@ export function PresenterLabelList(props: Props) {
             Label-List
           </Button>
 
-          <Button onClick={props.slider_list_clear_on_click} sx={{ width: '100%' }}>
+          <Button onClick={props.delete_label_list_on_click} sx={{ width: '100%' }}>
             <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Clear Label-List
           </Button>
-          <Button onClick={() => props.save_labels_on_click?.()} sx={{ width: '100%' }}>
+          <Button onClick={() => props.save_label_list_on_click?.()} sx={{ width: '100%' }}>
             <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Save Label-List
           </Button>
@@ -52,8 +52,6 @@ export function PresenterLabelList(props: Props) {
       <WidgetLabelList
         labels={props.lables_list}
         delete_label_from_list_on_click={props.delete_label_from_list_on_click}
-        slider_list_clear_on_click={props.slider_list_clear_on_click}
-        save_labels_on_click={props.save_labels_on_click}
         toggle_list={open}
       />
     </Box>

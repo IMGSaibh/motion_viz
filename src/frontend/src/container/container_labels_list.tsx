@@ -22,7 +22,7 @@ export function ContainerLabelsList() {
   const remove_label = use_remove_label_cxt();
   const clear_label_list = use_clear_label_list_ctx();
 
-  const frame = use_slider_frame_cxt();
+  // const frame = use_slider_frame_cxt();
   const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();
@@ -32,12 +32,12 @@ export function ContainerLabelsList() {
     const fc = Math.max(0, frame_count ?? 0);
 
     labels.forEach((m) => {
-      const name = m.label && m.label.trim() ? m.label : `Label_${m.id}`;
-      const img = label_image_map.get(name) ?? null;
+      const name = m.button_text && m.button_text.trim() ? m.button_text : `Label_${m.id}`;
+      // const img = label_image_map.get(name) ?? null;
 
       // nur patchen, wenn wirklich nötig (reduziert re-renders)
-      if (m.framecount !== fc || m.label !== name) {
-        update_label_meta(m.id, { framecount: fc, label: name });
+      if (m.button_text !== name) {
+        update_label_meta(m.id, { button_text: name });
       }
     });
   }, [labels, frame_count, label_image_map, update_label_meta]);
@@ -49,32 +49,36 @@ export function ContainerLabelsList() {
     [remove_label],
   );
 
-  const clear_label_list_on_click = useCallback(() => {
+  const delete_label_list_on_click = useCallback(() => {
     clear_label_list();
   }, [clear_label_list]);
 
-  // const current_label_image = useMemo(() => {
-  //   const hit = labels.find((m) => {
-  //     const from = Math.min(m.from, m.to);
-  //     const to = Math.max(m.from, m.to);
-  //     return frame >= from && frame < to;
-  //   });
-  //   return hit?.label_image ?? null;
-  // }, [labels, frame]);
-
-  const on_save_click = useCallback(() => {
+  const save_label_list_on_click = useCallback(() => {
     if (!selected_motion) return;
 
-    const labels_map = labels.map((m) => {
-      const startframe = Math.min(m.from, m.to);
-      const endframe = Math.max(m.from, m.to);
-      return { startframe, endframe };
+    const parts = selected_motion.split(/[/\\]/).filter(Boolean);
+    const filename = parts.pop() ?? selected_motion;
+    const path = parts.length ? `/${parts.join('/')}/` : '/';
+
+    console.log('Saving path in labels:', path);
+    console.log('Saving labels:', labels);
+
+    const motion_file = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
+
+    const exported_labels = labels.map((label) => {
+      return {
+        ergo_method: label.ergo_method,
+        start_frame: label.start_frame,
+        end_frame: label.end_frame,
+        button_text: label.button_text,
+      };
     });
 
-    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
-
     hook_save_labels.mutate(
-      { motion_name, labels: labels_map },
+      {
+        file_name: motion_file,
+        labels: exported_labels,
+      },
       {
         onSuccess: (respond: any) => {
           if (respond.message) success(respond.message);
@@ -89,8 +93,8 @@ export function ContainerLabelsList() {
     <PresenterLabelList
       lables_list={labels}
       delete_label_from_list_on_click={delete_label_from_list_on_click}
-      slider_list_clear_on_click={clear_label_list_on_click}
-      save_labels_on_click={on_save_click}
+      delete_label_list_on_click={delete_label_list_on_click}
+      save_label_list_on_click={save_label_list_on_click}
     />
   );
 }
