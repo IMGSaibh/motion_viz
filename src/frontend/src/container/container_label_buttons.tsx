@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Box, Grid } from '@mui/material';
 import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 
 import {
   use_add_slider_label_ctx,
@@ -10,12 +10,11 @@ import {
   use_set_range_slider_value_cxt,
   use_slider_frame_cxt,
   use_range_marker_cxt,
-  // use_add_rula_cat_ctx,
 } from '@/context/context_slider_label_list';
 import type { Label } from '@/domain/datatypes';
 
 export function ContainerLabelButtons() {
-  const { frame_count, current_frame: three_js_current_frame } = useThreeJSEngine();
+  const { frame_count } = use_three_js_engine_ctx();
   const slider_frame = use_slider_frame_cxt();
   const frame_slider_range = use_range_slider_value_cxt();
   const set_range = use_set_range_slider_value_cxt();

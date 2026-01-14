@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
-import { uid } from '@/domain/label_logic';
+import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 
 export type Range = [number, number];
 
@@ -22,9 +22,8 @@ type MarkerAction =
       from: number;
       to: number;
       label?: string;
-      category?: string;
+      ergo_method?: string;
       color?: string;
-      label_image?: LabelImage | null;
       framecount?: number;
       categories?: LabelCategory[];
     };
@@ -62,7 +61,7 @@ type FrameSliderLabellistContext = {
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
-function normalize(label: Label): Label {
+function normalize_label_data(label: Label): Label {
   if (Number.isNaN(label.from) || Number.isNaN(label.to)) return label;
   const from = Math.min(label.from, label.to);
   const to = Math.max(label.from, label.to);
@@ -72,7 +71,7 @@ function normalize(label: Label): Label {
 function markerReducer(state: Label[], action: MarkerAction): Label[] {
   switch (action.type) {
     case 'add': {
-      const label_bar_normalized = normalize(action.label);
+      const label_bar_normalized = normalize_label_data(action.label);
       if (!label_bar_normalized.id) return state;
       if (state.some((x) => x.id === label_bar_normalized.id)) return state;
       return [...state, label_bar_normalized];
@@ -102,8 +101,8 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
           patch.label = action.label;
           changed = true;
         }
-        if (action.category !== undefined && x.ergo_method !== action.category) {
-          patch.ergo_method = action.category;
+        if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
+          patch.ergo_method = action.ergo_method;
           changed = true;
         }
         if (action.color !== undefined && x.color !== action.color) {
@@ -127,33 +126,6 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
     default:
       return state;
   }
-}
-
-function normalizeCategory(c?: string) {
-  return (c ?? 'Uncategorized').trim() || 'Uncategorized';
-}
-
-function canSaveForRange(args: {
-  labels: Label[];
-  category?: string;
-  from: number;
-  to: number;
-  ignoreId?: string | null;
-}) {
-  const fromN = Math.min(args.from, args.to);
-  const toN = Math.max(args.from, args.to);
-  const targetCategory = normalizeCategory(args.category);
-
-  const hasOverlapSameCategory = args.labels.some((m) => {
-    if (args.ignoreId && m.id === args.ignoreId) return false;
-    const mCat = normalizeCategory(m.ergo_method);
-    if (mCat !== targetCategory) return false;
-    const mf = Math.min(m.from, m.to);
-    const mt = Math.max(m.from, m.to);
-    return fromN < mt && toN > mf;
-  });
-
-  return !hasOverlapSameCategory;
 }
 
 export function use_current_label_range_geometry_cxt(frame_count: number): RectangleLabelBar {
@@ -202,12 +174,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const add_label_rect = useCallback(
     (label: Label) => {
-      const ok = canSaveForRange({
+      const ok = can_save_for_range({
         labels: labels_marker_reducer,
         category: label.ergo_method,
         from: label.from,
         to: label.to,
-        ignoreId: null,
+        ignore_id: null,
       });
       if (!ok) return; // blockiert Speichern im Context
       dispatch({ type: 'add', label: label });
@@ -226,7 +198,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_range([m.from, m.to]);
       set_editing_id(id);
 
-      if (normalizeCategory(m.ergo_method) === 'RULA') {
+      if (normalize_category(m.ergo_method) === 'RULA') {
         const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
           string,
           LabelImage | null
@@ -238,7 +210,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
 
-      if (normalizeCategory(m.ergo_method) === 'OWAS') {
+      if (normalize_category(m.ergo_method) === 'OWAS') {
         const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
           string,
           LabelImage | null
@@ -258,17 +230,17 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     if (!editing_id) return;
 
     const editingMarker = labels_marker_reducer.find((m) => m.id === editing_id);
-    const ok = canSaveForRange({
+    const ok = can_save_for_range({
       labels: labels_marker_reducer,
       category: editingMarker?.ergo_method,
       from: range[0],
       to: range[1],
-      ignoreId: editing_id,
+      ignore_id: editing_id,
     });
 
     if (!ok) return;
 
-    const isRula = normalizeCategory(editingMarker?.ergo_method) === 'RULA';
+    const isRula = normalize_category(editingMarker?.ergo_method) === 'RULA';
     const rulaLabel = `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`;
 
     dispatch({
@@ -276,7 +248,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       id: editing_id,
       from: range[0],
       to: range[1],
-      ...(isRula ? { label: rulaLabel, category: 'RULA' } : {}),
+      ...(isRula ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
     });
     console.log('Edited label:', editing_id, range);
     set_editing_id(null);
@@ -311,7 +283,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         from: current.from,
         to: current.to,
         label: patch.label,
-        category: patch.ergo_method,
+        ergo_method: patch.ergo_method,
         color: patch.color,
         framecount: patch.framecount,
       });
@@ -462,12 +434,12 @@ export function use_can_save_label_cxt() {
       const editingMarker = v.editing_id ? v.label.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
 
-      return canSaveForRange({
+      return can_save_for_range({
         labels: v.label,
         category: targetCategory,
         from: v.range[0],
         to: v.range[1],
-        ignoreId: v.editing_id,
+        ignore_id: v.editing_id,
       });
     };
   });

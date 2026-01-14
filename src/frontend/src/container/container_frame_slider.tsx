@@ -1,4 +1,4 @@
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { use_slider_frame_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
@@ -29,7 +29,7 @@ export function ContainerFrameSlider() {
     cleanup_loop,
     cleanup_thumbnail_render,
     is_playing,
-  } = useThreeJSEngine();
+  } = use_three_js_engine_ctx();
 
   const handleTogglePlay = useCallback(() => {
     play_pause();

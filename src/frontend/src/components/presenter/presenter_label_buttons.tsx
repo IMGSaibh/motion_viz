@@ -7,6 +7,7 @@ import type { Label } from '@/domain/datatypes';
 
 type Props = {
   onClick?: (label: Label) => void;
+  onChange?: (_event: React.SyntheticEvent, newValue: string) => void;
 };
 
 export function PresenterLabelButtons(props: Props) {

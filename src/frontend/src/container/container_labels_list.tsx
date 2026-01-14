@@ -1,4 +1,4 @@
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useCallback, useEffect, useMemo } from 'react';
 import {
   use_slider_frame_cxt,
@@ -13,7 +13,7 @@ import { PresenterLabelList } from '@/components/presenter/presenter_label_list'
 import { get_label_all_label_images_rula } from '@/Assets/label_images';
 
 export function ContainerLabelsList() {
-  const { frame_count, selected_motion } = useThreeJSEngine();
+  const { frame_count, selected_motion } = use_three_js_engine_ctx();
 
   const labels = use_range_marker_cxt();
   const update_label_meta = use_update_label_meta_cxt();
