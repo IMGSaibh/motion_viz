@@ -78,6 +78,7 @@ export class ThreeJSEngine {
     const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
     const fileUrl = apiUrl(`/data/${file_extension}/${filename}`);
+
     switch (file_extension) {
       case 'bvh':
         this.bvh_loader = new BVH_loader(this.scene);

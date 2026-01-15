@@ -57,7 +57,6 @@ export function ContainerLabelButtons() {
   const on_click_save_label = useCallback(
     (label: Label) => {
       add_label(label);
-      console.log('Added label:', label);
     },
     [add_label],
   );

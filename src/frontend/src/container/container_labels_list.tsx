@@ -21,7 +21,6 @@ export function ContainerLabelsList() {
   const remove_label = use_remove_label_cxt();
   const clear_label_list = use_clear_label_list_ctx();
 
-  // const frame = use_slider_frame_cxt();
   const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();

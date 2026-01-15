@@ -31,17 +31,22 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)
-    file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
+    label_json_file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
+
+    mocap_file_ending = Path(payload.motion_name).suffix
+    path_to_mocap_file = f"data/{mocap_file_ending[1:]}/{payload.motion_name}"
 
     label_file = {
-        "file_path": "not implemented yet",
+        "file_path": path_to_mocap_file,
         "annotator": "not implemented yet",
         "filename": payload.motion_name,
         "labels": labels
     }
-    file_path.write_text(json.dumps(label_file, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+    label_json_file_path.write_text(json.dumps(label_file, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {
-        "message": "saved labels to " + str(file_path.resolve()), 
+        "message": "saved labels to " + str(label_json_file_path.resolve()), 
         "warning": "",
     }

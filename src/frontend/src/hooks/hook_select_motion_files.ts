@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { list_motion_files, MotionFileItem } from '../api/api_file_processing';
+import { list_motion_files, MotionFileItem } from '@/api/api_file_processing';
 
 export function select_motion_files(options?: { enabled?: boolean; staleTime?: number }) {
   const query_keys = {
@@ -16,7 +16,7 @@ export function select_motion_files(options?: { enabled?: boolean; staleTime?: n
       ];
       return items;
     },
-    staleTime: options?.staleTime ?? 30_000,
+    staleTime: options?.staleTime ?? 30000,
     enabled: options?.enabled ?? true,
   });
 }
