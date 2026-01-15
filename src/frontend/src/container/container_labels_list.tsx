@@ -1,7 +1,6 @@
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
-  use_slider_frame_cxt,
   use_remove_label_cxt,
   use_clear_label_list_ctx,
   use_range_marker_cxt,
@@ -31,13 +30,13 @@ export function ContainerLabelsList() {
   useEffect(() => {
     const fc = Math.max(0, frame_count ?? 0);
 
-    labels.forEach((m) => {
-      const name = m.button_text && m.button_text.trim() ? m.button_text : `Label_${m.id}`;
+    labels.forEach((label) => {
+      const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
       // const img = label_image_map.get(name) ?? null;
 
       // nur patchen, wenn wirklich nötig (reduziert re-renders)
-      if (m.button_text !== name) {
-        update_label_meta(m.id, { button_text: name });
+      if (label.button_text !== name) {
+        update_label_meta(label.id, { button_text: name });
       }
     });
   }, [labels, frame_count, label_image_map, update_label_meta]);
@@ -56,15 +55,6 @@ export function ContainerLabelsList() {
   const save_label_list_on_click = useCallback(() => {
     if (!selected_motion) return;
 
-    const parts = selected_motion.split(/[/\\]/).filter(Boolean);
-    const filename = parts.pop() ?? selected_motion;
-    const path = parts.length ? `/${parts.join('/')}/` : '/';
-
-    console.log('Saving path in labels:', path);
-    console.log('Saving labels:', labels);
-
-    const motion_file = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
-
     const exported_labels = labels.map((label) => {
       return {
         ergo_method: label.ergo_method,
@@ -76,7 +66,7 @@ export function ContainerLabelsList() {
 
     hook_save_labels.mutate(
       {
-        file_name: motion_file,
+        file_name: selected_motion,
         labels: exported_labels,
       },
       {
