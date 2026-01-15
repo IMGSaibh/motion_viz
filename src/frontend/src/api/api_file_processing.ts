@@ -1,4 +1,4 @@
-import { fetch_json, fetch_form } from './api_client';
+import { fetch_json, fetch_form } from '@/api/api_client';
 
 export type MotionFilesResponse = { bvh: string[]; fbx: string[]; npy: string[] };
 export type MotionFileItem = { type: 'bvh' | 'fbx' | 'npy'; name: string };
@@ -25,6 +25,15 @@ export async function uploadFiles(files: File[], opts?: { signal?: AbortSignal }
   const form = new FormData();
   files.forEach((f) => form.append('files', f));
   return fetch_form<{ message?: string | number; warning?: string[] | string }>('/api_file_upload/upload', form, {
+    signal: opts?.signal,
+  });
+}
+
+export async function deleteFiles(filenames: string[], opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message?: string | number; warning?: string[] | string }>('/api_file_delete/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filenames }),
     signal: opts?.signal,
   });
 }
