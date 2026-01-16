@@ -9,7 +9,7 @@ import {
   use_can_save_label_cxt,
   use_owas_selected_cxt,
   use_set_owas_selected_cxt,
-  use_clear_owas_selected_cxt as use_unselect_owas_cxt,
+  use_unselect_owas_cxt as use_unselect_owas_cxt,
 } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';

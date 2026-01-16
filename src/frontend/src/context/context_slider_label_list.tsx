@@ -51,7 +51,7 @@ type FrameSliderLabellistContext = {
 
   owas_selected: Record<string, LabelImage | null>;
   set_owas_selected: (next: Record<string, LabelImage | null>) => void;
-  unselected_owas: () => void;
+  unselect_owas: () => void;
 
   update_label_meta: (id: string, patch: Partial<Pick<Label, 'button_text' | 'ergo_method' | 'color'>>) => void;
 };
@@ -305,7 +305,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       owas_selected,
       set_owas_selected,
-      unselected_owas: unselected_owas,
+      unselect_owas: unselected_owas,
     }),
     [
       range,
@@ -504,9 +504,9 @@ export function use_set_owas_selected_cxt() {
   });
 }
 
-export function use_clear_owas_selected_cxt() {
+export function use_unselect_owas_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.unselected_owas;
+    return v.unselect_owas;
   });
 }

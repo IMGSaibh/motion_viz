@@ -34,7 +34,7 @@ export function PresenterLabelList(props: Props) {
             }
             sx={{ width: '100%' }}
           >
-            Label-List
+            Label-List {props.lables_list.length > 0 ? `(${props.lables_list.length})` : ''}
           </Button>
 
           <Button onClick={props.delete_label_list_on_click} sx={{ width: '100%' }}>

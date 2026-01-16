@@ -15,9 +15,9 @@ export function WidgetFileOperations(props: Props) {
         Upload Files
         <input ref={props.file_dialog_reference} type="file" multiple hidden onChange={props.file_dialog_on_change} />
       </Button>
-      <Button startIcon={<DeleteIcon />} onClick={props.delete_dialog_on_click}>
+      {/* <Button startIcon={<DeleteIcon />} onClick={props.delete_dialog_on_click}>
         Delete Files
-      </Button>
+      </Button> */}
     </>
   );
 }
