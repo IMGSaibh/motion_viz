@@ -182,7 +182,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
-
   const start_editing_label = useCallback(
     (id: string) => {
       const m = labels_marker_reducer.find((x) => x.id === id);
@@ -261,7 +260,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   }, []);
 
-  const unselected_owas = useCallback(() => {
+  const unselect_owas = useCallback(() => {
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, []);
 
@@ -305,7 +304,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       owas_selected,
       set_owas_selected,
-      unselect_owas: unselected_owas,
+      unselect_owas,
     }),
     [
       range,
@@ -328,7 +327,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
       owas_selected,
       set_owas_selected,
-      unselected_owas,
+      unselect_owas,
     ],
   );
 

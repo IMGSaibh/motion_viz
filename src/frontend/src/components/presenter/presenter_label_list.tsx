@@ -5,16 +5,18 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
 import type { LabelImage, Label } from '@/domain/datatypes';
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 type Props = {
   lables_list: Label[];
   delete_label_from_list_on_click?: (id: string) => void;
   delete_label_list_on_click?: () => void;
   save_label_list_on_click?: () => void;
+  download_labels_on_click?: () => void;
 };
 
 export function PresenterLabelList(props: Props) {
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, set_open] = useState<boolean>(true);
   return (
     <Box
       sx={(theme) => ({
@@ -26,7 +28,7 @@ export function PresenterLabelList(props: Props) {
           {/* Dropdown-Header */}
 
           <Button
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => set_open((v) => !v)}
             startIcon={
               <ExpandMoreIcon
                 sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
@@ -44,6 +46,16 @@ export function PresenterLabelList(props: Props) {
           <Button onClick={() => props.save_label_list_on_click?.()} sx={{ width: '100%' }}>
             <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Save Label-List
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('download labels clicked');
+              props.download_labels_on_click?.();
+            }}
+            sx={{ width: '100%' }}
+          >
+            <GetAppIcon fontSize="small" sx={{ mr: '0.5rem' }} />
+            Download Labels
           </Button>
         </Grid>
         <Grid size={{ md: 4 }}></Grid>

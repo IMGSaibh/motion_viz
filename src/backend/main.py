@@ -6,6 +6,7 @@ from backend.api import api_motion_descriptor
 from backend.api import api_pose_viewer_conversion
 from backend.api import api_motion_file_conversion
 from backend.api import api_save_labels
+from backend.api import api_download_labels
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -19,6 +20,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"],  # <- wichtig für filename aus Header
 )
 
 @app.get("/")
@@ -41,6 +43,7 @@ app.include_router(api_motion_descriptor.router, prefix="/api_motion_descriptor"
 app.include_router(api_pose_viewer_conversion.router, prefix="/api_pose_viewer_conversion")
 app.include_router(api_motion_file_conversion.router, prefix="/api_motion_file_conversion")
 app.include_router(api_save_labels.router, prefix="/api_save_labels")
+app.include_router(api_download_labels.router, prefix="/api_download_labels")
 
 
 

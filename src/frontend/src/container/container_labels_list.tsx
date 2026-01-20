@@ -7,6 +7,7 @@ import {
   use_update_label_meta_cxt,
 } from '@/context/context_slider_label_list';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
+import { hook_download_labels } from '@/hooks/hook_download_labels';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
 import { get_label_all_label_images_rula } from '@/Assets/label_images';
@@ -18,6 +19,7 @@ export function ContainerLabelsList() {
   const update_label_meta = use_update_label_meta_cxt();
 
   const hook_save_labels = hook_save_labels_to_json();
+  // const hook_download_labels = hook_download_labels();
   const remove_label = use_remove_label_cxt();
   const clear_label_list = use_clear_label_list_ctx();
 
@@ -84,6 +86,7 @@ export function ContainerLabelsList() {
       delete_label_from_list_on_click={delete_label_from_list_on_click}
       delete_label_list_on_click={delete_label_list_on_click}
       save_label_list_on_click={save_label_list_on_click}
+      download_labels_on_click={hook_download_labels}
     />
   );
 }

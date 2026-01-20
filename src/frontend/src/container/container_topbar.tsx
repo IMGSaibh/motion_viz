@@ -99,9 +99,28 @@ export function ContainerTopbar() {
       onError: (err: any) => error(err?.message || 'Creation failed'),
     });
   }
+  function reset_current_motion() {
+    // UI
+    set_motion_file_selected('');
+
+    // ThreeJS / Player
+    set_selected_motion(null as any);
+    stop();
+    go_to_frame(0);
+
+    // Slider / Labels
+    set_std_slider_value(0);
+    set_range([0, 1]);
+    clear_slider_label_list();
+  }
 
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     const filename = e.target.value;
+
+    reset_current_motion();
+
+    if (!filename) return;
+
     set_motion_file_selected(filename);
     set_selected_motion(e.target.value);
     await load_motion_file(e.target.value);

@@ -70,3 +70,12 @@ export async function save_labels_to_json(
     body: JSON.stringify({ motion_name, labels }),
   });
 }
+
+export async function download_labels_jsons(opts?: { signal?: AbortSignal }) {
+  console.log('api file download_labels_jsons called');
+
+  return fetch_json<{ message: string; warning?: string | string[] }>('/api_download_labels/download_labels', {
+    method: 'POST',
+    signal: opts?.signal,
+  });
+}
