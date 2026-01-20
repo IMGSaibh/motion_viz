@@ -21,6 +21,36 @@ export class HttpError extends Error {
   }
 }
 
+export async function fetch_labels<T>(path: string, opts: FetchOptions = {}) {
+  const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 150000 } = opts;
+  const controller = new AbortController();
+  const timeout_id = timeoutMs
+    ? setTimeout(() => controller.abort(new DOMException('Request timeout', 'AbortError')), timeoutMs)
+    : undefined;
+
+  const respond = await fetch(BASE_URL + path, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(headers || {}) },
+    body,
+    signal: signal ?? controller.signal,
+  });
+
+  console.log('fetch labels response:', respond);
+  // try {
+  //   const respond = await fetch(BASE_URL + path, {
+  //     method,
+  //     headers: { 'Content-Type': 'application/json', ...(headers || {}) },
+  //     body,
+  //     signal: signal ?? controller.signal,
+  //   });
+  // } catch (error) {
+  //       return text ? (JSON.parse(text) as T) : (undefined as unknown as T);
+
+  // }
+
+  // return respond ? (JSON.parse(text) as T) : (undefined as unknown as T);
+}
+
 export async function fetch_json<T>(path: string, opts: FetchOptions = {}): Promise<T> {
   const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 150000 } = opts;
   const controller = new AbortController();
