@@ -1,6 +1,13 @@
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { use_slider_frame_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
+import {
+  use_slider_frame_cxt,
+  use_set_slider_frame_cxt,
+  use_clear_label_list_ctx,
+  use_set_range_slider_value_cxt,
+  use_unselect_rula_cxt,
+  use_unselect_owas_cxt,
+} from '@/context/context_slider_label_list';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 
 export function ContainerFrameSlider() {
@@ -10,6 +17,12 @@ export function ContainerFrameSlider() {
 
   const slider_frame_ctx = use_slider_frame_cxt();
   const set_slider_frame = use_set_slider_frame_cxt();
+  const set_range = use_set_range_slider_value_cxt();
+
+  const unselect_rula = use_unselect_rula_cxt();
+  const unselect_owas = use_unselect_owas_cxt();
+
+  const clear_slider_label_list = use_clear_label_list_ctx();
 
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -29,7 +42,7 @@ export function ContainerFrameSlider() {
     cleanup_loop,
     cleanup_thumbnail_render,
     is_playing,
-  } = useThreeJSEngine();
+  } = use_three_js_engine_ctx();
 
   const handleTogglePlay = useCallback(() => {
     play_pause();
@@ -53,6 +66,10 @@ export function ContainerFrameSlider() {
         cleanup_loop();
         cleanup_thumbnail_render();
         set_slider_frame(0);
+        set_range([0, 1]);
+        clear_slider_label_list();
+        unselect_owas();
+        unselect_rula();
       }
       if (e.code === 'ArrowRight') {
         e.preventDefault();

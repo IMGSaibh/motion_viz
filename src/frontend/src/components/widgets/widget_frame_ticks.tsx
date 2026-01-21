@@ -1,9 +1,5 @@
 import { Box, Grid } from '@mui/material';
 
-type Props = {
-  frame_count: number;
-};
-
 function computeTickInterval(frameCount: number): number {
   if (frameCount <= 50) return 10;
   if (frameCount <= 150) return 20;
@@ -14,6 +10,10 @@ function computeTickInterval(frameCount: number): number {
   if (frameCount <= 10000) return 800;
   return 2000;
 }
+
+type Props = {
+  frame_count: number;
+};
 
 export function WidgetFrameTicks(props: Props) {
   const frameCount = props.frame_count;

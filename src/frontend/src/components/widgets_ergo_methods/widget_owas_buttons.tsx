@@ -1,37 +1,39 @@
-import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import {
   get_label_images_cat1_owas,
   get_label_images_cat2_owas,
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
 } from '@/Assets/label_images';
-import SaveIcon from '@mui/icons-material/Save';
-import { useMemo, useState } from 'react';
 import {
-  use_add_slider_label_ctx,
   use_range_slider_value_cxt,
   use_can_save_label_cxt,
   use_owas_selected_cxt,
   use_set_owas_selected_cxt,
-  use_clear_owas_selected_cxt,
+  use_unselect_owas_cxt as use_unselect_owas_cxt,
 } from '@/context/context_slider_label_list';
-type Item = { src: string; label: string; category: string };
+import { useMemo } from 'react';
+import { uid } from '@/domain/label_logic';
+import SaveIcon from '@mui/icons-material/Save';
+import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
+import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 
 type Props = {
-  onClick?: (label: string, category: string) => void;
+  onClick?: (label: Label) => void;
 };
 
 function CategoryGrid({
+  cat,
   title,
-  items,
-  selectedLabel,
+  owas_button_images,
+  selected_cat_images,
   onSelect,
   isLast,
 }: {
+  cat: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4';
   title: string;
-  items: readonly Item[];
-  selectedLabel: string | null;
-  onSelect: (item: Item) => void;
+  owas_button_images: readonly LabelImage[];
+  selected_cat_images: string | null;
+  onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4', img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -55,15 +57,13 @@ function CategoryGrid({
           alignContent: 'start',
         }}
       >
-        {items.map((item, i) => {
-          const isSelected = selectedLabel === item.label;
-          const isDimmed = selectedLabel !== null && !isSelected;
+        {owas_button_images.map((item, i) => {
+          const isSelected = selected_cat_images === item.name;
+          const isDimmed = selected_cat_images !== null && !isSelected;
           return (
             <ButtonBase
-              key={`${item.category}-${item.label}-${i}`}
-              onClick={() => {
-                onSelect(item);
-              }}
+              key={`${item.category}-${item.name}-${i}`}
+              onClick={() => onSelect(cat, item)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
                 borderRadius: 0,
@@ -78,7 +78,7 @@ function CategoryGrid({
               <Box
                 component="img"
                 src={item.src}
-                alt={item.label}
+                alt={item.name}
                 sx={{
                   height: 40,
                   objectFit: 'contain',
@@ -97,7 +97,7 @@ function CategoryGrid({
                   py: 0.5,
                 }}
               >
-                {item.label}
+                {item.name}
               </Box>
             </ButtonBase>
           );
@@ -107,59 +107,52 @@ function CategoryGrid({
   );
 }
 
-function uid() {
-  // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const c: any = typeof crypto !== 'undefined' ? crypto : null;
-  return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 export function WidgetOwasButtons(props: Props) {
-  const can_save_label = use_can_save_label_cxt();
+  const label_images_cat1 = useMemo(() => get_label_images_cat1_owas(), []);
+  const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);
+  const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
+  const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
+
   const range = use_range_slider_value_cxt();
-  const add_slider_label = use_add_slider_label_ctx();
 
   const owas_selected = use_owas_selected_cxt();
   const set_owas_selected = use_set_owas_selected_cxt();
-  const clear_owas_selected = use_clear_owas_selected_cxt();
+  const unselect_owas = use_unselect_owas_cxt();
   const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
 
-  const cat1 = useMemo(() => get_label_images_cat1_owas(), []);
-  const cat2 = useMemo(() => get_label_images_cat2_owas(), []);
-  const cat3 = useMemo(() => get_label_images_cat3_owas(), []);
-  const cat4 = useMemo(() => get_label_images_cat4_owas(), []);
-
-  const cat1Key = cat1[0]?.category ?? 'CAT1';
-  const cat2Key = cat2[0]?.category ?? 'CAT2';
-  const cat3Key = cat3[0]?.category ?? 'CAT3';
-  const cat4Key = cat4[0]?.category ?? 'CAT4';
-
-  const slotForCategory = (cat: string) => {
-    if (cat === cat1Key) return 'CAT1';
-    if (cat === cat2Key) return 'CAT2';
-    if (cat === cat3Key) return 'CAT3';
-    return 'CAT4';
-  };
-  const handleSelect = (item: Item) => {
-    const slot = slotForCategory(item.category);
-    set_owas_selected({ ...owas_selected, [slot]: item.label });
-  };
-
+  const can_save_label = use_can_save_label_cxt();
   const canSaveOwas = can_save_label('OWAS');
+
+  const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4', img: LabelImage) => {
+    set_owas_selected({ ...owas_selected, [cat]: img });
+  };
 
   const handleSave = () => {
     if (!allSelected) return;
     if (!canSaveOwas) return;
 
-    add_slider_label({
-      id: uid(),
-      from: Math.min(range[0], range[1]),
-      to: Math.max(range[0], range[1]),
-      label: `${owas_selected.CAT1} | ${owas_selected.CAT2} | ${owas_selected.CAT3} | ${owas_selected.CAT4}`,
-      category: 'OWAS',
-    });
+    const categories: LabelCategory[] = [
+      { name: 'CAT1', image: owas_selected.CAT1! },
+      { name: 'CAT2', image: owas_selected.CAT2! },
+      { name: 'CAT3', image: owas_selected.CAT3! },
+      { name: 'CAT4', image: owas_selected.CAT4! },
+    ];
 
-    clear_owas_selected();
+    const from = Math.min(range[0], range[1]);
+    const to = Math.max(range[0], range[1]);
+    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
+
+    const label: Label = {
+      id: uid(),
+      start_frame: from,
+      end_frame: to,
+      ergo_method: 'OWAS',
+      button_text: labelText,
+      categories,
+    };
+
+    props.onClick?.(label);
+    unselect_owas();
   };
 
   return (
@@ -172,35 +165,39 @@ export function WidgetOwasButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT1"
             title="Kategorie Rücken"
-            items={cat1}
-            selectedLabel={owas_selected.CAT1}
+            owas_button_images={label_images_cat1}
+            selected_cat_images={owas_selected.CAT1?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT2"
             title="Kategorie Arme"
-            items={cat2}
-            selectedLabel={owas_selected.CAT2}
+            owas_button_images={label_images_cat2}
+            selected_cat_images={owas_selected.CAT2?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT3"
             title="Kategorie Beine"
-            items={cat3}
-            selectedLabel={owas_selected.CAT3}
+            owas_button_images={label_images_cat3}
+            selected_cat_images={owas_selected.CAT3?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT4"
             title="Kategorie Last"
-            items={cat4}
-            selectedLabel={owas_selected.CAT4}
+            owas_button_images={label_images_cat4}
+            selected_cat_images={owas_selected.CAT4?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>

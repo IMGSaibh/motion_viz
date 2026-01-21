@@ -7,8 +7,10 @@ from pydantic import BaseModel, Field
 router = APIRouter()
 
 class LabelItem(BaseModel):
-    startframe: int = Field(..., ge=0)
-    endframe: int = Field(..., ge=0)
+    ergo_method: str 
+    start_frame: int = Field(..., ge=0)
+    end_frame: int = Field(..., ge=0)
+    button_text: str
 
 class SaveLabelsRequest(BaseModel):
     motion_name: str          
@@ -22,20 +24,29 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
             "warning": "file could not be saved",
         }
 
-    # optional: make sure start <= end frame
     labels = []
     for item in payload.labels:
-        a, b = sorted((item.startframe, item.endframe))
-        labels.append({"startframe": a, "endframe": b})
+        a, b = sorted((item.start_frame, item.end_frame))
+        labels.append({"ergo_method": item.ergo_method,"start_frame": a, "end_frame": b,"button_text": item.button_text,})
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)
-    file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
+    label_json_file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
 
-    # only label list
-    file_path.write_text(json.dumps(labels, ensure_ascii=False, indent=2), encoding="utf-8")
+    mocap_file_ending = Path(payload.motion_name).suffix
+    path_to_mocap_file = f"data/{mocap_file_ending[1:]}/{payload.motion_name}"
+
+    label_file = {
+        "file_path": path_to_mocap_file,
+        "annotator": "not implemented yet",
+        "filename": payload.motion_name,
+        "labels": labels
+    }
+
+
+    label_json_file_path.write_text(json.dumps(label_file, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {
-        "message": "saved labels to " + str(file_path.resolve()), 
+        "message": "saved labels to " + str(label_json_file_path.resolve()), 
         "warning": "",
     }

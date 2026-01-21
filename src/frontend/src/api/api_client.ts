@@ -22,7 +22,7 @@ export class HttpError extends Error {
 }
 
 export async function fetch_json<T>(path: string, opts: FetchOptions = {}): Promise<T> {
-  const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 150000 } = opts;
+  const { method = 'GET', headers, body, signal, timeout_ms: timeoutMs = 0 } = opts;
   const controller = new AbortController();
   const timeout_id = timeoutMs
     ? setTimeout(() => controller.abort(new DOMException('Request timeout', 'AbortError')), timeoutMs)
@@ -84,8 +84,8 @@ export async function fetch_form<T>(path: string, form: FormData, opts: Omit<Fet
 }
 
 // builds a URL for DEV (localhost:8000) und PROD (same-origin/Nginx)
-export function apiUrl(path: string): string {
+export function api_get_base_url(path: string): string {
   const base = BASE_URL || window.location.origin; // PROD: same Origin
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${p}`;
+  const endpoint = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${endpoint}`;
 }

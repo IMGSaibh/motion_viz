@@ -1,25 +1,21 @@
 import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
-import { upload_motion_files } from '@/hooks/hook_upload_motion_files';
+import { hook_upload_motion_files, hook_delete_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
-import {
-  use_set_range_slider_value_cxt,
-  use_set_slider_frame_cxt,
-  // use_slider_frame_cxt,
-} from '@/context/context_slider_label_list';
+import { use_set_range_slider_value_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 
 export function ContainerTopbar() {
-  const { set_selected_motion, load_motion_file, go_to_frame } = useThreeJSEngine();
+  const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
   const set_range = use_set_range_slider_value_cxt();
   const { success, warning, error } = use_snackbar_ctx();
 
@@ -43,12 +39,12 @@ export function ContainerTopbar() {
 
   // --- React Query hooks ---
   const query_motion_files = select_motion_files({ enabled: false });
-  const mutation_upload_files = upload_motion_files();
+  const mutation_upload_files = hook_upload_motion_files();
+  const mutation_delete_files = hook_delete_motion_files();
   const mutation_create_descriptor = create_motion_descriptor();
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  // const std_slider_value = use_slider_frame_cxt();
   const set_std_slider_value = use_set_slider_frame_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
 
@@ -64,6 +60,18 @@ export function ContainerTopbar() {
       error(err?.message || 'Upload failed');
     } finally {
       e.target.value = '';
+    }
+  }
+
+  async function handle_delete_selected_motion_file_on_click() {
+    if (!motion_file_selected) return;
+
+    try {
+      const respond = await mutation_delete_files.mutateAsync([motion_file_selected]);
+      if (respond.message) success(`Deleted ${respond.message} file(s)`);
+      if (respond.warning) warning(`${respond.warning} not deleted`);
+    } catch (err: any) {
+      error(err?.message || 'Delete failed');
     }
   }
 
@@ -91,9 +99,28 @@ export function ContainerTopbar() {
       onError: (err: any) => error(err?.message || 'Creation failed'),
     });
   }
+  function reset_current_motion() {
+    // UI
+    set_motion_file_selected('');
+
+    // ThreeJS / Player
+    set_selected_motion(null as any);
+    stop();
+    go_to_frame(0);
+
+    // Slider / Labels
+    set_std_slider_value(0);
+    set_range([0, 1]);
+    clear_slider_label_list();
+  }
 
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     const filename = e.target.value;
+
+    reset_current_motion();
+
+    if (!filename) return;
+
     set_motion_file_selected(filename);
     set_selected_motion(e.target.value);
     await load_motion_file(e.target.value);
@@ -133,6 +160,7 @@ export function ContainerTopbar() {
       <PresenterTopbar
         file_dialog_reference={file_dialog_reference}
         file_dialog_on_change={handle_file_dialog_on_change}
+        delete_dialog_on_click={handle_delete_selected_motion_file_on_click}
         motion_config_reference={motion_config_references}
         motion_config_is_open={motion_config_is_open}
         motion_config_on_click={handle_motion_config_on_click}

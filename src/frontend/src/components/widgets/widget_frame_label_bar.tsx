@@ -1,11 +1,11 @@
 import { theme } from '@/theme';
 import { Box } from '@mui/material';
+import { overlaps } from '@/domain/label_logic';
 import {
-  overlaps,
   use_current_label_range_geometry_cxt,
   use_range_marker_cxt,
+  use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
-import { use_editing_label_id_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
   frame_count: number;
@@ -14,13 +14,9 @@ type Props = {
 export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_range_marker_cxt();
   const editing_id = use_editing_label_id_cxt();
-
   const isRtl = theme.direction === 'rtl';
-
-  // ✅ ersetzt: clamp/thumb_idx/from/to/leftPct/scaleX-Berechnung
   const currentGeom = use_current_label_range_geometry_cxt(props.frame_count);
 
-  // clamp nur noch für saved labels / overlap nötig
   const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
 
@@ -28,7 +24,7 @@ export function WidgetFrameLabelBar(props: Props) {
 
   const has_overlap = saved_labels
     .filter((label) => label.id !== editing_id)
-    .some(({ from: vf, to: vt }) => {
+    .some(({ start_frame: vf, end_frame: vt }) => {
       const vvFrom = clamp(Math.min(vf, vt));
       const vvTo = clamp(Math.max(vf, vt));
       return overlaps(currentGeom.from, currentGeom.to, vvFrom, vvTo);
@@ -46,7 +42,7 @@ export function WidgetFrameLabelBar(props: Props) {
         aria-hidden
       >
         {/* saved labels */}
-        {saved_labels.map(({ id, from: vf, to: vt, color }) => {
+        {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
           const vvFrom = clamp(Math.min(vf, vt));
           const vvTo = clamp(Math.max(vf, vt));
           const vvLen = Math.max(0, vvTo - vvFrom);

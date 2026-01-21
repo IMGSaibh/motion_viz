@@ -34,10 +34,10 @@ export function SnackbarProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       notify,
-      success: (m: string, ms?: number) => notify(m, 'success', ms),
-      info: (m: string, ms?: number) => notify(m, 'info', ms),
-      warning: (m: string, ms?: number) => notify(m, 'warning', ms),
-      error: (m: string, ms?: number) => notify(m, 'error', ms),
+      success: (message: string, ms?: number) => notify(message, 'success', ms),
+      info: (message: string, ms?: number) => notify(message, 'info', ms),
+      warning: (message: string, ms?: number) => notify(message, 'warning', ms),
+      error: (message: string, ms?: number) => notify(message, 'error', ms),
       close,
     }),
     [notify, close],

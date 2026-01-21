@@ -1,4 +1,4 @@
-import { WidgetFileUpload } from '@/components/widgets_topbar/widget_file_upload';
+import { WidgetFileOperations } from '@/components/widgets_topbar/widget_file_operations';
 import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_motion_descriptor';
 import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
 import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
@@ -8,6 +8,8 @@ import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 type Props = {
   file_dialog_reference: React.RefObject<HTMLInputElement | null>;
   file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+  delete_dialog_on_click: () => void;
 
   motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
   motion_config_is_open: boolean;
@@ -34,10 +36,12 @@ export function PresenterTopbar(props: Props) {
               {/* LEFT: Buttons */}
               <Stack direction="row" spacing={2} alignItems="center" flexWrap="nowrap">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <WidgetFileUpload
+                  <WidgetFileOperations
                     {...{
                       file_dialog_reference: props.file_dialog_reference,
                       file_dialog_on_change: props.file_dialog_on_change,
+
+                      delete_dialog_on_click: props.delete_dialog_on_click,
                     }}
                   />
                   <WidgetConvertMotionFile

@@ -3,7 +3,6 @@ from pathlib import Path
 import numpy as np
 from pymotion.io.bvh import BVH
 from pymotion.ops.skeleton import fk
-from backend.json_loader import JsonLoader
 
 
 
@@ -62,5 +61,8 @@ class BvhParser:
 
 
     def scale_data(self, skeleton_path: Path):
-        config = JsonLoader(skeleton_path)
-        self.bvh.set_scale(config.get("scale"))
+        if not skeleton_path.is_file():
+            raise FileNotFoundError(skeleton_path)
+        with skeleton_path.open(encoding="utf-8") as f:
+            config = json.load(f)
+            self.bvh.set_scale(config.get("scale"))

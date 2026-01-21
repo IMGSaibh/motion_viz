@@ -13,7 +13,7 @@ import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Utils from '@/threeJS/utils';
-import { apiUrl } from '@/api/api_client';
+import { api_get_base_url } from '@/api/api_client';
 
 export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;
@@ -77,7 +77,8 @@ export class ThreeJSEngine {
     }
     const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
-    const fileUrl = apiUrl(`/data/${file_extension}/${filename}`);
+    const fileUrl = api_get_base_url(`/data/${file_extension}/${filename}`);
+
     switch (file_extension) {
       case 'bvh':
         this.bvh_loader = new BVH_loader(this.scene);

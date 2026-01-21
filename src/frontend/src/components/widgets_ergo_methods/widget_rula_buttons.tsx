@@ -1,38 +1,38 @@
-import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import {
   get_label_images_cat1_rula,
   get_label_images_cat2_rula,
   get_label_images_cat3_rula,
 } from '@/Assets/label_images';
-import { useMemo } from 'react';
-import SaveIcon from '@mui/icons-material/Save';
-
 import {
-  use_add_slider_label_ctx,
-  use_range_slider_value_cxt,
   use_can_save_label_cxt,
-  use_rula_selected_cxt,
+  use_unselect_rula_cxt,
   use_set_rula_selected_cxt,
-  use_clear_rula_selected_cxt,
+  use_rula_selected_cxt,
 } from '@/context/context_slider_label_list';
+import { useMemo } from 'react';
+import { uid } from '@/domain/label_logic';
+import SaveIcon from '@mui/icons-material/Save';
+import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
+import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
+import { use_range_slider_value_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
-  onClick?: (label: string, category: string) => void;
+  onClick?: (label: Label) => void;
 };
 
-type Item = { src: string; label: string; category: string };
-
 function CategoryGrid({
+  cat,
   title,
-  items,
-  selectedLabel,
+  rula_button_images,
+  selected_cat_image,
   onSelect,
   isLast,
 }: {
+  cat: 'CAT1' | 'CAT2' | 'CAT3';
   title: string;
-  items: readonly Item[];
-  selectedLabel: string | null;
-  onSelect: (item: Item) => void;
+  rula_button_images: readonly LabelImage[];
+  selected_cat_image: string | null;
+  onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -56,15 +56,13 @@ function CategoryGrid({
           alignContent: 'start',
         }}
       >
-        {items.map((item, i) => {
-          const isSelected = selectedLabel === item.label;
-          const isDimmed = selectedLabel !== null && !isSelected;
+        {rula_button_images.map((item, i) => {
+          const isSelected = selected_cat_image === item.name;
+          const isDimmed = selected_cat_image !== null && !isSelected;
           return (
             <ButtonBase
-              key={`${item.category}-${item.label}-${i}`}
-              onClick={() => {
-                onSelect(item);
-              }}
+              key={`${item.category}-${item.name}-${i}`}
+              onClick={() => onSelect(cat, item)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
                 borderRadius: 0,
@@ -79,7 +77,7 @@ function CategoryGrid({
               <Box
                 component="img"
                 src={item.src}
-                alt={item.label}
+                alt={item.name}
                 sx={{
                   height: 40,
                   objectFit: 'contain',
@@ -98,7 +96,7 @@ function CategoryGrid({
                   py: 0.5,
                 }}
               >
-                {item.label}
+                {item.name}
               </Box>
             </ButtonBase>
           );
@@ -108,59 +106,50 @@ function CategoryGrid({
   );
 }
 
-function uid() {
-  // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const c: any = typeof crypto !== 'undefined' ? crypto : null;
-  return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 export function WidgetRulaButtons(props: Props) {
-  const add_slider_label = use_add_slider_label_ctx();
+  const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
+  const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
+  const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
+
   const range = use_range_slider_value_cxt();
-
-  const cat1 = useMemo(() => get_label_images_cat1_rula(), []);
-  const cat2 = useMemo(() => get_label_images_cat2_rula(), []);
-  const cat3 = useMemo(() => get_label_images_cat3_rula(), []);
-
-  // category keys aus Items (stabil)
-  const cat1Key = cat1[0]?.category ?? 'CAT1';
-  const cat2Key = cat2[0]?.category ?? 'CAT2';
-  const cat3Key = cat3[0]?.category ?? 'CAT3';
 
   const rula_selected = use_rula_selected_cxt();
   const set_rula_selected = use_set_rula_selected_cxt();
-  const clear_rula_selected = use_clear_rula_selected_cxt();
-
+  const unselect_rula = use_unselect_rula_cxt();
   const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const slotForCategory = (cat: string) => {
-    if (cat === cat1Key) return 'CAT1' as const;
-    if (cat === cat2Key) return 'CAT2' as const;
-    return 'CAT3' as const;
-  };
-  const handleSelect = (item: Item) => {
-    const slot = slotForCategory(item.category);
-    set_rula_selected({ ...rula_selected, [slot]: item.label });
+  const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => {
+    set_rula_selected({ ...rula_selected, [cat]: img });
   };
 
-  const handleSave = () => {
+  const on_handle_save = () => {
     if (!allSelected) return;
     if (!canSaveRula) return;
 
-    add_slider_label({
-      id: uid(),
-      from: Math.min(range[0], range[1]),
-      to: Math.max(range[0], range[1]),
-      label: `${rula_selected.CAT1} | ${rula_selected.CAT2} | ${rula_selected.CAT3}`,
-      category: 'RULA',
-    });
+    const categories: LabelCategory[] = [
+      { name: 'CAT1', image: rula_selected.CAT1! },
+      { name: 'CAT2', image: rula_selected.CAT2! },
+      { name: 'CAT3', image: rula_selected.CAT3! },
+    ];
 
-    // ✅ danach wieder von vorne beginnen
-    clear_rula_selected();
+    const from = Math.min(range[0], range[1]);
+    const to = Math.max(range[0], range[1]);
+    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
+
+    const label: Label = {
+      id: uid(),
+      start_frame: from,
+      end_frame: to,
+      ergo_method: 'RULA',
+      button_text: labelText,
+      categories,
+    };
+
+    props.onClick?.(label);
+    unselect_rula();
   };
 
   return (
@@ -173,38 +162,41 @@ export function WidgetRulaButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT1"
             title="Gruppe: Arm | Hand"
-            items={cat1}
-            selectedLabel={rula_selected.CAT1}
+            rula_button_images={label_images_cat1}
+            selected_cat_image={rula_selected.CAT1?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT2"
             title="Gruppe: Nacken | Rumpf | Beine"
-            items={cat2}
-            selectedLabel={rula_selected.CAT2}
+            rula_button_images={label_images_cat2}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
+            cat="CAT3"
             title="Gruppe: Muskelarbeit | Kraft"
-            items={cat3}
-            selectedLabel={rula_selected.CAT3}
+            rula_button_images={label_images_cat3}
+            selected_cat_image={rula_selected.CAT3?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
-        {/* Actions */}
+        {/* Save Button */}
         <Grid size={{ md: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <IconButton
               size="small"
               aria-label="Save label"
-              onClick={handleSave}
+              onClick={on_handle_save}
               disabled={!allSelected || !canSaveRula}
               sx={{ border: 1, borderRadius: 0 }}
             >

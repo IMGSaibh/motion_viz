@@ -1,4 +1,4 @@
-import { fetch_json, fetch_form } from './api_client';
+import { fetch_json, fetch_form } from '@/api/api_client';
 
 export type MotionFilesResponse = { bvh: string[]; fbx: string[]; npy: string[] };
 export type MotionFileItem = { type: 'bvh' | 'fbx' | 'npy'; name: string };
@@ -29,6 +29,15 @@ export async function uploadFiles(files: File[], opts?: { signal?: AbortSignal }
   });
 }
 
+export async function deleteFiles(filenames: string[], opts?: { signal?: AbortSignal }) {
+  return fetch_json<{ message?: string | number; warning?: string[] | string }>('/api_file_delete/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filenames }),
+    signal: opts?.signal,
+  });
+}
+
 export async function createMotionDescriptor(data: MotionDescriptorData, opts?: { signal?: AbortSignal }) {
   return fetch_json<{ message: string }>('/api_motion_descriptor/motion_descriptor', {
     method: 'POST',
@@ -51,7 +60,10 @@ export async function convertBvh(opts?: { signal?: AbortSignal }) {
   );
 }
 
-export async function save_labels_to_json(motion_name: string, labels: { startframe: number; endframe: number }[]) {
+export async function save_labels_to_json(
+  motion_name: string,
+  labels: { ergo_method?: string; start_frame: number; end_frame: number; button_text?: string }[],
+) {
   return fetch_json('/api_save_labels/save_labels', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

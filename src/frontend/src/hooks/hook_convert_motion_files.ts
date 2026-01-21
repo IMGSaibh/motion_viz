@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { convertBvh, convertWithPoseViewer } from '../api/api_file_processing';
+import { convertBvh, convertWithPoseViewer } from '@/api/api_file_processing';
 
 const query_keys = {
   motionFiles: ['motion-files'] as const,

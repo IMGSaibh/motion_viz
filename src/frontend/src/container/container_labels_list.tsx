@@ -1,95 +1,76 @@
-import { useThreeJSEngine } from '@/context/context_three_js_engine';
-import { useRef, useCallback, useMemo } from 'react';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
+import { useCallback, useEffect } from 'react';
 import {
-  use_slider_frame_cxt,
   use_remove_label_cxt,
   use_clear_label_list_ctx,
   use_range_marker_cxt,
+  use_update_label_meta_cxt,
 } from '@/context/context_slider_label_list';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
+import { hook_download_labels } from '@/hooks/hook_download_labels';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
-import { LabelImage, get_label_all_label_images_rula } from '@/Assets/label_images';
-
-export type Label = {
-  id: string;
-  label: string;
-  label_image: LabelImage | null;
-  range: [number, number];
-  framecount: number;
-  category: string;
-};
-export const lable_list: Label[] = [];
+import { get_label_all_label_images_rula } from '@/Assets/label_images';
 
 export function ContainerLabelsList() {
-  const { frame_count, selected_motion } = useThreeJSEngine();
+  const { frame_count, selected_motion } = use_three_js_engine_ctx();
 
-  const markers = use_range_marker_cxt();
-  const label_id = useRef<number>(lable_list.length + 1);
+  const labels = use_range_marker_cxt();
+  const update_label_meta = use_update_label_meta_cxt();
+
   const hook_save_labels = hook_save_labels_to_json();
+  const { download_labels } = hook_download_labels();
+
   const remove_label = use_remove_label_cxt();
   const clear_label_list = use_clear_label_list_ctx();
 
-  const range_markers = use_range_marker_cxt();
-  const frame = use_slider_frame_cxt();
   const label_image_map = get_label_all_label_images_rula();
 
   const { success, error } = use_snackbar_ctx();
 
-  const label_list_on_click = useCallback(
+  // ✅ Sync: framecount + label_image (und fallback label) in den Context schreiben
+  useEffect(() => {
+    const fc = Math.max(0, frame_count ?? 0);
+
+    labels.forEach((label) => {
+      const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
+      // const img = label_image_map.get(name) ?? null;
+
+      // nur patchen, wenn wirklich nötig (reduziert re-renders)
+      if (label.button_text !== name) {
+        update_label_meta(label.id, { button_text: name });
+      }
+    });
+  }, [labels, frame_count, label_image_map, update_label_meta]);
+
+  const delete_label_from_list_on_click = useCallback(
     (id: string) => {
       remove_label(id);
     },
     [remove_label],
   );
 
-  const clear_label_list_on_click = useCallback(() => {
-    label_id.current = 1;
+  const delete_label_list_on_click = useCallback(() => {
     clear_label_list();
   }, [clear_label_list]);
 
-  const label_list: Label[] = useMemo(() => {
-    const fc = Math.max(0, frame_count ?? 0);
-    return markers.map((m) => {
-      const from = Math.min(m.from, m.to);
-      const to = Math.max(m.from, m.to);
-      const name = m.label ? m.label : `Label_${m.id}`;
-      const img = label_image_map.get(name) ?? null;
-
-      return {
-        id: m.id,
-        label: name,
-        label_image: img,
-        range: [from, to] as [number, number],
-        framecount: fc,
-        category: m.category || 'Uncategorized',
-      };
-    });
-  }, [markers, frame_count, label_image_map]);
-
-  const current_label_image = useMemo(() => {
-    const hit = range_markers.find((m) => {
-      const from = Math.min(m.from, m.to);
-      const to = Math.max(m.from, m.to);
-      return frame >= from && frame < to;
-    });
-    if (!hit?.label) return null;
-    return label_image_map.get(hit.label) ?? null;
-  }, [range_markers, frame, label_image_map]);
-
-  const on_save_click = useCallback(() => {
+  const save_label_list_on_click = useCallback(() => {
     if (!selected_motion) return;
 
-    const labels_map = markers.map((m) => {
-      const startframe = Math.min(m.from, m.to);
-      const endframe = Math.max(m.from, m.to);
-      return { startframe, endframe };
+    const exported_labels = labels.map((label) => {
+      return {
+        ergo_method: label.ergo_method,
+        start_frame: label.start_frame,
+        end_frame: label.end_frame,
+        button_text: label.button_text,
+      };
     });
 
-    const motion_name = (selected_motion.split(/[/\\]/).pop() ?? selected_motion).trim();
-
     hook_save_labels.mutate(
-      { motion_name, labels: labels_map },
+      {
+        file_name: selected_motion,
+        labels: exported_labels,
+      },
       {
         onSuccess: (respond: any) => {
           if (respond.message) success(respond.message);
@@ -98,17 +79,19 @@ export function ContainerLabelsList() {
         onError: (err: any) => error(err?.message || 'Saving labels failed'),
       },
     );
-  }, [markers, selected_motion, hook_save_labels, success, error]);
+  }, [labels, selected_motion, hook_save_labels, success, error]);
+
+  const download_labels_on_click = useCallback(() => {
+    download_labels();
+  }, [download_labels]);
 
   return (
-    <>
-      <PresenterLabelList
-        lables_list={label_list}
-        slider_list_on_click={label_list_on_click}
-        slider_list_clear_on_click={clear_label_list_on_click}
-        save_labels_on_click={on_save_click}
-        label_image={current_label_image}
-      />
-    </>
+    <PresenterLabelList
+      lables_list={labels}
+      delete_label_from_list_on_click={delete_label_from_list_on_click}
+      delete_label_list_on_click={delete_label_list_on_click}
+      save_label_list_on_click={save_label_list_on_click}
+      download_labels_on_click={download_labels_on_click}
+    />
   );
 }

@@ -81,7 +81,9 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     threejs_mngr_ref.current?.play_pause?.();
     sync_is_playing();
   }, [sync_is_playing]);
+
   const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
+
   const stop = useCallback(() => {
     threejs_mngr_ref.current?.pause?.();
     threejs_mngr_ref.current?.go_to_frame?.(0);
@@ -142,7 +144,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   return <three_js_engine_context.Provider value={value}>{children}</three_js_engine_context.Provider>;
 }
 
-export const useThreeJSEngine = () => {
+export const use_three_js_engine_ctx = () => {
   const ctx = useContext(three_js_engine_context);
   if (!ctx) throw new Error('useThreeJSEngine must be used within a ThreeJSEngineProvider');
   return ctx;

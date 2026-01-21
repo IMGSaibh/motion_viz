@@ -7,10 +7,10 @@ import { styled } from '@mui/material/styles';
 import Slider from '@mui/material/Slider';
 import ModeEditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Label } from '@/container/container_labels_list';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
 import ClearIcon from '@mui/icons-material/Clear';
+import type { Label } from '@/domain/datatypes';
 
 import {
   use_start_edit_label_cxt,
@@ -18,6 +18,7 @@ import {
   use_cancel_edit_label_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
+import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 
 const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
   zIndex: 1,
@@ -60,9 +61,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 
 type Props = {
   labels: Label[];
-  slider_list_on_click?: (id: string) => void;
-  slider_list_clear_on_click?: () => void;
-  save_labels_on_click?: () => void;
+  delete_label_from_list_on_click?: (id: string) => void;
   toggle_list: boolean;
 };
 
@@ -71,6 +70,7 @@ export function WidgetLabelList(props: Props) {
   const saveEdit = use_save_edit_label_cxt();
   const cancelEdit = use_cancel_edit_label_cxt();
   const editingId = use_editing_label_id_cxt();
+  const { frame_count } = use_three_js_engine_ctx();
 
   return (
     <Box
@@ -101,15 +101,14 @@ export function WidgetLabelList(props: Props) {
                       borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                     })}
                   >
-                    <WidgetLabelPreview label_image={slider_label.label_image} />
+                    <WidgetLabelPreview categories={slider_label.categories ?? null} />
                   </Grid>
-
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
                       disabled={true}
-                      value={slider_label.range}
+                      value={[slider_label.start_frame, slider_label.end_frame]}
                       min={0}
-                      max={slider_label.framecount}
+                      max={frame_count ?? 0}
                     />
                   </Grid>
                   <Grid size={{ md: 1 }}>
@@ -124,13 +123,13 @@ export function WidgetLabelList(props: Props) {
                       })}
                     >
                       <Typography variant="body2" noWrap>
-                        {slider_label.label}
+                        {slider_label.button_text}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Kategorie ${slider_label.category}`}
+                        {`Methode ${slider_label.ergo_method}`}
                       </Typography>
                       <Typography variant="caption" noWrap>
-                        {`Frame: ${slider_label.range[0]} – ${slider_label.range[1]}`}
+                        {`Frame: ${slider_label.start_frame} – ${slider_label.end_frame}`}
                       </Typography>
                       {/* Buttons underneath text */}
                       <Box
@@ -156,19 +155,19 @@ export function WidgetLabelList(props: Props) {
 
                             <IconButton
                               size="small"
-                              onClick={() => props.slider_list_on_click?.(slider_label.id)}
-                              aria-label="Delete label"
-                              sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
-                            >
-                              <DeleteIcon fontSize="inherit" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
                               onClick={cancelEdit}
                               aria-label="Cancel label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
                               <ClearIcon fontSize="inherit" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => props.delete_label_from_list_on_click?.(slider_label.id)}
+                              aria-label="Delete label"
+                              sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
+                            >
+                              <DeleteIcon fontSize="inherit" />
                             </IconButton>
                           </>
                         ) : (
@@ -184,7 +183,7 @@ export function WidgetLabelList(props: Props) {
 
                             <IconButton
                               size="small"
-                              onClick={() => props.slider_list_on_click?.(slider_label.id)}
+                              onClick={() => props.delete_label_from_list_on_click?.(slider_label.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
