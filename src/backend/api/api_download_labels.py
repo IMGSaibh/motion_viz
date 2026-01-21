@@ -9,8 +9,7 @@ router = APIRouter()
 @router.get("/download_labels")
 async def download_labels():
     labels_dir = Path("data/labels")
-    print("Labels dir:", labels_dir)
-    print("Labels Backend fired:", labels_dir)
+    
     if not labels_dir.exists():
         raise HTTPException(status_code=404, detail="Folder data/labels not found")
 

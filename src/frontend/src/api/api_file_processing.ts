@@ -1,4 +1,4 @@
-import { fetch_json, fetch_form, fetch_labels } from '@/api/api_client';
+import { fetch_json, fetch_form } from '@/api/api_client';
 
 export type MotionFilesResponse = { bvh: string[]; fbx: string[]; npy: string[] };
 export type MotionFileItem = { type: 'bvh' | 'fbx' | 'npy'; name: string };
@@ -68,14 +68,5 @@ export async function save_labels_to_json(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ motion_name, labels }),
-  });
-}
-
-export async function download_labels_jsons(opts?: { signal?: AbortSignal }) {
-  console.log('api file download_labels_jsons called');
-
-  return fetch_labels<{ message: string; warning?: string | string[] }>('/api_download_labels/download_labels', {
-    method: 'POST',
-    signal: opts?.signal,
   });
 }
