@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import type { LabelImage, Label } from '@/domain/datatypes';
+import type { Label } from '@/domain/datatypes';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 type Props = {
@@ -49,7 +49,6 @@ export function PresenterLabelList(props: Props) {
           </Button>
           <Button
             onClick={() => {
-              console.log('download labels clicked');
               props.download_labels_on_click?.();
             }}
             sx={{ width: '100%' }}

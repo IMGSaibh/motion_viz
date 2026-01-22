@@ -54,10 +54,10 @@ export async function convertWithPoseViewer(opts?: { signal?: AbortSignal }) {
 }
 
 export async function convertBvh(opts?: { signal?: AbortSignal }) {
-  return fetch_json<{ message: string; warning?: string | string[] }>(
-    '/api_motion_file_conversion/convert_bvh_to_npy',
-    { method: 'POST', signal: opts?.signal },
-  );
+  return fetch_json<{ message: string; warning?: string | string[] }>('/api_bvh_conversion/convert_bvh_to_npy', {
+    method: 'POST',
+    signal: opts?.signal,
+  });
 }
 
 export async function save_labels_to_json(

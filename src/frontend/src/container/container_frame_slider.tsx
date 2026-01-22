@@ -18,7 +18,6 @@ export function ContainerFrameSlider() {
   const slider_frame_ctx = use_slider_frame_cxt();
   const set_slider_frame = use_set_slider_frame_cxt();
   const set_range = use_set_range_slider_value_cxt();
-
   const unselect_rula = use_unselect_rula_cxt();
   const unselect_owas = use_unselect_owas_cxt();
 
@@ -44,7 +43,7 @@ export function ContainerFrameSlider() {
     is_playing,
   } = use_three_js_engine_ctx();
 
-  const handleTogglePlay = useCallback(() => {
+  const on_click_play_toggle = useCallback(() => {
     play_pause();
   }, [play_pause]);
 
@@ -215,7 +214,7 @@ export function ContainerFrameSlider() {
       on_mouse_up_slider_track: on_mouse_up_slider_track,
       on_mouse_leave_slider_track: on_mouse_leave_slider_track,
       is_playing,
-      on_click_play_toggle: handleTogglePlay,
+      on_click_play_toggle,
     }),
     [
       slider_frame_ctx,
@@ -226,7 +225,7 @@ export function ContainerFrameSlider() {
       on_mouse_up_slider_track,
       on_mouse_leave_slider_track,
       is_playing,
-      handleTogglePlay,
+      on_click_play_toggle,
     ],
   );
 

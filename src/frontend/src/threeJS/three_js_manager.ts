@@ -197,16 +197,16 @@ export class ThreeJSEngine {
   cleanup_player() {
     if (this.npy_player) {
       this.npy_player.dispose();
-      this.npy_player = null;
       this.npy_loader?.dispose();
+      this.npy_player = null;
     } else if (this.bvh_player) {
       this.bvh_player.dispose();
-      this.bvh_player = null;
       this.bvh_loader?.dispose();
+      this.bvh_player = null;
     } else if (this.fbx_player) {
       this.fbx_player.dispose();
-      this.fbx_player = null;
       this.fbx_loader?.dispose();
+      this.fbx_player = null;
     }
   }
 
