@@ -17,7 +17,7 @@ export function ContainerFrameSlider() {
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
   const frame_slider_range = use_range_slider_value_cxt();
 
-  const { current_frame_slider_value, set_slider_frame } = use_frame_slider_context();
+  const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
 
   const set_range = use_set_range_slider_value_cxt();
   const unselect_rula = use_unselect_rula_cxt();
@@ -58,11 +58,11 @@ export function ContainerFrameSlider() {
       if (e.code === 'KeyS') {
         stop();
         go_to_frame(0);
-        set_slider_frame(0);
+        set_frame_slider_value(0);
       }
       if (e.code === 'KeyR') {
         reset_engine();
-        set_slider_frame(0);
+        set_frame_slider_value(0);
         set_range([0, 1]);
         clear_slider_label_list();
         unselect_owas();
@@ -72,35 +72,35 @@ export function ContainerFrameSlider() {
         e.preventDefault();
         if (!frame_count) return;
         const maxIdx = Math.max(0, frame_count - 1);
-        const nextFrame = Math.min(maxIdx, current_frame_slider_value + 1);
+        const nextFrame = Math.min(maxIdx, frame_slider_value + 1);
         pause();
-        set_slider_frame(nextFrame);
+        set_frame_slider_value(nextFrame);
         go_to_frame(nextFrame);
       }
 
       if (e.code === 'ArrowLeft') {
         e.preventDefault();
         if (!frame_count) return;
-        const prevFrame = Math.max(0, current_frame_slider_value - 1);
+        const prevFrame = Math.max(0, frame_slider_value - 1);
         pause();
-        set_slider_frame(prevFrame);
+        set_frame_slider_value(prevFrame);
         go_to_frame(prevFrame);
       }
       if (e.code === 'KeyD') print_scene_components();
 
       if (e.code === 'KeyA') {
         e.preventDefault();
-        set_range([current_frame_slider_value, frame_slider_range[1]]);
+        set_range([frame_slider_value, frame_slider_range[1]]);
       }
       if (e.code === 'KeyE') {
         e.preventDefault();
-        set_range([frame_slider_range[0], current_frame_slider_value]);
+        set_range([frame_slider_range[0], frame_slider_value]);
       }
       if (e.code === 'Digit1' && e.location === 0) {
-        set_range([current_frame_slider_value, frame_slider_range[1]]);
+        set_range([frame_slider_value, frame_slider_range[1]]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        set_range([frame_slider_range[0], current_frame_slider_value]);
+        set_range([frame_slider_range[0], frame_slider_value]);
       }
     };
 
@@ -113,8 +113,8 @@ export function ContainerFrameSlider() {
     go_to_frame,
     print_scene_components,
     frame_count,
-    current_frame_slider_value,
-    set_slider_frame,
+    frame_slider_value,
+    set_frame_slider_value,
     cleanup_loop,
     cleanup_player,
     cleanup_thumbnail_render,
@@ -128,8 +128,8 @@ export function ContainerFrameSlider() {
 
     if (!is_playing) return;
 
-    set_slider_frame(current_frame);
-  }, [current_frame, frame_count, is_playing, set_slider_frame]);
+    set_frame_slider_value(current_frame);
+  }, [current_frame, frame_count, is_playing, set_frame_slider_value]);
 
   const compute_slider_track_frame = useCallback(
     (clientX: number) => {
@@ -147,11 +147,11 @@ export function ContainerFrameSlider() {
     (frameIdx: number) => {
       const maxIdx = Math.max(0, (frame_count ?? 0) - 1);
       const clamped_frame = Math.max(0, Math.min(frameIdx, maxIdx));
-      set_slider_frame(clamped_frame);
+      set_frame_slider_value(clamped_frame);
       pause();
       go_to_frame(clamped_frame);
     },
-    [frame_count, pause, go_to_frame, set_slider_frame],
+    [frame_count, pause, go_to_frame, set_frame_slider_value],
   );
 
   const on_mouse_down_slider_track = useCallback(
@@ -218,7 +218,7 @@ export function ContainerFrameSlider() {
 
   const frame_slider_track_props = useMemo(
     () => ({
-      slider_frame: current_frame_slider_value,
+      frame_slider_value,
       frame_count: frame_count ?? 0,
       frame_slider_range: frame_slider_range as Range,
       hover_frame: frame_slider_track_hovered_frame,
@@ -231,7 +231,7 @@ export function ContainerFrameSlider() {
       on_click_play_toggle,
     }),
     [
-      current_frame_slider_value,
+      frame_slider_value,
       frame_count,
       frame_slider_range,
       frame_slider_track_hovered_frame,

@@ -6,7 +6,7 @@ import { use_current_label_range_geometry_cxt } from '@/context/context_slider_l
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 
 type Props = {
-  slider_frame: number;
+  frame_slider_value: number;
   frame_count: number;
   hover_frame: number | null;
   slider_track_ref: React.RefObject<HTMLDivElement | null>;
@@ -22,7 +22,7 @@ type Props = {
 
 export function WidgetFrameSlider(props: Props) {
   const hasFrames = props.frame_count > 0;
-  const clamped_frame = hasFrames ? Math.min(Math.max(props.slider_frame, 0), props.frame_count - 1) : 0;
+  const clamped_frame = hasFrames ? Math.min(Math.max(props.frame_slider_value, 0), props.frame_count - 1) : 0;
 
   const markerPct = hasFrames ? ((clamped_frame + 0.5) / props.frame_count) * 100 : 0;
   const hoverPct =

@@ -5,7 +5,7 @@ import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar
 
 type Props = {
   // current frame
-  slider_frame: number;
+  frame_slider_value: number;
   frame_count: number;
   frame_slider_range: [number, number];
 
@@ -35,7 +35,7 @@ export function PresenterFrameSlider(props: Props) {
 
       {/* Frame-Slider */}
       <WidgetFrameSlider
-        slider_frame={props.slider_frame}
+        frame_slider_value={props.frame_slider_value}
         frame_count={props.frame_count}
         hover_frame={props.hover_frame}
         slider_track_ref={props.slider_track_ref}
