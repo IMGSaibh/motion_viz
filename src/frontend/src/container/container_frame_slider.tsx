@@ -30,10 +30,10 @@ export function ContainerFrameSlider() {
   const {
     frame_count,
     current_frame,
-    selected_motion,
     go_to_frame,
     stop,
     pause,
+    reset_engine,
     play_pause,
     print_scene_components,
     get_thumbnail_for_frame,
@@ -59,11 +59,7 @@ export function ContainerFrameSlider() {
         set_slider_frame(0);
       }
       if (e.code === 'KeyR') {
-        stop();
-        go_to_frame(0);
-        cleanup_player();
-        cleanup_loop();
-        cleanup_thumbnail_render();
+        reset_engine();
         set_slider_frame(0);
         set_range([0, 1]);
         clear_slider_label_list();
@@ -231,20 +227,24 @@ export function ContainerFrameSlider() {
 
   return (
     <>
-      <PresenterFrameSlider {...frame_slider_track_props} />
-      <img
-        ref={preview_render_img_ref}
-        alt=""
-        style={{
-          position: 'absolute',
-          display: 'none',
-          top: -230,
-          left: 0,
-          zIndex: 1,
-          border: '1px solid #000',
-          pointerEvents: 'none',
-        }}
-      />
+      {frame_count && (
+        <>
+          <PresenterFrameSlider {...frame_slider_track_props} />
+          <img
+            ref={preview_render_img_ref}
+            alt=""
+            style={{
+              position: 'absolute',
+              display: 'none',
+              top: -230,
+              left: 0,
+              zIndex: 1,
+              border: '1px solid #000',
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
     </>
   );
 }

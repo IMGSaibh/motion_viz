@@ -28,13 +28,11 @@ export function ContainerLabelsList() {
 
   const { success, error } = use_snackbar_ctx();
 
-  // ✅ Sync: framecount + label_image (und fallback label) in den Context schreiben
   useEffect(() => {
     const fc = Math.max(0, frame_count ?? 0);
 
     labels.forEach((label) => {
       const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
-      // const img = label_image_map.get(name) ?? null;
 
       // nur patchen, wenn wirklich nötig (reduziert re-renders)
       if (label.button_text !== name) {
