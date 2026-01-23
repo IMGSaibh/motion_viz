@@ -2,8 +2,7 @@ import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } fr
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
-
-export type Range = [number, number];
+import type { Range } from '@/domain/datatypes';
 
 export type RectangleLabelBar = {
   from: number;

@@ -1,11 +1,13 @@
 import { Box } from '@mui/material';
 import { WidgetFrameTicks } from '@/components/widgets/widget_frame_ticks';
 import { WidgetFrameSlider } from '@/components/widgets/widget_frame_slider';
+import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
 
 type Props = {
   // current frame
   slider_frame: number;
   frame_count: number;
+  frame_slider_range: [number, number];
 
   // calculated hover frame from container
   hover_frame: number | null;
@@ -28,10 +30,10 @@ export function PresenterFrameSlider(props: Props) {
         bgcolor: theme.palette.wip_color_theme[500],
       })}
     >
-      {/* Ticks über dem Slider */}
+      {/* Slider ticks */}
       <WidgetFrameTicks frame_count={props.frame_count} />
 
-      {/* eigentlicher Frame-Slider */}
+      {/* Frame-Slider */}
       <WidgetFrameSlider
         slider_frame={props.slider_frame}
         frame_count={props.frame_count}
@@ -44,6 +46,9 @@ export function PresenterFrameSlider(props: Props) {
         is_playing={props.is_playing}
         on_click_play_toggle={props.on_click_play_toggle}
       />
+
+      {/* Frame-bar under frame slider */}
+      <WidgetFrameLabelBar frame_count={props.frame_count} frame_slider_range={props.frame_slider_range} />
     </Box>
   );
 }

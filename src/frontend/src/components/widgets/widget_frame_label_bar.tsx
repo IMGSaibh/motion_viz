@@ -1,5 +1,5 @@
 import { theme } from '@/theme';
-import { Box } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { overlaps } from '@/domain/label_logic';
 import {
   use_current_label_range_geometry_cxt,
@@ -32,57 +32,63 @@ export function WidgetFrameLabelBar(props: Props) {
 
   return (
     <>
-      <Box
-        sx={{
-          position: 'relative',
-          height: 10,
-          overflow: 'hidden',
-          background: theme.palette.action.hover,
-        }}
-        aria-hidden
-      >
-        {/* saved labels */}
-        {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
-          const vvFrom = clamp(Math.min(vf, vt));
-          const vvTo = clamp(Math.max(vf, vt));
-          const vvLen = Math.max(0, vvTo - vvFrom);
+      <Grid container spacing={0} alignItems="center">
+        <Grid size={{ md: 1 }} />
+        <Grid size={{ md: 10 }}>
+          <Box
+            sx={{
+              position: 'relative',
+              height: 10,
+              overflow: 'hidden',
+              background: theme.palette.action.hover,
+            }}
+            aria-hidden
+          >
+            {/* saved labels */}
+            {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
+              const vvFrom = clamp(Math.min(vf, vt));
+              const vvTo = clamp(Math.max(vf, vt));
+              const vvLen = Math.max(0, vvTo - vvFrom);
 
-          const vLeft = pct(vvFrom, props.frame_count);
-          const vScale =
-            props.frame_count > 0 ? Math.max(0, Math.round((vvLen / props.frame_count) * 10000) / 10000) : 0;
+              const vLeft = pct(vvFrom, props.frame_count);
+              const vScale =
+                props.frame_count > 0 ? Math.max(0, Math.round((vvLen / props.frame_count) * 10000) / 10000) : 0;
 
-          return (
+              return (
+                <Box
+                  key={id}
+                  sx={(theme) => ({
+                    bgcolor: theme.palette.wip_color_theme[600],
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    transformOrigin: isRtl ? 'right center' : 'left center',
+                    transform: `scaleX(${vScale})`,
+                    ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
+                    background: color ?? theme.palette.wip_color_theme[600],
+                    pointerEvents: 'none',
+                  })}
+                />
+              );
+            })}
+
+            {/* current labels */}
             <Box
-              key={id}
               sx={(theme) => ({
-                bgcolor: theme.palette.wip_color_theme[600],
                 position: 'absolute',
                 inset: 0,
                 width: '100%',
                 transformOrigin: isRtl ? 'right center' : 'left center',
-                transform: `scaleX(${vScale})`,
-                ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                background: color ?? theme.palette.wip_color_theme[600],
+                transform: `scaleX(${scaleX})`,
+                ...(isRtl ? { right: `${currentGeom.leftPct}%` } : { left: `${currentGeom.leftPct}%` }),
+                background: has_overlap ? theme.palette.error.main : theme.palette.wip_color_theme[600],
                 pointerEvents: 'none',
               })}
             />
-          );
-        })}
-
-        {/* current labels */}
-        <Box
-          sx={(theme) => ({
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            transformOrigin: isRtl ? 'right center' : 'left center',
-            transform: `scaleX(${scaleX})`,
-            ...(isRtl ? { right: `${currentGeom.leftPct}%` } : { left: `${currentGeom.leftPct}%` }),
-            background: has_overlap ? theme.palette.error.main : theme.palette.wip_color_theme[600],
-            pointerEvents: 'none',
-          })}
-        />
-      </Box>
+          </Box>
+        </Grid>
+        <Grid size={{ md: 1 }} />
+      </Grid>
     </>
   );
 }

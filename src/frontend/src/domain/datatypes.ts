@@ -1,4 +1,6 @@
 // reine Datentypen (KEIN React)
+export type Range = [number, number];
+
 export type LabelImage = {
   name: string;
   src: string;
