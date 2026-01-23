@@ -1,8 +1,6 @@
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import {
-  use_slider_frame_cxt,
-  use_set_slider_frame_cxt,
   use_clear_label_list_ctx,
   use_set_range_slider_value_cxt,
   use_unselect_rula_cxt,
@@ -11,6 +9,7 @@ import {
 } from '@/context/context_slider_label_list';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
+import { use_frame_slider_context } from '@/context/context_slider_frame';
 
 export function ContainerFrameSlider() {
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
@@ -18,8 +17,8 @@ export function ContainerFrameSlider() {
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
   const frame_slider_range = use_range_slider_value_cxt();
 
-  const slider_frame_ctx = use_slider_frame_cxt();
-  const set_slider_frame = use_set_slider_frame_cxt();
+  const { current_frame_slider_value, set_slider_frame } = use_frame_slider_context();
+
   const set_range = use_set_range_slider_value_cxt();
   const unselect_rula = use_unselect_rula_cxt();
   const unselect_owas = use_unselect_owas_cxt();
@@ -73,7 +72,7 @@ export function ContainerFrameSlider() {
         e.preventDefault();
         if (!frame_count) return;
         const maxIdx = Math.max(0, frame_count - 1);
-        const nextFrame = Math.min(maxIdx, slider_frame_ctx + 1);
+        const nextFrame = Math.min(maxIdx, current_frame_slider_value + 1);
         pause();
         set_slider_frame(nextFrame);
         go_to_frame(nextFrame);
@@ -82,7 +81,7 @@ export function ContainerFrameSlider() {
       if (e.code === 'ArrowLeft') {
         e.preventDefault();
         if (!frame_count) return;
-        const prevFrame = Math.max(0, slider_frame_ctx - 1);
+        const prevFrame = Math.max(0, current_frame_slider_value - 1);
         pause();
         set_slider_frame(prevFrame);
         go_to_frame(prevFrame);
@@ -91,17 +90,17 @@ export function ContainerFrameSlider() {
 
       if (e.code === 'KeyA') {
         e.preventDefault();
-        set_range([slider_frame_ctx, frame_slider_range[1]]);
+        set_range([current_frame_slider_value, frame_slider_range[1]]);
       }
       if (e.code === 'KeyE') {
         e.preventDefault();
-        set_range([frame_slider_range[0], slider_frame_ctx]);
+        set_range([frame_slider_range[0], current_frame_slider_value]);
       }
       if (e.code === 'Digit1' && e.location === 0) {
-        set_range([slider_frame_ctx, frame_slider_range[1]]);
+        set_range([current_frame_slider_value, frame_slider_range[1]]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        set_range([frame_slider_range[0], slider_frame_ctx]);
+        set_range([frame_slider_range[0], current_frame_slider_value]);
       }
     };
 
@@ -114,7 +113,7 @@ export function ContainerFrameSlider() {
     go_to_frame,
     print_scene_components,
     frame_count,
-    slider_frame_ctx,
+    current_frame_slider_value,
     set_slider_frame,
     cleanup_loop,
     cleanup_player,
@@ -219,7 +218,7 @@ export function ContainerFrameSlider() {
 
   const frame_slider_track_props = useMemo(
     () => ({
-      slider_frame: slider_frame_ctx,
+      slider_frame: current_frame_slider_value,
       frame_count: frame_count ?? 0,
       frame_slider_range: frame_slider_range as Range,
       hover_frame: frame_slider_track_hovered_frame,
@@ -232,7 +231,7 @@ export function ContainerFrameSlider() {
       on_click_play_toggle,
     }),
     [
-      slider_frame_ctx,
+      current_frame_slider_value,
       frame_count,
       frame_slider_range,
       frame_slider_track_hovered_frame,

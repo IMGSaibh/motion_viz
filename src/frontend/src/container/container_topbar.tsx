@@ -9,7 +9,9 @@ import { select_motion_files } from '@/hooks/hook_select_motion_files';
 import { hook_upload_motion_files, hook_delete_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
-import { use_set_range_slider_value_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
+import { use_set_range_slider_value_cxt } from '@/context/context_slider_label_list';
+
+import { use_frame_slider_context } from '@/context/context_slider_frame';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
@@ -45,7 +47,8 @@ export function ContainerTopbar() {
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  const set_std_slider_value = use_set_slider_frame_cxt();
+  const { current_frame_slider_value, set_slider_frame } = use_frame_slider_context();
+
   const clear_slider_label_list = use_clear_label_list_ctx();
 
   // ======================= Handler =======================
@@ -100,16 +103,14 @@ export function ContainerTopbar() {
     });
   }
   function reset_current_motion() {
-    // UI
     set_motion_file_selected('');
 
-    // ThreeJS / Player
     set_selected_motion(null as any);
     stop();
     go_to_frame(0);
 
-    // Slider / Labels
-    set_std_slider_value(0);
+    set_slider_frame(0);
+
     set_range([0, 1]);
     clear_slider_label_list();
   }
@@ -126,7 +127,7 @@ export function ContainerTopbar() {
     await load_motion_file(e.target.value);
     stop();
     go_to_frame(0);
-    set_std_slider_value(0);
+    set_slider_frame(0);
     set_range([0, 1]);
     clear_slider_label_list();
   }

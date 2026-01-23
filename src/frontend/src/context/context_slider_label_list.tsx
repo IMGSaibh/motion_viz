@@ -41,9 +41,6 @@ type FrameSliderLabellistContext = {
   save_current_edited_label: () => void;
   cancel_current_edit_label: () => void;
 
-  slider_frame: number;
-  set_slider_frame: (n: number) => void;
-
   rula_selected: Record<string, LabelImage | null>;
   set_rula_selected: (next: Record<string, LabelImage | null>) => void;
   unselect_rula: () => void;
@@ -57,99 +54,10 @@ type FrameSliderLabellistContext = {
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
-function normalize_label_data(label: Label): Label {
-  if (Number.isNaN(label.start_frame) || Number.isNaN(label.end_frame)) return label;
-  const from = Math.min(label.start_frame, label.end_frame);
-  const to = Math.max(label.start_frame, label.end_frame);
-  return { ...label, start_frame: from, end_frame: to };
-}
-
-function markerReducer(state: Label[], action: MarkerAction): Label[] {
-  switch (action.type) {
-    case 'add': {
-      const label_bar_normalized = normalize_label_data(action.label);
-      if (!label_bar_normalized.id) return state;
-      if (state.some((x) => x.id === label_bar_normalized.id)) return state;
-      return [...state, label_bar_normalized];
-    }
-    case 'remove': {
-      const next = state.filter((x) => x.id !== action.id);
-      return next.length === state.length ? state : next;
-    }
-    case 'clear': {
-      return state.length === 0 ? state : [];
-    }
-    case 'update': {
-      const from = Math.min(action.from, action.to);
-      const to = Math.max(action.from, action.to);
-      let changed = false;
-
-      const next = state.map((x) => {
-        if (x.id !== action.id) return x;
-
-        const patch: Partial<Label> = {};
-        if (x.start_frame !== from || x.end_frame !== to) {
-          patch.start_frame = from;
-          patch.end_frame = to;
-          changed = true;
-        }
-        if (action.label !== undefined && x.button_text !== action.label) {
-          patch.button_text = action.label;
-          changed = true;
-        }
-        if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
-          patch.ergo_method = action.ergo_method;
-          changed = true;
-        }
-        if (action.color !== undefined && x.color !== action.color) {
-          patch.color = action.color;
-          changed = true;
-        }
-        if (action.categories !== undefined && x.categories !== action.categories) {
-          patch.categories = action.categories;
-          changed = true;
-        }
-
-        return Object.keys(patch).length ? { ...x, ...patch } : x;
-      });
-
-      return changed ? next : state;
-    }
-    default:
-      return state;
-  }
-}
-
-export function use_current_label_range_geometry_cxt(frame_count: number): RectangleLabelBar {
-  const range = use_range_slider_value_cxt();
-
-  return useMemo(() => {
-    const fc = Math.max(0, frame_count ?? 0);
-    const maxIdx = Math.max(0, fc - 1);
-    const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
-    const pct = (n: number, d: number) => (d > 0 ? (n / d) * 100 : 0);
-
-    const a = clamp(range[0]);
-    const b = clamp(range[1]);
-    const from = Math.min(a, b);
-    const to = Math.max(a, b);
-    const length = Math.max(0, to - from);
-
-    return {
-      from,
-      to,
-      leftPct: pct(from, fc),
-      scaleX: fc > 0 ? Math.max(0, length / fc) : 0,
-    };
-  }, [frame_count, range]);
-}
-
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
   const [labels_marker_reducer, dispatch] = useReducer(markerReducer, [] as Label[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
-
-  const [slider_frame, set_slider_frame] = useState(0);
 
   const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
     CAT1: null,
@@ -281,7 +189,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [labels_marker_reducer],
   );
 
-  const frame_slider_label_list_ctx_memo_ctx = useMemo<FrameSliderLabellistContext>(
+  const value = useMemo<FrameSliderLabellistContext>(
     () => ({
       range,
       set_slider_label_range: set_range,
@@ -293,8 +201,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       start_editing_label,
       save_current_edited_label,
       cancel_current_edit_label,
-      slider_frame: slider_frame,
-      set_slider_frame,
 
       rula_selected,
       set_rula_selected,
@@ -316,9 +222,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      slider_frame,
-      set_slider_frame,
-
       rula_selected,
       set_rula_selected,
       unselect_rula,
@@ -330,11 +233,94 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     ],
   );
 
-  return (
-    <frame_slider_label_list_context.Provider value={frame_slider_label_list_ctx_memo_ctx}>
-      {children}
-    </frame_slider_label_list_context.Provider>
-  );
+  return <frame_slider_label_list_context.Provider value={value}>{children}</frame_slider_label_list_context.Provider>;
+}
+
+function normalize_label_data(label: Label): Label {
+  if (Number.isNaN(label.start_frame) || Number.isNaN(label.end_frame)) return label;
+  const from = Math.min(label.start_frame, label.end_frame);
+  const to = Math.max(label.start_frame, label.end_frame);
+  return { ...label, start_frame: from, end_frame: to };
+}
+
+function markerReducer(state: Label[], action: MarkerAction): Label[] {
+  switch (action.type) {
+    case 'add': {
+      const label_bar_normalized = normalize_label_data(action.label);
+      if (!label_bar_normalized.id) return state;
+      if (state.some((x) => x.id === label_bar_normalized.id)) return state;
+      return [...state, label_bar_normalized];
+    }
+    case 'remove': {
+      const next = state.filter((x) => x.id !== action.id);
+      return next.length === state.length ? state : next;
+    }
+    case 'clear': {
+      return state.length === 0 ? state : [];
+    }
+    case 'update': {
+      const from = Math.min(action.from, action.to);
+      const to = Math.max(action.from, action.to);
+      let changed = false;
+
+      const next = state.map((x) => {
+        if (x.id !== action.id) return x;
+
+        const patch: Partial<Label> = {};
+        if (x.start_frame !== from || x.end_frame !== to) {
+          patch.start_frame = from;
+          patch.end_frame = to;
+          changed = true;
+        }
+        if (action.label !== undefined && x.button_text !== action.label) {
+          patch.button_text = action.label;
+          changed = true;
+        }
+        if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
+          patch.ergo_method = action.ergo_method;
+          changed = true;
+        }
+        if (action.color !== undefined && x.color !== action.color) {
+          patch.color = action.color;
+          changed = true;
+        }
+        if (action.categories !== undefined && x.categories !== action.categories) {
+          patch.categories = action.categories;
+          changed = true;
+        }
+
+        return Object.keys(patch).length ? { ...x, ...patch } : x;
+      });
+
+      return changed ? next : state;
+    }
+    default:
+      return state;
+  }
+}
+
+export function use_current_label_range_geometry_cxt(frame_count: number): RectangleLabelBar {
+  const range = use_range_slider_value_cxt();
+
+  return useMemo(() => {
+    const fc = Math.max(0, frame_count ?? 0);
+    const maxIdx = Math.max(0, fc - 1);
+    const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
+    const pct = (n: number, d: number) => (d > 0 ? (n / d) * 100 : 0);
+
+    const a = clamp(range[0]);
+    const b = clamp(range[1]);
+    const from = Math.min(a, b);
+    const to = Math.max(a, b);
+    const length = Math.max(0, to - from);
+
+    return {
+      from,
+      to,
+      leftPct: pct(from, fc),
+      scaleX: fc > 0 ? Math.max(0, length / fc) : 0,
+    };
+  }, [frame_count, range]);
 }
 
 /* =================================================================
@@ -432,23 +418,6 @@ export function use_can_save_label_cxt() {
         ignore_id: v.editing_id,
       });
     };
-  });
-}
-
-/* =================================================================
-                            frame slider ctx  
-==================================================================*/
-
-export function use_slider_frame_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_std_slider_value_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.slider_frame;
-  });
-}
-export function use_set_slider_frame_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_std_slider_value_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.set_slider_frame;
   });
 }
 

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ThreeJSEngine } from '@/threeJS/three_js_manager';
 
 type ThreeJSEngineContext = {
@@ -154,6 +154,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
 
 export const use_three_js_engine_ctx = () => {
   const ctx = useContext(three_js_engine_context);
-  if (!ctx) throw new Error('useThreeJSEngine must be used within a ThreeJSEngineProvider');
+  if (!ctx) throw new Error('use_three_js_engine_ctx must be used within a ThreeJSEngineProvider');
   return ctx;
 };
