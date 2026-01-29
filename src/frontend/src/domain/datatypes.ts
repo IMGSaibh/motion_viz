@@ -1,6 +1,13 @@
 // reine Datentypen (KEIN React)
 export type Range = [number, number];
 
+export type RectangleLabelBar = {
+  from: number;
+  to: number;
+  leftPct: number;
+  scaleX: number;
+};
+
 export type LabelImage = {
   name: string;
   src: string;
@@ -12,7 +19,7 @@ export type LabelCategory = {
   image: LabelImage | null;
 };
 
-export type Label = {
+export type ErgoLabel = {
   id: string;
   start_frame: number;
   end_frame: number;
@@ -22,9 +29,26 @@ export type Label = {
   categories: LabelCategory[];
 };
 
+// TODO: remove labeML and use Label attributes
 export type LabelML = {
   ergo_method?: string;
   start_frame: number;
   end_frame: number;
   button_text?: string;
 };
+
+export type MarkerAction =
+  | { type: 'add'; label: ErgoLabel }
+  | { type: 'remove'; id: string }
+  | { type: 'clear' }
+  | {
+      type: 'update';
+      id: string;
+      from: number;
+      to: number;
+      label?: string;
+      ergo_method?: string;
+      color?: string;
+      framecount?: number;
+      categories?: LabelCategory[];
+    };

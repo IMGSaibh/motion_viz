@@ -3,11 +3,10 @@ import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import type { Label } from '@/domain/datatypes';
+import type { ErgoLabel } from '@/domain/datatypes';
 
 type Props = {
-  onClick?: (label: Label) => void;
-  onChange?: (_event: React.SyntheticEvent, newValue: string) => void;
+  on_click_save_label?: (label: ErgoLabel) => void;
 };
 
 export function PresenterLabelButtons(props: Props) {
@@ -74,9 +73,9 @@ export function PresenterLabelButtons(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <WidgetRulaButtons onClick={props.onClick} />}
-      {method === 'OWAS' && <WidgetOwasButtons onClick={props.onClick} />}
-      {method === 'LMM' && <WidgetLmmButtons onClick={props.onClick} />}
+      {method === 'RULA' && <WidgetRulaButtons onClick={props.on_click_save_label} />}
+      {method === 'OWAS' && <WidgetOwasButtons on_click_save_label={props.on_click_save_label} />}
+      {method === 'LMM' && <WidgetLmmButtons onClick={props.on_click_save_label} />}
     </Box>
   );
 }

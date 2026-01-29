@@ -47,8 +47,7 @@ export function ContainerTopbar() {
   const mutation_convert_pv = convert_with_pose_viewer();
   const mutation_convert_bvh = convert_bvh();
 
-  const { frame_slider_value: current_frame_slider_value, set_frame_slider_value: set_slider_frame } =
-    use_frame_slider_context();
+  const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
 
   const clear_slider_label_list = use_clear_label_list_ctx();
 
@@ -110,7 +109,7 @@ export function ContainerTopbar() {
     stop();
     go_to_frame(0);
 
-    set_slider_frame(0);
+    set_frame_slider_value(0);
 
     set_range([0, 1]);
     clear_slider_label_list();
@@ -128,7 +127,7 @@ export function ContainerTopbar() {
     await load_motion_file(e.target.value);
     stop();
     go_to_frame(0);
-    set_slider_frame(0);
+    set_frame_slider_value(0);
     set_range([0, 1]);
     clear_slider_label_list();
   }

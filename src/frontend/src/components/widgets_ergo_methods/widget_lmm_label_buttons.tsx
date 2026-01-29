@@ -1,7 +1,7 @@
 import { Box, ButtonBase, styled, FormControl, FormLabel, Grid, Select, MenuItem, InputLabel } from '@mui/material';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { get_label_images_cat1_llm } from '@/Assets/label_images';
-import type { Label, LabelCategory } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory } from '@/domain/datatypes';
 
 const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
@@ -23,7 +23,7 @@ const LabelButtonLMM = styled(ButtonBase)(({ theme }) => ({
 }));
 
 type Props = {
-  onClick?: (label: Label) => void;
+  onClick?: (label: ErgoLabel) => void;
 };
 
 export function WidgetLmmButtons({ onClick }: Props) {

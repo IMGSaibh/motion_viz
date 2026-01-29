@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
 import ClearIcon from '@mui/icons-material/Clear';
-import type { Label } from '@/domain/datatypes';
+import type { ErgoLabel } from '@/domain/datatypes';
 
 import {
   use_start_edit_label_cxt,
@@ -60,7 +60,7 @@ const LabelSliderTemplate = styled(Slider)(({ theme }) => ({
 }));
 
 type Props = {
-  labels: Label[];
+  labels: ErgoLabel[];
   delete_label_from_list_on_click?: (id: string) => void;
   toggle_list: boolean;
 };

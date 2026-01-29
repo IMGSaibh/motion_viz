@@ -1,38 +1,18 @@
-import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
+import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 import type { Range } from '@/domain/datatypes';
-
-export type RectangleLabelBar = {
-  from: number;
-  to: number;
-  leftPct: number;
-  scaleX: number;
-};
-
-type MarkerAction =
-  | { type: 'add'; label: Label }
-  | { type: 'remove'; id: string }
-  | { type: 'clear' }
-  | {
-      type: 'update';
-      id: string;
-      from: number;
-      to: number;
-      label?: string;
-      ergo_method?: string;
-      color?: string;
-      framecount?: number;
-      categories?: LabelCategory[];
-    };
+import type { MarkerAction } from '@/domain/datatypes';
+import type { RectangleLabelBar } from '@/domain/datatypes';
+import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
 
 type FrameSliderLabellistContext = {
   range: Range;
   set_slider_label_range: (r: Range) => void;
 
-  label: Label[];
-  add_slider_label: (m: Label) => void;
+  ergo_label: ErgoLabel[];
+  add_slider_label: (m: ErgoLabel) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -41,39 +21,19 @@ type FrameSliderLabellistContext = {
   save_current_edited_label: () => void;
   cancel_current_edit_label: () => void;
 
-  rula_selected: Record<string, LabelImage | null>;
-  set_rula_selected: (next: Record<string, LabelImage | null>) => void;
-  unselect_rula: () => void;
-
-  owas_selected: Record<string, LabelImage | null>;
-  set_owas_selected: (next: Record<string, LabelImage | null>) => void;
-  unselect_owas: () => void;
-
-  update_label_meta: (id: string, patch: Partial<Pick<Label, 'button_text' | 'ergo_method' | 'color'>>) => void;
+  update_label_meta: (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const [range, set_range] = useState<Range>([0, 0]);
-  const [labels_marker_reducer, dispatch] = useReducer(markerReducer, [] as Label[]);
+  const [labels_marker_reducer, dispatch] = useReducer(markerReducer, [] as ErgoLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
+  const { set_rula_selected, rula_selected, set_owas_selected } = use_ergo_methods_context();
 
-  const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
-  });
-
-  const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
-    CAT4: null,
-  });
-
-  const add_label_rect = useCallback(
-    (label: Label) => {
+  const add_slider_label = useCallback(
+    (label: ErgoLabel) => {
       const ok = can_save_for_range({
         labels: labels_marker_reducer,
         category: label.ergo_method,
@@ -86,19 +46,18 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     },
     [labels_marker_reducer],
   );
-
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
   const start_editing_label = useCallback(
     (id: string) => {
-      const m = labels_marker_reducer.find((x) => x.id === id);
-      if (!m) return;
+      const label = labels_marker_reducer.find((x) => x.id === id);
+      if (!label) return;
 
-      set_range([m.start_frame, m.end_frame]);
+      set_range([label.start_frame, label.end_frame]);
       set_editing_id(id);
 
-      if (normalize_category(m.ergo_method) === 'RULA') {
-        const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
+      if (normalize_category(label.ergo_method) === 'RULA') {
+        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
           string,
           LabelImage | null
         >;
@@ -109,8 +68,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
 
-      if (normalize_category(m.ergo_method) === 'OWAS') {
-        const by_name = Object.fromEntries((m.categories ?? []).map((c) => [c.name, c.image])) as Record<
+      if (normalize_category(label.ergo_method) === 'OWAS') {
+        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
           string,
           LabelImage | null
         >;
@@ -153,26 +112,16 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     set_editing_id(null);
 
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id, range, labels_marker_reducer, rula_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id]);
 
-  const unselect_rula = useCallback(() => {
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
-  }, []);
-
-  const unselect_owas = useCallback(() => {
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
-  }, []);
-
   const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<Label, 'button_text' | 'ergo_method' | 'color'>>) => {
+    (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => {
       const current = labels_marker_reducer.find((m) => m.id === id);
       if (!current) return;
 
@@ -189,12 +138,17 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [labels_marker_reducer],
   );
 
+  useEffect(() => {
+    console.log(labels_marker_reducer[0].id);
+    console.log('==========================');
+  });
+
   const value = useMemo<FrameSliderLabellistContext>(
     () => ({
       range,
       set_slider_label_range: set_range,
-      label: labels_marker_reducer,
-      add_slider_label: add_label_rect,
+      ergo_label: labels_marker_reducer,
+      add_slider_label,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
@@ -202,19 +156,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      rula_selected,
-      set_rula_selected,
-      unselect_rula,
       update_label_meta,
-
-      owas_selected,
-      set_owas_selected,
-      unselect_owas,
     }),
     [
       range,
       labels_marker_reducer,
-      add_label_rect,
+      add_slider_label,
       remove_label_rect,
       clear_label_rects,
       editing_id,
@@ -222,51 +169,44 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      rula_selected,
-      set_rula_selected,
-      unselect_rula,
       update_label_meta,
-
-      owas_selected,
-      set_owas_selected,
-      unselect_owas,
     ],
   );
 
   return <frame_slider_label_list_context.Provider value={value}>{children}</frame_slider_label_list_context.Provider>;
 }
 
-function normalize_label_data(label: Label): Label {
+function normalize_label_data(label: ErgoLabel): ErgoLabel {
   if (Number.isNaN(label.start_frame) || Number.isNaN(label.end_frame)) return label;
   const from = Math.min(label.start_frame, label.end_frame);
   const to = Math.max(label.start_frame, label.end_frame);
   return { ...label, start_frame: from, end_frame: to };
 }
 
-function markerReducer(state: Label[], action: MarkerAction): Label[] {
+function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
   switch (action.type) {
     case 'add': {
       const label_bar_normalized = normalize_label_data(action.label);
-      if (!label_bar_normalized.id) return state;
-      if (state.some((x) => x.id === label_bar_normalized.id)) return state;
-      return [...state, label_bar_normalized];
+      if (!label_bar_normalized.id) return labels;
+      if (labels.some((x) => x.id === label_bar_normalized.id)) return labels;
+      return [...labels, label_bar_normalized];
     }
     case 'remove': {
-      const next = state.filter((x) => x.id !== action.id);
-      return next.length === state.length ? state : next;
+      const next = labels.filter((x) => x.id !== action.id);
+      return next.length === labels.length ? labels : next;
     }
     case 'clear': {
-      return state.length === 0 ? state : [];
+      return labels.length === 0 ? labels : [];
     }
     case 'update': {
       const from = Math.min(action.from, action.to);
       const to = Math.max(action.from, action.to);
       let changed = false;
 
-      const next = state.map((x) => {
+      const next = labels.map((x) => {
         if (x.id !== action.id) return x;
 
-        const patch: Partial<Label> = {};
+        const patch: Partial<ErgoLabel> = {};
         if (x.start_frame !== from || x.end_frame !== to) {
           patch.start_frame = from;
           patch.end_frame = to;
@@ -292,10 +232,10 @@ function markerReducer(state: Label[], action: MarkerAction): Label[] {
         return Object.keys(patch).length ? { ...x, ...patch } : x;
       });
 
-      return changed ? next : state;
+      return changed ? next : labels;
     }
     default:
-      return state;
+      return labels;
   }
 }
 
@@ -342,10 +282,10 @@ export function use_set_range_slider_value_cxt() {
   });
 }
 
-export function use_range_marker_cxt() {
+export function use_get_labels_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_label_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.label;
+    if (!v) throw new Error('use_get_labels_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.ergo_label;
   });
 }
 
@@ -407,11 +347,11 @@ export function use_can_save_label_cxt() {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
     return (category?: string) => {
-      const editingMarker = v.editing_id ? v.label.find((m) => m.id === v.editing_id) : null;
+      const editingMarker = v.editing_id ? v.ergo_label.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
 
       return can_save_for_range({
-        labels: v.label,
+        labels: v.ergo_label,
         category: targetCategory,
         from: v.range[0],
         to: v.range[1],
@@ -421,59 +361,9 @@ export function use_can_save_label_cxt() {
   });
 }
 
-/* =================================================================
-                            rula buttons ctx  
-==================================================================*/
-
-export function use_rula_selected_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_rula_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.rula_selected;
-  });
-}
-
-export function use_set_rula_selected_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_rula_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.set_rula_selected;
-  });
-}
-
-export function use_unselect_rula_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_unselected_rula_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.unselect_rula;
-  });
-}
-
 export function use_update_label_meta_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
     return v.update_label_meta;
-  });
-}
-
-/* =================================================================
-                            owas buttons ctx  
-==================================================================*/
-
-export function use_owas_selected_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.owas_selected;
-  });
-}
-
-export function use_set_owas_selected_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.set_owas_selected;
-  });
-}
-
-export function use_unselect_owas_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_clear_owas_selected_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.unselect_owas;
   });
 }

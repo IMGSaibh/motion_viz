@@ -3,7 +3,7 @@ import { Box, Grid } from '@mui/material';
 import { overlaps } from '@/domain/label_logic';
 import {
   use_current_label_range_geometry_cxt,
-  use_range_marker_cxt,
+  use_get_labels_cxt,
   use_editing_label_id_cxt,
 } from '@/context/context_slider_label_list';
 
@@ -12,7 +12,7 @@ type Props = {
   frame_slider_range: [number, number];
 };
 export function WidgetFrameLabelBar(props: Props) {
-  const saved_labels = use_range_marker_cxt();
+  const saved_labels = use_get_labels_cxt();
   const editing_id = use_editing_label_id_cxt();
   const isRtl = theme.direction === 'rtl';
   const currentGeom = use_current_label_range_geometry_cxt(props.frame_count);

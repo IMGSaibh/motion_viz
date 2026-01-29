@@ -8,6 +8,7 @@ import { FrameSliderLabellistProvider } from '@/context/context_slider_label_lis
 import { SnackbarProvider } from '@/context/context_snackbar';
 import { ContainerLabelButtons } from './container/container_label_buttons';
 import { FrameSliderContexProvider } from './context/context_slider_frame';
+import { ErgoMethodsContexProvider } from './context/contex_ergo_methods';
 
 export default function App() {
   return (
@@ -16,20 +17,22 @@ export default function App() {
         <ThreeJSEngineProvider>
           <ThreeJSScene />
           <FrameSliderContexProvider>
-            <FrameSliderLabellistProvider>
-              <ContainerTopbar />
-              <Box
-                sx={(theme) => ({
-                  position: 'absolute',
-                  width: '100%',
-                  bottom: '0vw',
-                })}
-              >
-                <ContainerFrameSlider />
-                <ContainerLabelButtons />
-                <ContainerLabelsList />
-              </Box>
-            </FrameSliderLabellistProvider>
+            <ErgoMethodsContexProvider>
+              <FrameSliderLabellistProvider>
+                <ContainerTopbar />
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    width: '100%',
+                    bottom: '0vw',
+                  })}
+                >
+                  <ContainerFrameSlider />
+                  <ContainerLabelButtons />
+                  <ContainerLabelsList />
+                </Box>
+              </FrameSliderLabellistProvider>
+            </ErgoMethodsContexProvider>
           </FrameSliderContexProvider>
         </ThreeJSEngineProvider>
       </SnackbarProvider>

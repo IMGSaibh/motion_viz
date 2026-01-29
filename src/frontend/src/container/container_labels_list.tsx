@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react';
 import {
   use_remove_label_cxt,
   use_clear_label_list_ctx,
-  use_range_marker_cxt,
+  use_get_labels_cxt,
   use_update_label_meta_cxt,
 } from '@/context/context_slider_label_list';
 import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
@@ -11,18 +11,19 @@ import { hook_download_labels } from '@/hooks/hook_download_labels';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
 import { get_label_all_label_images_rula } from '@/Assets/label_images';
+import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
 
 export function ContainerLabelsList() {
   const { frame_count, selected_motion } = use_three_js_engine_ctx();
 
-  const labels = use_range_marker_cxt();
+  const labels = use_get_labels_cxt();
   const update_label_meta = use_update_label_meta_cxt();
+  const remove_label = use_remove_label_cxt();
+  const clear_label_list = use_clear_label_list_ctx();
+  const { set_owas_selected, set_rula_selected } = use_ergo_methods_context();
 
   const hook_save_labels = hook_save_labels_to_json();
   const { download_labels } = hook_download_labels();
-
-  const remove_label = use_remove_label_cxt();
-  const clear_label_list = use_clear_label_list_ctx();
 
   const label_image_map = get_label_all_label_images_rula();
 
@@ -50,6 +51,8 @@ export function ContainerLabelsList() {
 
   const delete_label_list_on_click = useCallback(() => {
     clear_label_list();
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [clear_label_list]);
 
   const save_label_list_on_click = useCallback(() => {

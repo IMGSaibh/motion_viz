@@ -3,17 +3,17 @@ from pathlib import Path
 import numpy as np
 # from pymotion.io.bvh import BVH
 from pymotion.ops.skeleton import fk
-from mocap_loader import MotionDataReader
+# from mocap_loader import MotionDataReader
 
 class PVParser:
     def __init__(self, file_path: str, descriptor_file: str):
-        reader = MotionDataReader(file_path, descriptor_file)
-        if reader.positions is None:
-            raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
-        self.positions = reader.positions * 100 # Convert from centimeters to meters
-        self.r_hierarchy = reader.generateJointHierarchyArray()
-        self.joint_names = reader.generateNameList()
-        self.joint_graph = reader.joint_graph
+        # reader = MotionDataReader(file_path, descriptor_file)
+        # if reader.positions is None:
+        #     raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
+        # self.positions = reader.positions * 100 # Convert from centimeters to meters
+        # self.r_hierarchy = reader.generateJointHierarchyArray()
+        # self.joint_names = reader.generateNameList()
+        # self.joint_graph = reader.joint_graph
 
         workspacefolder = Path.cwd()
         skeleton = {

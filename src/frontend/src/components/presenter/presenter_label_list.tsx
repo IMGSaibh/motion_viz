@@ -4,11 +4,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import type { Label } from '@/domain/datatypes';
+import type { ErgoLabel } from '@/domain/datatypes';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 type Props = {
-  lables_list: Label[];
+  lables_list: ErgoLabel[];
   delete_label_from_list_on_click?: (id: string) => void;
   delete_label_list_on_click?: () => void;
   save_label_list_on_click?: () => void;

@@ -3,10 +3,10 @@ import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import {
   use_clear_label_list_ctx,
   use_set_range_slider_value_cxt,
-  use_unselect_rula_cxt,
-  use_unselect_owas_cxt,
   use_range_slider_value_cxt,
 } from '@/context/context_slider_label_list';
+import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_slider_frame';
@@ -20,8 +20,7 @@ export function ContainerFrameSlider() {
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
 
   const set_range = use_set_range_slider_value_cxt();
-  const unselect_rula = use_unselect_rula_cxt();
-  const unselect_owas = use_unselect_owas_cxt();
+  const { owas_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_context();
 
   const clear_slider_label_list = use_clear_label_list_ctx();
 
@@ -65,8 +64,8 @@ export function ContainerFrameSlider() {
         set_frame_slider_value(0);
         set_range([0, 1]);
         clear_slider_label_list();
-        unselect_owas();
-        unselect_rula();
+        set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+        set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
       }
       if (e.code === 'ArrowRight') {
         e.preventDefault();
