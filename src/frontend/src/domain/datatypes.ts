@@ -29,14 +29,6 @@ export type ErgoLabel = {
   categories: LabelCategory[];
 };
 
-// TODO: remove labeML and use Label attributes
-export type LabelML = {
-  ergo_method?: string;
-  start_frame: number;
-  end_frame: number;
-  button_text?: string;
-};
-
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
   | { type: 'remove'; id: string }

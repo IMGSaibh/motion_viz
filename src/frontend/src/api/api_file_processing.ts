@@ -59,14 +59,3 @@ export async function convertBvh(opts?: { signal?: AbortSignal }) {
     signal: opts?.signal,
   });
 }
-
-export async function save_labels_to_json(
-  motion_name: string,
-  labels: { ergo_method?: string; start_frame: number; end_frame: number; button_text?: string }[],
-) {
-  return fetch_json('/api_save_labels/save_labels', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ motion_name, labels }),
-  });
-}

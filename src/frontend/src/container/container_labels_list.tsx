@@ -6,9 +6,8 @@ import {
   use_get_labels_cxt,
   use_update_label_meta_cxt,
 } from '@/context/context_slider_label_list';
-import { hook_save_labels_to_json } from '@/hooks/hook_upload_motion_files';
 import { hook_download_labels } from '@/hooks/hook_download_labels';
-import { use_snackbar_ctx } from '@/context/context_snackbar';
+import { hook_save_labels } from '@/hooks/hook_save_labels';
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
 import { get_label_all_label_images_rula } from '@/Assets/label_images';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
@@ -22,15 +21,15 @@ export function ContainerLabelsList() {
   const clear_label_list = use_clear_label_list_ctx();
   const { set_owas_selected, set_rula_selected } = use_ergo_methods_context();
 
-  const hook_save_labels = hook_save_labels_to_json();
+  // const hook_save_labels = hook_save_labels_to_json();
+  const { save_labels } = hook_save_labels();
+
   const { download_labels } = hook_download_labels();
 
   const label_image_map = get_label_all_label_images_rula();
 
-  const { success, error } = use_snackbar_ctx();
-
   useEffect(() => {
-    const fc = Math.max(0, frame_count ?? 0);
+    // const fc = Math.max(0, frame_count ?? 0);
 
     labels.forEach((label) => {
       const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
@@ -59,28 +58,11 @@ export function ContainerLabelsList() {
     if (!selected_motion) return;
 
     const exported_labels = labels.map((label) => {
-      return {
-        ergo_method: label.ergo_method,
-        start_frame: label.start_frame,
-        end_frame: label.end_frame,
-        button_text: label.button_text,
-      };
+      return label;
     });
 
-    hook_save_labels.mutate(
-      {
-        file_name: selected_motion,
-        labels: exported_labels,
-      },
-      {
-        onSuccess: (respond: any) => {
-          if (respond.message) success(respond.message);
-          if (respond.warning) error(respond.warning);
-        },
-        onError: (err: any) => error(err?.message || 'Saving labels failed'),
-      },
-    );
-  }, [labels, selected_motion, hook_save_labels, success, error]);
+    save_labels(selected_motion, exported_labels);
+  }, [labels, selected_motion, save_labels]);
 
   const download_labels_on_click = useCallback(() => {
     download_labels();

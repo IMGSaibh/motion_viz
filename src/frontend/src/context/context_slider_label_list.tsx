@@ -138,10 +138,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [labels_marker_reducer],
   );
 
-  useEffect(() => {
-    console.log(labels_marker_reducer[0].id);
-    console.log('==========================');
-  });
+  // useEffect(() => {
+  //   console.log(labels_marker_reducer[0].id);
+  //   console.log('==========================');
+  // });
 
   const value = useMemo<FrameSliderLabellistContext>(
     () => ({
