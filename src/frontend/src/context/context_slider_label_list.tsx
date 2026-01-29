@@ -2,15 +2,12 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useReducer, us
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
-import type { Range } from '@/domain/datatypes';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_frame_slider_context } from '@/context/context_slider_frame';
 
 type FrameSliderLabellistContext = {
-  range: Range;
-  set_slider_label_range: (r: Range) => void;
-
   ergo_label: ErgoLabel[];
   add_slider_label: (m: ErgoLabel) => void;
   remove_slider_label: (id: string) => void;
@@ -27,7 +24,7 @@ type FrameSliderLabellistContext = {
 const frame_slider_label_list_context = createContext<FrameSliderLabellistContext | null>(null);
 
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
-  const [range, set_range] = useState<Range>([0, 0]);
+  const { range, set_range } = use_frame_slider_context();
   const [labels_marker_reducer, dispatch] = useReducer(markerReducer, [] as ErgoLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
   const { set_rula_selected, rula_selected, set_owas_selected } = use_ergo_methods_context();
@@ -145,8 +142,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const value = useMemo<FrameSliderLabellistContext>(
     () => ({
-      range,
-      set_slider_label_range: set_range,
       ergo_label: labels_marker_reducer,
       add_slider_label,
       remove_slider_label: remove_label_rect,
@@ -159,7 +154,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       update_label_meta,
     }),
     [
-      range,
       labels_marker_reducer,
       add_slider_label,
       remove_label_rect,
@@ -240,7 +234,7 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
 }
 
 export function use_current_label_range_geometry_cxt(frame_count: number): RectangleLabelBar {
-  const range = use_range_slider_value_cxt();
+  const { range } = use_frame_slider_context();
 
   return useMemo(() => {
     const fc = Math.max(0, frame_count ?? 0);
@@ -266,21 +260,6 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
 /* =================================================================
                             frame slider range ctx  
 ==================================================================*/
-
-// ===== Selektor-Hooks – minimal re-render =====
-export function use_range_slider_value_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_slider_range_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.range;
-  });
-}
-
-export function use_set_range_slider_value_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_set_range_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.set_slider_label_range;
-  });
-}
 
 export function use_get_labels_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
@@ -349,12 +328,12 @@ export function use_can_save_label_cxt() {
     return (category?: string) => {
       const editingMarker = v.editing_id ? v.ergo_label.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
-
+      const { range, set_range } = use_frame_slider_context();
       return can_save_for_range({
         labels: v.ergo_label,
         category: targetCategory,
-        from: v.range[0],
-        to: v.range[1],
+        from: range[0],
+        to: range[1],
         ignore_id: v.editing_id,
       });
     };

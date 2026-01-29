@@ -16,12 +16,11 @@ export function ContainerLabelsList() {
   const { frame_count, selected_motion } = use_three_js_engine_ctx();
 
   const labels = use_get_labels_cxt();
-  const update_label_meta = use_update_label_meta_cxt();
   const remove_label = use_remove_label_cxt();
+  const update_label_meta = use_update_label_meta_cxt();
   const clear_label_list = use_clear_label_list_ctx();
   const { set_owas_selected, set_rula_selected } = use_ergo_methods_context();
 
-  // const hook_save_labels = hook_save_labels_to_json();
   const { save_labels } = hook_save_labels();
 
   const { download_labels } = hook_download_labels();
@@ -29,8 +28,6 @@ export function ContainerLabelsList() {
   const label_image_map = get_label_all_label_images_rula();
 
   useEffect(() => {
-    // const fc = Math.max(0, frame_count ?? 0);
-
     labels.forEach((label) => {
       const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
 

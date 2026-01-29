@@ -4,13 +4,14 @@ import {
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
 } from '@/Assets/label_images';
-import { use_range_slider_value_cxt, use_can_save_label_cxt } from '@/context/context_slider_label_list';
+import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_frame_slider_context } from '@/context/context_slider_frame';
 
 type Props = {
   on_click_save_label?: (label: ErgoLabel) => void;
@@ -108,7 +109,8 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
 
-  const range = use_range_slider_value_cxt();
+  const { range, set_range } = use_frame_slider_context();
+
   const can_save_label = use_can_save_label_cxt();
   const { owas_selected, set_owas_selected } = use_ergo_methods_context();
 

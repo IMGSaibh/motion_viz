@@ -10,7 +10,6 @@ import { hook_upload_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
-import { use_set_range_slider_value_cxt } from '@/context/context_slider_label_list';
 
 import { use_frame_slider_context } from '@/context/context_slider_frame';
 
@@ -19,7 +18,7 @@ import { use_snackbar_ctx } from '@/context/context_snackbar';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
-  const set_range = use_set_range_slider_value_cxt();
+  const { range, set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
@@ -45,7 +44,6 @@ export function ContainerTopbar() {
   const mutation_upload_files = hook_upload_motion_files();
   const mutation_create_descriptor = create_motion_descriptor();
   const mutation_convert_pv = convert_with_pose_viewer();
-  // const mutation_convert_bvh = convert_bvh();
   const { convert_bvh_to_npy } = hook_bvh_conversion();
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
@@ -100,7 +98,7 @@ export function ContainerTopbar() {
 
     set_frame_slider_value(0);
 
-    set_range([0, 1]);
+    set_range([0, 0]);
     clear_slider_label_list();
   }
 
@@ -117,7 +115,7 @@ export function ContainerTopbar() {
     stop();
     go_to_frame(0);
     set_frame_slider_value(0);
-    set_range([0, 1]);
+    set_range([0, 0]);
     clear_slider_label_list();
   }
 
