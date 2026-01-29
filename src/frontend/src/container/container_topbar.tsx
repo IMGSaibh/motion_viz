@@ -8,7 +8,8 @@ import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
 import { hook_upload_motion_files, hook_delete_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
-import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
+import { convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
+import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
 import { use_set_range_slider_value_cxt } from '@/context/context_slider_label_list';
 
 import { use_frame_slider_context } from '@/context/context_slider_frame';
@@ -45,7 +46,8 @@ export function ContainerTopbar() {
   const mutation_delete_files = hook_delete_motion_files();
   const mutation_create_descriptor = create_motion_descriptor();
   const mutation_convert_pv = convert_with_pose_viewer();
-  const mutation_convert_bvh = convert_bvh();
+  // const mutation_convert_bvh = convert_bvh();
+  const { convert_bvh_to_npy } = hook_bvh_conversion();
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
 
@@ -144,7 +146,7 @@ export function ContainerTopbar() {
 
   async function handle_convert_motion_file() {
     try {
-      const respond = await mutation_convert_bvh.mutateAsync();
+      const respond = await convert_bvh_to_npy();
       if (respond.message) success(respond.message);
       if (respond.warning) warning(`${respond.warning}`);
     } catch (e: any) {
