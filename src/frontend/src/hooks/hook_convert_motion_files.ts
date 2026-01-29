@@ -11,11 +11,3 @@ export function convert_with_pose_viewer() {
     onSuccess: () => qc.invalidateQueries({ queryKey: query_keys.motionFiles }),
   });
 }
-
-// export function convert_bvh() {
-//   const qc = useQueryClient();
-//   return useMutation({
-//     mutationFn: () => convertBvh(),
-//     onSuccess: () => qc.invalidateQueries({ queryKey: query_keys.motionFiles }),
-//   });
-// }

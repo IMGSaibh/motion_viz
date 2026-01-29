@@ -6,7 +6,7 @@ import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/api/api_file_processing';
 import { select_motion_files } from '@/hooks/hook_select_motion_files';
-import { hook_upload_motion_files, hook_delete_motion_files } from '@/hooks/hook_upload_motion_files';
+import { hook_upload_motion_files } from '@/hooks/hook_upload_motion_files';
 import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
 import { convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
 import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
@@ -43,7 +43,6 @@ export function ContainerTopbar() {
   // --- React Query hooks ---
   const query_motion_files = select_motion_files({ enabled: false });
   const mutation_upload_files = hook_upload_motion_files();
-  const mutation_delete_files = hook_delete_motion_files();
   const mutation_create_descriptor = create_motion_descriptor();
   const mutation_convert_pv = convert_with_pose_viewer();
   // const mutation_convert_bvh = convert_bvh();
@@ -65,18 +64,6 @@ export function ContainerTopbar() {
       error(err?.message || 'Upload failed');
     } finally {
       e.target.value = '';
-    }
-  }
-
-  async function handle_delete_selected_motion_file_on_click() {
-    if (!motion_file_selected) return;
-
-    try {
-      const respond = await mutation_delete_files.mutateAsync([motion_file_selected]);
-      if (respond.message) success(`Deleted ${respond.message} file(s)`);
-      if (respond.warning) warning(`${respond.warning} not deleted`);
-    } catch (err: any) {
-      error(err?.message || 'Delete failed');
     }
   }
 
@@ -163,7 +150,6 @@ export function ContainerTopbar() {
       <PresenterTopbar
         file_dialog_reference={file_dialog_reference}
         file_dialog_on_change={handle_file_dialog_on_change}
-        delete_dialog_on_click={handle_delete_selected_motion_file_on_click}
         motion_config_reference={motion_config_references}
         motion_config_is_open={motion_config_is_open}
         motion_config_on_click={handle_motion_config_on_click}

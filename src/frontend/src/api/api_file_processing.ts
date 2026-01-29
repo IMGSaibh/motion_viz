@@ -29,15 +29,6 @@ export async function uploadFiles(files: File[], opts?: { signal?: AbortSignal }
   });
 }
 
-export async function deleteFiles(filenames: string[], opts?: { signal?: AbortSignal }) {
-  return fetch_json<{ message?: string | number; warning?: string[] | string }>('/api_file_delete/delete', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filenames }),
-    signal: opts?.signal,
-  });
-}
-
 export async function createMotionDescriptor(data: MotionDescriptorData, opts?: { signal?: AbortSignal }) {
   return fetch_json<{ message: string }>('/api_motion_descriptor/motion_descriptor', {
     method: 'POST',
@@ -52,10 +43,3 @@ export async function convertWithPoseViewer(opts?: { signal?: AbortSignal }) {
     signal: opts?.signal,
   });
 }
-
-// export async function convertBvh(opts?: { signal?: AbortSignal }) {
-//   return fetch_json<{ message: string; warning?: string | string[] }>('/api_bvh_conversion/convert_bvh_to_npy', {
-//     method: 'POST',
-//     signal: opts?.signal,
-//   });
-// }
