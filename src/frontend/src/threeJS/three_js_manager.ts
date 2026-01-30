@@ -12,8 +12,8 @@ import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { api_get_base_url } from '@/hooks/hook_endpoints';
 import Utils from '@/threeJS/utils';
-import { api_get_base_url } from '@/api/api_client';
 
 export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;

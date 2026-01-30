@@ -8,7 +8,7 @@ workspacefolder = Path.cwd()
 @router.post("/motion_descriptor")
 async def create_motion_config(config: MotionConfig):
     generator = JSONGenerator()
-    data_schema = generator.load_schema(Path.joinpath(workspacefolder, "src/backend/json_schema/data_schema.json"))
+    data_schema = generator.load_schema(Path.joinpath(workspacefolder, "data/shemes/data_schema.json"))
     generator.from_config(config)
 
     if config is None:  
@@ -17,7 +17,7 @@ async def create_motion_config(config: MotionConfig):
             "message": "",
         }
     
-    generator.save(Path.joinpath(workspacefolder, "data/descriptor_files/new_schema.json"))
+    generator.save(Path.joinpath(workspacefolder, "data/shemes/new_schema.json"))
 
     return {
         "message": "config file created",
