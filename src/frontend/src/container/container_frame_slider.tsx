@@ -4,7 +4,7 @@ import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
-import { use_frame_slider_context } from '@/context/context_slider_frame';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 export function ContainerFrameSlider() {
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
@@ -57,7 +57,7 @@ export function ContainerFrameSlider() {
       if (e.code === 'KeyR') {
         reset_engine();
         set_frame_slider_value(0);
-        set_range([0, 1]);
+        set_range([0, 0]);
         clear_slider_label_list();
         set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
         set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
@@ -92,6 +92,7 @@ export function ContainerFrameSlider() {
       }
       if (e.code === 'Digit1' && e.location === 0) {
         set_range([frame_slider_value, range[1]]);
+        console.log('range', range);
       }
       if (e.code === 'Digit2' && e.location === 0) {
         set_range([range[0], frame_slider_value]);
@@ -112,6 +113,7 @@ export function ContainerFrameSlider() {
     cleanup_loop,
     cleanup_player,
     cleanup_thumbnail_render,
+    set_range,
   ]);
 
   useEffect(() => {

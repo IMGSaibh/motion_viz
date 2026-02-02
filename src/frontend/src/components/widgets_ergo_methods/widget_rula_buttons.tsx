@@ -10,7 +10,7 @@ import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
 import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { use_frame_slider_context } from '@/context/context_slider_frame';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
   onClick?: (label: ErgoLabel) => void;

@@ -11,7 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
-import { use_frame_slider_context } from '@/context/context_slider_frame';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
   on_click_save_label?: (label: ErgoLabel) => void;

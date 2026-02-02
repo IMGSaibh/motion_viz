@@ -48,7 +48,7 @@ export function PresenterFrameSlider(props: Props) {
       />
 
       {/* Frame-bar under frame slider */}
-      <WidgetFrameLabelBar frame_count={props.frame_count} frame_slider_range={props.frame_slider_range} />
+      <WidgetFrameLabelBar frame_count={props.frame_count} />
     </Box>
   );
 }

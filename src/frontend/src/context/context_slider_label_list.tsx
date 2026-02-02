@@ -5,7 +5,7 @@ import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
 import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
-import { use_frame_slider_context } from '@/context/context_slider_frame';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type FrameSliderLabellistContext = {
   ergo_label: ErgoLabel[];

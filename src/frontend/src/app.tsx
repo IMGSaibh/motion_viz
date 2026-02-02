@@ -7,7 +7,7 @@ import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import { FrameSliderLabellistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
 import { ContainerLabelButtons } from './container/container_label_buttons';
-import { FrameSliderContexProvider } from './context/context_slider_frame';
+import { FrameSliderContexProvider } from './context/context_frame_slider';
 import { ErgoMethodsContexProvider } from './context/contex_ergo_methods';
 
 export default function App() {

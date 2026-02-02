@@ -9,7 +9,6 @@ import {
 
 type Props = {
   frame_count: number;
-  frame_slider_range: [number, number];
 };
 export function WidgetFrameLabelBar(props: Props) {
   const saved_labels = use_get_labels_cxt();

@@ -9,7 +9,7 @@ import { hook_motion_descriptor } from '@/hooks/hook_create_motion_file_descript
 import { hook_pose_viewer_conversion } from '@/hooks/hook_convert_via_pose_viewer';
 import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
 
-import { use_frame_slider_context } from '@/context/context_slider_frame';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
