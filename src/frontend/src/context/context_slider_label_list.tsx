@@ -237,22 +237,32 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
   const { range } = use_frame_slider_context();
 
   return useMemo(() => {
+    // range is inclusive: [from,to] covers at least 1 frame
+    // Widget draws overlay by scaling a full-width bar (width:100%) with scaleX,
+    // so scaleX must be the fraction of frames covered and leftPct the start offset.
     const fc = Math.max(0, frame_count ?? 0);
-    const maxIdx = Math.max(0, fc - 1);
+
+    if (fc === 0) {
+      return { from: 0, to: 0, leftPct: 0, scaleX: 0 };
+    }
+
+    const maxIdx = fc - 1;
     const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
-    const pct = (n: number, d: number) => (d > 0 ? (n / d) * 100 : 0);
 
     const a = clamp(range[0]);
     const b = clamp(range[1]);
+
     const from = Math.min(a, b);
     const to = Math.max(a, b);
-    const length = Math.max(0, to - from);
+
+    // inclusive length (so [0,0] still covers 1 frame)
+    const framesCovered = Math.max(1, to - from + 1);
 
     return {
       from,
       to,
-      leftPct: pct(from, fc),
-      scaleX: fc > 0 ? Math.max(0, length / fc) : 0,
+      leftPct: (from / fc) * 100,
+      scaleX: Math.min(1, framesCovered / fc),
     };
   }, [frame_count, range]);
 }
