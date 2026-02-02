@@ -18,9 +18,7 @@ export function WidgetFrameLabelBar(props: Props) {
 
   const clamp = (n: number) => Math.max(0, Math.min(n, props.frame_count));
   const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 10000) / 100 : 0);
-
   const scaleX = props.frame_count > 0 ? Math.max(0, Math.round((length / props.frame_count) * 10000) / 10000) : 0;
-
   const has_overlap = saved_labels
     .filter((label) => label.id !== editing_id)
     .some(({ start_frame: vf, end_frame: vt }) => {
@@ -47,7 +45,7 @@ export function WidgetFrameLabelBar(props: Props) {
             {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
               const vvFrom = clamp(Math.min(vf, vt));
               const vvTo = clamp(Math.max(vf, vt));
-              const vvLen = Math.max(0, vvTo - vvFrom);
+              const vvLen = Math.max(0, vvTo - vvFrom + 1);
 
               const vLeft = pct(vvFrom, props.frame_count);
               const vScale =

@@ -106,7 +106,7 @@ export function WidgetLabelList(props: Props) {
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
                       disabled={true}
-                      value={[slider_label.start_frame, slider_label.end_frame]}
+                      value={[slider_label.start_frame, slider_label.end_frame + 1]}
                       min={0}
                       max={frame_count ?? 0}
                     />
