@@ -92,7 +92,6 @@ export function ContainerFrameSlider() {
       }
       if (e.code === 'Digit1' && e.location === 0) {
         set_range([frame_slider_value, range[1]]);
-        console.log('range', range);
       }
       if (e.code === 'Digit2' && e.location === 0) {
         set_range([range[0], frame_slider_value]);
