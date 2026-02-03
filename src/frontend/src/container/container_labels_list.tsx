@@ -67,7 +67,7 @@ export function ContainerLabelsList() {
 
   return (
     <PresenterLabelList
-      lables_list={labels}
+      lable_list={labels}
       delete_label_from_list_on_click={delete_label_from_list_on_click}
       delete_label_list_on_click={delete_label_list_on_click}
       save_label_list_on_click={save_label_list_on_click}

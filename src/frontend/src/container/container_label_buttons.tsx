@@ -17,7 +17,6 @@ export function ContainerLabelButtons(props: Props) {
 
   const on_click_save_label = useCallback(
     (label: ErgoLabel) => {
-      console.log('range', range);
       if (range[0] == 0 && range[1] == 0) {
         error(`Label range cant be within: [${range[0]}, ${range[1]}]`);
         return;
