@@ -18,7 +18,7 @@ type FrameSliderLabelListContext = {
   save_current_edited_label: () => void;
   cancel_current_edit_label: () => void;
 
-  update_label_meta: (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => void;
+  // update_label_meta: (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabelListContext | null>(null);
@@ -127,6 +127,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       ...(rulaLabel !== undefined ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
       ...(categories !== undefined ? { categories } : {}),
     });
+    console.log('label id', editing_id);
+    console.log('Saved edited label', ergo_labels);
 
     set_editing_id(null);
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
@@ -139,23 +141,23 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   }, [editing_id]);
 
-  const update_label_meta = useCallback(
-    (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => {
-      const current = ergo_labels.find((m) => m.id === id);
-      if (!current) return;
+  // const update_label_meta = useCallback(
+  //   (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => {
+  //     const current = ergo_labels.find((m) => m.id === id);
+  //     if (!current) return;
 
-      dispatch({
-        type: 'update',
-        id,
-        from: current.start_frame,
-        to: current.end_frame,
-        label: patch.button_text,
-        ergo_method: patch.ergo_method,
-        color: patch.color,
-      });
-    },
-    [ergo_labels],
-  );
+  //     dispatch({
+  //       type: 'update',
+  //       id,
+  //       from: current.start_frame,
+  //       to: current.end_frame,
+  //       label: patch.button_text,
+  //       ergo_method: patch.ergo_method,
+  //       color: patch.color,
+  //     });
+  //   },
+  //   [ergo_labels],
+  // );
 
   // useEffect(() => {
   //   console.log(labels_marker_reducer[0].id);
@@ -173,7 +175,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      update_label_meta,
+      // update_label_meta,
     }),
     [
       ergo_labels,
@@ -185,7 +187,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       save_current_edited_label,
       cancel_current_edit_label,
 
-      update_label_meta,
+      // update_label_meta,
     ],
   );
 
@@ -372,9 +374,9 @@ export function use_can_save_label_cxt() {
   });
 }
 
-export function use_update_label_meta_cxt() {
-  return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
-    return v.update_label_meta;
-  });
-}
+// export function use_update_label_meta_cxt() {
+//   return useContextSelector(frame_slider_label_list_context, (v) => {
+//     if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
+//     return v.update_label_meta;
+//   });
+// }

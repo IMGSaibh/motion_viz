@@ -4,7 +4,7 @@ import {
   use_remove_label_cxt,
   use_clear_label_list_ctx,
   use_get_labels_cxt,
-  use_update_label_meta_cxt,
+  // use_update_label_meta_cxt,
 } from '@/context/context_slider_label_list';
 import { hook_download_labels } from '@/hooks/hook_download_labels';
 import { hook_save_labels } from '@/hooks/hook_save_labels';
@@ -17,26 +17,40 @@ export function ContainerLabelsList() {
 
   const labels = use_get_labels_cxt();
   const remove_label = use_remove_label_cxt();
-  const update_label_meta = use_update_label_meta_cxt();
+  // const update_label_meta = use_update_label_meta_cxt();
   const clear_label_list = use_clear_label_list_ctx();
   const { set_owas_selected, set_rula_selected } = use_ergo_methods_context();
 
-  const { save_labels } = hook_save_labels();
+  const { save_label_list } = hook_save_labels();
 
   const { download_labels } = hook_download_labels();
 
   const label_image_map = get_label_all_label_images_rula();
 
+  // useEffect(() => {
+  //   labels.forEach((label) => {
+  //     const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
+
+  //     // nur patchen, wenn wirklich nötig (reduziert re-renders)
+  //     if (label.button_text !== name) {
+  //       update_label_meta(label.id, { button_text: name });
+  //     }
+  //   });
+  // }, [labels, frame_count, label_image_map, update_label_meta]);
+
   useEffect(() => {
     labels.forEach((label) => {
       const name = label.button_text && label.button_text.trim() ? label.button_text : `Label_${label.id}`;
+      console.log('==================== im container ====================');
+      console.log('label', label);
+      console.log('label categories', label.categories);
 
       // nur patchen, wenn wirklich nötig (reduziert re-renders)
       if (label.button_text !== name) {
-        update_label_meta(label.id, { button_text: name });
+        // update_label_meta(label.id, { button_text: name });
       }
     });
-  }, [labels, frame_count, label_image_map, update_label_meta]);
+  }, [labels, frame_count, label_image_map]);
 
   const delete_label_from_list_on_click = useCallback(
     (id: string) => {
@@ -58,8 +72,8 @@ export function ContainerLabelsList() {
       return label;
     });
 
-    save_labels(selected_motion, exported_labels);
-  }, [labels, selected_motion, save_labels]);
+    save_label_list(selected_motion, labels);
+  }, [labels, selected_motion, save_label_list]);
 
   const download_labels_on_click = useCallback(() => {
     download_labels();

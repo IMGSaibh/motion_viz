@@ -123,7 +123,9 @@ export function WidgetLabelList(props: Props) {
                       })}
                     >
                       <Typography variant="body2" noWrap>
-                        {ergoLabel.button_text}
+                        {ergoLabel.categories[0].image?.name}
+                        {ergoLabel.categories[1].image?.name}
+                        {ergoLabel.categories[2].image?.name}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Methode ${ergoLabel.ergo_method}`}

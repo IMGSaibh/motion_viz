@@ -13,7 +13,7 @@ export function hook_save_labels() {
   const queryClient = useQueryClient();
   const { success, error } = use_snackbar_ctx();
 
-  const save_labels = useCallback(
+  const save_label_list = useCallback(
     async (motion_name: string, labels: ErgoLabel[]) => {
       try {
         const response = await fetch(ENDPOINT, {
@@ -58,5 +58,5 @@ export function hook_save_labels() {
     [queryClient, success, error],
   );
 
-  return { save_labels };
+  return { save_label_list };
 }
