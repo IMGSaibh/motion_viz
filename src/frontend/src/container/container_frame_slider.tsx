@@ -1,7 +1,7 @@
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
-import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
@@ -15,7 +15,7 @@ export function ContainerFrameSlider() {
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
 
-  const { owas_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_context();
+  const { owas_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
 
   const clear_slider_label_list = use_clear_label_list_ctx();
 

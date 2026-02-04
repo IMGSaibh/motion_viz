@@ -7,7 +7,7 @@ import {
   get_label_images_cat3_rula,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
-import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
@@ -109,7 +109,7 @@ export function WidgetRulaButtons(props: Props) {
 
   const { range, set_range } = use_frame_slider_context();
 
-  const { rula_selected, set_rula_selected } = use_ergo_methods_context();
+  const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
   const can_save_label = use_can_save_label_cxt();

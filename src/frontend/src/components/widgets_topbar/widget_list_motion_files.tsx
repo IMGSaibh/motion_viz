@@ -7,22 +7,16 @@ import { SelectChangeEvent } from '@mui/material/Select';
 type Props = {
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
-  motion_file_list_on_focus: () => void;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
 
 export function WidgetListFiles(props: Props) {
-  const labelText = props.motion_file_selected || 'Select file';
-  const labelId = 'motion-file-select-label';
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id={labelId} shrink>
-        {'Selected file'}
-      </InputLabel>
+      <InputLabel shrink>{'Selected file'}</InputLabel>
       <Select
         value={props.motion_file_selected || ''}
-        label={labelText}
-        onFocus={props.motion_file_list_on_focus}
+        label={props.motion_file_selected}
         onChange={props.motion_file_list_on_change}
       >
         <MenuItem value="">

@@ -10,7 +10,7 @@ import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
-import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
@@ -112,7 +112,7 @@ export function WidgetOwasButtons(props: Props) {
   const { range, set_range } = use_frame_slider_context();
 
   const can_save_label = use_can_save_label_cxt();
-  const { owas_selected, set_owas_selected } = use_ergo_methods_context();
+  const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
 
   const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
   const canSaveOwas = can_save_label('OWAS');

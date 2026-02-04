@@ -1,6 +1,5 @@
-import { ErgoLabel, LabelImage, MarkerAction } from '@/domain/datatypes';
-import { can_save_for_range } from '@/domain/label_logic';
-import { createContext, useState, useContext, useCallback, useReducer, useEffect } from 'react';
+import { LabelImage } from '@/domain/datatypes';
+import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
   rula_selected: Record<string, LabelImage | null>;
@@ -34,8 +33,8 @@ export function ErgoMethodsContexProvider({ children }: { children: React.ReactN
   return <ergo_methods_context.Provider value={value}>{children}</ergo_methods_context.Provider>;
 }
 
-export const use_ergo_methods_context = () => {
+export const use_ergo_methods_cxt = () => {
   const ctx = useContext(ergo_methods_context);
-  if (!ctx) throw new Error('use_ergo_methods_context must be used within a ErgoMethodsContexProvider');
+  if (!ctx) throw new Error('use_ergo_methods_ctx must be used within a ErgoMethodsContexProvider');
   return ctx;
 };

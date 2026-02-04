@@ -19,7 +19,6 @@ type Props = {
 
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
-  motion_file_list_on_focus: () => void;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
 
@@ -63,7 +62,7 @@ export function PresenterTopbar(props: Props) {
                 <WidgetListFiles
                   motion_files={props.motion_files}
                   motion_file_selected={props.motion_file_selected}
-                  motion_file_list_on_focus={props.motion_file_list_on_focus}
+                  // motion_file_list_on_focus={props.motion_file_list_on_focus}
                   motion_file_list_on_change={props.motion_file_list_on_change}
                 />
               </Box>

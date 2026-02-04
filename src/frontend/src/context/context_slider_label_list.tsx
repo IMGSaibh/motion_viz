@@ -4,7 +4,7 @@ import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
-import { use_ergo_methods_context } from '@/context/contex_ergo_methods';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type FrameSliderLabelListContext = {
@@ -17,8 +17,6 @@ type FrameSliderLabelListContext = {
   start_editing_label: (id: string) => void;
   save_current_edited_label: () => void;
   cancel_current_edit_label: () => void;
-
-  // update_label_meta: (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => void;
 };
 
 const frame_slider_label_list_context = createContext<FrameSliderLabelListContext | null>(null);
@@ -27,7 +25,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   const { range, set_range } = use_frame_slider_context();
   const [ergo_labels, dispatch] = useReducer(markerReducer, [] as ErgoLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
-  const { set_rula_selected, rula_selected, set_owas_selected, owas_selected } = use_ergo_methods_context();
+  const { set_rula_selected, rula_selected, set_owas_selected, owas_selected } = use_ergo_methods_cxt();
 
   const add_slider_label = useCallback(
     (label: ErgoLabel) => {
@@ -141,29 +139,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   }, [editing_id]);
 
-  // const update_label_meta = useCallback(
-  //   (id: string, patch: Partial<Pick<ErgoLabel, 'button_text' | 'ergo_method' | 'color'>>) => {
-  //     const current = ergo_labels.find((m) => m.id === id);
-  //     if (!current) return;
-
-  //     dispatch({
-  //       type: 'update',
-  //       id,
-  //       from: current.start_frame,
-  //       to: current.end_frame,
-  //       label: patch.button_text,
-  //       ergo_method: patch.ergo_method,
-  //       color: patch.color,
-  //     });
-  //   },
-  //   [ergo_labels],
-  // );
-
-  // useEffect(() => {
-  //   console.log(labels_marker_reducer[0].id);
-  //   console.log('==========================');
-  // });
-
   const value = useMemo<FrameSliderLabelListContext>(
     () => ({
       ergo_labels,
@@ -174,8 +149,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       start_editing_label,
       save_current_edited_label,
       cancel_current_edit_label,
-
-      // update_label_meta,
     }),
     [
       ergo_labels,
@@ -186,8 +159,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       start_editing_label,
       save_current_edited_label,
       cancel_current_edit_label,
-
-      // update_label_meta,
     ],
   );
 
@@ -261,9 +232,6 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
   const { range } = use_frame_slider_context();
 
   return useMemo(() => {
-    // range is inclusive: [from,to] covers at least 1 frame
-    // Widget draws overlay by scaling a full-width bar (width:100%) with scaleX,
-    // so scaleX must be the fraction of frames covered and leftPct the start offset.
     const fc = Math.max(0, frame_count ?? 0);
 
     if (fc === 0) {
@@ -279,7 +247,6 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
     const from = Math.min(a, b);
     const to = Math.max(a, b);
 
-    // inclusive length (so [0,0] still covers 1 frame)
     const framesCovered = Math.max(1, to - from + 1);
 
     return {
@@ -373,10 +340,3 @@ export function use_can_save_label_cxt() {
     };
   });
 }
-
-// export function use_update_label_meta_cxt() {
-//   return useContextSelector(frame_slider_label_list_context, (v) => {
-//     if (!v) throw new Error('use_update_label_meta_cxt must be used within <FrameSliderLabellistProvider>');
-//     return v.update_label_meta;
-//   });
-// }

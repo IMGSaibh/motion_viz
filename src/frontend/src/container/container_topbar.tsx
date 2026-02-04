@@ -44,7 +44,6 @@ export function ContainerTopbar() {
   const motion_files = hook_list_motion_files();
 
   const { upload_files } = hook_file_upload();
-  // const mutation_create_descriptor = create_motion_descriptor();
   const { create_motion_descriptor } = hook_motion_descriptor();
   const { convert_pv_style } = hook_pose_viewer_conversion();
   const { convert_bvh_to_npy } = hook_bvh_conversion();
@@ -85,11 +84,6 @@ export function ContainerTopbar() {
       colgap: parseInt(motion_config_references.colgap.current?.value || '0'),
       dimsize: parseInt(motion_config_references.dimsize.current?.value || '3'),
     };
-
-    // mutation_create_descriptor.mutate(data, {
-    //   onSuccess: (respond: any) => success(respond?.message || 'Created descriptor file!'),
-    //   onError: (err: any) => error(err?.message || 'Creation failed'),
-    // });
 
     create_motion_descriptor(data);
   }
@@ -143,11 +137,6 @@ export function ContainerTopbar() {
     }
   }
 
-  async function handle_motion_file_list_on_focus() {
-    // await query_motion_files.refetch();
-    // await list_motion_files()
-  }
-
   return (
     <>
       <PresenterTopbar
@@ -159,10 +148,8 @@ export function ContainerTopbar() {
         motion_config_create_on_click={handle_motion_config_create_on_click}
         convert_pv_files_on_click={handle_convert_with_pose_viewer}
         convert_bvh_files_on_click={handle_convert_motion_file}
-        // motion_files={query_motion_files.data ?? []}
         motion_files={motion_files.data ?? []}
         motion_file_selected={motion_file_selected}
-        motion_file_list_on_focus={handle_motion_file_list_on_focus}
         motion_file_list_on_change={handle_motion_file_list_on_change}
       />
     </>
