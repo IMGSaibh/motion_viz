@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ThreeJSEngine } from '@/threeJS/three_js_manager';
 
 type ThreeJSEngineContext = {
@@ -13,7 +13,7 @@ type ThreeJSEngineContext = {
   play_pause: () => void;
   stop: () => void;
   pause: () => void;
-
+  reset_engine: () => void;
   load_motion_file: (file: string) => Promise<void>;
   cleanup_player: () => void;
   cleanup_loop: () => void;
@@ -99,6 +99,13 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
+  const reset_engine = useCallback(() => {
+    (set_frame_count(0), stop());
+    threejs_mngr_ref.current?.cleanup_player?.();
+    threejs_mngr_ref.current?.cleanup_loop?.();
+    threejs_mngr_ref.current?.cleanup_thumbnail_render?.();
+    go_to_frame(0);
+  }, []);
 
   const value = useMemo<ThreeJSEngineContext>(
     () => ({
@@ -115,7 +122,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       play_pause,
       stop,
       pause,
-
+      reset_engine,
       cleanup_player,
       cleanup_loop,
       cleanup_thumbnail_render,
@@ -132,6 +139,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       play_pause,
       stop,
       pause,
+      reset_engine,
       cleanup_player,
       cleanup_loop,
       cleanup_thumbnail_render,
@@ -146,6 +154,6 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
 
 export const use_three_js_engine_ctx = () => {
   const ctx = useContext(three_js_engine_context);
-  if (!ctx) throw new Error('useThreeJSEngine must be used within a ThreeJSEngineProvider');
+  if (!ctx) throw new Error('use_three_js_engine_ctx must be used within a ThreeJSEngineProvider');
   return ctx;
 };

@@ -1,4 +1,4 @@
-import { Label } from '@/domain/datatypes';
+import { ErgoLabel } from '@/domain/datatypes';
 
 export function uid() {
   // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
@@ -17,7 +17,7 @@ export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number)
 }
 
 export function can_save_for_range(args: {
-  labels: Label[];
+  labels: ErgoLabel[];
   category?: string;
   from: number;
   to: number;

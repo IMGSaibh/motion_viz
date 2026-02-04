@@ -4,21 +4,17 @@ import {
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
 } from '@/Assets/label_images';
-import {
-  use_range_slider_value_cxt,
-  use_can_save_label_cxt,
-  use_owas_selected_cxt,
-  use_set_owas_selected_cxt,
-  use_unselect_owas_cxt as use_unselect_owas_cxt,
-} from '@/context/context_slider_label_list';
+import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
-import type { LabelImage, LabelCategory, Label } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
-  onClick?: (label: Label) => void;
+  on_click_save_label?: (label: ErgoLabel) => void;
 };
 
 function CategoryGrid({
@@ -113,14 +109,12 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
 
-  const range = use_range_slider_value_cxt();
-
-  const owas_selected = use_owas_selected_cxt();
-  const set_owas_selected = use_set_owas_selected_cxt();
-  const unselect_owas = use_unselect_owas_cxt();
-  const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
+  const { range, set_range } = use_frame_slider_context();
 
   const can_save_label = use_can_save_label_cxt();
+  const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
+
+  const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
   const canSaveOwas = can_save_label('OWAS');
 
   const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4', img: LabelImage) => {
@@ -142,7 +136,7 @@ export function WidgetOwasButtons(props: Props) {
     const to = Math.max(range[0], range[1]);
     const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
 
-    const label: Label = {
+    const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
       end_frame: to,
@@ -151,8 +145,8 @@ export function WidgetOwasButtons(props: Props) {
       categories,
     };
 
-    props.onClick?.(label);
-    unselect_owas();
+    props.on_click_save_label?.(label);
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   };
 
   return (

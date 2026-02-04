@@ -15,9 +15,20 @@ export function hook_download_labels() {
         method: 'GET',
       });
 
-      // check Response
-      if (!(response instanceof Response)) {
-        throw new Error('Invalid response object from fetch');
+      // check HTTP status first
+      if (!response.ok) {
+        // versuche Fehltext lesbar zu machen
+        const ct = response.headers.get('content-type') || '';
+        const errText = ct.includes('application/json') ? JSON.stringify(await response.json()) : await response.text();
+
+        throw new Error(`Download failed (${response.status}): ${errText}`);
+      }
+
+      // optional: verify content-type
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('zip')) {
+        const preview = await response.text();
+        throw new Error(`Expected ZIP but got "${contentType}". Body starts with: ${preview.slice(0, 200)}`);
       }
 
       // Dateiname extrahieren

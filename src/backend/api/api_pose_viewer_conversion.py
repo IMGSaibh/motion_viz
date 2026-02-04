@@ -50,11 +50,11 @@ async def convert_pv_style():
         # (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
         # "bvh_pos_100"),                                                                                  
 
-        # # Vicon Poeticon Deadlock
-        # (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",
-        #   "bvh_pos_100"),                                                                               
+        # # Vicon Poeticon
+        (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",
+          "bvh_pos_100"),                                                                               
 
-        #  Lara notworking
+        #  Lara 
         (f"{workspacefolder}/data/csv/L02_S01_R04_A17_N01_norm_data.csv",
         "lara_csv"),                                                                                        
 

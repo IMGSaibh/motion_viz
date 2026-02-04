@@ -9,8 +9,6 @@ type Props = {
   file_dialog_reference: React.RefObject<HTMLInputElement | null>;
   file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
 
-  delete_dialog_on_click: () => void;
-
   motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
   motion_config_is_open: boolean;
   motion_config_on_click: () => void;
@@ -21,7 +19,6 @@ type Props = {
 
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
-  motion_file_list_on_focus: () => void;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
 
@@ -40,8 +37,6 @@ export function PresenterTopbar(props: Props) {
                     {...{
                       file_dialog_reference: props.file_dialog_reference,
                       file_dialog_on_change: props.file_dialog_on_change,
-
-                      delete_dialog_on_click: props.delete_dialog_on_click,
                     }}
                   />
                   <WidgetConvertMotionFile
@@ -67,7 +62,7 @@ export function PresenterTopbar(props: Props) {
                 <WidgetListFiles
                   motion_files={props.motion_files}
                   motion_file_selected={props.motion_file_selected}
-                  motion_file_list_on_focus={props.motion_file_list_on_focus}
+                  // motion_file_list_on_focus={props.motion_file_list_on_focus}
                   motion_file_list_on_change={props.motion_file_list_on_change}
                 />
               </Box>

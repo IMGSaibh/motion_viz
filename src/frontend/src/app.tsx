@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import ThreeJSScene from '@/threeJS/three_js_scene';
 import { ContainerTopbar } from '@/container/container_topbar';
 import { ContainerFrameSlider } from './container/container_frame_slider';
@@ -5,8 +6,9 @@ import { ContainerLabelsList } from './container/container_labels_list';
 import { ThreeJSEngineProvider } from '@/context/context_three_js_engine';
 import { FrameSliderLabellistProvider } from '@/context/context_slider_label_list';
 import { SnackbarProvider } from '@/context/context_snackbar';
-import { Box } from '@mui/material';
 import { ContainerLabelButtons } from './container/container_label_buttons';
+import { FrameSliderContexProvider } from './context/context_frame_slider';
+import { ErgoMethodsContexProvider } from './context/contex_ergo_methods';
 
 export default function App() {
   return (
@@ -14,20 +16,24 @@ export default function App() {
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
-          <FrameSliderLabellistProvider>
-            <ContainerTopbar />
-            <Box
-              sx={(theme) => ({
-                position: 'absolute',
-                width: '100%',
-                bottom: '0vw',
-              })}
-            >
-              <ContainerFrameSlider />
-              <ContainerLabelButtons />
-              <ContainerLabelsList />
-            </Box>
-          </FrameSliderLabellistProvider>
+          <FrameSliderContexProvider>
+            <ErgoMethodsContexProvider>
+              <FrameSliderLabellistProvider>
+                <ContainerTopbar />
+                <Box
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    width: '100%',
+                    bottom: '0vw',
+                  })}
+                >
+                  <ContainerFrameSlider />
+                  <ContainerLabelButtons />
+                  <ContainerLabelsList />
+                </Box>
+              </FrameSliderLabellistProvider>
+            </ErgoMethodsContexProvider>
+          </FrameSliderContexProvider>
         </ThreeJSEngineProvider>
       </SnackbarProvider>
     </>

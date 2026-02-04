@@ -4,11 +4,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import type { LabelImage, Label } from '@/domain/datatypes';
+import type { ErgoLabel } from '@/domain/datatypes';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 type Props = {
-  lables_list: Label[];
+  lable_list: ErgoLabel[];
   delete_label_from_list_on_click?: (id: string) => void;
   delete_label_list_on_click?: () => void;
   save_label_list_on_click?: () => void;
@@ -36,7 +36,7 @@ export function PresenterLabelList(props: Props) {
             }
             sx={{ width: '100%' }}
           >
-            Label-List {props.lables_list.length > 0 ? `(${props.lables_list.length})` : ''}
+            Label-List {props.lable_list.length > 0 ? `(${props.lable_list.length})` : ''}
           </Button>
 
           <Button onClick={props.delete_label_list_on_click} sx={{ width: '100%' }}>
@@ -49,7 +49,6 @@ export function PresenterLabelList(props: Props) {
           </Button>
           <Button
             onClick={() => {
-              console.log('download labels clicked');
               props.download_labels_on_click?.();
             }}
             sx={{ width: '100%' }}
@@ -62,7 +61,7 @@ export function PresenterLabelList(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
       <WidgetLabelList
-        labels={props.lables_list}
+        labels={props.lable_list}
         delete_label_from_list_on_click={props.delete_label_from_list_on_click}
         toggle_list={open}
       />

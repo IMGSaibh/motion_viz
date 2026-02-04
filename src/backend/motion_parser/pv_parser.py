@@ -1,8 +1,6 @@
 import json
-from pathlib import Path
 import numpy as np
-# from pymotion.io.bvh import BVH
-from pymotion.ops.skeleton import fk
+from pathlib import Path
 from mocap_loader import MotionDataReader
 
 class PVParser:
@@ -23,6 +21,7 @@ class PVParser:
             json.dump(skeleton, f, indent=2)
 
     def save_npy(self, out_path: str):
+        pass
         arr = self.positions
         if arr is None:
             raise ValueError("self.positions ist None – es wurde keine Datenmatrix gesetzt.")

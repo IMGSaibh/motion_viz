@@ -4,19 +4,21 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
-import type { MotionDescriptorData } from '@/api/api_file_processing';
-import { select_motion_files } from '@/hooks/hook_select_motion_files';
-import { hook_upload_motion_files, hook_delete_motion_files } from '@/hooks/hook_upload_motion_files';
-import { create_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
-import { convert_bvh, convert_with_pose_viewer } from '@/hooks/hook_convert_motion_files';
-import { use_set_range_slider_value_cxt, use_set_slider_frame_cxt } from '@/context/context_slider_label_list';
+import type { MotionDescriptorData } from '@/hooks/hook_create_motion_file_descriptor';
+import { hook_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
+import { hook_pose_viewer_conversion } from '@/hooks/hook_convert_via_pose_viewer';
+import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
+
+import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
+import { hook_file_upload } from '@/hooks/hook_file_upload';
+import { hook_list_motion_files } from '@/hooks/hook_select_motion_files';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
-  const set_range = use_set_range_slider_value_cxt();
+  const { range, set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
@@ -38,40 +40,29 @@ export function ContainerTopbar() {
   } as const;
 
   // --- React Query hooks ---
-  const query_motion_files = select_motion_files({ enabled: false });
-  const mutation_upload_files = hook_upload_motion_files();
-  const mutation_delete_files = hook_delete_motion_files();
-  const mutation_create_descriptor = create_motion_descriptor();
-  const mutation_convert_pv = convert_with_pose_viewer();
-  const mutation_convert_bvh = convert_bvh();
+  // const query_motion_files = select_motion_files({ enabled: false });
+  const motion_files = hook_list_motion_files();
 
-  const set_std_slider_value = use_set_slider_frame_cxt();
+  const { upload_files } = hook_file_upload();
+  const { create_motion_descriptor } = hook_motion_descriptor();
+  const { convert_pv_style } = hook_pose_viewer_conversion();
+  const { convert_bvh_to_npy } = hook_bvh_conversion();
+
+  const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
+
   const clear_slider_label_list = use_clear_label_list_ctx();
 
-  // ======================= Handler =======================
   async function handle_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     try {
-      const respond = await mutation_upload_files.mutateAsync(files);
+      const respond = await upload_files(files);
       if (respond.message) success(`${respond.message} Files Uploaded`);
       if (respond.warning) warning(`${respond.warning} not supported`);
     } catch (err: any) {
       error(err?.message || 'Upload failed');
     } finally {
       e.target.value = '';
-    }
-  }
-
-  async function handle_delete_selected_motion_file_on_click() {
-    if (!motion_file_selected) return;
-
-    try {
-      const respond = await mutation_delete_files.mutateAsync([motion_file_selected]);
-      if (respond.message) success(`Deleted ${respond.message} file(s)`);
-      if (respond.warning) warning(`${respond.warning} not deleted`);
-    } catch (err: any) {
-      error(err?.message || 'Delete failed');
     }
   }
 
@@ -94,23 +85,18 @@ export function ContainerTopbar() {
       dimsize: parseInt(motion_config_references.dimsize.current?.value || '3'),
     };
 
-    mutation_create_descriptor.mutate(data, {
-      onSuccess: (respond: any) => success(respond?.message || 'Created descriptor file!'),
-      onError: (err: any) => error(err?.message || 'Creation failed'),
-    });
+    create_motion_descriptor(data);
   }
   function reset_current_motion() {
-    // UI
     set_motion_file_selected('');
 
-    // ThreeJS / Player
     set_selected_motion(null as any);
     stop();
     go_to_frame(0);
 
-    // Slider / Labels
-    set_std_slider_value(0);
-    set_range([0, 1]);
+    set_frame_slider_value(0);
+
+    set_range([0, 0]);
     clear_slider_label_list();
   }
 
@@ -126,14 +112,14 @@ export function ContainerTopbar() {
     await load_motion_file(e.target.value);
     stop();
     go_to_frame(0);
-    set_std_slider_value(0);
-    set_range([0, 1]);
+    set_frame_slider_value(0);
+    set_range([0, 0]);
     clear_slider_label_list();
   }
 
   async function handle_convert_with_pose_viewer() {
     try {
-      const respond = await mutation_convert_pv.mutateAsync();
+      const respond = await convert_pv_style();
       if (respond.message) success(respond.message);
       if (respond.warning) warning(`${respond.warning}`);
     } catch (e: any) {
@@ -143,7 +129,7 @@ export function ContainerTopbar() {
 
   async function handle_convert_motion_file() {
     try {
-      const respond = await mutation_convert_bvh.mutateAsync();
+      const respond = await convert_bvh_to_npy();
       if (respond.message) success(respond.message);
       if (respond.warning) warning(`${respond.warning}`);
     } catch (e: any) {
@@ -151,25 +137,19 @@ export function ContainerTopbar() {
     }
   }
 
-  async function handle_motion_file_list_on_focus() {
-    await query_motion_files.refetch();
-  }
-
   return (
     <>
       <PresenterTopbar
         file_dialog_reference={file_dialog_reference}
         file_dialog_on_change={handle_file_dialog_on_change}
-        delete_dialog_on_click={handle_delete_selected_motion_file_on_click}
         motion_config_reference={motion_config_references}
         motion_config_is_open={motion_config_is_open}
         motion_config_on_click={handle_motion_config_on_click}
         motion_config_create_on_click={handle_motion_config_create_on_click}
         convert_pv_files_on_click={handle_convert_with_pose_viewer}
         convert_bvh_files_on_click={handle_convert_motion_file}
-        motion_files={query_motion_files.data ?? []}
+        motion_files={motion_files.data ?? []}
         motion_file_selected={motion_file_selected}
-        motion_file_list_on_focus={handle_motion_file_list_on_focus}
         motion_file_list_on_change={handle_motion_file_list_on_change}
       />
     </>
