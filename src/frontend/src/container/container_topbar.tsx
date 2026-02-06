@@ -15,11 +15,13 @@ import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { hook_file_upload } from '@/hooks/hook_file_upload';
 import { hook_list_motion_files } from '@/hooks/hook_select_motion_files';
+import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
   const { range, set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
+  const { set_rula_selected, set_owas_selected } = use_ergo_methods_cxt();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
@@ -115,6 +117,8 @@ export function ContainerTopbar() {
     set_frame_slider_value(0);
     set_range([0, 0]);
     clear_slider_label_list();
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }
 
   async function handle_convert_with_pose_viewer() {
