@@ -124,9 +124,9 @@ main.py
 /src
 │
 ├── /hooks
-│   ├── hook_1.ts                        ← communication with FastAPI backend
-│   ├── hook_1.ts                        ← communication with FastAPI backend
-│   ├── ...                              ← communication with FastAPI backend
+│   ├── hook_1.ts                       ← communication with FastAPI backend
+│   ├── hook_1.ts                       ← communication with FastAPI backend
+│   ├── ...                             ← communication with FastAPI backend
 │
 ├── /threeJS                            ← 3D webgl engine
 │   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
