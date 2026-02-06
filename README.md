@@ -123,10 +123,10 @@ main.py
 ```bash
 /src
 │
-├── /api
-│   ├── api_1.ts                        ← communication with FastAPI backend
-│   ├── api_2.ts                        ← communication with FastAPI backend
-│   ├── ...                             ← communication with FastAPI backend
+├── /hooks
+│   ├── hook_1.ts                        ← communication with FastAPI backend
+│   ├── hook_1.ts                        ← communication with FastAPI backend
+│   ├── ...                              ← communication with FastAPI backend
 │
 ├── /threeJS                            ← 3D webgl engine
 │   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
