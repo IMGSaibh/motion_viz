@@ -1,6 +1,6 @@
 from pathlib import Path
 from fastapi import APIRouter
-from backend.motion_parser.pv_parser import PVParser
+# from backend.motion_parser.pv_parser import PVParser
 
 router = APIRouter()
 workspacefolder = Path.cwd()
@@ -64,9 +64,9 @@ async def convert_pv_style():
         print(f"processing {mocap_file}")
         print(f"processing {descriptor_file}")
 
-        pv_parser = PVParser(mocap_file, descriptor_file)
+        # pv_parser = PVParser(mocap_file, descriptor_file)
         save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
-        pv_parser.save_npy(str(save_npy_path))
+        # pv_parser.save_npy(str(save_npy_path))
         
 
     return {
