@@ -102,7 +102,6 @@ export class ThreeJSEngine {
         
         await this.npy_loader.create_skeleton(skeletonPath);
 
-        this.npy_loader.printJointInfo();
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
         break;
