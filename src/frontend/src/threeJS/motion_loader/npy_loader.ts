@@ -7,13 +7,13 @@ import { JointCoordsystemLocal } from '@/threeJS/components/JointCoordSystemLoca
 //lädt json und npy
 
 export class NPY_loader {
-  npy_motion: THREE.Group; //This holds all the bones and joints
+  npy_motion: THREE.Group; //This holds all the bones and joints that actually get added to the scene and therefore rendered
   numpy_data: any;
   currentFrame: number;
   frameCount: number;
   jointCount: number;
-  joints: THREE.Mesh[];
-  npy_skeleton: any[];
+  joints: THREE.Mesh[]; //Array of spheres for quick access of the joints
+  npy_skeleton: any[]; //Holds the child and parent IDs as well as bone geometry
   elapsed: number;
   speed: number;
   fps: number;
@@ -111,10 +111,10 @@ export class NPY_loader {
 
   //This creates the visible cilindrical geometry that visualize the different bones
   _create_bones(skeleton_json: any, renderer: THREE.WebGLRenderer | null = null) {
-    const boneGeometry = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 8);
-    // const boneMaterial = new THREE.MeshNormalMaterial({
-    //   // wireframe: true,
-    // });
+    const radialSegments = 8;
+    const radius = 1.0;
+    const length = 0.7;
+    const boneGeometry = new THREE.CylinderGeometry(radius, radius, length, radialSegments);
 
     const jointGraph = skeleton_json['joint-graph'];
     if (!jointGraph) {
@@ -136,7 +136,7 @@ export class NPY_loader {
 
       const boneMaterial = new THREE.MeshBasicMaterial({
         color: mat_color,
-        wireframe: false,
+        wireframe: true,
       });
 
       const bone = new THREE.Mesh(boneGeometry, boneMaterial);

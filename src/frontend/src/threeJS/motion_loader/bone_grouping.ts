@@ -11,7 +11,7 @@ const JOINT_CATEGORIES = {
   LEG_R: 'legR',
   FOOT_L: 'footL',
   FOOT_R: 'footR',
-  UNIDENTIFIED: 'u'
+  UNIDENTIFIED: 'unidentified'
 } as const;
 
 export type JointCategory = typeof JOINT_CATEGORIES[keyof typeof JOINT_CATEGORIES];
@@ -41,8 +41,8 @@ assign_categories(skeleton_json : any) {
         if (category) {
         this.joint_group_map.push(category);
         } else {
-        console.warn(`No category found for joint: ${name}, assigning to SPINE as default`);
-        category = JOINT_CATEGORIES.SPINE;
+        console.warn(`No category found for joint: ${name}, assigning to UNIDENTIFIED`);
+        category = JOINT_CATEGORIES.UNIDENTIFIED;
         this.joint_group_map.push(category);
         }
  

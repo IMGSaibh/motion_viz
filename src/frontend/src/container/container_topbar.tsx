@@ -6,7 +6,7 @@ import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/hooks/hook_create_motion_file_descriptor';
 import { hook_motion_descriptor } from '@/hooks/hook_create_motion_file_descriptor';
-import { hook_pose_viewer_conversion } from '@/hooks/hook_convert_via_pose_viewer';
+import { hook_pose_viewer_conversion } from '@/hooks/hook_pose_viewer_conversion';
 import { hook_bvh_conversion } from '@/hooks/hook_convert_bvh_to_npy';
 
 import { use_frame_slider_context } from '@/context/context_frame_slider';

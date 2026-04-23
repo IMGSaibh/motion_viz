@@ -13,6 +13,9 @@ export function hook_file_upload() {
   const queryClient = useQueryClient();
   const { success, error } = use_snackbar_ctx();
 
+  //QUESTION: Why is this called so often? seems like almost every frame
+  console.debug("I'm calling the file upload button!!");
+
   const upload_files = useCallback(
     async (files: File[] | FileList) => {
       const fileArray = Array.isArray(files) ? files : Array.from(files);
