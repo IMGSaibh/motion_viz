@@ -3,6 +3,10 @@ import * as THREE from 'three';
 import { Text } from 'troika-three-text';
 import { JointCoordsystemLocal } from '@/threeJS/components/JointCoordSystemLocal';
 
+import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+
 type HierarchyTuple = [number, number];
 
 export interface SkeletonData {
@@ -26,6 +30,10 @@ export class NPY_loader {
   joint_indices_names: Text[] = [];
   joint_indices_names_text = new THREE.Group();
 
+  maxTrailPoints: number = 120; // Länge des Schweifs
+  trailLine: Line2 | null = null;
+  trailLineWidth: number = 4;
+
   // joint_coordsystem_local: JointCoordsystemLocal | null;
   // joint_orientations: any[];
 
@@ -48,6 +56,66 @@ export class NPY_loader {
     this.joint_indices_names_text = new THREE.Group();
     // this.joint_coordsystem_local = null;
     // this.joint_orientations = [];
+  }
+
+  init_trail(jointIndex: number = 0) {
+    this.create_full_trail(jointIndex);
+  }
+
+  create_full_trail(jointIndex: number = 0) {
+    if (!this.numpy_data) return;
+    if (jointIndex < 0 || jointIndex >= this.jointCount) return;
+
+    // alten Trail entfernen
+    if (this.trailLine) {
+      this.scene.remove(this.trailLine);
+      this.trailLine.geometry.dispose();
+      (this.trailLine.material as LineMaterial).dispose();
+      this.trailLine = null;
+    }
+
+    const positions: number[] = [];
+    let lastPoint: THREE.Vector3 | null = null;
+
+    for (let frame = 0; frame < this.frameCount; frame++) {
+      const base = frame * this.jointCount * 3;
+
+      const x = this.numpy_data[base + jointIndex * 3 + 0];
+      const y = this.numpy_data[base + jointIndex * 3 + 1];
+      const z = this.numpy_data[base + jointIndex * 3 + 2];
+
+      const p = new THREE.Vector3(x, y, z);
+
+      // Pfad auf dem Boden projizieren
+      p.y = 0;
+
+      // doppelte / fast gleiche Punkte vermeiden
+      if (!lastPoint || lastPoint.distanceTo(p) > 0.01) {
+        positions.push(p.x, p.y, p.z);
+        lastPoint = p.clone();
+      }
+    }
+
+    if (positions.length < 6) {
+      console.warn('Trail konnte nicht erzeugt werden: zu wenige Punkte.');
+      return;
+    }
+
+    const geometry = new LineGeometry();
+    geometry.setPositions(positions);
+
+    const material = new LineMaterial({
+      color: 0xff0000,
+      linewidth: this.trailLineWidth,
+    });
+
+    material.resolution.set(window.innerWidth, window.innerHeight);
+
+    const line = new Line2(geometry, material);
+    line.computeLineDistances();
+
+    this.trailLine = line;
+    this.scene.add(this.trailLine);
   }
 
   async load_npy_animation(file_url: string) {
@@ -104,7 +172,7 @@ export class NPY_loader {
   }
 
   _create_bones(skeleton: any, renderer: THREE.WebGLRenderer | null = null) {
-    const boneGeometry = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 8);
+    const boneGeometry = new THREE.CylinderGeometry(3.0, 3.0, 0.8, 8);
     const boneMaterial = new THREE.MeshNormalMaterial({
       // wireframe: true,
     });
