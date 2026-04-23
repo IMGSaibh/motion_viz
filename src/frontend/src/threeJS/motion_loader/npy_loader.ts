@@ -58,20 +58,18 @@ export class NPY_loader {
     // this.joint_orientations = [];
   }
 
-  init_trail(jointIndex: number = 0) {
-    this.create_full_trail(jointIndex);
-  }
-
   create_full_trail(jointIndex: number = 0) {
     if (!this.numpy_data) return;
     if (jointIndex < 0 || jointIndex >= this.jointCount) return;
 
     // alten Trail entfernen
+    console.log(this.trailLine);
     if (this.trailLine) {
       this.scene.remove(this.trailLine);
       this.trailLine.geometry.dispose();
       (this.trailLine.material as LineMaterial).dispose();
       this.trailLine = null;
+      console.log('Alter Trail entfernt');
     }
 
     const positions: number[] = [];
@@ -109,12 +107,15 @@ export class NPY_loader {
       linewidth: this.trailLineWidth,
     });
 
-    material.resolution.set(window.innerWidth, window.innerHeight);
+    // material.resolution.set(window.innerWidth, window.innerHeight);
 
-    const line = new Line2(geometry, material);
-    line.computeLineDistances();
+    // const line = new Line2(geometry, material);
+    // line.computeLineDistances();
 
-    this.trailLine = line;
+    this.trailLine =  new Line2(geometry, material);
+    console.log("check 2: " + this.trailLine);
+
+    this.trailLine.computeLineDistances();
     this.scene.add(this.trailLine);
   }
 
@@ -281,11 +282,12 @@ export class NPY_loader {
         }
       }
     });
-
     this.npy_motion.clear();
     this.scene.remove(this.npy_motion);
     this.scene.remove(this.joint_indices_names_text);
-
+    
+    // TODO: free GPU memory of this.trailLine 
+    this.scene.remove(this.trailLine!);
     // // TODO: uncomment to use this
     // this.joint_coordsystem_local!.dispose();
   }
