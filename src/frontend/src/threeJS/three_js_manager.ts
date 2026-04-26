@@ -100,7 +100,7 @@ export class ThreeJSEngine {
 
         const skeletonPath = fileUrl.replace('/data/npy/', '/data/json/').replace(/\.npy$/i, '.json');
         await this.npy_loader.create_skeleton(skeletonPath);
-        this.npy_loader.create_full_trail(0);
+
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
         break;

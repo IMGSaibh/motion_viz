@@ -7,13 +7,6 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 
-type HierarchyTuple = [number, number];
-
-export interface SkeletonData {
-  hierarchy: HierarchyTuple[];
-  joints: unknown[];
-}
-
 export class NPY_loader {
   npy_motion: THREE.Group;
   numpy_data: any;
@@ -29,11 +22,7 @@ export class NPY_loader {
   scene: THREE.Scene;
   joint_indices_names: Text[] = [];
   joint_indices_names_text = new THREE.Group();
-
-  maxTrailPoints: number = 120; // Länge des Schweifs
-  trailLine: Line2 | null = null;
-  trailLineWidth: number = 4;
-
+  mesh: any = [];
   // joint_coordsystem_local: JointCoordsystemLocal | null;
   // joint_orientations: any[];
 
@@ -58,67 +47,6 @@ export class NPY_loader {
     // this.joint_orientations = [];
   }
 
-  create_full_trail(jointIndex: number = 0) {
-    if (!this.numpy_data) return;
-    if (jointIndex < 0 || jointIndex >= this.jointCount) return;
-
-    // alten Trail entfernen
-    console.log(this.trailLine);
-    if (this.trailLine) {
-      this.scene.remove(this.trailLine);
-      this.trailLine.geometry.dispose();
-      (this.trailLine.material as LineMaterial).dispose();
-      this.trailLine = null;
-      console.log('Alter Trail entfernt');
-    }
-
-    const positions: number[] = [];
-    let lastPoint: THREE.Vector3 | null = null;
-
-    for (let frame = 0; frame < this.frameCount; frame++) {
-      const base = frame * this.jointCount * 3;
-
-      const x = this.numpy_data[base + jointIndex * 3 + 0];
-      const y = this.numpy_data[base + jointIndex * 3 + 1];
-      const z = this.numpy_data[base + jointIndex * 3 + 2];
-
-      const p = new THREE.Vector3(x, y, z);
-
-      // Pfad auf dem Boden projizieren
-      p.y = 0;
-
-      // doppelte / fast gleiche Punkte vermeiden
-      if (!lastPoint || lastPoint.distanceTo(p) > 0.01) {
-        positions.push(p.x, p.y, p.z);
-        lastPoint = p.clone();
-      }
-    }
-
-    if (positions.length < 6) {
-      console.warn('Trail konnte nicht erzeugt werden: zu wenige Punkte.');
-      return;
-    }
-
-    const geometry = new LineGeometry();
-    geometry.setPositions(positions);
-
-    const material = new LineMaterial({
-      color: 0xff0000,
-      linewidth: this.trailLineWidth,
-    });
-
-    // material.resolution.set(window.innerWidth, window.innerHeight);
-
-    // const line = new Line2(geometry, material);
-    // line.computeLineDistances();
-
-    this.trailLine =  new Line2(geometry, material);
-    console.log("check 2: " + this.trailLine);
-
-    this.trailLine.computeLineDistances();
-    this.scene.add(this.trailLine);
-  }
-
   async load_npy_animation(file_url: string) {
     const loader = new npyjs();
     const response = await fetch(file_url);
@@ -130,8 +58,6 @@ export class NPY_loader {
     const [frameCount, jointCount, _] = parsed_npy.shape;
     this.frameCount = frameCount;
     this.jointCount = jointCount;
-
-    this.joint_indices_names = Array.from({ length: jointCount }, () => new Text());
 
     // // TODO: uncomment to use this
     // this.joint_orientations = Array.from({ length: this.jointCount }, () => ({
@@ -150,6 +76,7 @@ export class NPY_loader {
 
   _create_joints() {
     const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    this.joint_indices_names = Array.from({ length: this.jointCount }, () => new Text());
 
     for (let i = 0; i < this.jointCount; i++) {
       const geom = new THREE.SphereGeometry(this.joint_size, 8, 8);
@@ -165,6 +92,25 @@ export class NPY_loader {
       this.joint_indices_names[i].sync(); // <— wichtig
       this.joint_indices_names_text.add(this.joint_indices_names[i] as unknown as THREE.Object3D);
       this.joint_indices_names_text.name = 'joint_indices_text';
+
+      const meshmaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+      const meshgeom = new THREE.SphereGeometry(1.0, 8, 8);
+      this.mesh[`sphere_${i}`] = new THREE.Mesh(meshgeom, meshmaterial);
+      this.mesh[`sphere_${i}`].trailLength = 250;
+      this.mesh[`sphere_${i}`].trailPoints = [];
+      this.mesh[`sphere_${i}`].speed = 0.1;
+      this.mesh[`sphere_${i}`].targetPosition = new THREE.Vector3();
+
+      const trailMaterial = new LineMaterial({
+        color: 0xff0000,
+        linewidth: 4,
+      });
+      trailMaterial.resolution.set(window.innerWidth, window.innerHeight);
+      this.mesh[`trail_${i}`] = new Line2(new LineGeometry(), trailMaterial);
+      this.mesh[`trail_${i}`].frustumCulled = false;
+      this.mesh[`trail_${i}`].name = 'trail of joint' + this.joint_indices_names[i].text;
+      this.scene.add(this.mesh[`trail_${i}`]);
+      // this.scene.add(this.mesh[`sphere_${i}`]);
     }
 
     this.scene.add(this.joint_indices_names_text);
@@ -215,6 +161,11 @@ export class NPY_loader {
     }
   }
 
+  // create_trail() {
+  //   this.mesh['trail_1'] = new THREE.Line(new THREE.BufferGeometry(), new LineMaterial({ color: 0x00ff00 }));
+  //   this.scene.add(this.mesh);
+  // }
+
   update_skeleton(frameIdx: number) {
     const y_axis = new THREE.Vector3(0, 1, 0);
     const direction = new THREE.Vector3();
@@ -226,6 +177,38 @@ export class NPY_loader {
       const y = this.numpy_data[base + i * 3 + 1];
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
+
+      this.mesh[`sphere_${i}`].targetPosition.set(x, y, z);
+      this.mesh[`sphere_${i}`].position.lerp(this.mesh[`sphere_${i}`].targetPosition, this.mesh[`sphere_${i}`].speed);
+
+      // Für den Trail: echte Joint-Koordinate dieses Frames speichern
+      this.mesh[`sphere_${i}`].trailPoints.push(new THREE.Vector3(x, y, z));
+
+      if (this.mesh[`sphere_${i}`].trailPoints.length > this.mesh[`sphere_${i}`].trailLength) {
+        this.mesh[`sphere_${i}`].trailPoints.shift();
+      }
+
+      const positions: number[] = [];
+
+      for (let j = 0; j < this.mesh[`sphere_${i}`].trailPoints.length; j++) {
+        const p = this.mesh[`sphere_${i}`].trailPoints[j];
+        positions.push(p.x, p.y, p.z);
+      }
+
+      // if (i < 2) {
+      //   console.log(`Joint ${i} trail or Line:`, this.mesh[`trail_${i}`]);
+      // }
+      // if (i === 0) {
+      //   console.log(this.mesh[`sphere_${i}`].trailPoints.length, positions.length);
+      // }
+
+      // this.mesh[`trail_${i}`].geometry.setPositions(positions);
+      // this.mesh[`trail_${i}`].geometry.needsUpdate = true;
+
+      if (positions.length >= 6) {
+        this.mesh[`trail_${i}`].geometry.setPositions(positions);
+        this.mesh[`trail_${i}`].computeLineDistances();
+      }
 
       this.joint_indices_names[i].position.set(x, y + this.joint_size * 2.2, z);
       // // jointAxisPoint is a reference to the position of the joint axis orientation
@@ -285,9 +268,7 @@ export class NPY_loader {
     this.npy_motion.clear();
     this.scene.remove(this.npy_motion);
     this.scene.remove(this.joint_indices_names_text);
-    
-    // TODO: free GPU memory of this.trailLine 
-    this.scene.remove(this.trailLine!);
+
     // // TODO: uncomment to use this
     // this.joint_coordsystem_local!.dispose();
   }
