@@ -136,7 +136,7 @@ export class NPY_loader {
 
       const boneMaterial = new THREE.MeshBasicMaterial({
         color: mat_color,
-        wireframe: true,
+        wireframe: false,
       });
 
       const bone = new THREE.Mesh(boneGeometry, boneMaterial);

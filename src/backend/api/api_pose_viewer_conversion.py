@@ -1,75 +1,67 @@
 from pathlib import Path
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from backend.motion_parser.pv_parser import PVParser
 
 router = APIRouter()
 workspacefolder = Path.cwd()
 
+class ConversionRequest(BaseModel):
+    file_name: str
+
 @router.post("/convert_pv_style")
-async def convert_pv_style():
+async def convert_pv_style(request: ConversionRequest):
     workspacefolder = Path.cwd()
+    
+    # Define directories for different file types
     mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
+    bvh_dir_path = Path.joinpath(workspacefolder, "data/bvh/")
+    csv_dir_path = Path.joinpath(workspacefolder, "data/csv/")
     npy_dir_path = Path.joinpath(workspacefolder, "data/npy")
     json_dir = Path.joinpath(workspacefolder, "data/json")
 
-
+    # Create directories if they don't exist
     mvnx_dir_path.mkdir(parents=True, exist_ok=True)
+    bvh_dir_path.mkdir(parents=True, exist_ok=True)
+    csv_dir_path.mkdir(parents=True, exist_ok=True)
     json_dir.mkdir(parents=True, exist_ok=True)
     npy_dir_path.mkdir(parents=True, exist_ok=True)
     
-    mvnx_files = list(mvnx_dir_path.glob("*.mvnx"))
-
-    if not mvnx_files:
+    file_name = request.file_name
+    file_path = None
+    
+    # Determine which directory to search based on file extension
+    if file_name.endswith('.mvnx'):
+        file_path = Path.joinpath(mvnx_dir_path, file_name)
+        descriptor_file = "xsens_mvnx"  # Default descriptor for mvnx files
+    elif file_name.endswith('.bvh'):
+        file_path = Path.joinpath(bvh_dir_path, file_name)
+        descriptor_file = "bvh_pos_100"  # Default descriptor for bvh files
+    elif file_name.endswith('.csv'):
+        file_path = Path.joinpath(csv_dir_path, file_name)
+        descriptor_file = "lara_csv"  # Default descriptor for csv files
+    else:
         return {
             "message": "",
-            "warning": "no pose viewer compatible files found.",
+            "warning": f"Unsupported file type: {file_name}. Only .mvnx, .bvh, and .csv files are supported.",
         }
     
-
-    # pairs of descriptor_file und mocap_file
-    # ======================================= Arbeitstätigkeiten =======================================
-    file_pairs = [
-
-        # # aimove
-        # (f"{workspacefolder}/data/bvh/S3P03R3.bvh",
-        # "bvh_pos_100"),                                                                            
-
-        # # mmhd
-        # (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
-        #   "xsens_mvnx"),                                                                                 
-
-        # # carda
-        # (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
-        #   "bvh_pos_1000"),                                                                          
-
-        # # andy data
-        # (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
-        #                "xsens_mvnx"),                                                                 
-
-        # # inhard
-        # (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
-        # "bvh_pos_100"),                                                                                  
-
-        # # Vicon Poeticon
-        # (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",
-        #   "bvh_pos_100"),                                                                               
-
-        #  Lara 
-        (f"{workspacefolder}/data/csv/L02_S01_R04_A17_N01_norm_data.csv",
-        "lara_csv"),                                                                                        
-
-    ]
+    # Check if file exists
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"File not found: {file_name} in {file_path.parent}")
     
-    for mocap_file, descriptor_file in file_pairs:
-        print(f"processing {mocap_file}")
-        print(f"processing {descriptor_file}")
+    try:
+        print(f"Processing: {file_path}")
+        print(f"Using descriptor: {descriptor_file}")
 
-        pv_parser = PVParser(mocap_file, descriptor_file)
-        save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
+        pv_parser = PVParser(str(file_path), descriptor_file)
+        save_npy_path = Path.joinpath(npy_dir_path, file_path.stem)  # Remove file extension
         pv_parser.save_npy(str(save_npy_path))
         
-
-    return {
-        "message": "pose viewer compatible files converted",
-        "warning": "",
-    }
+        return {
+            "message": f"Successfully converted {file_name} to NPY",
+            "warning": "",
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")

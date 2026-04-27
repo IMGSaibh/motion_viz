@@ -6,7 +6,7 @@ type Props = {
   file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function WidgetFileOperations(props: Props) {
+export function WidgetUploadButton(props: Props) {
   return (
     <>
       <Button component="label" startIcon={<CloudUploadIcon />}>

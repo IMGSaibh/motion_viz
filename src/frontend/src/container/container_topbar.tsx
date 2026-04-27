@@ -24,6 +24,7 @@ export function ContainerTopbar() {
   const { set_rula_selected, set_owas_selected } = use_ergo_methods_cxt();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
+  const pv_file_dialog_reference = useRef<HTMLInputElement>(null);   // For pose viewer
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
   const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
 
@@ -63,6 +64,39 @@ export function ContainerTopbar() {
       if (respond.warning) warning(`${respond.warning} not supported`);
     } catch (err: any) {
       error(err?.message || 'Upload failed');
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+    async function handle_pv_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const fName =  files[0].name;
+    var fileExt = fName.split('.').pop();
+
+    if(!(fileExt == "mvnx" || fileExt == "bvh" || fileExt == "csv")){
+      console.warn("file extension not supported!");
+      warning(`file extension not supported`);
+      return;
+    }
+
+    //upload the file first, then try to convert it afterwards
+    try {
+      const respond = await upload_files(files);
+      if (respond.message) success(`${respond.message} Files Uploaded`);
+      if (respond.warning) warning(`${respond.warning} not supported`);
+
+    }catch (err: any) {
+      error(err?.message || 'Upload failed');
+    }
+
+    try {
+      const respond = await convert_pv_style(fName);
+      if (respond.message) success(respond.message);
+      if (respond.warning) warning(respond.warning);
+    } catch (err: any) {
+      error(err?.message || 'PV Conversion failed');
     } finally {
       e.target.value = '';
     }
@@ -122,13 +156,13 @@ export function ContainerTopbar() {
   }
 
   async function handle_convert_with_pose_viewer() {
-    try {
-      const respond = await convert_pv_style();
-      if (respond.message) success(respond.message);
-      if (respond.warning) warning(`${respond.warning}`);
-    } catch (e: any) {
-      error(e?.message || 'Conversion failed');
-    }
+  //   try {
+  //     const respond = await convert_pv_style();
+  //     if (respond.message) success(respond.message);
+  //     if (respond.warning) warning(`${respond.warning}`);
+  //   } catch (e: any) {
+  //     error(e?.message || 'Conversion failed');
+  //   }
   }
 
   async function handle_convert_motion_file() {
@@ -151,6 +185,8 @@ export function ContainerTopbar() {
         motion_config_on_click={handle_motion_config_on_click}
         motion_config_create_on_click={handle_motion_config_create_on_click}
         convert_pv_files_on_click={handle_convert_with_pose_viewer}
+        pv_file_dialog_reference={pv_file_dialog_reference}        // ← ADD THIS
+        pv_file_dialog_on_change={handle_pv_file_dialog_on_change}
         convert_bvh_files_on_click={handle_convert_motion_file}
         motion_files={motion_files.data ?? []}
         motion_file_selected={motion_file_selected}

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
+import { FilePresent } from '@mui/icons-material';
 
 const ENDPOINT = '/api_pose_viewer_conversion/convert_pv_style';
 
@@ -13,16 +14,26 @@ export function hook_pose_viewer_conversion() {
   const queryClient = useQueryClient();
   const { success, error } = use_snackbar_ctx();
 
-  const convert_pv_style = useCallback(async () => {
+  const convert_pv_style = useCallback(async (fileName : string) => {
+    console.log( fileName);
+
+    
     try {
-      const response = await fetch(ENDPOINT, { method: 'POST' });
+
+        const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ file_name: fileName }),
+      });
 
       if (!response.ok) {
         const ct = response.headers.get('content-type') || '';
         const errText = ct.includes('application/json') ? JSON.stringify(await response.json()) : await response.text();
 
         throw new Error(`Pose Viewer conversion failed (${response.status}): ${errText}`);
-      }
+      } 
 
       const data = (await response.json()) as PoseViewerConversionResponse;
 

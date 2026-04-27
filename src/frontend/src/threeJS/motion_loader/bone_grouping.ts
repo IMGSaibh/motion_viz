@@ -73,7 +73,7 @@ get_color_by_joint_id(jointId: number): number {
   
   if (!color) {
     console.warn(`No color defined for category: ${category} (joint ${jointId})`);
-    return 0xCCCCCC; // Default gray
+    return 0x777777; // Default gray
   }
   
   return color;
@@ -121,7 +121,7 @@ const CATEGORY_COLORS: Record<JointCategory, number> = {
   [JOINT_CATEGORIES.LEG_R]: 0xFF9F4A,    // Orange
   [JOINT_CATEGORIES.FOOT_L]: 0xE28F6E,   // Terracotta
   [JOINT_CATEGORIES.FOOT_R]: 0xE28F6E,   // Terracotta
-  [JOINT_CATEGORIES.UNIDENTIFIED]: 0xFFFFFF //black
+  [JOINT_CATEGORIES.UNIDENTIFIED]: 0x000000 //black
 };
 
 // Color mapping for each category (with slightly different colors for left and right)
@@ -137,7 +137,7 @@ const CATEGORY_COLORS_DISTINCT: Record<JointCategory, number> = {
   [JOINT_CATEGORIES.LEG_R]: 0xFF8C42,    // Darker Orange
   [JOINT_CATEGORIES.FOOT_L]: 0xE28F6E,   // Terracotta
   [JOINT_CATEGORIES.FOOT_R]: 0xD47C58,   // Darker Terracotta
-  [JOINT_CATEGORIES.UNIDENTIFIED]: 0xFFFFFF //black
+  [JOINT_CATEGORIES.UNIDENTIFIED]: 0x000000 //black
 };
 
 const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
@@ -154,10 +154,16 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   chest2: JOINT_CATEGORIES.SPINE,
   chest3: JOINT_CATEGORIES.SPINE,
   chest4: JOINT_CATEGORIES.SPINE,
+  "spine s": JOINT_CATEGORIES.SPINE,
+  "spine b1": JOINT_CATEGORIES.SPINE,
+  "spine n1": JOINT_CATEGORIES.SPINE,
+  "spine a": JOINT_CATEGORIES.SPINE,
+  "spine e": JOINT_CATEGORIES.SPINE,
 
   // Head
   neck: JOINT_CATEGORIES.HEAD,
   head: JOINT_CATEGORIES.HEAD,
+  "head end": JOINT_CATEGORIES.HEAD,
   hairb: JOINT_CATEGORIES.HEAD,
   haira: JOINT_CATEGORIES.HEAD,
   hat: JOINT_CATEGORIES.HEAD,
@@ -180,6 +186,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   leftforearm: JOINT_CATEGORIES.ARM_L,
   lsleeve: JOINT_CATEGORIES.ARM_L,
   lbackpack_strap: JOINT_CATEGORIES.ARM_L,
+  "l collar": JOINT_CATEGORIES.ARM_L,
+  "l shou": JOINT_CATEGORIES.ARM_L,
+  "l elbow": JOINT_CATEGORIES.ARM_L,
+  "l humerus": JOINT_CATEGORIES.ARM_R,
 
   // Right Arm
   rightcollar: JOINT_CATEGORIES.ARM_R,
@@ -191,6 +201,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   rightforearm: JOINT_CATEGORIES.ARM_R,
   rsleeve: JOINT_CATEGORIES.ARM_R,
   rbackpack_strap: JOINT_CATEGORIES.ARM_R,
+  "r collar": JOINT_CATEGORIES.ARM_R,
+  "r shou": JOINT_CATEGORIES.ARM_R,
+  "r elbow": JOINT_CATEGORIES.ARM_R,
+  "r humerus": JOINT_CATEGORIES.ARM_R,
 
   // Left Hand
   lefthand: JOINT_CATEGORIES.HAND_L,
@@ -210,6 +224,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   lefthandpinky1: JOINT_CATEGORIES.HAND_L,
   lefthandpinky2: JOINT_CATEGORIES.HAND_L,
   lefthandpinky3: JOINT_CATEGORIES.HAND_L,
+  "l wrist": JOINT_CATEGORIES.HAND_L,
+  "l wrist end": JOINT_CATEGORIES.HAND_L,
+  "hand l": JOINT_CATEGORIES.HAND_L,
+  "ftip l": JOINT_CATEGORIES.HAND_L,
 
   // Right Hand
   righthand: JOINT_CATEGORIES.HAND_R,
@@ -229,6 +247,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   righthandpinky1: JOINT_CATEGORIES.HAND_R,
   righthandpinky2: JOINT_CATEGORIES.HAND_R,
   righthandpinky3: JOINT_CATEGORIES.HAND_R,
+  "r wrist": JOINT_CATEGORIES.HAND_R,
+  "r wrist end": JOINT_CATEGORIES.HAND_R,
+  "hand r": JOINT_CATEGORIES.HAND_R,
+  "ftip r": JOINT_CATEGORIES.HAND_R,
 
   // Left Leg
   leftupleg: JOINT_CATEGORIES.LEG_L,
@@ -237,6 +259,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   leftlowleg: JOINT_CATEGORIES.LEG_L,
   leftknee: JOINT_CATEGORIES.LEG_L,
   leftpantleg: JOINT_CATEGORIES.LEG_L,
+  "l femur": JOINT_CATEGORIES.LEG_L,
+  "l tibia": JOINT_CATEGORIES.LEG_L,
+  "hip l": JOINT_CATEGORIES.LEG_L,
+  "knee l": JOINT_CATEGORIES.LEG_L,
 
   // Right Leg
   rightupleg: JOINT_CATEGORIES.LEG_R,
@@ -245,6 +271,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   rightlowleg: JOINT_CATEGORIES.LEG_R,
   rightknee: JOINT_CATEGORIES.LEG_R,
   rightpantleg: JOINT_CATEGORIES.LEG_R,
+  "r femur": JOINT_CATEGORIES.LEG_R,
+  "r tibia": JOINT_CATEGORIES.LEG_R,
+  "hip r": JOINT_CATEGORIES.LEG_R,
+  "knee r": JOINT_CATEGORIES.LEG_R,
 
   // Left Foot
   leftfoot: JOINT_CATEGORIES.FOOT_L,
@@ -252,6 +282,10 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   lefttoebase: JOINT_CATEGORIES.FOOT_L,
   lefttoe: JOINT_CATEGORIES.FOOT_L,
   lfoottongue: JOINT_CATEGORIES.FOOT_L,
+  "l foot": JOINT_CATEGORIES.FOOT_L,
+  "l toe": JOINT_CATEGORIES.FOOT_L,
+  "ankle l": JOINT_CATEGORIES.FOOT_L,
+  "fball l": JOINT_CATEGORIES.FOOT_L,
 
   // Right Foot
   rightfoot: JOINT_CATEGORIES.FOOT_R,
@@ -259,8 +293,13 @@ const JOINT_NAME_PATTERNS: Record<string, JointCategory> = {
   righttoebase: JOINT_CATEGORIES.FOOT_R,
   righttoe: JOINT_CATEGORIES.FOOT_R,
   rfoottongue: JOINT_CATEGORIES.FOOT_R,
+  "r foot": JOINT_CATEGORIES.FOOT_R,
+  "r toe": JOINT_CATEGORIES.FOOT_R,
+  "ankle r": JOINT_CATEGORIES.FOOT_R,
+  "fball r": JOINT_CATEGORIES.FOOT_R,
 
   // Other
   backpack: JOINT_CATEGORIES.SPINE,
   boyfacialanim_joint: JOINT_CATEGORIES.HEAD,
+  "lower back": JOINT_CATEGORIES.SPINE,
 };
