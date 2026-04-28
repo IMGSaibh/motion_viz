@@ -45,5 +45,6 @@ async def upload(files: List[UploadFile] = File(...)):
     saved = len(files) - len(not_saved_files)
     return {
         "message": saved or "",
-        "warning": ", ".join(not_saved_files)  or ""
+        "warning": ", ".join(not_saved_files)  or "",
+        "target_path": target_path if target_path else ""
     }

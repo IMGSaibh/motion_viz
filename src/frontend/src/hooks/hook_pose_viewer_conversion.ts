@@ -14,9 +14,8 @@ export function hook_pose_viewer_conversion() {
   const queryClient = useQueryClient();
   const { success, error } = use_snackbar_ctx();
 
-  const convert_pv_style = useCallback(async (fileName : string) => {
-    console.log( fileName);
-
+  const convert_pv_style = useCallback(async (filePath : string) => {
+    console.log( filePath);
     
     try {
 
@@ -25,7 +24,7 @@ export function hook_pose_viewer_conversion() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ file_name: fileName }),
+        body: JSON.stringify({ file_path: filePath }),
       });
 
       if (!response.ok) {

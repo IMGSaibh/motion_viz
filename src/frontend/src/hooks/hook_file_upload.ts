@@ -7,6 +7,7 @@ const ENDPOINT = '/api_file_upload/upload';
 type FileUploadResponse = {
   message: number | string; // backend: saved(int) oder ""
   warning: string; // backend: ", ".join(not_saved_files) oder ""
+  target_path: string //path to the file uploaded including the file name or ""
 };
 
 export function hook_file_upload() {

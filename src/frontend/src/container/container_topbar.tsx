@@ -72,6 +72,7 @@ export function ContainerTopbar() {
     async function handle_pv_file_dialog_on_change(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
+
     const fName =  files[0].name;
     var fileExt = fName.split('.').pop();
 
@@ -81,18 +82,23 @@ export function ContainerTopbar() {
       return;
     }
 
+    var pathToFile = "";
+
     //upload the file first, then try to convert it afterwards
     try {
       const respond = await upload_files(files);
       if (respond.message) success(`${respond.message} Files Uploaded`);
       if (respond.warning) warning(`${respond.warning} not supported`);
+      if (respond.target_path) pathToFile = respond.target_path;
+      console.log(pathToFile);
 
     }catch (err: any) {
       error(err?.message || 'Upload failed');
+      return;
     }
 
     try {
-      const respond = await convert_pv_style(fName);
+      const respond = await convert_pv_style(pathToFile);
       if (respond.message) success(respond.message);
       if (respond.warning) warning(respond.warning);
     } catch (err: any) {
