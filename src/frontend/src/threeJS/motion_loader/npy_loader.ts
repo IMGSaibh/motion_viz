@@ -83,21 +83,16 @@ export class NPY_loader {
   }
 
   create_full_trail(jointIndex: number = 0, frameIdx: number = this.currentFrame, windowSize: number = 50) {
-    if (!this.numpy_data || this.jointCount <= 0 || this.frameCount <= 0) return;
-    if (jointIndex < 0 || jointIndex >= this.jointCount) return;
-
-    const clampedFrame = Math.min(Math.max(frameIdx, 0), this.frameCount - 1);
-
     // Frame 0: keine Linie anzeigen.
     // Ab Frame 1 werden Verbindungen zwischen den letzten max. 50 Segmenten angezeigt:
     // Frame 1  -> 0-1
     // Frame 2  -> 0-1, 1-2
     // Frame 50 -> 0-1 ... 49-50
     // Frame 51 -> 1-2 ... 50-51
-    const startFrame = Math.max(0, clampedFrame - windowSize);
+    const startFrame = Math.max(0, frameIdx - windowSize);
     const positions: number[] = [];
 
-    for (let frame = startFrame; frame <= clampedFrame; frame++) {
+    for (let frame = startFrame; frame <= frameIdx; frame++) {
       const base = frame * this.jointCount * 3;
 
       const x = this.numpy_data[base + jointIndex * 3 + 0];
@@ -105,10 +100,9 @@ export class NPY_loader {
       const z = this.numpy_data[base + jointIndex * 3 + 2];
 
       positions.push(x, y, z);
-      console.log(`create_full_trail Frame ${frame}: Joint ${jointIndex} Position: (${x}, ${y}, ${z})`);
+      console.log(`Frame ${frame}: Joint ${jointIndex} `);
+      console.log(`Position: (${x}, ${y}, ${z})`);
     }
-
-    console.log(`Trail von Frame ${startFrame} bis ${clampedFrame}:`, positions);
 
     if (!this.trailGeometry) {
       this.trailGeometry = new LineGeometry();
@@ -121,27 +115,23 @@ export class NPY_loader {
       });
     }
 
-    // Wichtig: Für breite Line2-Linien braucht LineMaterial die Viewport-Auflösung.
-    // Falls du Zugriff auf renderer/domElement hast, kannst du diese Werte dort genauer setzen.
-    if (typeof window !== 'undefined') {
-      this.trailMaterial.resolution.set(window.innerWidth, window.innerHeight);
+    // 100 feste Punkte von (1,0,0) bis (100,0,0)
+    for (let i = 1; i <= 100; i++) {
+      positions.push(i, 0, 0);
     }
 
-    const hasVisibleSegment = positions.length >= 6;
-    if (!hasVisibleSegment) {
-      return;
-    }
+    const geometry = new LineGeometry();
+    geometry.setPositions(positions);
 
-    this.trailGeometry.setPositions(positions);
+    const material = new LineMaterial({
+      color: 0xff0000,
+      linewidth: 4,
+    });
 
-    if (!this.trailLine) {
-      this.trailLine = new Line2(this.trailGeometry, this.trailMaterial);
-      this.trailLine.name = `joint_${jointIndex}_trail`;
-      // this.scene.add(this.trailLine);
-      this.npy_motion.add(this.trailLine);
-    }
+    const trailLine = new Line2(geometry, material);
 
-    this.trailLine.computeLineDistances();
+    trailLine.computeLineDistances();
+    this.scene.add(trailLine);
   }
 
   _create_joints() {
@@ -224,9 +214,6 @@ export class NPY_loader {
       const z = this.numpy_data[base + i * 3 + 2];
       this.joints[i].position.set(x, y, z);
 
-      if (i == 10) {
-        console.log(`update_skeleton Frame ${frameIdx}: Joint ${i} Position: (${x}, ${y}, ${z})`);
-      }
       this.joint_indices_names[i].position.set(x, y + this.joint_size * 2.2, z);
       // // jointAxisPoint is a reference to the position of the joint axis orientation
       // // TODO: uncomment to use this
@@ -301,33 +288,45 @@ export class NPY_loader {
     this.trailMaterial = null;
   }
 
-  // create_full_trail(jointIndex: number = 0) {
-  //   const positions: number[] = [];
-  //   let lastPoint: THREE.Vector3 | null = null;
+  get_points_of_movement(frameIdx: number, jointIndex: number = 10, windowSize: number = 50) {
+    const positions: number[] = [];
+    const endFrame = Math.min(Math.max(frameIdx, 1), this.frameCount);
+    const startFrame = Math.max(0, endFrame - windowSize + 1);
 
-  //   for (let frame = 0; frame < 50; frame++) {
-  //     const base = frame * this.jointCount * 3;
+    for (let i = startFrame; i < endFrame; i++) {
+      const base = i * this.jointCount * 3;
 
-  //     const x = this.numpy_data[base + jointIndex * 3 + 0];
-  //     const y = this.numpy_data[base + jointIndex * 3 + 1];
-  //     const z = this.numpy_data[base + jointIndex * 3 + 2];
+      const x = this.numpy_data[base + jointIndex * 3 + 0];
+      const y = this.numpy_data[base + jointIndex * 3 + 1];
+      const z = this.numpy_data[base + jointIndex * 3 + 2];
+      positions.push(x, y, z);
+    }
 
-  //     const p = new THREE.Vector3(x, y, z);
+    const geometry = new LineGeometry();
+    geometry.setPositions(positions);
+    console.log(positions);
+    for (let i = 0; i < positions.length; i += 3) {
+      console.log(`Point ${i / 3}:`, {
+        x: positions[i],
+        y: positions[i + 1],
+        z: positions[i + 2],
+      });
+    }
 
-  //     positions.push(p.x, p.y, p.z);
-  //   }
+    const starts = geometry.attributes.instanceStart?.array;
+    const ends = geometry.attributes.instanceEnd?.array;
 
-  //   const geometry = new LineGeometry();
-  //   geometry.setPositions(positions);
+    console.log('starts:', starts);
+    console.log('ends:', ends);
 
-  //   const material = new LineMaterial({
-  //     color: 0xff0000,
-  //     linewidth: 4,
-  //   });
+    const material = new LineMaterial({
+      color: 0xff0000,
+      linewidth: 4,
+    });
 
-  //   const trailLine = new Line2(geometry, material);
+    const trailLine = new Line2(geometry, material);
 
-  //   trailLine.computeLineDistances();
-  //   this.scene.add(trailLine);
-  // }
+    trailLine.computeLineDistances();
+    this.scene.add(trailLine);
+  }
 }
