@@ -81,8 +81,7 @@ export class NPY_Player {
     // last frame_index leads to  last undefined joint positions
     if (this.frame_index < this.frame_count) {
       this.npy_loader_object.update_skeleton(this.frame_index);
-      // this.npy_loader_object.create_full_trail(10, this.frame_index);
-      this.npy_loader_object.get_points_of_movement(this.frame_index);
+      this.npy_loader_object.trail_line_at_joint(this.frame_index, 2, 100);
     }
   }
 
