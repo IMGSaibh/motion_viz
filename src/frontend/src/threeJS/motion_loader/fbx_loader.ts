@@ -6,7 +6,6 @@ export class FBX_Loader {
   fbx_loader: FBXLoader;
   fbx_motion: THREE.Group | null;
   joints: THREE.Mesh[];
-  joint_text_markers: THREE.Group;
   // virtualMarkers: THREE.Mesh[];
   mixer: THREE.AnimationMixer | null;
   clipAction: THREE.AnimationAction | null;
@@ -19,13 +18,11 @@ export class FBX_Loader {
   trackedVertexMarkersMeshes: THREE.Mesh[] = [];
   averagePositionMarker: THREE.Mesh | null = null;
 
-
-  // Text properties (matching NPY_loader)
+  //Text for visualizing vertex indices
   joint_size: number = 0.05;
   joint_indices_names: Text[] = [];
   joint_indices_names_text: THREE.Group = new THREE.Group();
   skinnedMesh: THREE.SkinnedMesh | null = null;
-  rootBone: THREE.Bone | null = null;
 
   constructor(scene: THREE.Scene) {
     this.fbx_loader = new FBXLoader();
@@ -39,7 +36,6 @@ export class FBX_Loader {
     this.keyframeCount = 0;
     this.duration = 0;
     this.scene = scene;
-    this.joint_text_markers = new THREE.Group();
     this.joint_indices_names_text.name = 'vertex_indices_text';
   }
 
@@ -54,8 +50,6 @@ export class FBX_Loader {
       this.fbx_motion.name = fileUrl;
     }
 
-    // console.log(this.fbx_motion?.children);
-    // this.printObjInformation();
     this.mixer = new THREE.AnimationMixer(result);
     this.clipAction = this.mixer.clipAction(result.animations[0]);
     this.duration = this.clipAction.getClip().duration;
@@ -70,13 +64,10 @@ export class FBX_Loader {
       const material = new THREE.MeshStandardMaterial({
       color: 0x000000,
       wireframe: true,
-      // transparent: true,
-      //opacity: 0.5,
       vertexColors: false
       });
 
       skinnedMesh.material = material;
-
       // this.createVertexLabels(vertexCount, positions, 10);
     }
 
@@ -94,10 +85,8 @@ export class FBX_Loader {
     if (obj.type === "Bone") {
       const bone = obj as THREE.Bone;
 
-      // Get the world position of the bone
       const worldPos = bone.getWorldPosition(new THREE.Vector3());
 
-      // Create a sphere mesh
       const sphereGeometry = new THREE.SphereGeometry(0.35, 8, 8);
       const sphereMaterial = new THREE.MeshStandardMaterial({
         color: 0xff0000,
@@ -111,10 +100,8 @@ export class FBX_Loader {
       sphere.position.copy(worldPos);
       this.joints.push(sphere);
     }
-
     this.joints.forEach(joint => { this.scene.add(joint); });
   });
-
   }
 
 
@@ -151,8 +138,7 @@ export class FBX_Loader {
 
   update_tracked_vertices() {
     if (!this.skinnedMesh || this.trackedVertexIds.length === 0) return;
-    
-    // Get the bind pose geometry
+    // Get vertex positions from geometry
     const geometry = this.skinnedMesh.geometry;
     const vertexPositions = geometry.attributes.position.array;
     
@@ -180,7 +166,7 @@ export class FBX_Loader {
                 // Get weights and indices for this vertex
                 const i4 = vertexId * 4;
                 //skinWeights are how much each bone influences the vertex, skinIndices are which bones influence the vertex
-                const weights = [
+                const currentWeights = [
                     skinWeights[i4], skinWeights[i4 + 1], 
                     skinWeights[i4 + 2], skinWeights[i4 + 3]
                 ];
@@ -188,14 +174,13 @@ export class FBX_Loader {
                     boneIndices[i4], boneIndices[i4 + 1], 
                     boneIndices[i4 + 2], boneIndices[i4 + 3]
                 ];
-                const g =  this.skinnedMesh?.geometry;
                 // for(let i=0; i<4; i++){
                 //     console.log(`Vertex ${vertexId} influenced by bone index ${boneIndices[i]} with weight ${weights[i]}`);
                 // }
                 
                 const finalPos = new THREE.Vector3(0, 0, 0);
                 for (let i = 0; i < 4; i++) {
-                    if (weights[i] > 0) {
+                    if (currentWeights[i] > 0) {
                         const boneIndex = currentBoneIndices[i];
                         // Each bone matrix is 16 floats (4x4 matrix)
                         const offset = boneIndex * 16;
@@ -205,7 +190,7 @@ export class FBX_Loader {
                         const boneMatrix4 = new THREE.Matrix4().fromArray(boneMatrixArray);
                         
                         const transformed = bindPos.clone().applyMatrix4(boneMatrix4);
-                        finalPos.add(transformed.multiplyScalar(weights[i]));
+                        finalPos.add(transformed.multiplyScalar(currentWeights[i]));
                     }
                 }
                 // console.log(`Vertex ${vertexId} final position: (${finalPos.x.toFixed(2)}, ${finalPos.y.toFixed(2)}, ${finalPos.z.toFixed(2)})`);
@@ -242,6 +227,8 @@ export class FBX_Loader {
     }
   }
 
+  //This method is only for visualization purposes, it creates a text label for each vertex, showing its index
+  //This can be used to identify the vertices that get tracked
   private createVertexLabels(vertexCount: number, positions: THREE.TypedArray, step: number) {
     const vertexIdsToShow: number[] = [];
 
@@ -300,6 +287,14 @@ export class FBX_Loader {
         }
       }
     });
+    this.averagePositionMarker?.geometry.dispose();
+    this.averagePositionMarker = null;
+    this.trackedVertexMarkersMeshes.forEach(marker => marker.geometry.dispose());
+    this.trackedVertexMarkersMeshes = [];
+    this.joints.forEach(joint => joint.geometry.dispose());
+    this.joints = [];
+    this.skinnedMesh?.geometry.dispose();
+    this.skinnedMesh = null;
 
     this.fbx_motion.clear();
     this.scene.remove(this.fbx_motion);
