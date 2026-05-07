@@ -23,7 +23,7 @@ export class FBX_Player {
     this.fbx_player_object = {
       tick: (delta: number) => {
         if (this.is_playing) this.update(delta);
-        this.fbx_loader_object.update_tracked_vertices();
+        this.fbx_loader_object.update_virtual_markers();
       },
     };
   }
