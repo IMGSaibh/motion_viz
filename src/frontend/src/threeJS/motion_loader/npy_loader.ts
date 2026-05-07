@@ -203,12 +203,25 @@ export class NPY_loader {
     // this.joint_coordsystem_local!.update(this.joint_orientations);
   }
 
+  getTrailColor(t: number): THREE.Color {
+    const blue = new THREE.Color('#0080ff');
+    const yellow = new THREE.Color('#fffb00');
+    const red = new THREE.Color('#ff001e');
+
+    if (t <= 0.5) {
+      return blue.lerp(yellow, t / 0.5);
+    }
+
+    return yellow.lerp(red, (t - 0.5) / 0.5);
+  }
+
   trail_line_at_joint(frameIdx: number, jointIndex: number = 0, windowSize: number = 50) {
     this.dispose_trail_line();
 
     const positions: number[] = [];
     const endFrame = Math.min(Math.max(frameIdx, 1), this.frameCount);
     const startFrame = Math.max(0, endFrame - windowSize + 1);
+    const colors: number[] = [];
 
     for (let i = startFrame; i < endFrame; i++) {
       const base = i * this.jointCount * 3;
@@ -217,14 +230,21 @@ export class NPY_loader {
       const y = this.numpy_data[base + jointIndex * 3 + 1];
       const z = this.numpy_data[base + jointIndex * 3 + 2];
       positions.push(x, y, z);
+
+      const t = positions.length / 3 <= 1 ? 0 : (positions.length / 3 - 1) / Math.max(1, endFrame - startFrame - 1);
+
+      const color = this.getTrailColor(t);
+      colors.push(color.r, color.g, color.b);
     }
 
     this.trailGeometry = new LineGeometry();
     this.trailGeometry.setPositions(positions);
+    this.trailGeometry.setColors(colors);
 
     this.trailMaterial = new LineMaterial({
-      color: 0xff0000,
-      linewidth: 4,
+      // color: 0xff0000,
+      linewidth: 16,
+      vertexColors: true,
     });
 
     this.trailLine = new Line2(this.trailGeometry, this.trailMaterial);

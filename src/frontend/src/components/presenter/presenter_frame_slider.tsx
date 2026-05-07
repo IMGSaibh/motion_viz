@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { WidgetFrameTicks } from '@/components/widgets/widget_frame_ticks';
 import { WidgetFrameSlider } from '@/components/widgets/widget_frame_slider';
 import { WidgetFrameLabelBar } from '@/components/widgets/widget_frame_label_bar';
+import { WidgetColormap } from '@/components/widgets/widget_viridis_colormap';
 
 type Props = {
   // current frame
@@ -30,6 +31,8 @@ export function PresenterFrameSlider(props: Props) {
         bgcolor: theme.palette.wip_color_theme[500],
       })}
     >
+      <WidgetColormap />
+
       {/* Slider ticks */}
       <WidgetFrameTicks frame_count={props.frame_count} />
 
