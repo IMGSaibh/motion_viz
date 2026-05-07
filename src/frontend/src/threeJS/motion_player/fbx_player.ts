@@ -1,6 +1,7 @@
 import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
+import * as THREE from 'three';
 
 export class FBX_Player {
   public fbx_player_object: Updatable;
@@ -22,6 +23,7 @@ export class FBX_Player {
     this.fbx_player_object = {
       tick: (delta: number) => {
         if (this.is_playing) this.update(delta);
+        this.fbx_loader_object.update_tracked_vertices();
       },
     };
   }
@@ -131,4 +133,6 @@ export class FBX_Player {
     this.go_to_frame(previous_frame);
     return dataUrl;
   }
+
+  
 }

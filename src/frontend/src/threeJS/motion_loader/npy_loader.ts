@@ -14,7 +14,6 @@ export class NPY_loader {
   jointCount: number;
   joints: THREE.Mesh[]; //Array of spheres for quick access of the joints
   npy_skeleton: any[]; //Holds the child and parent IDs as well as bone geometry
-  elapsed: number;
   speed: number;
   fps: number;
   joint_size: number;
@@ -37,7 +36,6 @@ export class NPY_loader {
     this.jointCount = 0;
     this.joints = [];
     this.npy_skeleton = [];
-    this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
     this.joint_size = 0.8;
