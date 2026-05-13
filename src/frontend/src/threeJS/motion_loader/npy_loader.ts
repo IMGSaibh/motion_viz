@@ -215,12 +215,13 @@ export class NPY_loader {
     return yellow.lerp(red, (t - 0.5) / 0.5);
   }
 
-  trail_line_at_joint(frameIdx: number, jointIndex: number = 0, windowSize: number = 50) {
+  trail_line_at_joint(frameIdx: number, jointIndex: number = 0, windowSize: number = 50, endFrameExtension: number = 0) {
     this.dispose_trail_line();
 
     const positions: number[] = [];
-    const endFrame = Math.min(Math.max(frameIdx, 1), this.frameCount);
-    const startFrame = Math.max(0, endFrame - windowSize + 1);
+    const currentEndFrame = Math.min(Math.max(frameIdx, 1), this.frameCount);
+    const endFrame = Math.min(currentEndFrame + Math.max(0, endFrameExtension), this.frameCount);
+    const startFrame = Math.max(0, currentEndFrame - windowSize + 1);
     const colors: number[] = [];
 
     for (let i = startFrame; i < endFrame; i++) {
@@ -243,7 +244,7 @@ export class NPY_loader {
 
     this.trailMaterial = new LineMaterial({
       // color: 0xff0000,
-      linewidth: 16,
+      linewidth: 4,
       vertexColors: true,
     });
 
