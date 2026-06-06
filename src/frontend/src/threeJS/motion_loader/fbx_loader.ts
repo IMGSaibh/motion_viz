@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { Text } from 'troika-three-text';
 
+//TODO: could also cache the skinWeights and skinIndices in here so we do not have to recalculate them every frame
 type virtualMarker = {
   name: string;
   vertexIDs: number[];
@@ -9,6 +10,10 @@ type virtualMarker = {
   markerMesh: THREE.Mesh;
 }
 
+type formatMapping = { 
+  formatName: string;
+  jointIndices: number[];
+}
 
 export class FBX_Loader {
   fbx_loader: FBXLoader;
@@ -41,72 +46,131 @@ export class FBX_Loader {
     this.keyframeCount = 0;
     this.duration = 0;
     this.scene = scene;
-    this.joint_indices_names_text.name = 'vertex_indices_text';
   }
 
 
   async load_fbx_animation(fileUrl: string) {
-    const trackedVertexIds: number[] = [6400, 6720, 6750, 35150, 35350, 35140];
-    this.create_virtual_marker("l_arm_marker", trackedVertexIds);
+    // const trackedVertexIds: number[] = [6400, 6720, 6750, 35150, 35350, 35140];
+    // this.create_virtual_marker("l_arm_marker", [6400, 6720, 6750, 35150, 35350, 35140]);
+    // this.create_virtual_marker("xsenx_marker", [40040, 39350, 38370, 55940, 13140, 56480, 56880, 24970, 25420, 12320, 11740, 16600, 9200, 39960, 34590, 35110,
+    //   51060, 40670, 10610, 11200, 50320
+    // ]);
+    
 
     const result = await this.fbx_loader.loadAsync(fileUrl);
     if (this.fbx_motion) {
       this.fbx_motion.add(result);
       this.fbx_motion.name = fileUrl;
+      console.log(`Loaded FBX animation from ${fileUrl}`);
     }
+    console.log('FBX scaling details:');
+    console.log(result.scale, result.rotation, result.position);
+    
+
+    console.log(result.animations);
 
     this.mixer = new THREE.AnimationMixer(result);
     this.clipAction = this.mixer.clipAction(result.animations[0]);
     this.duration = this.clipAction.getClip().duration;
-    const track = this.clipAction.getClip().tracks[0];
-    this.keyframeCount = track.times.length;
+    console.log(`Animation duration: ${this.duration} seconds`);
 
-    const geoGroup = this.fbx_motion?.getObjectByName("rp_nathan_animated_003_walking_geoGRP");
-    const skinnedMesh = geoGroup?.getObjectByName("rp_nathan_animated_003_walking_geo") as THREE.SkinnedMesh;
+    this.keyframeCount = Math.round(this.clipAction.getClip().duration * 30); // Assuming 30 FPS, this is an estimate of total keyframes
+    console.log(`Estimated keyframe count: ${this.keyframeCount}`);
 
-    if(skinnedMesh){
-      this.skinnedMesh = skinnedMesh
+    this.fbx_motion?.traverse((child) => {
+      if(child.type === "SkinnedMesh"){
+        this.skinnedMesh = child as THREE.SkinnedMesh;
+        console.log(`Found SkinnedMesh: ${this.skinnedMesh.name}, Vertex Count: ${this.skinnedMesh.geometry.attributes.position.count}`);
+      }
+    });
+
+    // const geoGroup = this.fbx_motion?.getObjectByName("rp_nathan_animated_003_walking_geoGRP");
+    // const skinnedMesh = geoGroup?.getObjectByName("rp_nathan_animated_003_walking_geo") as THREE.SkinnedMesh;
+
+    this.fbx_motion?.traverse((child) => {
+      console.log(`Object: ${child.name}, Type: ${child.type}`);
+    });
+
+    if(this.skinnedMesh){
       const material = new THREE.MeshStandardMaterial({
       color: 0x000000,
       wireframe: true,
       vertexColors: false
       });
 
-      skinnedMesh.material = material;
-      // this.createVertexLabels(vertexCount, positions, 10);
+      this.skinnedMesh.material = material;
+      this.createVertexLabels(this.skinnedMesh.geometry.attributes.position.count, this.skinnedMesh.geometry.attributes.position.array, 10);
     }
 
 
-  this.skeletonHelper = new THREE.SkeletonHelper(result);
-  if (this.fbx_motion) {
-    this.fbx_motion.add(this.skeletonHelper);
-  }
-  if (this.fbx_motion) {
-    this.scene.add(this.fbx_motion);
-  }
+    this.skeletonHelper = new THREE.SkeletonHelper(result);
+    // if (this.fbx_motion) {
+    //   this.fbx_motion.add(this.skeletonHelper);
+    // }
+    if (this.fbx_motion) {
+      this.scene.add(this.fbx_motion);
+    }
 
-  // Traverse through the result to find all bones
-  result.traverse((obj) => {
-    if (obj.type === "Bone") {
-      const bone = obj as THREE.Bone;
+    const kinnectOneMarkers = [1, 3, 5, 15, 41, 16, 17, 20, 26, 29, 41, 42, 43, 45, 52, 55, 6, 7, 66, 67, 68, 69, 73, 74, 75, 76];
+    const sphereGeometry = new THREE.SphereGeometry(0.5, 8, 8);
+    const nonMarkerMat = new THREE.MeshStandardMaterial({
+      color: 0xff0000,
+      emissive: 0x330000,
+      roughness: 0.3,
+      metalness: 0.1,
+    });
+    const markerMat = new THREE.MeshStandardMaterial({
+      color: 0x00ff00,
+      emissive: 0x003300,
+      roughness: 0.3,
+      metalness: 0.1,
+    });
+    console.log('Number of Bones:')
+    console.log(`SkeletonHelper has ${this.skeletonHelper?.bones.length} bones`);
+    console.log(`SkinnedMesh has ${this.skinnedMesh?.skeleton.bones.length} bones`);
 
-      const worldPos = bone.getWorldPosition(new THREE.Vector3());
+    // Visualize joints with spheres
+    if(this.skinnedMesh) {
+      this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
+        const worldPos = bone.getWorldPosition(new THREE.Vector3());
 
-      const sphereGeometry = new THREE.SphereGeometry(0.35, 8, 8);
-      const sphereMaterial = new THREE.MeshStandardMaterial({
-        color: 0xff0000,
-        emissive: 0x330000,
-        roughness: 0.3,
-        metalness: 0.1,
+        let sphere: THREE.Mesh | null = null;
+        
+        if(kinnectOneMarkers.includes(idx)){
+          sphere = new THREE.Mesh(sphereGeometry, nonMarkerMat);
+        }
+        else sphere = new THREE.Mesh(sphereGeometry, nonMarkerMat);
+
+        // Position the sphere at the bone's world position
+        sphere.position.copy(worldPos);
+        this.joints.push(sphere);
+        this.scene.add(sphere);
       });
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      // this.joints.forEach(joint => { this.scene.add(joint); });
+      
+      // Create text labels for each bone showing its index
+      this.joint_indices_names = Array.from({ length: this.skinnedMesh.skeleton.bones.length }, () => new Text());
+      console.log(this.skinnedMesh.skeleton.bones);
+        this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
+          const worldPos = bone.getWorldPosition(new THREE.Vector3());
+          
+          this.joint_indices_names[idx].text = String(idx);
+          this.joint_indices_names[idx].fontSize = 2.0;
+          this.joint_indices_names[idx].anchorX = 'center';
+          this.joint_indices_names[idx].anchorY = 'middle';
+          this.joint_indices_names[idx].color = 0xff0000;
+          this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 2, worldPos.z);
+          this.joint_indices_names[idx].sync();
+          
+          this.joint_indices_names_text.add(this.joint_indices_names[idx] as unknown as THREE.Object3D);
+        });
+        
+        this.scene.add(this.joint_indices_names_text);
 
-      // Position the sphere at the bone's world position
-      sphere.position.copy(worldPos);
-      this.joints.push(sphere);
-    }
-    this.joints.forEach(joint => { this.scene.add(joint); });
-  });
+        // this.createVertexLabels(this.skinnedMesh.geometry.attributes.position.count, this.skinnedMesh.geometry.attributes.position.array, 10);
+      }
+
+
   }
 
 
@@ -115,7 +179,7 @@ export class FBX_Loader {
     const vertexMarkerMeshes: THREE.Mesh[] = [];
     
     vertexIds.forEach(vertexId => {
-        const sphereGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+        const sphereGeometry = new THREE.SphereGeometry(0.9, 16, 16);
         const sphereMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x00ff00,
             emissive: 0x00ff00,
@@ -274,6 +338,7 @@ update_virtual_markers() {
 
     for (let idx = 0; idx < uniqueVertexIds.length; idx++) {
       const vertexId = uniqueVertexIds[idx];
+      //This might have to be multiplied by 100
       const x = positions[vertexId * 3];
       const y = positions[vertexId * 3 + 1];
       const z = positions[vertexId * 3 + 2];
@@ -290,7 +355,6 @@ update_virtual_markers() {
       this.joint_indices_names_text.add(this.joint_indices_names[idx] as unknown as THREE.Object3D);
     }
 
-    this.joint_indices_names_text.name = 'vertex_indices_text';
     this.scene.add(this.joint_indices_names_text);
   }
 

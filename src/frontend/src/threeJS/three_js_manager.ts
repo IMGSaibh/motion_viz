@@ -2,9 +2,11 @@ import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
 import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
+import { GLTF_Loader } from '@/threeJS/motion_loader/gltf_loader';
 import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
+import { GLTF_Player } from '@/threeJS/motion_player/gltf_player';
 import { Loop } from '@/threeJS/system/loop';
 import { Resizer } from '@/threeJS/system/resizer';
 import { createScene } from '@/threeJS/components/scene';
@@ -14,6 +16,7 @@ import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { api_get_base_url } from '@/hooks/hook_endpoints';
 import Utils from '@/threeJS/utils';
+import * as THREE from 'three';
 
 export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;
@@ -24,6 +27,9 @@ export class ThreeJSEngine {
 
   private fbx_loader: FBX_Loader | null;
   private fbx_player: FBX_Player | null;
+
+  private gltf_loader: GLTF_Loader | null;
+  private gltf_player: GLTF_Player | null;
 
   private scene: Scene;
   private renderer: WebGLRenderer;
@@ -45,6 +51,9 @@ export class ThreeJSEngine {
 
     this.fbx_player = null;
     this.fbx_loader = null;
+
+    this.gltf_loader = null;
+    this.gltf_player = null;
 
     this.camera = createCamera();
     this.renderer = createRenderer();
@@ -105,13 +114,22 @@ export class ThreeJSEngine {
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);
         break;
-    }
+        
+      case 'glb': 
+        this.gltf_loader = new GLTF_Loader(this.scene);
+        await this.gltf_loader.load_gltf_animation(fileUrl);
+        this.gltf_player = new GLTF_Player(this.gltf_loader);
+        this.loop.updatables.push(this.gltf_player.gltf_player_object);
+        break;
+      }
+      
   }
 
-  get_current_player(): NPY_Player | BVH_Player | FBX_Player | null {
+  get_current_player(): NPY_Player | BVH_Player | FBX_Player | GLTF_Player | null {
     if (this.npy_player) return this.npy_player;
     else if (this.bvh_player) return this.bvh_player;
     else if (this.fbx_player) return this.fbx_player;
+    else if (this.gltf_player) return this.gltf_player;
     return null;
   }
 
@@ -147,6 +165,15 @@ export class ThreeJSEngine {
         190,
         this.thumbnail_renderer,
       );
+    else if (this.gltf_player)      
+      return await this.gltf_player.render_thumbnail(
+        frame_index,
+        this.scene,
+        this.camera,
+        260,
+        190,
+        this.thumbnail_renderer,
+    );
     return null;
   }
 
@@ -154,30 +181,35 @@ export class ThreeJSEngine {
     if (this.npy_player) return this.npy_player.is_playing;
     else if (this.bvh_player) return this.bvh_player.is_playing;
     else if (this.fbx_player) return this.fbx_player.is_playing;
+    else if (this.gltf_player) return this.gltf_player.is_playing;
   }
 
   play_pause() {
     if (this.npy_player) this.npy_player.play_pause();
     else if (this.bvh_player) this.bvh_player.play_pause();
     else if (this.fbx_player) this.fbx_player.play_pause();
+    else if (this.gltf_player) this.gltf_player.play_pause();
   }
 
   pause() {
     if (this.npy_player) this.npy_player.pause();
     else if (this.bvh_player) this.bvh_player.pause();
     else if (this.fbx_player) this.fbx_player.pause();
+    else if (this.gltf_player) this.gltf_player.pause();
   }
 
   go_to_frame(frame_index: number) {
     if (this.npy_player) this.npy_player.go_to_frame(frame_index);
     else if (this.bvh_player) this.bvh_player.go_to_frame(frame_index);
     else if (this.fbx_player) this.fbx_player.go_to_frame(frame_index);
+    else if (this.gltf_player) this.gltf_player.go_to_frame(frame_index);
   }
 
   get_frame_count(): number {
     if (this.npy_player) return this.npy_player.get_frame_count();
     else if (this.bvh_player) return this.bvh_player.get_frame_count();
     else if (this.fbx_player) return this.fbx_player.get_frame_count();
+    else if (this.gltf_player) return this.gltf_player.get_frame_count();
     return 0;
   }
 
@@ -185,6 +217,7 @@ export class ThreeJSEngine {
     if (this.npy_player) return this.npy_player.get_frame_index();
     else if (this.bvh_player) return this.bvh_player.get_frame_index();
     else if (this.fbx_player) return this.fbx_player.get_frame_index();
+    else if (this.gltf_player) return this.gltf_player.get_frame_index();
     return 0;
   }
 
@@ -209,6 +242,10 @@ export class ThreeJSEngine {
       this.fbx_player.dispose();
       this.fbx_loader?.dispose();
       this.fbx_player = null;
+    } else if (this.gltf_player) {
+      this.gltf_player.dispose();
+      this.gltf_loader?.dispose();
+      this.gltf_player = null;
     }
   }
 
@@ -230,4 +267,47 @@ export class ThreeJSEngine {
     this.renderer.dispose();
     this.scene_container.removeChild(this.renderer.domElement);
   }
+
+    // Get vertex under mouse
+getVertexUnderMouse(
+  event: MouseEvent, 
+  camera: THREE.Camera, 
+  skinnedMesh: THREE.SkinnedMesh,
+  renderer : THREE.WebGLRenderer
+): { face: THREE.Face, vertices: { index: number, position: THREE.Vector3 }[], point: THREE.Vector3 } | null {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  
+  const rendererDomElement = renderer.domElement;
+  
+  mouse.x = (event.clientX / rendererDomElement.clientWidth) * 2 - 1;
+  mouse.y = -(event.clientY / rendererDomElement.clientHeight) * 2 + 1;
+  
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(skinnedMesh);
+  
+  if (intersects.length > 0) {
+    const intersect = intersects[0];
+    const face = intersect.face;
+    if (!face) return null;
+    
+    const geometry = skinnedMesh.geometry;
+    const positions = geometry.attributes.position.array;
+    
+    // Get the three vertices of the triangle
+    const vertexIndices = [face.a, face.b, face.c];
+    const vertices = vertexIndices.map(idx => ({
+      index: idx,
+      position: new THREE.Vector3(
+        positions[idx * 3],
+        positions[idx * 3 + 1],
+        positions[idx * 3 + 2]
+      )
+    }));
+    
+    return { face, vertices, point: intersect.point };
+  }
+  return null;
+}
+
 }

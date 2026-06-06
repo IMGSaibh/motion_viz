@@ -1,7 +1,6 @@
 import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
-import * as THREE from 'three';
 
 export class FBX_Player {
   public fbx_player_object: Updatable;
@@ -9,6 +8,9 @@ export class FBX_Player {
   private fbx_loader_object: FBX_Loader;
   private frame_count: number;
   private frame_index: number = 0;
+  private fps: number = 30; // Store your desired frame rate
+  private duration: number = 0;
+  private sampleRate: number = 1 / 30;
 
   private on_frame_changed_callback?: (frameIndex: number) => void;
 
@@ -19,11 +21,13 @@ export class FBX_Player {
     this.frame_count = fbx_loader_object.keyframeCount - 1;
     this.is_playing = false;
     this.frame_index = 0;
+    this.duration = fbx_loader_object.duration;
+    this.frame_count = Math.floor(this.duration * this.fps);
 
     this.fbx_player_object = {
       tick: (delta: number) => {
         if (this.is_playing) this.update(delta);
-        this.fbx_loader_object.update_virtual_markers();
+        // this.fbx_loader_object.update_virtual_markers();
       },
     };
   }
@@ -31,36 +35,44 @@ export class FBX_Player {
   set_on_frame_changed_callback(cb: (frameIndex: number) => void) {
     this.on_frame_changed_callback = cb;
   }
-
-  update(delta: number) {
-    this.fbx_loader_object.mixer!.update(delta);
-    const time = this.fbx_loader_object.mixer!.time;
-    // get the closest keyframe index based on the current time
-    const track = this.fbx_loader_object.clipAction!.getClip().tracks[0];
-
-    let closest_index = 0;
-    let min_diff = Infinity;
-
-    for (let i = 0; i < track.times.length; i++) {
-      const diff = Math.abs(track.times[i] - time);
-      if (diff < min_diff) {
-        min_diff = diff;
-        closest_index = i;
-      }
+    
+    go_to_frame(frame_index: number) {
+        if (!this.fbx_loader_object.mixer) return;
+        
+        this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
+        
+        // Simple time calculation - no track dependency!
+        const time = this.frame_index * this.sampleRate;
+        const clampedTime = Math.min(time, this.duration - 0.001);
+        
+        this.fbx_loader_object.mixer.setTime(clampedTime);
+        
+        if (this.on_frame_changed_callback) {
+            this.on_frame_changed_callback(this.frame_index);
+        }
     }
-
-    if (this.frame_index >= this.frame_count) {
-      this.frame_index = this.frame_count;
-      this.is_playing = false;
+    
+    update(delta: number) {
+        this.fbx_loader_object.mixer!.update(delta);
+        
+        // Calculate current frame based on time
+        const currentTime = this.fbx_loader_object.mixer!.time;
+        const calculatedFrame = Math.floor(currentTime * this.fps);
+        
+        if (calculatedFrame !== this.frame_index) {
+            this.frame_index = calculatedFrame;
+            
+            if (this.on_frame_changed_callback) {
+                this.on_frame_changed_callback(this.frame_index);
+            }
+        }
+        
+        // Stop at the end
+        if (currentTime >= this.duration) {
+            this.is_playing = false;
+            // Optionally loop or stop
+        }
     }
-
-    this.frame_index = closest_index;
-
-    if (this.on_frame_changed_callback) {
-      this.on_frame_changed_callback(this.frame_index);
-    }
-    this.go_to_frame(this.frame_index);
-  }
 
   play_pause() {
     // toggle play/pause
@@ -78,27 +90,6 @@ export class FBX_Player {
   pause() {
     this.is_playing = false;
     this.fbx_loader_object.mixer!.setTime(0);
-  }
-
-  go_to_frame(frame_index: number) {
-    if (!this.fbx_loader_object.mixer || !this.fbx_loader_object.clipAction) return;
-
-    // Safety clamp
-    this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
-
-    // Berechne den Zeitwert aus dem Keyframe-Index
-    const track = this.fbx_loader_object.clipAction.getClip().tracks[0];
-    const time = track.times[this.frame_index];
-    // we need to handle last keyframe specially, because it leeds to reset the animation
-    // three js doenst work with keyframes, so last keyfram jumps beyond setTime(animation duration)
-    // and resets the animation, maybe three js restart animation from the beginning when time is
-    // greater or euqal than duration
-    if (time >= this.fbx_loader_object.duration) {
-      this.fbx_loader_object.mixer.setTime(this.fbx_loader_object.duration - 0.01);
-      return;
-    }
-
-    this.fbx_loader_object.mixer.setTime(time);
   }
 
   get_frame_count(): number {

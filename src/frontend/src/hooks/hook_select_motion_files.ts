@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 const ENDPOINT = '/api_list_files/list_files';
 
 export type MotionFileItem = {
-  type: 'bvh' | 'fbx' | 'npy';
+  type: 'bvh' | 'fbx' | 'npy' | 'glb';
   name: string;
 };
 
@@ -11,6 +11,7 @@ type MotionFilesResponse = {
   bvh: string[];
   fbx: string[];
   npy: string[];
+  glb: string[];
 };
 
 export function hook_list_motion_files() {
@@ -31,6 +32,7 @@ export function hook_list_motion_files() {
         ...data.bvh.map((name) => ({ type: 'bvh' as const, name })),
         ...data.fbx.map((name) => ({ type: 'fbx' as const, name })),
         ...data.npy.map((name) => ({ type: 'npy' as const, name })),
+        ...data.glb.map((name) => ({ type: 'glb' as const, name })),
       ];
 
       return items;

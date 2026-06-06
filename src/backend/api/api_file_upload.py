@@ -14,6 +14,7 @@ async def upload(files: List[UploadFile] = File(...)):
         ".json": Path("data/json"),
         ".mvnx": Path("data/mvnx"),
         ".npy": Path("data/npy"),
+        ".glb": Path("data/glb"),
     }
     # make sure all target directories exist
     for target in target_dirs.values():
