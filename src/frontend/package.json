@@ -23,9 +23,10 @@
     "use-context-selector": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.12.2",
     "@types/three": "^0.178.0",
     "@vitejs/plugin-react": "^3.0.0",
+    "fs": "^0.0.1-security",
     "typescript": "^5.8.3",
     "vite": "^4.0.0",
     "vite-plugin-checker": "^0.9.3"

@@ -25,7 +25,7 @@ export class GLTF_Player {
       tick: (delta: number) => {
         if (this.is_playing) this.update(delta);
         // Uncomment if you have virtual markers in GLTF_Loader
-        // this.gltf_loader_object.update_virtual_markers();
+         this.gltf_loader_object.update_virtual_markers();
       },
     };
   }

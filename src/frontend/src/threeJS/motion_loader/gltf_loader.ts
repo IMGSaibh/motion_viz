@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Text } from 'troika-three-text';
 
+type virtualMarker = {
+  name: string;
+  vertexIDs: number[];
+  vertexMarkerMeshes: THREE.Mesh[];
+  markerMesh: THREE.Mesh;
+}
+
 export class GLTF_Loader {
   gltf_loader: GLTFLoader;
   gltf_motion: THREE.Group | null;
@@ -13,6 +20,9 @@ export class GLTF_Loader {
   duration: number;
   scene: THREE.Scene;
   skinnedMesh: THREE.SkinnedMesh | null = null;
+  scale: number = 100;
+
+  virtualMarkers: virtualMarker[] = [];   
   
   // For bone visualization
   joint_indices_names: Text[] = [];
@@ -39,6 +49,8 @@ export class GLTF_Loader {
       this.gltf_motion.name = fileUrl;
       console.log(`Loaded GLTF animation from ${fileUrl}`);
     }
+
+    this.gltf_motion?.scale.set(this.scale, this.scale, this.scale);
     
     console.log('GLTF scaling details:');
     console.log(result.scene.scale, result.scene.rotation, result.scene.position);
@@ -77,6 +89,12 @@ export class GLTF_Loader {
         vertexColors: false
       });
       this.skinnedMesh.material = material;
+
+    //   this.createVertexLabels(this.skinnedMesh.geometry.attributes.position.count, this.skinnedMesh.geometry.attributes.position.array, 5);
+      this.create_virtual_marker('chest_top_marker', [3930, 1690, 60, 410, 2640]);
+      this.create_virtual_marker('shoulder_right_marker', [390, 1700]);
+      this.create_virtual_marker('shoulder_left_marker', [3945, 3975, 3965]);
+      this.create_virtual_marker('back_bottom_marker', [1750, 1720, 3955, 55]);
     }
     
     // Create skeleton helper for visualization
@@ -93,7 +111,7 @@ export class GLTF_Loader {
       console.log(`SkeletonHelper has ${this.skeletonHelper?.bones.length} bones`);
       console.log(`SkinnedMesh has ${this.skinnedMesh.skeleton.bones.length} bones`);
       
-      const sphereGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+      const sphereGeometry = new THREE.SphereGeometry(0.8, 16, 16);
       const boneMaterial = new THREE.MeshStandardMaterial({
         color: 0xff6600,
         emissive: 0x331100,
@@ -109,7 +127,7 @@ export class GLTF_Loader {
         sphere.position.copy(worldPos);
         sphere.userData = { boneName: bone.name, boneIndex: idx };
         this.joints.push(sphere);
-        // this.scene.add(sphere);
+        this.scene.add(sphere);
       });
 
       console.log("BoundingBox:", this.skinnedMesh.boundingBox);
@@ -121,46 +139,207 @@ export class GLTF_Loader {
       this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
         const worldPos = bone.getWorldPosition(new THREE.Vector3());
         
-        this.joint_indices_names[idx].text = `${idx}: ${bone.name}`;
-        this.joint_indices_names[idx].fontSize = 0.5;
+        this.joint_indices_names[idx].text = `${idx}`;
+        this.joint_indices_names[idx].fontSize = 0.8;
         this.joint_indices_names[idx].anchorX = 'center';
         this.joint_indices_names[idx].anchorY = 'middle';
         this.joint_indices_names[idx].color = 0xffaa00;
-        this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 0.5, worldPos.z);
+        this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 0.9, worldPos.z);
         this.joint_indices_names[idx].sync();
         
         this.joint_indices_names_text.add(this.joint_indices_names[idx] as unknown as THREE.Object3D);
       });
       
-    //   this.scene.add(this.joint_indices_names_text);
+       this.scene.add(this.joint_indices_names_text);
     } else {
       console.warn('No skinned mesh or skeleton found in GLTF file');
     }
   }
-  
-  // Update method for animation (call with delta time)
-  update(delta: number) {
-    if (this.mixer) {
-      this.mixer.update(delta);
-    }
+
+  create_virtual_marker(name: string, vertexIds: number[]) {
+      // Create individual marker meshes for each vertex
+      const vertexMarkerMeshes: THREE.Mesh[] = [];
+      
+      vertexIds.forEach(vertexId => {
+          const sphereGeometry = new THREE.SphereGeometry(0.6, 16, 16);
+          const sphereMaterial = new THREE.MeshStandardMaterial({ 
+              color: 0xff6600,
+              emissive: 0xff3300,
+              emissiveIntensity: 0.3
+          });
+          const marker = new THREE.Mesh(sphereGeometry, sphereMaterial);
+          marker.userData = { 
+              vertexId, 
+              type: 'tracked_vertex',
+              virtualMarkerName: name 
+          };
+          vertexMarkerMeshes.push(marker);
+          this.scene.add(marker);
+      });
+      
+      // Create the main/parent marker mesh for this virtual marker (average position)
+      const avgSphereGeo = new THREE.SphereGeometry(0.8, 32, 32);
+      const avgSphereMat = new THREE.MeshStandardMaterial({ 
+          color: 0x00ff00,
+          emissive: 0x00ff00,
+          emissiveIntensity: 0.5
+      });
+      const markerMesh = new THREE.Mesh(avgSphereGeo, avgSphereMat);
+      markerMesh.userData = { 
+          type: 'virtual_marker',
+          name: name,
+          vertexCount: vertexIds.length
+      };
+      this.scene.add(markerMesh);
+      
+      // Create and store the virtual marker object
+      const virtualMarker: virtualMarker = {
+          name: name,
+          vertexIDs: vertexIds,
+          vertexMarkerMeshes: vertexMarkerMeshes,
+          markerMesh: markerMesh
+      };
+      
+      this.virtualMarkers.push(virtualMarker);
+      
+      console.log(`Created virtual marker "${name}" tracking ${vertexIds.length} vertices`);
+      
+      return virtualMarker; // Return for chaining if needed
   }
+
+  //This method is only for visualization purposes, it creates a text label for each vertex, showing its index
+    //This can be used to identify the vertices that get tracked
+    private createVertexLabels(vertexCount: number, positions: THREE.TypedArray, step: number) {
+      const vertexIdsToShow: number[] = [];
   
-  // Play animation
-  play() {
-    if (this.clipAction) {
-      this.clipAction.play();
-    }
-  }
   
-  // Pause animation
-  pause() {
-    if (this.mixer) {
-      // No direct pause, but we can stop updating or store state
-      if (this.clipAction) {
-        this.clipAction.stop();
+      for (let i = 0; i < vertexCount; i += step) {
+        vertexIdsToShow.push(i);
       }
+  
+      // Remove duplicates and sort
+      const uniqueVertexIds = [...new Set(vertexIdsToShow)].sort((a, b) => a - b);
+  
+      console.log(`Creating text labels for ${uniqueVertexIds.length} vertices`);
+  
+      // Initialize text array
+      this.joint_indices_names = Array.from({ length: uniqueVertexIds.length }, () => new Text());
+  
+      for (let idx = 0; idx < uniqueVertexIds.length; idx++) {
+        const vertexId = uniqueVertexIds[idx];
+        //This might have to be multiplied by 100
+        const x = positions[vertexId * 3] * this.scale;
+        const y = positions[vertexId * 3 + 1] * this.scale;
+        const z = positions[vertexId * 3 + 2] * this.scale;
+  
+        // Create text using Troika (matching NPY_loader exactly)
+        this.joint_indices_names[idx].text = String(vertexId);
+        this.joint_indices_names[idx].fontSize = 0.5;
+        this.joint_indices_names[idx].anchorX = 'center';
+        this.joint_indices_names[idx].anchorY = 'middle';
+        this.joint_indices_names[idx].color = 0xff0000; // Red for vertices
+        this.joint_indices_names[idx].position.set(x, y, z);
+        this.joint_indices_names[idx].sync(); // Important!
+  
+        this.joint_indices_names_text.add(this.joint_indices_names[idx] as unknown as THREE.Object3D);
+      }
+  
+      this.scene.add(this.joint_indices_names_text);
     }
-  }
+
+    update_virtual_markers() {
+        this.virtualMarkers.forEach((virtualMarker) => {
+          if (!this.skinnedMesh || virtualMarker.vertexIDs.length === 0) return;
+          // Get vertex positions from geometry
+          const geometry = this.skinnedMesh.geometry;
+          const vertexPositions = geometry.attributes.position.array;
+          
+          // Get bone matrices
+          const skeleton = this.skinnedMesh.skeleton;
+          this.skinnedMesh.skeleton.update(); // Ensure bone matrices are updated
+          
+          let sumX = 0, sumY = 0, sumZ = 0;
+          let validCount = 0;
+          
+          virtualMarker.vertexIDs.forEach((vertexId, idx) => {
+              if (vertexId * 3 < vertexPositions.length) {
+                  //This is the initial position of the vertices (rest pose), we use this in combination with the bone matrices
+                  //to calculate the current position of the vertex each frame
+                  const bindX = vertexPositions[vertexId * 3];
+                  const bindY = vertexPositions[vertexId * 3 + 1];
+                  const bindZ = vertexPositions[vertexId * 3 + 2];
+                  const bindPos = new THREE.Vector3(bindX, bindY, bindZ);
+                  
+                  // Get skinning weights and bone indices for this vertex
+                  const skinWeights = geometry.attributes.skinWeight.array;
+                  const boneIndices = geometry.attributes.skinIndex.array;
+                  
+                  if (skinWeights && boneIndices) {
+                      // Get weights and indices for this vertex
+                      const i4 = vertexId * 4;
+                      //skinWeights are how much each bone influences the vertex, skinIndices are which bones influence the vertex
+                      const currentWeights = [
+                          skinWeights[i4], skinWeights[i4 + 1], 
+                          skinWeights[i4 + 2], skinWeights[i4 + 3]
+                      ];
+                      const currentBoneIndices = [
+                          boneIndices[i4], boneIndices[i4 + 1], 
+                          boneIndices[i4 + 2], boneIndices[i4 + 3]
+                      ];
+                      // for(let i=0; i<4; i++){
+                      //     console.log(`Vertex ${vertexId} influenced by bone index ${boneIndices[i]} with weight ${weights[i]}`);
+                      // }
+                      
+                      const finalPos = new THREE.Vector3(0, 0, 0);
+                      for (let i = 0; i < 4; i++) {
+                          if (currentWeights[i] > 0) {
+                              const boneIndex = currentBoneIndices[i];
+                              // Each bone matrix is 16 floats (4x4 matrix)
+                              const offset = boneIndex * 16;
+                              
+                              // Extract the 16 values for this bone from the Float32Array
+                              const boneMatrixArray = skeleton.boneMatrices.slice(offset, offset + 16);
+                              const boneMatrix4 = new THREE.Matrix4().fromArray(boneMatrixArray);
+                              
+                              const transformed = bindPos.clone().applyMatrix4(boneMatrix4);
+                              finalPos.add(transformed.multiplyScalar(currentWeights[i]));
+                          }
+                      }
+                      // console.log(`Vertex ${vertexId} final position: (${finalPos.x.toFixed(2)}, ${finalPos.y.toFixed(2)}, ${finalPos.z.toFixed(2)})`);
+                      // Transform from local mesh space to world space
+                      // let worldPos = new THREE.Vector3(0,0,0);
+                      // if(this.skinnedMesh) worldPos = finalPos.applyMatrix4(this.skinnedMesh.matrixWorld);
+                      
+                      // Update marker
+                      if (virtualMarker.vertexMarkerMeshes[idx]) {
+                          virtualMarker.vertexMarkerMeshes[idx].position.copy(finalPos); 
+                      }
+                      
+                      // Accumulate for average
+                      sumX += finalPos.x;
+                      sumY += finalPos.y;
+                      sumZ += finalPos.z;
+                      validCount++;
+                  }
+                  else {
+                      console.warn(`Vertex ${vertexId} is missing skinWeight or skinIndex attributes`);
+                  }
+              }
+              else {
+                console.warn(`Vertex ID ${vertexId} is out of bounds for position attribute (length: ${vertexPositions.length})`);
+              }
+          });
+          
+          // Calculate and update average position marker
+          if (validCount > 0 && virtualMarker.markerMesh) {
+            const avgX = sumX / validCount;
+            const avgY = sumY / validCount;
+            const avgZ = sumZ / validCount;
+            virtualMarker.markerMesh.position.set(avgX, avgY, avgZ);
+          }
+        });
+    }
+    
   
   // Clean up resources
   dispose() {
