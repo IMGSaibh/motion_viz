@@ -20,7 +20,7 @@ export class NPY_loader {
   scene: THREE.Scene;
   joint_indices_names: Text[] = [];
   joint_indices_names_text = new THREE.Group();
-  bone_colorer: Bone_grouping;
+  // bone_colorer: Bone_grouping;
   //jointGroupMap: JointCategory[] = []; //Array that holds the joint category for each joint index
 
   // joint_coordsystem_local: JointCoordsystemLocal | null;
@@ -42,7 +42,7 @@ export class NPY_loader {
     this.scene = scene;
     this.joint_indices_names = []; //
     this.joint_indices_names_text = new THREE.Group(); //Text labels that get displayed next to the joints
-    this.bone_colorer = new Bone_grouping;
+    // this.bone_colorer = new Bone_grouping;
     // this.joint_coordsystem_local = null;
     // this.joint_orientations = [];
   }
@@ -54,6 +54,8 @@ export class NPY_loader {
     const response = await fetch(file_url);
     const arrayBuffer = await response.arrayBuffer();
     const parsed_npy = loader.parse(arrayBuffer);
+
+    
 
     this.npy_motion.name = file_url;
     this.numpy_data = parsed_npy.data;
@@ -75,8 +77,15 @@ export class NPY_loader {
   async create_skeleton(skeletonPath: string, renderer = null) {
     const response = await fetch(skeletonPath);
     const skeleton_json = await response.json();
-    this.bone_colorer.assign_categories(skeleton_json);
-    this.bone_colorer.print_joint_categories();
+    console.log("Skeleton JSON loaded:", skeleton_json);
+
+    const metadata = skeleton_json['metadata'];
+    if (metadata && metadata.fps) {
+      this.fps = metadata.fps;
+      console.log(`FPS set to ${this.fps} from skeleton JSON metadata.`);
+    }
+    // this.bone_colorer.assign_categories(skeleton_json);
+    // this.bone_colorer.print_joint_categories();
     // this.jointGroupMap =  this._assign_categories(skeleton_json); //fills up the JointGroupmap array so it can be used in _create_bones to color the bones differently
     // this._print_joint_categories(this.jointGroupMap);
     this._create_joints();
@@ -130,10 +139,10 @@ export class NPY_loader {
       // Parent -1? → Root, diesen überspringen wir für Bones
       if (parentIdx === -1) continue;
 
-      const mat_color: number = this.bone_colorer.get_color_by_joint_id(childIdx);
+      // const mat_color: number = this.bone_colorer.get_color_by_joint_id(childIdx);
 
       const boneMaterial = new THREE.MeshBasicMaterial({
-        color: mat_color,
+        color: 0x00ff00,
         wireframe: false,
       });
 

@@ -4,10 +4,45 @@ import { Text } from 'troika-three-text';
 
 type virtualMarker = {
   name: string;
+  jointID: number,
   vertexIDs: number[];
   vertexMarkerMeshes: THREE.Mesh[];
   markerMesh: THREE.Mesh;
 }
+
+type formatMapping = {
+    name: string;
+    existingJointIDs: number[];
+    virtualMarkers: virtualMarker[];
+}
+
+//A joint mapping from the LARa format to XSens format
+const joint_map = new Map<number, number>([
+    [0, 0], 
+    [1, 2],
+    [2, 4],
+    [3, 5],
+    [4, 6],
+    [5, 7],
+    [6, 9],
+    [7, 10],
+    [8, 11],
+    [10, 12],
+    [11, 14],
+    [12, 15],
+    [13, 16],
+    [15, 17],
+    [16, 18],
+    [17, 19],
+    [18, 20],
+    [19, 21],
+    [20, 22],
+    [21, 23],
+    [22, 24],
+    [23, 25],
+    [24, 26]
+])
+
 
 export class GLTF_Loader {
   gltf_loader: GLTFLoader;
@@ -21,6 +56,15 @@ export class GLTF_Loader {
   scene: THREE.Scene;
   skinnedMesh: THREE.SkinnedMesh | null = null;
   scale: number = 100;
+  isRecording: boolean = false;
+  currentFrameData: number[][] = [];
+  fps = 30;
+
+  xSensFormatMapping: formatMapping = {
+    name: 'Xsens',
+    existingJointIDs: [10, 15, 18, 19, 12, 17, 13, 0, 1, 16, 2, 5, 6, 7, 3, 8, 10, 11, 4, 20, 21,  22, 23, 24],
+    virtualMarkers: []
+  }
 
   virtualMarkers: virtualMarker[] = [];   
   
@@ -60,8 +104,17 @@ export class GLTF_Loader {
       console.log(`Found ${result.animations.length} animations:`, result.animations.map(a => a.name));
       
       this.mixer = new THREE.AnimationMixer(result.scene);
-      this.clipAction = this.mixer.clipAction(result.animations[0]);
-      this.duration = this.clipAction.getClip().duration;
+      let longestDuration = 0;
+      for (const anim of result.animations) {
+        const action = this.mixer.clipAction(anim);
+        const clipDuration = anim.duration;
+        if (clipDuration > longestDuration) {
+          longestDuration = clipDuration;
+          this.clipAction = action;
+        }
+      }
+    //   this.clipAction = this.mixer.clipAction(result.animations[0]);
+      this.duration = this.clipAction!.getClip().duration;
       console.log(`Animation duration: ${this.duration} seconds`);
       
       this.keyframeCount = Math.round(this.duration * 30);
@@ -91,10 +144,10 @@ export class GLTF_Loader {
       this.skinnedMesh.material = material;
 
     //   this.createVertexLabels(this.skinnedMesh.geometry.attributes.position.count, this.skinnedMesh.geometry.attributes.position.array, 5);
-      this.create_virtual_marker('chest_top_marker', [3930, 1690, 60, 410, 2640]);
-      this.create_virtual_marker('shoulder_right_marker', [390, 1700]);
-      this.create_virtual_marker('shoulder_left_marker', [3945, 3975, 3965]);
-      this.create_virtual_marker('back_bottom_marker', [1750, 1720, 3955, 55]);
+      this.xSensFormatMapping.virtualMarkers.push(this.create_virtual_marker('chest_top_marker', 3, [3930, 1690, 60, 410, 2640]));
+      this.xSensFormatMapping.virtualMarkers.push(this.create_virtual_marker('shoulder_right_marker', 8, [390, 1700]));
+      this.xSensFormatMapping.virtualMarkers.push(this.create_virtual_marker('shoulder_left_marker', 13, [3945, 3975, 3965]));
+      this.xSensFormatMapping.virtualMarkers.push(this.create_virtual_marker('back_bottom_marker', 1 , [1750, 1720, 3955, 55]));
     }
     
     // Create skeleton helper for visualization
@@ -118,23 +171,37 @@ export class GLTF_Loader {
         roughness: 0.3,
         metalness: 0.1,
       });
+
+      const markerMaterial = new THREE.MeshStandardMaterial({
+          color: 0x00ff00,
+          emissive: 0x00ff00,
+          emissiveIntensity: 0.5
+      });
       
       // Create spheres for each bone
       this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
+        let sphere: THREE.Mesh;
         const worldPos = bone.getWorldPosition(new THREE.Vector3());
         
-        const sphere = new THREE.Mesh(sphereGeometry, boneMaterial);
+        
+        if(this.xSensFormatMapping.existingJointIDs.includes(idx)) {
+            sphere = new THREE.Mesh(sphereGeometry, markerMaterial);
+        } else {
+            sphere = new THREE.Mesh(sphereGeometry, boneMaterial);
+        }
+        // const sphere = new THREE.Mesh(sphereGeometry, boneMaterial);
         sphere.position.copy(worldPos);
         sphere.userData = { boneName: bone.name, boneIndex: idx };
         this.joints.push(sphere);
         this.scene.add(sphere);
       });
 
-      console.log("BoundingBox:", this.skinnedMesh.boundingBox);
-      
       // Create text labels for each bone
       this.joint_indices_names = Array.from({ length: this.skinnedMesh.skeleton.bones.length }, () => new Text());
-      console.log('Bones in skeleton:', this.skinnedMesh.skeleton.bones.map(b => b.name));
+      for(const bone of this.skinnedMesh.skeleton.bones) {
+        console.log(`Bone: ${bone.name}`);
+        console.log(`Bone children: ${bone.children.map(c => c.name).join(', ')}`);
+      }
       
       this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
         const worldPos = bone.getWorldPosition(new THREE.Vector3());
@@ -144,7 +211,7 @@ export class GLTF_Loader {
         this.joint_indices_names[idx].anchorX = 'center';
         this.joint_indices_names[idx].anchorY = 'middle';
         this.joint_indices_names[idx].color = 0xffaa00;
-        this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 0.9, worldPos.z);
+        this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 1.1, worldPos.z);
         this.joint_indices_names[idx].sync();
         
         this.joint_indices_names_text.add(this.joint_indices_names[idx] as unknown as THREE.Object3D);
@@ -154,14 +221,17 @@ export class GLTF_Loader {
     } else {
       console.warn('No skinned mesh or skeleton found in GLTF file');
     }
+
+    // await this.convert_to_xsens_format();
+
   }
 
-  create_virtual_marker(name: string, vertexIds: number[]) {
+  create_virtual_marker(name: string, jointidx: number, vertexIds: number[]) {
       // Create individual marker meshes for each vertex
       const vertexMarkerMeshes: THREE.Mesh[] = [];
       
       vertexIds.forEach(vertexId => {
-          const sphereGeometry = new THREE.SphereGeometry(0.6, 16, 16);
+          const sphereGeometry = new THREE.SphereGeometry(0.4, 16, 16);
           const sphereMaterial = new THREE.MeshStandardMaterial({ 
               color: 0xff6600,
               emissive: 0xff3300,
@@ -196,6 +266,7 @@ export class GLTF_Loader {
       const virtualMarker: virtualMarker = {
           name: name,
           vertexIDs: vertexIds,
+          jointID: jointidx,
           vertexMarkerMeshes: vertexMarkerMeshes,
           markerMesh: markerMesh
       };
@@ -336,10 +407,90 @@ export class GLTF_Loader {
             const avgY = sumY / validCount;
             const avgZ = sumZ / validCount;
             virtualMarker.markerMesh.position.set(avgX, avgY, avgZ);
+
+            //Write into the current frame data for export
+            this.currentFrameData[virtualMarker.jointID] = [avgX, avgY, avgZ];
           }
         });
     }
     
+    update_bone_markers() {
+    if(!this.skinnedMesh) return;
+    
+    this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
+        const worldPos = bone.getWorldPosition(new THREE.Vector3());
+        if (this.joints[idx]) {
+            this.joints[idx].position.copy(worldPos);
+        }
+        if (this.joint_indices_names[idx]) {
+            this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 1.1, worldPos.z);
+            this.joint_indices_names[idx].sync();
+        }
+
+        let targetID = -1;
+        
+        if(joint_map.has(idx)) {
+            targetID = joint_map.get(idx)!;
+            if(targetID !== undefined) {
+                this.currentFrameData[targetID] = [worldPos.x, worldPos.y, worldPos.z];
+            }
+        }
+    });
+    
+    }
+
+    async convert_to_xsens_format() {
+      const delta = 1 / this.fps;
+      console.log("delta:", delta);
+      let numFrames = 0;
+
+      await this.start_recording();
+      this.clipAction?.play();
+      this.mixer?.setTime(0);
+
+      for(let i = 0; i < this.keyframeCount; i++) {
+         this.mixer?.update(delta);
+         this.skinnedMesh?.updateWorldMatrix(true, true);
+         this.update_virtual_markers();
+         this.update_bone_markers();
+         console.log('Frame', i, 'currentFrameData:', this.currentFrameData);
+         await this.record_frame();
+         numFrames++;
+        }
+        await this.close_recording();
+      console.log(`Finished converting to Xsens format with ${numFrames} frames recorded.`);
+    }
+
+    async start_recording() {
+        console.log("Starting recording of motion data...");
+        const response = await fetch("/api_write_npy_data/start_recording", {
+            method: "GET"
+        });
+        const data = await response.json();
+        console.log(data.message);
+        this.isRecording = true;    
+    }
+
+    async record_frame() {
+        if(this.isRecording) {
+            await fetch("/api_write_npy_data/write_frame", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({frame: this.currentFrameData})
+            });
+        }
+    }
+
+    async close_recording() {
+        const response = await fetch("/api_write_npy_data/save_recording", {
+            method: "POST"
+        });
+        const result = await response.json();
+        console.log(result.message);
+        this.isRecording = false;
+    }
   
   // Clean up resources
   dispose() {

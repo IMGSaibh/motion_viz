@@ -27,6 +27,7 @@ export class NPY_Player {
     this.frame_index = 0;
     this.elapsedTime = 0;
     this.fps = npy_loader_object.fps;
+    console.log('FPS in player set to:', this.fps);
     // 1 / fps gives us the duration of one frame in seconds
     // cause we use three.js delta, we need to convert it to seconds
     this.frameDuration = 1 / this.fps;

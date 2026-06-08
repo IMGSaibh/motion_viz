@@ -7,6 +7,7 @@ from backend.api import api_pose_viewer_conversion
 from backend.api import api_bvh_conversion
 from backend.api import api_save_labels
 from backend.api import api_download_labels
+from backend.api import api_write_npy_data
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -46,6 +47,6 @@ app.include_router(api_pose_viewer_conversion.router, prefix="/api_pose_viewer_c
 app.include_router(api_bvh_conversion.router, prefix="/api_bvh_conversion")
 app.include_router(api_save_labels.router, prefix="/api_save_labels")
 app.include_router(api_download_labels.router, prefix="/api_download_labels")
-
+app.include_router(api_write_npy_data.router, prefix="/api_write_npy_data")
 
 

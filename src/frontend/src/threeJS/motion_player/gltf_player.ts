@@ -22,10 +22,10 @@ export class GLTF_Player {
     this.frame_index = 0;
 
     this.gltf_player_object = {
-      tick: (delta: number) => {
+      tick: async (delta: number) => {
         if (this.is_playing) this.update(delta);
-        // Uncomment if you have virtual markers in GLTF_Loader
          this.gltf_loader_object.update_virtual_markers();
+         this.gltf_loader_object.update_bone_markers();
       },
     };
   }
@@ -70,11 +70,19 @@ export class GLTF_Player {
     // Stop at the end
     if (currentTime >= this.duration) {
       this.is_playing = false;
+      this.gltf_loader_object.close_recording();
     }
   }
 
-  play_pause() {
-    // toggle play/pause
+  start_recording() {
+    console.log("Starting recording of motion data...");
+    fetch("/api_write_npy_data/start_recording", { method: "GET" })
+    .then(r => r.json())
+    .then(console.log)
+  }
+
+  async play_pause() {
+        // toggle play/pause
     if (this.frame_index >= this.frame_count) {
       this.go_to_frame(0);
       this.is_playing = true;
