@@ -506,7 +506,39 @@ export class GLTF_Loader {
       }
     });
     this.joints = [];
+    this.virtualMarkers.forEach(marker => {
+        this.scene.remove(marker.markerMesh);
+        marker.markerMesh.geometry.dispose();
+        if (marker.markerMesh.material) {
+            if (Array.isArray(marker.markerMesh.material)) {
+                marker.markerMesh.material.forEach(m => m.dispose());
+            } else {
+                marker.markerMesh.material.dispose();
+            }
+        }
+        marker.vertexMarkerMeshes.forEach(vertexMarker => {
+            this.scene.remove(vertexMarker);
+            vertexMarker.geometry.dispose();
+            if (vertexMarker.material) {
+                if (Array.isArray(vertexMarker.material)) {
+                    vertexMarker.material.forEach(m => m.dispose());
+                } else {
+                    vertexMarker.material.dispose();
+                }
+            }
+        });
+    });
+    this.virtualMarkers = [];
+
+    this.joint_indices_names.forEach(text => {
+        this.scene.remove(text as unknown as THREE.Object3D);
+        text.dispose();
+    });
+    this.joint_indices_names = [];
+    this.scene.remove(this.joint_indices_names_text);
+    this.joint_indices_names_text.clear();
     
+
     if (this.gltf_motion) {
       this.scene.remove(this.gltf_motion);
     }
