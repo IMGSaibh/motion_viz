@@ -47,7 +47,8 @@ export class NPY_loader {
     // this.joint_orientations = [];
   }
   
-
+  //TODO: Maye rewrite this so that it only loads the npy data and returns it, instead of directly adding it to the scene
+  //That way, it could be used more generically and we don't need to worry about the scene in this class, which is not really its responsibility
   async load_npy_animation(file_url: string) {
     //TODO: lädt numpy aus dem backend
     const loader = new npyjs();

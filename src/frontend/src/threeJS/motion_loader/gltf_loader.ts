@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Text } from 'troika-three-text';
+import { generateAnimationClip } from '@/hooks/hook_generate_animation_clip';
 
 type virtualMarker = {
   name: string;
@@ -103,6 +104,7 @@ export class GLTF_Loader {
     if (result.animations && result.animations.length > 0) {
       console.log(`Found ${result.animations.length} animations:`, result.animations.map(a => a.name));
       
+
       this.mixer = new THREE.AnimationMixer(result.scene);
       let longestDuration = 0;
       for (const anim of result.animations) {
@@ -115,6 +117,7 @@ export class GLTF_Loader {
       }
     //   this.clipAction = this.mixer.clipAction(result.animations[0]);
       this.duration = this.clipAction!.getClip().duration;
+      console.log(`Animation clip: `, this.clipAction!.getClip());
       console.log(`Animation duration: ${this.duration} seconds`);
       
       this.keyframeCount = Math.round(this.duration * 30);
@@ -223,6 +226,7 @@ export class GLTF_Loader {
     }
 
     // await this.convert_to_xsens_format();
+    await this.getAnimationClip();
 
   }
 
@@ -490,6 +494,12 @@ export class GLTF_Loader {
         const result = await response.json();
         console.log(result.message);
         this.isRecording = false;
+    }
+
+    async getAnimationClip() {
+      console.log("generating animation clip")
+      const response = await generateAnimationClip("data/npy/free_pack_male_base_mesh.npy");
+      console.log(response)
     }
   
   // Clean up resources

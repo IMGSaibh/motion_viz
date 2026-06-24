@@ -24,6 +24,7 @@ async def start_recording():
     joint_count = None
     return {"message": "Recording started"}
 
+#TODO: This should not be written every frame, but instead after all frames are processed
 @router.post("/write_frame")
 async def write_frame(data: FrameData):
     print(f"Received frame with {len(data.frame)} joints")
