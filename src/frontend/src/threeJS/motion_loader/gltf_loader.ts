@@ -17,36 +17,22 @@ type formatMapping = {
     virtualMarkers: virtualMarker[];
 }
 
-//A joint mapping from the LARa format to XSens format
-const joint_map = new Map<number, number>([
-    [0, 0], 
-    [1, 2],
-    [2, 4],
-    [3, 5],
-    [4, 6],
-    [5, 7],
-    [6, 9],
-    [7, 10],
-    [8, 11],
-    [10, 12],
-    [11, 14],
-    [12, 15],
-    [13, 16],
-    [15, 17],
-    [16, 18],
-    [17, 19],
-    [18, 20],
-    [19, 21],
-    [20, 22],
-    [21, 23],
-    [22, 24],
-    [23, 25],
-    [24, 26]
-])
+interface KeyFrameTrackData {
+    values: number[];
+    times: number[];
+}
 
+interface GenerateClipResponse {
+    message: string;
+    jointCount: number;
+    frameCount: number;
+    shape: number[];
+    filePath: string;
+    keyframeTracks: KeyFrameTrackData[];
+}
 
 export class GLTF_Loader {
-  gltf_loader: GLTFLoader;
+  gltf_loader: GLTFLoader; //This is the gltf loader provided by three.js
   gltf_motion: THREE.Group | null;
   joints: THREE.Mesh[];
   mixer: THREE.AnimationMixer | null;
@@ -57,9 +43,8 @@ export class GLTF_Loader {
   scene: THREE.Scene;
   skinnedMesh: THREE.SkinnedMesh | null = null;
   scale: number = 100;
-  isRecording: boolean = false;
-  currentFrameData: number[][] = [];
   fps = 30;
+  keyFrameTracks: THREE.KeyframeTrack[] = []
 
   xSensFormatMapping: formatMapping = {
     name: 'Xsens',
@@ -96,9 +81,6 @@ export class GLTF_Loader {
     }
 
     this.gltf_motion?.scale.set(this.scale, this.scale, this.scale);
-    
-    console.log('GLTF scaling details:');
-    console.log(result.scene.scale, result.scene.rotation, result.scene.position);
     
     // Handle animations if present
     if (result.animations && result.animations.length > 0) {
@@ -226,7 +208,7 @@ export class GLTF_Loader {
     }
 
     // await this.convert_to_xsens_format();
-    await this.getAnimationClip();
+    //await this.getAnimationClip();
 
   }
 
@@ -361,10 +343,7 @@ export class GLTF_Loader {
                           boneIndices[i4], boneIndices[i4 + 1], 
                           boneIndices[i4 + 2], boneIndices[i4 + 3]
                       ];
-                      // for(let i=0; i<4; i++){
-                      //     console.log(`Vertex ${vertexId} influenced by bone index ${boneIndices[i]} with weight ${weights[i]}`);
-                      // }
-                      
+
                       const finalPos = new THREE.Vector3(0, 0, 0);
                       for (let i = 0; i < 4; i++) {
                           if (currentWeights[i] > 0) {
@@ -379,12 +358,7 @@ export class GLTF_Loader {
                               const transformed = bindPos.clone().applyMatrix4(boneMatrix4);
                               finalPos.add(transformed.multiplyScalar(currentWeights[i]));
                           }
-                      }
-                      // console.log(`Vertex ${vertexId} final position: (${finalPos.x.toFixed(2)}, ${finalPos.y.toFixed(2)}, ${finalPos.z.toFixed(2)})`);
-                      // Transform from local mesh space to world space
-                      // let worldPos = new THREE.Vector3(0,0,0);
-                      // if(this.skinnedMesh) worldPos = finalPos.applyMatrix4(this.skinnedMesh.matrixWorld);
-                      
+                      }                      
                       // Update marker
                       if (virtualMarker.vertexMarkerMeshes[idx]) {
                           virtualMarker.vertexMarkerMeshes[idx].position.copy(finalPos); 
@@ -411,15 +385,13 @@ export class GLTF_Loader {
             const avgY = sumY / validCount;
             const avgZ = sumZ / validCount;
             virtualMarker.markerMesh.position.set(avgX, avgY, avgZ);
-
-            //Write into the current frame data for export
-            this.currentFrameData[virtualMarker.jointID] = [avgX, avgY, avgZ];
           }
         });
     }
     
     update_bone_markers() {
     if(!this.skinnedMesh) return;
+    this.skinnedMesh?.updateWorldMatrix(true, true);
     
     this.skinnedMesh.skeleton.bones.forEach((bone, idx) => {
         const worldPos = bone.getWorldPosition(new THREE.Vector3());
@@ -429,81 +401,47 @@ export class GLTF_Loader {
         if (this.joint_indices_names[idx]) {
             this.joint_indices_names[idx].position.set(worldPos.x, worldPos.y + 1.1, worldPos.z);
             this.joint_indices_names[idx].sync();
-        }
-
-        let targetID = -1;
+        }        
         
-        if(joint_map.has(idx)) {
-            targetID = joint_map.get(idx)!;
-            if(targetID !== undefined) {
-                this.currentFrameData[targetID] = [worldPos.x, worldPos.y, worldPos.z];
-            }
-        }
     });
     
     }
 
-    async convert_to_xsens_format() {
-      const delta = 1 / this.fps;
-      console.log("delta:", delta);
-      let numFrames = 0;
-
-      await this.start_recording();
-      this.clipAction?.play();
-      this.mixer?.setTime(0);
-
-      for(let i = 0; i < this.keyframeCount; i++) {
-         this.mixer?.update(delta);
-         this.skinnedMesh?.updateWorldMatrix(true, true);
-         this.update_virtual_markers();
-         this.update_bone_markers();
-         console.log('Frame', i, 'currentFrameData:', this.currentFrameData);
-         await this.record_frame();
-         numFrames++;
-        }
-        await this.close_recording();
-      console.log(`Finished converting to Xsens format with ${numFrames} frames recorded.`);
-    }
-
-    async start_recording() {
-        console.log("Starting recording of motion data...");
-        const response = await fetch("/api_write_npy_data/start_recording", {
-            method: "GET"
-        });
-        const data = await response.json();
-        console.log(data.message);
-        this.isRecording = true;    
-    }
-
-    async record_frame() {
-        if(this.isRecording) {
-            await fetch("/api_write_npy_data/write_frame", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({frame: this.currentFrameData})
-            });
-        }
-    }
-
-    async close_recording() {
-        const response = await fetch("/api_write_npy_data/save_recording", {
-            method: "POST"
-        });
-        const result = await response.json();
-        console.log(result.message);
-        this.isRecording = false;
-    }
-
     async getAnimationClip() {
       console.log("generating animation clip")
-      const response = await generateAnimationClip("data/npy/free_pack_male_base_mesh.npy");
+      const response = await generateAnimationClip("data/npy/free_pack_male_base_mesh.npy") as GenerateClipResponse;
       console.log(response)
+
+      this.createAnimationClip(response.keyframeTracks, response.frameCount);
+    }
+
+    createAnimationClip(keyFrameTracks: KeyFrameTrackData[], numFrames: number) {
+    for (const [index, track] of keyFrameTracks.entries()) {
+        // Create a name for each track (e.g., "joint_0", "joint_1", etc.)
+        const trackName = `joint_${index}`;
+        
+        const newTrack = new THREE.KeyframeTrack(
+            trackName,
+            track.times,  
+            track.values 
+        );
+        this.keyFrameTracks.push(newTrack);
+      }
+
+      const animClip = new THREE.AnimationClip("Animation", numFrames / 30, this.keyFrameTracks)
+      if(!this.mixer) this.mixer = new THREE.AnimationMixer(this.scene)
+      if(this.mixer) {
+        this.clipAction = new THREE.AnimationAction(this.mixer, animClip)
+        this.keyframeCount = numFrames;
+        this.duration = numFrames / 30;
+      }
+      else console.error("Animation Mixer does not exist, new Animation Action could not be created!")
     }
   
   // Clean up resources
   dispose() {
+    this.keyFrameTracks = []
+
     this.joints.forEach(joint => {
       this.scene.remove(joint);
       joint.geometry?.dispose();

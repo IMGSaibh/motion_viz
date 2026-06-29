@@ -8,6 +8,7 @@ from typing import List
 router = APIRouter()
 
 class KeyFrameTrack(BaseModel):
+    name: str
     values: List[float]
     times: List[float]
 
@@ -51,7 +52,7 @@ async def generate_animation_clip(filePath: str = Query(...)):
                 for frame in range(frame_count):
                     times.extend([frame * time_step])
 
-                trackName = "{joint_idx}.position"
+                trackName = f"{joint_idx}.position"
                 
                 keyframe_tracks.append(
                     KeyFrameTrack(

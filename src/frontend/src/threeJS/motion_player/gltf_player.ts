@@ -70,7 +70,7 @@ export class GLTF_Player {
     // Stop at the end
     if (currentTime >= this.duration) {
       this.is_playing = false;
-      this.gltf_loader_object.close_recording();
+      // this.gltf_loader_object.close_recording();
     }
   }
 
