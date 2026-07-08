@@ -66,7 +66,7 @@ export class SkeletonMapper {
         // let skeleton1_npy_url = skeleton1_json_url.replace('.json', '.npy').replace('/json/', '/npy/');
 
         // console.log(skeleton1_npy_url);
-        let restPoseResponse = await getRestPose("data/npy/example.npy");
+        let restPoseResponse = await getRestPose("data/npy/L02_S01_R04_A17_N01_norm_data.npy");
         this.restposeA = restPoseResponse.restPose;
         console.log("Rest pose:", this.restposeA);
 
@@ -83,15 +83,30 @@ export class SkeletonMapper {
         // this.getNamingHeuristic(this.skeleton1.topologicalBranches);
         // console.log("Skeleton 1:", this.skeletonA);
         // console.log("Skeleton 2:", this.skeletonB);
-
+        let graphA = this.getGraphRepresentation(this.skeletonA);
         let graphB = this.getGraphRepresentation(this.skeletonB);
-        console.log("Graph B:", graphB);
 
-        this.graphVisualizer?.drawGraph(graphB, this.restposeB, scene);
 
-        let match: number[] = [];
-        
-        
+        const matches: Map<number, number>[] = [];
+        this.matchGraphs(graphA, graphB, new Map(), matches);
+
+        console.log(`Found ${matches.length} possible matches`);
+        if (matches.length > 0) {
+            console.log("First match:", Array.from(matches[0].entries()));
+        }
+        let matchColors: Map<number, string> = new Map();
+
+        for(const m of matches[0].entries()) {  
+            const color: string = `#${Math.floor(Math.random() * 0xffffff).toString(16)}`;
+            matchColors.set(m[0], color);
+            matchColors.set(m[1], color);
+            console.log(`Match: ${m[0]} -> ${m[1]}, Color: ${color}`);
+
+        }
+
+        this.graphVisualizer?.drawGraph(graphA, this.restposeA, -50, matchColors, scene);
+        this.graphVisualizer?.drawGraph(graphB, this.restposeB, 50, matchColors, scene);
+
     }
 
     private buildSkeleton(jsonData: any): Skeleton {
@@ -244,6 +259,73 @@ export class SkeletonMapper {
     skeleton.topologicalBranches = collapsedEdges;
     }
 
+    private matchGraphs(graphA: GraphNode[], graphB: GraphNode[], match: Map<number, number> = new Map(), matches: Map<number, number>[] = []): Map<number, number>[] {
+    
+    // If all nodes in graphA are matched, we have a complete solution
+    if (match.size === graphA.length) {
+        matches.push(new Map(match));
+        return matches;
+    }
+    
+    // Get the next unmatched node from graphA
+    const nodeA = graphA.find(node => !match.has(node.id));
+    if (!nodeA) return matches;
+    
+    // Try to match nodeA with every node in graphB
+    for (const nodeB of graphB) {
+        if (this.canMatch(graphA, graphB, nodeA, nodeB, match)) {
+            // Add to match and recurse
+            match.set(nodeA.id, nodeB.id);
+            this.matchGraphs(graphA, graphB, match, matches);
+            // Backtrack
+            match.delete(nodeA.id);
+        }
+    }
+    
+    return matches;
+    }
+
+    private canMatch(
+        graphA: GraphNode[],
+        graphB: GraphNode[],
+        nodeA: GraphNode,
+        nodeB: GraphNode,
+        match: Map<number, number>
+    ): boolean {
+        
+        // Constraint 1: nodeB must not already be matched
+        if (Array.from(match.values()).includes(nodeB.id)) {
+            return false;
+        }
+        
+        // Constraint 2: nodeA must have <= neighbors than nodeB
+        if (nodeA.neighbours.length > nodeB.neighbours.length) {
+            return false;
+        }
+        
+        // Constraint 3: Neighbor consistency
+        // For each neighbor of nodeA that is already matched,
+        // its matched partner must be a neighbor of nodeB
+        for (const neighborId of nodeA.neighbours) {
+            if (match.has(neighborId)) {
+                const matchedNeighborId = match.get(neighborId)!;
+                // Find the matched neighbor node in graphB
+                const matchedNeighborB = graphB.find(n => n.id === matchedNeighborId);
+                if (!matchedNeighborB) return false;
+                
+                // Check if matchedNeighborB is actually adjacent to nodeB
+                if (!nodeB.neighbours.includes(matchedNeighborId)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    // HEURISTICS
+    //************************************************************************************************************** */
+
     private getHeightHeuristic (branches: TopologicalBranch[], restpose: number[][]): void {
         if (!restpose || restpose.length === 0) {
             console.warn("Rest pose data is empty or undefined. Cannot compute height heuristic.");
@@ -303,38 +385,36 @@ export class SkeletonMapper {
 
 
 export class GraphVisualizer {
-    drawGraph(graph: GraphNode[], restPose: number[][], scene: THREE.Scene): void {
+    drawGraph(graph: GraphNode[], restPose: number[][], offset:number, matchColors: Map<number, string>,scene: THREE.Scene): void {
         const nodePositions = new Map<number, THREE.Vector3>();
+        const offsetVector = new THREE.Vector3(offset, 0, 0);
 
         // Create spheres for each node
         for (const node of graph) {
             const pos = restPose[node.id];
             if (!pos) continue;
 
-            const position = new THREE.Vector3(pos[0], pos[1], pos[2]);
+            const position = new THREE.Vector3(pos[0], pos[1], pos[2]).add(offsetVector);
             nodePositions.set(node.id, position);
 
             // Create sphere
-            const sphereGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+            const sphereGeometry = new THREE.SphereGeometry(2.5, 16, 16);
             const sphereMaterial = new THREE.MeshStandardMaterial({
-                color: 0x00ff88,
+                color: matchColors.get(node.id) || 0x00ff00,
                 roughness: 0.3,
                 metalness: 0.1,
-                emissive: 0x00ff88,
                 emissiveIntensity: 0.2
             });
             const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
             sphere.position.copy(position);
-            sphere.userData.isSkeletonVisualization = true;
             scene.add(sphere);
 
-            // In your GraphVisualizer or wherever you need it
-        const textLabel = this.createTextLabel(
-            String(node.id), 
-            new THREE.Vector3(pos[0], pos[1] + 3, pos[2]), 
-            scene,
-            3,
-            0xff0000
+            const textLabel = this.createTextLabel(
+                String(node.id), 
+                new THREE.Vector3(pos[0], pos[1] + 7, pos[2]).add(offsetVector), 
+                scene,
+                3,
+                0xff0000
             );
         }
 
@@ -375,7 +455,6 @@ export class GraphVisualizer {
         });
         const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
         cylinder.position.copy(midPoint);
-        cylinder.userData.isSkeletonVisualization = true;
 
         // Orient cylinder along direction
         const up = new THREE.Vector3(0, 1, 0);
@@ -383,21 +462,9 @@ export class GraphVisualizer {
         cylinder.quaternion.copy(quaternion);
 
         scene.add(cylinder);
-
-        // Add a subtle glow line along the bone
-        const points = [start, end];
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        const lineMaterial = new THREE.LineBasicMaterial({
-            color: 0x88ddff,
-            transparent: true,
-            opacity: 0.2
-        });
-        const line = new THREE.Line(lineGeometry, lineMaterial);
-        line.userData.isSkeletonVisualization = true;
-        scene.add(line);
     }
 
-    createTextLabel(text: string, position: THREE.Vector3, scene: THREE.Scene, fontSize: number = 2.2, color: number = 0x000000): Text {
+    createTextLabel(text: string, position: THREE.Vector3, scene: THREE.Scene, fontSize: number = 8, color: number = 0x000000): Text {
     const textLabel = new Text();
     textLabel.text = text;
     textLabel.fontSize = fontSize;
