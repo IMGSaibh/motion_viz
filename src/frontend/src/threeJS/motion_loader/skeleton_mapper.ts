@@ -1,6 +1,7 @@
 import { BodyPart, mapNameToLimb } from "./limb_classifier"
 import { getRestPose } from "@/hooks/hook_generate_animation_clip"
 import * as THREE from 'three';
+import { Text } from 'troika-three-text';
 
 type SkeletonNode = {
     id: number,
@@ -161,15 +162,7 @@ export class SkeletonMapper {
                     existingNode.neighbours.push(startId);
                 }
             }
-        }
-
-        for (const branch of skeleton.topologicalBranches) {
-            const startId = branch.start.id;
-            const endId = branch.end.id;
-
-
-        }
-        
+        }        
         return graph;
  }
 
@@ -334,6 +327,15 @@ export class GraphVisualizer {
             sphere.position.copy(position);
             sphere.userData.isSkeletonVisualization = true;
             scene.add(sphere);
+
+            // In your GraphVisualizer or wherever you need it
+        const textLabel = this.createTextLabel(
+            String(node.id), 
+            new THREE.Vector3(pos[0], pos[1] + 3, pos[2]), 
+            scene,
+            3,
+            0xff0000
+            );
         }
 
         // Create cylinders for each connection
@@ -394,4 +396,18 @@ export class GraphVisualizer {
         line.userData.isSkeletonVisualization = true;
         scene.add(line);
     }
+
+    createTextLabel(text: string, position: THREE.Vector3, scene: THREE.Scene, fontSize: number = 2.2, color: number = 0x000000): Text {
+    const textLabel = new Text();
+    textLabel.text = text;
+    textLabel.fontSize = fontSize;
+    textLabel.anchorX = 'center';
+    textLabel.anchorY = 'middle';
+    textLabel.color = color;
+    textLabel.position.copy(position);
+    textLabel.sync(); // Important: must sync to generate geometry
+    
+    scene.add(textLabel as unknown as THREE.Object3D);
+    return textLabel;
+}
 }
