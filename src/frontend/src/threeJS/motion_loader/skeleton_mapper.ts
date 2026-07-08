@@ -1,5 +1,6 @@
 import { BodyPart, mapNameToLimb } from "./limb_classifier"
 import { getRestPose } from "@/hooks/hook_generate_animation_clip"
+import * as THREE from 'three';
 
 type SkeletonNode = {
     id: number,
@@ -24,6 +25,11 @@ type TopologicalBranch = {
     branchHeuristics: BranchHeuristics
 }
 
+type GraphNode = {
+    id: number,
+    neighbours: number[],
+}
+
 type BranchHeuristics = {
     leg_l_weight: number,
     leg_r_weight: number,
@@ -34,41 +40,56 @@ type BranchHeuristics = {
 }
 
 export class SkeletonMapper {
-    skeleton1: Skeleton | null = null;
-    skeleton2: Skeleton | null = null;
-    restpose1: number[][] = [];
-    restpose2: number[][] = [];
+    skeletonA: Skeleton | null = null;
+    skeletonB: Skeleton | null = null;
+    restposeA: number[][] = [];
+    restposeB: number[][] = [];
+    public graphA: GraphNode[] = [];
+    public graphB: GraphNode[] = [];
+    graphVisualizer: GraphVisualizer | null = null;
 
-    async mapSkeletons(skeleton1_json_url: string, skeleton2_json_url: string) {
+    constructor() {
+        this.graphVisualizer = new GraphVisualizer();
+    }
+
+    async mapSkeletons(skeleton1_json_url: string, skeleton2_json_url: string, scene: THREE.Scene) {
         let response = await fetch(skeleton1_json_url);
         let json1 = await response.json();
         
         response = await fetch(skeleton2_json_url);
         let json2 = await response.json();
         
-        this.skeleton1 = this.buildSkeleton(json1);
-        this.skeleton2 = this.buildSkeleton(json2);
+        this.skeletonA = this.buildSkeleton(json1);
+        this.skeletonB = this.buildSkeleton(json2);
 
-        let skeleton1_npy_url = skeleton1_json_url.replace('.json', '.npy').replace('/json/', '/npy/');
+        // let skeleton1_npy_url = skeleton1_json_url.replace('.json', '.npy').replace('/json/', '/npy/');
 
         // console.log(skeleton1_npy_url);
         let restPoseResponse = await getRestPose("data/npy/example.npy");
-        this.restpose1 = restPoseResponse.restPose;
-        console.log("Rest pose:", this.restpose1);
+        this.restposeA = restPoseResponse.restPose;
+        console.log("Rest pose:", this.restposeA);
 
         restPoseResponse = await getRestPose("data/npy/A_test.npy");
-        this.restpose2 = restPoseResponse.restPose;
+        this.restposeB = restPoseResponse.restPose;
         // console.log("Rest pose 2:", this.restpose2);
         
         // Collapse both skeletons
-        this.collapseSkeleton(this.skeleton1);
-        this.collapseSkeleton(this.skeleton2);
+        this.collapseSkeleton(this.skeletonA);
+        this.collapseSkeleton(this.skeletonB);
         
         
-        this.getHeightHeuristic(this.skeleton2.topologicalBranches, this.restpose2);
+        this.getHeightHeuristic(this.skeletonB.topologicalBranches, this.restposeB);
         // this.getNamingHeuristic(this.skeleton1.topologicalBranches);
-        console.log("Skeleton 1:", this.skeleton1);
-        console.log("Skeleton 2:", this.skeleton2);
+        // console.log("Skeleton 1:", this.skeletonA);
+        // console.log("Skeleton 2:", this.skeletonB);
+
+        let graphB = this.getGraphRepresentation(this.skeletonB);
+        console.log("Graph B:", graphB);
+
+        this.graphVisualizer?.drawGraph(graphB, this.restposeB, scene);
+
+        let match: number[] = [];
+        
         
     }
 
@@ -112,6 +133,45 @@ export class SkeletonMapper {
             topologicalBranches: []
         };
     }
+
+    private getGraphRepresentation(skeleton: Skeleton): GraphNode[] {
+        const graph: GraphNode[] = [];
+        let coveredIDs = new Set<number>();
+        for (const branch of skeleton.topologicalBranches) {
+            const startId = branch.start.id;
+            const endId = branch.end.id;
+
+            if(!coveredIDs.has(startId)) {
+                graph.push({ id: startId, neighbours: [endId] });
+                coveredIDs.add(startId);
+            }
+            else {
+                const existingNode = graph.find(node => node.id === startId);
+                if (existingNode && !existingNode.neighbours.includes(endId)) {
+                    existingNode.neighbours.push(endId);
+                }
+            }
+            if(!coveredIDs.has(endId)) {
+                graph.push({ id: endId, neighbours: [startId] });
+                coveredIDs.add(endId);
+            }
+            else {
+                const existingNode = graph.find(node => node.id === endId);
+                if (existingNode && !existingNode.neighbours.includes(startId)) {
+                    existingNode.neighbours.push(startId);
+                }
+            }
+        }
+
+        for (const branch of skeleton.topologicalBranches) {
+            const startId = branch.start.id;
+            const endId = branch.end.id;
+
+
+        }
+        
+        return graph;
+ }
 
     private collapseSkeleton(skeleton: Skeleton): void {
         if (!skeleton || !skeleton.root) return;
@@ -245,5 +305,93 @@ export class SkeletonMapper {
         }
         if(numNodes === 0) return 0;
         return totalHeight / numNodes;
+    }
+}
+
+
+export class GraphVisualizer {
+    drawGraph(graph: GraphNode[], restPose: number[][], scene: THREE.Scene): void {
+        const nodePositions = new Map<number, THREE.Vector3>();
+
+        // Create spheres for each node
+        for (const node of graph) {
+            const pos = restPose[node.id];
+            if (!pos) continue;
+
+            const position = new THREE.Vector3(pos[0], pos[1], pos[2]);
+            nodePositions.set(node.id, position);
+
+            // Create sphere
+            const sphereGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+            const sphereMaterial = new THREE.MeshStandardMaterial({
+                color: 0x00ff88,
+                roughness: 0.3,
+                metalness: 0.1,
+                emissive: 0x00ff88,
+                emissiveIntensity: 0.2
+            });
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.copy(position);
+            sphere.userData.isSkeletonVisualization = true;
+            scene.add(sphere);
+        }
+
+        // Create cylinders for each connection
+        const connectionSet = new Set<string>();
+        for (const node of graph) {
+            const startPos = nodePositions.get(node.id);
+            if (!startPos) continue;
+
+            for (const neighbourId of node.neighbours) {
+                // Avoid duplicate connections (only add once)
+                const key = [node.id, neighbourId].sort().join('-');
+                if (connectionSet.has(key)) continue;
+                connectionSet.add(key);
+
+                const endPos = nodePositions.get(neighbourId);
+                if (!endPos) continue;
+
+                this.createCylinder(startPos, endPos, 0x66ccff, scene);
+            }
+        }
+    }
+
+    private createCylinder(start: THREE.Vector3, end: THREE.Vector3, color: number, scene: THREE.Scene): void {
+        const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+        const direction = new THREE.Vector3().subVectors(end, start);
+        const length = direction.length();
+        direction.normalize();
+
+        // Cylinder geometry (height = length)
+        const cylinderGeometry = new THREE.CylinderGeometry(0.7, 0.7, length, 6);
+        const cylinderMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.4,
+            metalness: 0.3,
+            transparent: true,
+            opacity: 0.8
+        });
+        const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+        cylinder.position.copy(midPoint);
+        cylinder.userData.isSkeletonVisualization = true;
+
+        // Orient cylinder along direction
+        const up = new THREE.Vector3(0, 1, 0);
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(up, direction);
+        cylinder.quaternion.copy(quaternion);
+
+        scene.add(cylinder);
+
+        // Add a subtle glow line along the bone
+        const points = [start, end];
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x88ddff,
+            transparent: true,
+            opacity: 0.2
+        });
+        const line = new THREE.Line(lineGeometry, lineMaterial);
+        line.userData.isSkeletonVisualization = true;
+        scene.add(line);
     }
 }

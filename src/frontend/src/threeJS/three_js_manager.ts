@@ -8,7 +8,7 @@ import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
 import { GLTF_Player } from '@/threeJS/motion_player/gltf_player';
-import { SkeletonMapper } from './motion_loader/skeleton_mapper';
+import { SkeletonMapper, GraphVisualizer } from './motion_loader/skeleton_mapper';
 import { Loop } from '@/threeJS/system/loop';
 import { Resizer } from '@/threeJS/system/resizer';
 import { createScene } from '@/threeJS/components/scene';
@@ -74,7 +74,10 @@ export class ThreeJSEngine {
     this.thumbnail_renderer.setSize(260, 190, false);
 
     let skeletonMapper = new SkeletonMapper();
-    skeletonMapper.mapSkeletons('http://localhost:8000/data/json/example.json', 'http://localhost:8000/data/json/A_test.json');
+    skeletonMapper.mapSkeletons('http://localhost:8000/data/json/example.json', 'http://localhost:8000/data/json/A_test.json', this.scene);
+    let graphVisualizer = new GraphVisualizer();
+    // graphVisualizer.drawGraph(skeletonMapper.graphA, skeletonMapper.restposeA, this.scene);
+    graphVisualizer.drawGraph(skeletonMapper.graphB, skeletonMapper.restposeB, this.scene);
 
   }
 
