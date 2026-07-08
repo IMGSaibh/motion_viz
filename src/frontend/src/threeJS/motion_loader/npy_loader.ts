@@ -56,8 +56,6 @@ export class NPY_loader {
     const arrayBuffer = await response.arrayBuffer();
     const parsed_npy = loader.parse(arrayBuffer);
 
-    
-
     this.npy_motion.name = file_url;
     this.numpy_data = parsed_npy.data;
     const [frameCount, jointCount, _] = parsed_npy.shape;
@@ -76,9 +74,10 @@ export class NPY_loader {
   }
 
   async create_skeleton(skeletonPath: string, renderer = null) {
+    console.log("Skeleton path: ", skeletonPath)
     const response = await fetch(skeletonPath);
     const skeleton_json = await response.json();
-    console.log("Skeleton JSON loaded:", skeleton_json);
+    // console.log("Skeleton JSON loaded:", skeleton_json);
 
     const metadata = skeleton_json['metadata'];
     if (metadata && metadata.fps) {
