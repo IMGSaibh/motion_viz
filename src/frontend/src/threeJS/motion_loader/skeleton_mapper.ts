@@ -66,11 +66,21 @@ export class SkeletonMapper {
         // let skeleton1_npy_url = skeleton1_json_url.replace('.json', '.npy').replace('/json/', '/npy/');
 
         // console.log(skeleton1_npy_url);
-        let restPoseResponse = await getRestPose("data/npy/L02_S01_R04_A17_N01_norm_data.npy");
-        this.restposeA = restPoseResponse.restPose;
-        console.log("Rest pose:", this.restposeA);
+        const filename = skeleton1_json_url.split('/').pop() || '';
+        const npyFilename = filename.replace('.json', '.npy');
+        const npyUrl = `data/npy/${npyFilename}`;
+        console.log("Numpy URL:", npyUrl);
 
-        restPoseResponse = await getRestPose("data/npy/A_test.npy");
+        let restPoseResponse = await getRestPose(npyUrl);
+        this.restposeA = restPoseResponse.restPose;
+        // console.log("Rest pose:", this.restposeA);
+
+        const fileName2 = skeleton2_json_url.split('/').pop() || '';
+        const npyFilename2 = fileName2.replace('.json', '.npy');
+        const npyUrl2 = `data/npy/${npyFilename2}`;
+        console.log("Numpy URL 2:", npyUrl2);
+
+        restPoseResponse = await getRestPose(npyUrl2);
         this.restposeB = restPoseResponse.restPose;
         // console.log("Rest pose 2:", this.restpose2);
         
@@ -95,14 +105,16 @@ export class SkeletonMapper {
             console.log("First match:", Array.from(matches[0].entries()));
         }
         let matchColors: Map<number, string> = new Map();
-
-        for(const m of matches[0].entries()) {  
-            const color: string = `#${Math.floor(Math.random() * 0xffffff).toString(16)}`;
-            matchColors.set(m[0], color);
-            matchColors.set(m[1], color);
-            console.log(`Match: ${m[0]} -> ${m[1]}, Color: ${color}`);
-
+        let cI = 0;
+        if(matches.length !== 0) {
+            for(const m of matches[0].entries()) {  
+                const color: string = getNextColor(cI++);
+                matchColors.set(m[0], color);
+                matchColors.set(m[1], color);
+                console.log(`Match: ${m[0]} -> ${m[1]}, Color: ${color}`);
+            }
         }
+
 
         this.graphVisualizer?.drawGraph(graphA, this.restposeA, -50, matchColors, scene);
         this.graphVisualizer?.drawGraph(graphB, this.restposeB, 50, matchColors, scene);
@@ -273,7 +285,7 @@ export class SkeletonMapper {
     
     // Try to match nodeA with every node in graphB
     for (const nodeB of graphB) {
-        if (this.canMatch(graphA, graphB, nodeA, nodeB, match)) {
+        if (this.canMatch(graphB, nodeA, nodeB, match)) {
             // Add to match and recurse
             match.set(nodeA.id, nodeB.id);
             this.matchGraphs(graphA, graphB, match, matches);
@@ -286,7 +298,6 @@ export class SkeletonMapper {
     }
 
     private canMatch(
-        graphA: GraphNode[],
         graphB: GraphNode[],
         nodeA: GraphNode,
         nodeB: GraphNode,
@@ -322,6 +333,37 @@ export class SkeletonMapper {
         
         return true;
     }
+
+    private evaluate(
+        graphA: GraphNode[],
+        graphB: GraphNode[],
+        match: Map<number, number>,
+        formerNodesA: Map<number, SkeletonNode[]>,  // node ID -> list of former nodes
+        formerNodesB: Map<number, SkeletonNode[]>   // node ID -> list of former nodes
+        ): number {
+            let error = 0;
+            
+            for (const nodeA of graphA) {
+                if (!match.has(nodeA.id)) {
+                    // Penalty for unmatched node: number of nodes in its collapsed path
+                    error += formerNodesA.get(nodeA.id)?.length || 0;
+                } else {
+                    const nodeBId = match.get(nodeA.id)!;
+                    const nodeB = graphB.find(n => n.id === nodeBId);
+                    if (!nodeB) {
+                        error += 100; // Big penalty for invalid match
+                        continue;
+                    }
+                    
+                    // Penalty for path length mismatch
+                    const lenA = formerNodesA.get(nodeA.id)?.length || 0;
+                    const lenB = formerNodesB.get(nodeB.id)?.length || 0;
+                    error += Math.abs(lenB - lenA);
+                }
+            }
+            
+            return error;
+        }
 
     // HEURISTICS
     //************************************************************************************************************** */
@@ -477,4 +519,41 @@ export class GraphVisualizer {
     scene.add(textLabel as unknown as THREE.Object3D);
     return textLabel;
 }
+}
+
+const colors = [
+  '#E6194B', // Red
+  '#3CB44B', // Green
+  '#4363D8', // Blue
+  '#FFE119', // Yellow
+  '#F032E6', // Magenta
+  '#42D4F4', // Cyan
+  '#F58231', // Orange
+  '#911EB4', // Purple
+  '#46F0F0', // Teal
+  '#BCF60C', // Lime
+  '#FABEBE', // Pink
+  '#008080', // Olive
+  '#E6BEFF', // Lavender
+  '#9A6324', // Brown
+  '#FFFAC8', // Beige
+  '#800000', // Maroon
+  '#AFFC41', // Neon Green
+  '#808000', // Dark Yellow
+  '#FFD8B1', // Peach
+  '#000075', // Navy
+  '#A9A9A9', // Dark Gray
+  '#DC143C', // Crimson
+  '#00FA9A', // Medium Spring Green
+  '#4169E1', // Royal Blue
+  '#FF8C00', // Dark Orange
+  '#7B68EE', // Medium Slate Blue
+  '#FF1493', // Deep Pink
+  '#20B2AA', // Light Sea Green
+  '#9370DB', // Medium Purple
+  '#F08080'  // Light Coral
+];
+
+function getNextColor(index:number): string { 
+    return colors[index % colors.length];
 }
