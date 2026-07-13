@@ -16,6 +16,7 @@ type SnackbarCtx = {
 
 const Ctx = createContext<SnackbarCtx | null>(null);
 
+// Check if providers can be summerized
 export function SnackbarProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string>('');

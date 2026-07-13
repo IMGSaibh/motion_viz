@@ -65,6 +65,11 @@ poetry install
 
 ## Optional
 
+- Install packages:
+  - ESlint
+  - Prettier - Code Formatter
+  - Even Better TOML
+
 ### create workspace settings.json for prettier plugin (autoformat code)
 
 ```json
@@ -147,16 +152,29 @@ main.py
 │   └── ...                             ← UI shell for multiple widgets
 │
 ├── /containers
-│   └── widget_container_1.tsx          ← Central logic + manager + states
-│   └── widget_container_2.tsx          ← Central logic + manager + states
+│   └── container_widgetname_1.tsx      ← maintains local state + calls backend + passes data to presenter
+│   └── container_widgetname_2.tsx      ← maintains local state + calls backend + passes data to presenter
+│   └── container_widgetname_2.tsx      ← container also can uses contexts
 │   └── ...
 │
 ├── /context
-│   └── context_1.tsx                   ← context objects + dependencies to other modul
-│   └── context_2.tsx                   ← context objects + dependencies to other modul
+│   └── context_1.tsx                   ← Components must access the same data + state management
+│   └── context_2.tsx                   ← Components must access the same data + state management
 │   └── ...
 │
 ├── app.tsx                             ← contains all containers
 │
 └── main.tsx                            ← Root
 ```
+
+- Container
+  - maintains local state
+  - calls hooks or backend functions
+  - is familiar with the Three.js manager
+  - handles events
+  - passes data as props to presenter components
+  - This component controls this specific area of the interface
+  - It is therefore associated with a specific feature or UI area
+- Context
+  - This data and states should be available for multiple components in the
+    component tree.
