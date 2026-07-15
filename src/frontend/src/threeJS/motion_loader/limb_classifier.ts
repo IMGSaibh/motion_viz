@@ -1,109 +1,232 @@
-export enum BodyPart {
+export enum BodyArea {
     HEAD = "head",
     TORSO = "torso",
-    ARM_LEFT = "arm_l",
-    ARM_RIGHT = "arm_r",
-    LEG_LEFT = "leg_l",
-    LEG_RIGHT = "leg_r",
+    ARM = "arm",
+    LEG = "leg",
+    HAND = "hand",
     NONE = "none"
 }
 
-// Record of possible name values mapped to limbs
-const nameToLimbMap: Record<string, BodyPart> = {
+export enum BodyPart {
+    HEAD = "head",
+    TORSO = "torso",
+    ARM_L = "arm_left",
+    ARM_R = "arm_right",
+    LEG_L = "leg_left",
+    LEG_R = "leg_right",
+    HAND_L = "hand_left",
+    HAND_R = "hand_right",
+    NONE = "none"
+}
+
+// Record of possible name values mapped to body parts (no left/right)
+const nameToBodyAreaMap: Record<string, BodyArea> = {
     // Head
-    "head": BodyPart.HEAD,
-    "skull": BodyPart.HEAD,
-    "face": BodyPart.HEAD,
-    "jaw": BodyPart.HEAD,
-    "neck": BodyPart.HEAD,
+    "head": BodyArea.HEAD,
+    "skull": BodyArea.HEAD,
+    "face": BodyArea.HEAD,
+    "jaw": BodyArea.HEAD,
+    "neck": BodyArea.HEAD,
+    "cranium": BodyArea.HEAD,
+    "forehead": BodyArea.HEAD,
+    "chin": BodyArea.HEAD,
+    "ear": BodyArea.HEAD,
+    "eye": BodyArea.HEAD,
+    "nose": BodyArea.HEAD,
+    "mouth": BodyArea.HEAD,
+    "cheek": BodyArea.HEAD,
+    "temple": BodyArea.HEAD,
+    "occipital": BodyArea.HEAD,
+    "parietal": BodyArea.HEAD,
+    "frontal": BodyArea.HEAD,
+    "temporal": BodyArea.HEAD,
+    "mandible": BodyArea.HEAD,
+    "maxilla": BodyArea.HEAD,
+    "zygomatic": BodyArea.HEAD,
+    "hyoid": BodyArea.HEAD,
     
     // Torso
-    "hips": BodyPart.TORSO,
-    "hip": BodyPart.TORSO,
-    "chest": BodyPart.TORSO,
-    "spine": BodyPart.TORSO,
-    "pelvis": BodyPart.TORSO,
-    "torso": BodyPart.TORSO,
-    "waist": BodyPart.TORSO,
-    "belly": BodyPart.TORSO,
+    "hip": BodyArea.TORSO,
+    "chest": BodyArea.TORSO,
+    "spine": BodyArea.TORSO,
+    "pelvis": BodyArea.TORSO,
+    "torso": BodyArea.TORSO,
+    "waist": BodyArea.TORSO,
+    "belly": BodyArea.TORSO,
+    "abdomen": BodyArea.TORSO,
+    "back": BodyArea.TORSO,
+    "collar": BodyArea.TORSO,    // Base collar
+    "clavicle": BodyArea.TORSO,  // Base clavicle
+    "sternum": BodyArea.TORSO,
+    "rib": BodyArea.TORSO,
+    "thorax": BodyArea.TORSO,
+    "lumbar": BodyArea.TORSO,
+    "sacrum": BodyArea.TORSO,
+    "coccyx": BodyArea.TORSO,
+    "scapula": BodyArea.TORSO,
+    "shoulderblade": BodyArea.TORSO,
+    "breast": BodyArea.TORSO,
+    "pectoral": BodyArea.TORSO,
     
-    // Left arm
-    "leftarm": BodyPart.ARM_LEFT,
-    "leftupperarm": BodyPart.ARM_LEFT,
-    "leftlowerarm": BodyPart.ARM_LEFT,
-    "lefthand": BodyPart.ARM_LEFT,
-    "leftshoulder": BodyPart.ARM_LEFT,
-    "leftcollar": BodyPart.ARM_LEFT,
-    "leftelbow": BodyPart.ARM_LEFT,
-    "leftwrist": BodyPart.ARM_LEFT,
-    "left_arm": BodyPart.ARM_LEFT,
-    "left_upper_arm": BodyPart.ARM_LEFT,
-    "left_lower_arm": BodyPart.ARM_LEFT,
-    "left_hand": BodyPart.ARM_LEFT,
-    "left_shoulder": BodyPart.ARM_LEFT,
+    // Arm (base, no side)
+    "arm": BodyArea.ARM,
+    "upperarm": BodyArea.ARM,
+    "lowerarm": BodyArea.ARM,
+    "shoulder": BodyArea.ARM, 
+    "elbow": BodyArea.ARM,
+    "humerus": BodyArea.ARM,
+    "radius": BodyArea.ARM,
+    "ulna": BodyArea.ARM,
+    "forearm": BodyArea.ARM,
+    "bicep": BodyArea.ARM,
+    "tricep": BodyArea.ARM,
+    "brachium": BodyArea.ARM,
+    "antebrachium": BodyArea.ARM,
+    "cubital": BodyArea.ARM,
+    "carpal": BodyArea.ARM,
     
-    // Right arm
-    "rightarm": BodyPart.ARM_RIGHT,
-    "rightupperarm": BodyPart.ARM_RIGHT,
-    "rightlowerarm": BodyPart.ARM_RIGHT,
-    "righthand": BodyPart.ARM_RIGHT,
-    "rightshoulder": BodyPart.ARM_RIGHT,
-    "rightcollar": BodyPart.ARM_RIGHT,
-    "rightelbow": BodyPart.ARM_RIGHT,
-    "rightwrist": BodyPart.ARM_RIGHT,
-    "right_arm": BodyPart.ARM_RIGHT,
-    "right_upper_arm": BodyPart.ARM_RIGHT,
-    "right_lower_arm": BodyPart.ARM_RIGHT,
-    "right_hand": BodyPart.ARM_RIGHT,
-    "right_shoulder": BodyPart.ARM_RIGHT,
+    // Hand (specifically hands)
+    "hand": BodyArea.HAND,
+    "palm": BodyArea.HAND,
+    "finger": BodyArea.HAND,
+    "thumb": BodyArea.HAND,
+    "index": BodyArea.HAND,
+    "middle": BodyArea.HAND,
+    "ring": BodyArea.HAND,
+    "pinky": BodyArea.HAND,
+    "knuckle": BodyArea.HAND,
+    "metacarpal": BodyArea.HAND,
+    "phalanx": BodyArea.HAND,
+    "phalange": BodyArea.HAND,
+    "carpus": BodyArea.HAND,
+    "wrist": BodyArea.HAND,      // Override: wrist can be arm or hand
+    "fingertip": BodyArea.HAND,
+    "nail": BodyArea.HAND,
+    "digit": BodyArea.HAND,
     
-    // Left leg
-    "leftupleg": BodyPart.LEG_LEFT,
-    "leftlowleg": BodyPart.LEG_LEFT,
-    "leftfoot": BodyPart.LEG_LEFT,
-    "leftthigh": BodyPart.LEG_LEFT,
-    "leftcalf": BodyPart.LEG_LEFT,
-    "lefttoe": BodyPart.LEG_LEFT,
-    "leftankle": BodyPart.LEG_LEFT,
-    "lefthip": BodyPart.LEG_LEFT,
-    "left_up_leg": BodyPart.LEG_LEFT,
-    "left_low_leg": BodyPart.LEG_LEFT,
-    "left_foot": BodyPart.LEG_LEFT,
-    "left_thigh": BodyPart.LEG_LEFT,
+    // Leg (base, no side)
+    "leg": BodyArea.LEG,
+    "thigh": BodyArea.LEG,
+    "calf": BodyArea.LEG,
+    "knee": BodyArea.LEG,
+    "femur": BodyArea.LEG,
+    "tibia": BodyArea.LEG,
+    "fibula": BodyArea.LEG,
+    "patella": BodyArea.LEG,
+    "quadriceps": BodyArea.LEG,
+    "hamstring": BodyArea.LEG,
+    "glute": BodyArea.LEG,
+    "buttock": BodyArea.LEG,
+    "popliteal": BodyArea.LEG,
     
-    // Right leg
-    "rightupleg": BodyPart.LEG_RIGHT,
-    "rightlowleg": BodyPart.LEG_RIGHT,
-    "rightfoot": BodyPart.LEG_RIGHT,
-    "rightthigh": BodyPart.LEG_RIGHT,
-    "rightcalf": BodyPart.LEG_RIGHT,
-    "righttoe": BodyPart.LEG_RIGHT,
-    "rightankle": BodyPart.LEG_RIGHT,
-    "righthip": BodyPart.LEG_RIGHT,
-    "right_up_leg": BodyPart.LEG_RIGHT,
-    "right_low_leg": BodyPart.LEG_RIGHT,
-    "right_foot": BodyPart.LEG_RIGHT,
-    "right_thigh": BodyPart.LEG_RIGHT,
+    // Feet
+    "foot": BodyArea.LEG,
+    "toe": BodyArea.LEG,
+    "ankle": BodyArea.LEG,
+    "heel": BodyArea.LEG,
+    "arch": BodyArea.LEG,
+    "sole": BodyArea.LEG,
+    "instep": BodyArea.LEG,
+    "ball": BodyArea.LEG,
+    "metatarsal": BodyArea.LEG,
+    "tarsal": BodyArea.LEG,
+    "calcaneus": BodyArea.LEG,
+    "talus": BodyArea.LEG,
+    "navicular": BodyArea.LEG,
+    "cuboid": BodyArea.LEG,
+    "cuneiform": BodyArea.LEG,
 };
 
-/**
- * Map a joint name to its corresponding limb
- */
-export function mapNameToLimb(name: string): BodyPart {
-    if(!name) return BodyPart.NONE;
+const leftRightMap: Record<string, string> = {
+    "left": "left",
+    "l": "left",
+    "right": "right",
+    "r": "right",
+    "_r": "right",
+    "_l": "left",
+    "l_": "left",
+    "r_": "right"
+};
+
+//identified name is the part of the string that was identified as a body area, while fullName is the original string.
+//e.g. if the input string is "lefthand", the identified name would be "hand" and the full name would be "left hand".
+type identifiedPart = {
+    fullName: string;
+    identifiedName?: string;
+    area: BodyArea;
+};
+
+//This method returns an identified part object, because the mapNameToLimb function needs to know what part of 
+//the string is the body area and what part is the side (left/right).
+function classifyBodyPart(name: string): identifiedPart {
+    if(!name) return { fullName: '', area: BodyArea.NONE };
     const lowerName = name.toLowerCase().replace(/\s/g, '');
 
     // Check exact match first
-    if (nameToLimbMap[lowerName]) {
-        return nameToLimbMap[lowerName];
+    if (nameToBodyAreaMap[lowerName]) {
+        return { fullName: lowerName, area: nameToBodyAreaMap[lowerName] };
     }
     
     // Check partial matches
-    for (const [key, limb] of Object.entries(nameToLimbMap)) {
+    for (const [key, value] of Object.entries(nameToBodyAreaMap)) {
         if (lowerName.includes(key)) {
-            return limb;
+            return { fullName: lowerName, identifiedName: key, area: value };
         }
     }
     
+    return { fullName: '', area: BodyArea.NONE };
+}
+
+export function mapNameToLimb(name: string): BodyPart {
+    const identifiedPart = classifyBodyPart(name);
+    // console.log("fullName:", identifiedPart.fullName, "identifiedName:", identifiedPart.identifiedName, "area:", identifiedPart.area);
+    const remainingName = removeIdentifiedName(identifiedPart);
+    // console.log("remainingName after removing identifiedName:", remainingName);
+
+    switch (identifiedPart.area) {
+        case BodyArea.HEAD:
+            return BodyPart.HEAD;
+        case BodyArea.TORSO:
+            return BodyPart.TORSO;
+        case BodyArea.ARM:
+            for(const [key, value] of Object.entries(leftRightMap)) {
+                if (remainingName.includes(key)) {
+                    // console.log("remainingName:", remainingName, "fullName:", identifiedPart.fullName);
+                    return value === "left" ? BodyPart.ARM_L : BodyPart.ARM_R;
+                }
+            }
+            break;
+        case BodyArea.LEG:
+            for(const [key, value] of Object.entries(leftRightMap)) {
+                if (remainingName.includes(key)) {
+                    // console.log("remainingName:", remainingName, "fullName:", identifiedPart.fullName);
+                    return value === "left" ? BodyPart.LEG_L : BodyPart.LEG_R;
+                }
+            }
+            break;
+        //TODO: Change this to actually treat hands differently, for now there are only arms
+        case BodyArea.HAND:
+            for(const [key, value] of Object.entries(leftRightMap)) {
+                if (remainingName.includes(key)) {
+                    return value === "left" ? BodyPart.ARM_L : BodyPart.ARM_R;
+                }
+            }
+            break;
+        default:    
+            return BodyPart.NONE;
+    }
+
     return BodyPart.NONE;
+}
+
+function removeIdentifiedName(part: identifiedPart): string {
+    if (!part.identifiedName) return part.fullName;
+    
+    // Remove the identifiedName from fullName (case insensitive)
+    const remaining = part.fullName.replace(
+        new RegExp(part.identifiedName, 'i'), 
+        ''
+    );
+    
+    return remaining;
 }

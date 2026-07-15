@@ -74,10 +74,10 @@ export class ThreeJSEngine {
     this.thumbnail_renderer.setSize(260, 190, false);
 
     let skeletonMapper = new SkeletonMapper();
+    //A_test.json 23 joints
+    //L02_S01_R04_A17_N01_norm_data.json Xsens 22 joints
+    //POSE-adult009-punch_right-002_1.json 33 joints
     skeletonMapper.mapSkeletons('http://localhost:8000/data/json/L02_S01_R04_A17_N01_norm_data.json', 'http://localhost:8000/data/json/A_test.json', this.scene);
-    // let graphVisualizer = new GraphVisualizer();
-    // graphVisualizer.drawGraph(skeletonMapper.graphA, skeletonMapper.restposeA, this.scene);
-    // graphVisualizer.drawGraph(skeletonMapper.graphB, skeletonMapper.restposeB, this.scene);
 
   }
 

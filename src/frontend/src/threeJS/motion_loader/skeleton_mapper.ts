@@ -1,4 +1,4 @@
-import { BodyPart, mapNameToLimb } from "./limb_classifier"
+import { BodyArea, mapNameToLimb, BodyPart } from "./limb_classifier"
 import { getRestPose } from "@/hooks/hook_generate_animation_clip"
 import * as THREE from 'three';
 import { Text } from 'troika-three-text';
@@ -22,8 +22,8 @@ type TopologicalBranch = {
     end: SkeletonNode,
     path: SkeletonNode[],
     nodeCount: number,
-    bodyPart: BodyPart //defined in LimbClassifier
-    branchHeuristics: BranchHeuristics
+    bodyPart: BodyArea //defined in LimbClassifier
+    // branchHeuristics: BranchHeuristics
 }
 
 type GraphNode = {
@@ -31,14 +31,7 @@ type GraphNode = {
     neighbours: number[],
 }
 
-type BranchHeuristics = {
-    leg_l_weight: number,
-    leg_r_weight: number,
-    arm_l_weight: number,
-    arm_r_weight: number,
-    torso_weight: number,
-    head_weight: number
-}
+type BranchHeuristics = Map<BodyPart, number>; // Map of body part to heuristic score
 
 export class SkeletonMapper {
     skeletonA: Skeleton | null = null;
@@ -89,7 +82,7 @@ export class SkeletonMapper {
         this.collapseSkeleton(this.skeletonB);
         
         
-        this.getHeightHeuristic(this.skeletonB.topologicalBranches, this.restposeB);
+        // this.getHeightHeuristic(this.skeletonB.topologicalBranches, this.restposeB);
         // this.getNamingHeuristic(this.skeleton1.topologicalBranches);
         // console.log("Skeleton 1:", this.skeletonA);
         // console.log("Skeleton 2:", this.skeletonB);
@@ -168,17 +161,21 @@ export class SkeletonMapper {
         for (const branch of skeleton.topologicalBranches) {
             const startId = branch.start.id;
             const endId = branch.end.id;
-
+            const heuristics = new Map<BodyPart, number>();
+            this.getNamingHeuristic(branch, heuristics);
+            //if start ID is not in the graph, add it with end ID as neighbour
             if(!coveredIDs.has(startId)) {
                 graph.push({ id: startId, neighbours: [endId] });
                 coveredIDs.add(startId);
             }
+            //if start ID is already in the graph, add end ID as neighbour if not already present
             else {
                 const existingNode = graph.find(node => node.id === startId);
                 if (existingNode && !existingNode.neighbours.includes(endId)) {
                     existingNode.neighbours.push(endId);
                 }
             }
+            //same for end ID
             if(!coveredIDs.has(endId)) {
                 graph.push({ id: endId, neighbours: [startId] });
                 coveredIDs.add(endId);
@@ -252,15 +249,7 @@ export class SkeletonMapper {
                             end: current,
                             path: path,
                             nodeCount: path.length,
-                            bodyPart: BodyPart.NONE,
-                            branchHeuristics: {
-                                leg_l_weight: 0,
-                                leg_r_weight: 0,
-                                arm_l_weight: 0,
-                                arm_r_weight: 0,
-                                torso_weight: 0,
-                                head_weight: 0
-                            }
+                            bodyPart: BodyArea.NONE
                         });
                     }
                 }
@@ -390,24 +379,23 @@ export class SkeletonMapper {
         console.log(heightsList);
 
         //TODO: This is just for testing and visualization, replace this with more robust height heuristic
-        heightsList[heightsList.length - 1].branch.bodyPart = BodyPart.HEAD;
-        heightsList[0].branch.bodyPart = BodyPart.LEG_LEFT;
-        heightsList[1].branch.bodyPart = BodyPart.LEG_RIGHT;
-        heightsList[2].branch.bodyPart = BodyPart.TORSO;
-        heightsList[3].branch.bodyPart = BodyPart.ARM_LEFT;
-        heightsList[4].branch.bodyPart = BodyPart.ARM_RIGHT;
+        // heightsList[heightsList.length - 1].branch.bodyPart = BodyPart.HEAD;
+        // heightsList[0].branch.bodyPart = BodyPart.LEG_LEFT;
+        // heightsList[1].branch.bodyPart = BodyPart.LEG_RIGHT;
+        // heightsList[2].branch.bodyPart = BodyPart.TORSO;
+        // heightsList[3].branch.bodyPart = BodyPart.ARM_LEFT;
+        // heightsList[4].branch.bodyPart = BodyPart.ARM_RIGHT;
     }
-    private getNamingHeuristic(branches: TopologicalBranch[]): BodyPart {
-        for (const branch of branches) {
-            for (const node of branch.path) {
-                console.log(`Node name: ${node.name}, mapped body part: ${mapNameToLimb(node.name)}`);
-                const bodyPart = mapNameToLimb(node.name);
-                if (bodyPart !== BodyPart.NONE) {
-                    return bodyPart;
-                }
+
+    private getNamingHeuristic(branch: TopologicalBranch, heuristics: BranchHeuristics) {
+        for (const node of branch.path) {
+            // console.log(`Node name: ${node.name}, mapped body part: ${mapNameToLimb(node.name)}`);
+            const bodyPart = mapNameToLimb(node.name);
+            if (bodyPart !== BodyPart.NONE) {
+                heuristics.set(bodyPart, (heuristics.get(bodyPart) || 0) + 1);
             }
         }
-        return BodyPart.NONE;
+         console.log(`Branch from ${branch.start.name} to ${branch.end.name} has heuristics:`, heuristics);
     }
 
     private getAvgPathHeight(path: SkeletonNode[], restpose: number[][]): number {
