@@ -58,9 +58,7 @@ export function ContainerTopbar() {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     try {
-      const respond = await upload_files(files);
-      if (respond.message) success(`${respond.message} Files Uploaded`);
-      if (respond.warning) warning(`${respond.warning} not supported`);
+      await upload_files(files);
     } catch (err: any) {
       error(err?.message || 'Upload failed');
     } finally {

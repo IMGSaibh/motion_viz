@@ -1,17 +1,21 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
+import { MOTION_FILES_QUERY_KEY } from '@/hooks/hook_select_motion_files';
 
 const ENDPOINT = '/api_file_upload/upload';
 
 type FileUploadResponse = {
-  message: number | string; // backend: saved(int) oder ""
-  warning: string; // backend: ", ".join(not_saved_files) oder ""
+  message: number | string;
+  warning: string;
+  saved_files?: string[];
+  skipped_existing_files?: string[];
+  unsupported_files?: string[];
 };
 
 export function hook_file_upload() {
   const queryClient = useQueryClient();
-  const { success, error } = use_snackbar_ctx();
+  const { success, warning, error } = use_snackbar_ctx();
 
   const upload_files = useCallback(
     async (files: File[] | FileList) => {
@@ -19,13 +23,11 @@ export function hook_file_upload() {
 
       try {
         const form = new FormData();
-        // Backend erwartet: files: List[UploadFile] = File(...)
-        for (const f of fileArray) form.append('files', f);
+        for (const file of fileArray) form.append('files', file);
 
         const response = await fetch(ENDPOINT, {
           method: 'POST',
           body: form,
-          // Wichtig: keinen Content-Type setzen (boundary wird automatisch gesetzt)
         });
 
         if (!response.ok) {
@@ -37,48 +39,54 @@ export function hook_file_upload() {
         }
 
         const data = (await response.json()) as FileUploadResponse;
-
         const savedCount = typeof data.message === 'number' ? data.message : data.message ? Number(data.message) : 0;
+        const skippedExistingFiles = data.skipped_existing_files ?? [];
+        const unsupportedFiles = data.unsupported_files ?? [];
 
-        const notSavedFiles = data.warning
-          ? data.warning
-              .split(',')
-              .map((s) => s.trim())
-              .filter(Boolean)
-          : [];
-
-        // Cache Metadata (wie bei download/save)
         queryClient.setQueryData(['file_upload_metadata'], {
           date: new Date().toISOString(),
           uploadedCount: fileArray.length,
-          uploadedFiles: fileArray.map((f) => ({ name: f.name, size: f.size, type: f.type })),
+          uploadedFiles: fileArray.map((file) => ({ name: file.name, size: file.size, type: file.type })),
           savedCount,
-          notSavedFiles,
+          savedFiles: data.saved_files ?? [],
+          skippedExistingFiles,
+          unsupportedFiles,
           warning: data.warning ?? '',
         });
 
-        // Optional: falls ihr Listen cached, hier invalidieren:
-        // queryClient.invalidateQueries({ queryKey: ['motions'] });
-        // queryClient.invalidateQueries({ queryKey: ['files'] });
+        await queryClient.invalidateQueries({ queryKey: MOTION_FILES_QUERY_KEY });
 
-        if (notSavedFiles.length > 0) {
-          error(
+        const skippedNotes = [
+          skippedExistingFiles.length > 0 ? `already uploaded: ${skippedExistingFiles.join(', ')}` : '',
+          unsupportedFiles.length > 0 ? `not supported: ${unsupportedFiles.join(', ')}` : '',
+        ].filter(Boolean);
+
+        if (skippedNotes.length > 0) {
+          const message =
             savedCount > 0
-              ? `Upload teilweise erfolgreich (${savedCount}/${fileArray.length}). Nicht unterstützt: ${notSavedFiles.join(', ')}`
-              : `Upload fehlgeschlagen: Nicht unterstützte Dateien: ${notSavedFiles.join(', ')}`,
-          );
-        } else {
+              ? `Upload teilweise erfolgreich (${savedCount}/${fileArray.length}); skipped: ${skippedNotes.join('; ')}`
+              : `Upload skipped: ${skippedNotes.join('; ')}`;
+
+          if (unsupportedFiles.length > 0) {
+            error(message);
+          } else {
+            warning(message);
+          }
+        } else if (savedCount > 0) {
           success(`Upload erfolgreich: ${savedCount} Datei(en) gespeichert`);
+        } else {
+          warning('Keine Dateien hochgeladen.');
         }
 
         return data;
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
         console.error('File Upload Error:', err);
-        error(`Fehler beim Upload: ${err.message}`);
+        error(`Fehler beim Upload: ${message}`);
         throw err;
       }
     },
-    [queryClient, success, error],
+    [queryClient, success, warning, error],
   );
 
   return { upload_files };

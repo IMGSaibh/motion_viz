@@ -19,31 +19,39 @@ async def upload(files: List[UploadFile] = File(...)):
     for target in target_dirs.values():
         target.mkdir(parents=True, exist_ok=True)
 
-    not_saved_files = []
+    saved_files: list[str] = []
+    unsupported_files: list[str] = []
+    skipped_existing_files: list[str] = []
 
     for file in files:
-        ext = Path(str(file.filename)).suffix.lower()
+        filename = str(file.filename)
+        ext = Path(filename).suffix.lower()
         target_dir = target_dirs.get(ext)
 
         if not target_dir:
-            # file type not supported
-            not_saved_files.append(file.filename)
+            unsupported_files.append(filename)
             continue
 
-        # rename file if it already exists
-        target_path = Path.joinpath(target_dir, str(file.filename))
-        counter = 1
-        while target_path.exists():
-            target_path = target_dir / f"{target_path.stem}_{counter}{target_path.suffix}"
-            counter += 1
+        target_path = target_dir / filename
+        if target_path.exists():
+            skipped_existing_files.append(filename)
+            continue
 
-        # save file to target directory
         contents = await file.read()
         with open(target_path, "wb") as f:
             f.write(contents)
+        saved_files.append(filename)
 
-    saved = len(files) - len(not_saved_files)
+    warnings = []
+    if skipped_existing_files:
+        warnings.append(f"Already uploaded, skipped: {', '.join(skipped_existing_files)}")
+    if unsupported_files:
+        warnings.append(f"Unsupported file type, skipped: {', '.join(unsupported_files)}")
+
     return {
-        "message": saved or "",
-        "warning": ", ".join(not_saved_files)  or ""
+        "message": len(saved_files) or "",
+        "warning": "; ".join(warnings),
+        "saved_files": saved_files,
+        "skipped_existing_files": skipped_existing_files,
+        "unsupported_files": unsupported_files,
     }
