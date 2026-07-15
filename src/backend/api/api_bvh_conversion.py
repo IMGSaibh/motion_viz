@@ -1,8 +1,15 @@
 from pathlib import Path
+from typing import TypedDict
 from fastapi import APIRouter
 from backend.motion_parser.bvh_parser import BvhParser 
 
 router = APIRouter()
+
+
+class BvhConversionError(TypedDict):
+    file: str
+    error_type: str
+    message: str
 
 
 @router.post("/convert_bvh_to_npy")
@@ -20,7 +27,7 @@ async def convert_bvh_to_npy():
             "message": "",
             "warning": "No [.bvh] files found.",
         }
-    errors = []
+    errors: list[BvhConversionError] = []
     for bvh_file in bvh_files:
         try:
             print(f"processing {bvh_file}")
@@ -33,16 +40,15 @@ async def convert_bvh_to_npy():
             bvh_parser.export_skeleton_converted(save_json_skeleton_path)
             bvh_parser.scale_data(save_json_skeleton_path)
 
-        # TODO: throw Snackbar error with details in frontend
         except Exception as e:
             errors.append({
                 "file": bvh_file.name,
-                # "error_type": type(e).__name__,
-                # "message": str(e),
+                "error_type": type(e).__name__,
+                "message": str(e),
             })
 
     return {
         "message": "[.bvh] files converted",
         "warning": "",
-        "errors": f"{errors}",
+        "errors": errors,
     }

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 const ENDPOINT = '/api_list_files/list_files';
+export const MOTION_FILES_QUERY_KEY = ['motion_files'] as const;
 
 export type MotionFileItem = {
   type: 'bvh' | 'fbx' | 'npy';
@@ -15,7 +16,7 @@ type MotionFilesResponse = {
 
 export function hook_list_motion_files() {
   return useQuery({
-    queryKey: ['motion_files'],
+    queryKey: MOTION_FILES_QUERY_KEY,
     queryFn: async (): Promise<MotionFileItem[]> => {
       const response = await fetch(ENDPOINT, { method: 'GET' });
 

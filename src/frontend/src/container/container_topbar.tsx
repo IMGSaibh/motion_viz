@@ -102,6 +102,13 @@ export function ContainerTopbar() {
     clear_slider_label_list();
   }
 
+  async function handle_motion_file_list_on_open() {
+    const result = await motion_files.refetch();
+    if (result.error) {
+      error(result.error instanceof Error ? result.error.message : 'Could not refresh file list');
+    }
+  }
+
   async function handle_motion_file_list_on_change(e: SelectChangeEvent<string>) {
     const filename = e.target.value;
 
@@ -134,7 +141,7 @@ export function ContainerTopbar() {
   async function handle_convert_motion_file() {
     try {
       const respond = await convert_bvh_to_npy();
-      if (respond.message) success(respond.message);
+      if (respond.message && !respond.errors?.length) success(respond.message);
       if (respond.warning) warning(`${respond.warning}`);
     } catch (e: any) {
       error(e?.message || 'Conversion failed');
@@ -155,6 +162,7 @@ export function ContainerTopbar() {
         motion_files={motion_files.data ?? []}
         motion_file_selected={motion_file_selected}
         motion_file_list_on_change={handle_motion_file_list_on_change}
+        motion_file_list_on_open={handle_motion_file_list_on_open}
       />
     </>
   );

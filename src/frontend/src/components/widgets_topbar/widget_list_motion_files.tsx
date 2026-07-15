@@ -8,6 +8,7 @@ type Props = {
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
+  motion_file_list_on_open: () => void;
 };
 
 export function WidgetListFiles(props: Props) {
@@ -18,6 +19,7 @@ export function WidgetListFiles(props: Props) {
         value={props.motion_file_selected || ''}
         label={props.motion_file_selected}
         onChange={props.motion_file_list_on_change}
+        onOpen={props.motion_file_list_on_open}
       >
         <MenuItem value="">
           <em>Select file</em>

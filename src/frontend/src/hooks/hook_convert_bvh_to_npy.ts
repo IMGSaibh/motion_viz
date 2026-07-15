@@ -1,14 +1,25 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
+import { MOTION_FILES_QUERY_KEY } from '@/hooks/hook_select_motion_files';
 
 const ENDPOINT = '/api_bvh_conversion/convert_bvh_to_npy';
+
+type BvhConversionError = {
+  file: string;
+  error_type: string;
+  message: string;
+};
 
 type BvhConversionResponse = {
   message: string;
   warning: string;
-  errors?: string; // backend liefert aktuell einen String (z.B. "[{'file': 'x.bvh'}]")
+  errors?: BvhConversionError[];
 };
+
+function format_conversion_errors(errors: BvhConversionError[]) {
+  return errors.map((item) => `${item.file}: ${item.error_type} - ${item.message}`).join('\n');
+}
 
 export function hook_bvh_conversion() {
   const queryClient = useQueryClient();
@@ -27,30 +38,28 @@ export function hook_bvh_conversion() {
 
       const data = (await response.json()) as BvhConversionResponse;
 
-      // Metadata ähnlich wie beim Download-Hook
       queryClient.setQueryData(['bvh_conversion_metadata'], {
         date: new Date().toISOString(),
         message: data.message,
         warning: data.warning,
-        errors: data.errors ?? '',
+        errors: data.errors ?? [],
       });
 
-      // Optional: falls ihr irgendwo Motion/Files/Assets cached, kann man hier invalidieren:
-      // queryClient.invalidateQueries({ queryKey: ['motions'] });
-      // queryClient.invalidateQueries({ queryKey: ['npy_files'] });
+      await queryClient.invalidateQueries({ queryKey: MOTION_FILES_QUERY_KEY });
 
       if (data.warning) {
         error(`Konvertierung abgeschlossen, aber Hinweis: ${data.warning}`);
-      } else if (data.errors && data.errors !== '[]') {
-        error(`Konvertierung abgeschlossen, aber mit Fehlern: ${data.errors}`);
+      } else if (data.errors?.length) {
+        error(`Konvertierung abgeschlossen, aber mit Fehlern:\n${format_conversion_errors(data.errors)}`, 10000);
       } else {
-        success(data.message || 'BVH → NPY Konvertierung abgeschlossen');
+        success(data.message || 'BVH -> NPY Konvertierung abgeschlossen');
       }
 
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('BVH Conversion Error:', err);
-      error(`Fehler bei BVH→NPY Konvertierung: ${err.message}`);
+      error(`Fehler bei BVH->NPY Konvertierung: ${message}`);
       throw err;
     }
   }, [queryClient, success, error]);
