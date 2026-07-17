@@ -129,17 +129,17 @@ main.py
 /src
 │
 |── /api
-|   |── api_response.ts                 <- shared HTTP response handling and validation
-|   |── motion_api.ts                   <- motion-related FastAPI requests
-|   └── labels_api.ts                   <- label-related FastAPI requests
+|   |── api_response.ts                 ← shared HTTP response handling and validation
+|   |── motion_api.ts                   ← motion-related FastAPI requests
+|   └── labels_api.ts                   ← label-related FastAPI requests
 |
 |── /hooks
-|   |── use_bvh_conversion.ts           <- React Query mutation orchestration
-|   |── use_motion_files.ts             <- React Query motion-file query
-|   └── use_*.ts                        <- feature-specific React Query hooks
+|   |── use_bvh_conversion.ts           ← React Query mutation orchestration
+|   |── use_motion_files.ts             ← React Query motion-file query
+|   └── use_*.ts                        ← feature-specific React Query hooks
 |
 |── /utils
-|   └── api_url.ts                      <- API base URL construction
+|   └── api_url.ts                      ← API base URL construction
 |
 │
 ├── /threeJS                            ← 3D webgl engine
