@@ -13,6 +13,7 @@ type Props = {
   motion_config_is_open: boolean;
   motion_config_on_click: () => void; // Toggle open/close
   motion_config_create_on_click: () => void; // Create descriptor
+  is_pending: boolean;
 };
 
 export function WidgetMotionDescriptorBar(props: Props) {
@@ -151,7 +152,7 @@ export function WidgetMotionDescriptorBar(props: Props) {
         <DialogActions>
           <Stack direction="row" spacing={1}>
             <Button onClick={props.motion_config_on_click}>Close</Button>
-            <Button onClick={props.motion_config_create_on_click} variant="outlined">
+            <Button onClick={props.motion_config_create_on_click} variant="outlined" disabled={props.is_pending}>
               Create descriptor Json
             </Button>
           </Stack>

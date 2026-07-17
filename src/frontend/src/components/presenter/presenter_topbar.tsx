@@ -8,14 +8,18 @@ import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 type Props = {
   file_dialog_reference: React.RefObject<HTMLInputElement | null>;
   file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  file_upload_is_pending: boolean;
 
   motion_config_reference: { [key: string]: React.RefObject<HTMLInputElement | null> };
   motion_config_is_open: boolean;
   motion_config_on_click: () => void;
   motion_config_create_on_click: () => void;
+  motion_descriptor_is_pending: boolean;
 
   convert_pv_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
   convert_bvh_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  bvh_conversion_is_pending: boolean;
+  pose_viewer_conversion_is_pending: boolean;
 
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
@@ -38,12 +42,15 @@ export function PresenterTopbar(props: Props) {
                     {...{
                       file_dialog_reference: props.file_dialog_reference,
                       file_dialog_on_change: props.file_dialog_on_change,
+                      is_pending: props.file_upload_is_pending,
                     }}
                   />
                   <WidgetConvertMotionFile
                     {...{
                       convert_pv_files_on_click: props.convert_pv_files_on_click,
                       convert_bvh_files_on_click: props.convert_bvh_files_on_click,
+                      bvh_conversion_is_pending: props.bvh_conversion_is_pending,
+                      pose_viewer_conversion_is_pending: props.pose_viewer_conversion_is_pending,
                     }}
                   />
                   <WidgetMotionDescriptorBar
@@ -52,6 +59,7 @@ export function PresenterTopbar(props: Props) {
                       motion_config_is_open: props.motion_config_is_open,
                       motion_config_on_click: props.motion_config_on_click,
                       motion_config_create_on_click: props.motion_config_create_on_click,
+                      is_pending: props.motion_descriptor_is_pending,
                     }}
                   />
                 </Box>

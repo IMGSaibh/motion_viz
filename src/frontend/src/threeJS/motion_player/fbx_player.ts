@@ -75,7 +75,7 @@ export class FBX_Player {
 
   pause() {
     this.is_playing = false;
-    this.fbx_loader_object.mixer!.setTime(0);
+    // this.fbx_loader_object.mixer!.setTime(0);
   }
 
   go_to_frame(frame_index: number) {

@@ -12,7 +12,7 @@ import { createCamera } from '@/threeJS/components/camera';
 import { createRenderer } from '@/threeJS/system/renderer';
 import { createOrbitControls } from '@/threeJS/components/orbitcontrol';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { api_get_base_url } from '@/hooks/hook_endpoints';
+import { api_get_base_url } from '@/utils/api_url';
 import Utils from '@/threeJS/utils';
 
 export class ThreeJSEngine {

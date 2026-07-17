@@ -13,6 +13,8 @@ type Props = {
   delete_label_list_on_click?: () => void;
   save_label_list_on_click?: () => void;
   download_labels_on_click?: () => void;
+  save_is_pending: boolean;
+  download_is_pending: boolean;
 };
 
 export function PresenterLabelList(props: Props) {
@@ -43,7 +45,7 @@ export function PresenterLabelList(props: Props) {
             <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Clear Label-List
           </Button>
-          <Button onClick={() => props.save_label_list_on_click?.()} sx={{ width: '100%' }}>
+          <Button onClick={() => props.save_label_list_on_click?.()} disabled={props.save_is_pending} sx={{ width: '100%' }}>
             <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Save Label-List
           </Button>
@@ -51,6 +53,7 @@ export function PresenterLabelList(props: Props) {
             onClick={() => {
               props.download_labels_on_click?.();
             }}
+            disabled={props.download_is_pending}
             sx={{ width: '100%' }}
           >
             <GetAppIcon fontSize="small" sx={{ mr: '0.5rem' }} />

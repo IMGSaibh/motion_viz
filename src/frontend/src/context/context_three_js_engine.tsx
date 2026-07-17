@@ -77,12 +77,19 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
   );
+
   const play_pause = useCallback(() => {
     threejs_mngr_ref.current?.play_pause?.();
     sync_is_playing();
   }, [sync_is_playing]);
 
-  const go_to_frame = useCallback((idx: number) => threejs_mngr_ref.current?.go_to_frame?.(idx), []);
+  const go_to_frame = useCallback(
+    (idx: number) => {
+      threejs_mngr_ref.current?.go_to_frame?.(idx);
+      set_current_frame(idx);
+    },
+    [set_current_frame],
+  );
 
   const stop = useCallback(() => {
     threejs_mngr_ref.current?.pause?.();

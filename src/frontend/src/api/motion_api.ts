@@ -1,0 +1,127 @@
+import { api_get_base_url } from '@/utils/api_url';
+import {
+  assert_response_ok,
+  parse_record,
+  read_optional_string_array,
+  read_string,
+  read_string_array,
+} from '@/api/api_response';
+
+export type MotionDescriptorData = {
+  format: string;
+  abbrev: string;
+  scale: number;
+  positions: string;
+  rotations: string;
+  systemname: string;
+  fps: number;
+  jointcount: number;
+  coloffset: number;
+  colgap: number;
+  dimsize: number;
+};
+
+export type MotionFileItem = {
+  type: 'bvh' | 'fbx' | 'npy';
+  name: string;
+};
+
+export type BvhConversionError = {
+  file: string;
+  error_type: string;
+  message: string;
+};
+
+export type BvhConversionResponse = {
+  message: string;
+  warning: string;
+  errors: BvhConversionError[];
+};
+
+export type MessageResponse = {
+  message: string;
+  warning: string;
+};
+
+export type FileUploadResponse = MessageResponse & {
+  saved_count: number;
+  saved_files: string[];
+  skipped_existing_files: string[];
+  unsupported_files: string[];
+};
+
+const ENDPOINTS = {
+  bvhConversion: '/api_bvh_conversion/convert_bvh_to_npy',
+  poseViewerConversion: '/api_pose_viewer_conversion/convert_pv_style',
+  motionDescriptor: '/api_motion_descriptor/motion_descriptor',
+  fileUpload: '/api_file_upload/upload',
+  motionFiles: '/api_list_files/list_files',
+} as const;
+
+function parse_message_response(value: unknown, responseName: string): MessageResponse {
+  const record = parse_record(value, responseName);
+  return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };
+}
+
+export async function convert_bvh_to_npy(): Promise<BvhConversionResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.bvhConversion), { method: 'POST' });
+  await assert_response_ok(response, 'BVH conversion');
+  const record = parse_record(await response.json(), 'BVH conversion');
+  const rawErrors = record.errors ?? [];
+  if (!Array.isArray(rawErrors)) throw new Error('Invalid response field: errors');
+  const errors = rawErrors.map((value) => {
+    const error = parse_record(value, 'BVH conversion error');
+    return {
+      file: read_string(error, 'file'),
+      error_type: read_string(error, 'error_type'),
+      message: read_string(error, 'message'),
+    };
+  });
+  return { ...parse_message_response(record, 'BVH conversion'), errors };
+}
+
+export async function convert_pose_viewer_files(): Promise<MessageResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.poseViewerConversion), { method: 'POST' });
+  await assert_response_ok(response, 'Pose Viewer conversion');
+  return parse_message_response(await response.json(), 'Pose Viewer conversion');
+}
+
+export async function create_motion_descriptor(config: MotionDescriptorData): Promise<MessageResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.motionDescriptor), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config),
+  });
+  await assert_response_ok(response, 'Motion descriptor creation');
+  return parse_message_response(await response.json(), 'Motion descriptor creation');
+}
+
+export async function upload_motion_files(files: File[]): Promise<FileUploadResponse> {
+  const form = new FormData();
+  files.forEach((file) => form.append('files', file));
+  const response = await fetch(api_get_base_url(ENDPOINTS.fileUpload), { method: 'POST', body: form });
+  await assert_response_ok(response, 'Upload');
+  const record = parse_record(await response.json(), 'upload');
+  const rawMessage = record.message;
+  const savedCount = typeof rawMessage === 'number' ? rawMessage : Number(rawMessage || 0);
+  if (!Number.isFinite(savedCount)) throw new Error('Invalid response field: message');
+  return {
+    message: String(rawMessage ?? ''),
+    warning: read_string(record, 'warning'),
+    saved_count: savedCount,
+    saved_files: read_optional_string_array(record, 'saved_files'),
+    skipped_existing_files: read_optional_string_array(record, 'skipped_existing_files'),
+    unsupported_files: read_optional_string_array(record, 'unsupported_files'),
+  };
+}
+
+export async function list_motion_files(signal?: AbortSignal): Promise<MotionFileItem[]> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.motionFiles), { method: 'GET', signal });
+  await assert_response_ok(response, 'List motion files');
+  const record = parse_record(await response.json(), 'motion files');
+  return [
+    ...read_string_array(record, 'bvh').map((name) => ({ type: 'bvh' as const, name })),
+    ...read_string_array(record, 'fbx').map((name) => ({ type: 'fbx' as const, name })),
+    ...read_string_array(record, 'npy').map((name) => ({ type: 'npy' as const, name })),
+  ];
+}
