@@ -128,10 +128,19 @@ main.py
 ```bash
 /src
 │
-├── /hooks
-│   ├── hook_1.ts                       ← communication with FastAPI backend
-│   ├── hook_1.ts                       ← communication with FastAPI backend
-│   ├── ...                             ← communication with FastAPI backend
+|── /api
+|   |── api_response.ts                 <- shared HTTP response handling and validation
+|   |── motion_api.ts                   <- motion-related FastAPI requests
+|   └── labels_api.ts                   <- label-related FastAPI requests
+|
+|── /hooks
+|   |── use_bvh_conversion.ts           <- React Query mutation orchestration
+|   |── use_motion_files.ts             <- React Query motion-file query
+|   └── use_*.ts                        <- feature-specific React Query hooks
+|
+|── /utils
+|   └── api_url.ts                      <- API base URL construction
+|
 │
 ├── /threeJS                            ← 3D webgl engine
 │   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
