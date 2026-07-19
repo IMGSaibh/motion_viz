@@ -23,12 +23,13 @@ type TopologicalBranch = {
     path: SkeletonNode[],
     nodeCount: number,
     bodyPart: BodyArea //defined in LimbClassifier
-    // branchHeuristics: BranchHeuristics
+    branchHeuristics: BranchHeuristics
 }
 
 type GraphNode = {
     id: number,
     neighbours: number[],
+    bodyPart: BodyPart
 }
 
 type BranchHeuristics = Map<BodyPart, number>; // Map of body part to heuristic score
@@ -58,7 +59,7 @@ export class SkeletonMapper {
 
         // let skeleton1_npy_url = skeleton1_json_url.replace('.json', '.npy').replace('/json/', '/npy/');
 
-        // console.log(skeleton1_npy_url);
+        //TODO: Make sure that the skeleton1 is always the one with less nodes. Otherwise there will possibly be 0 matches fouund
         const filename = skeleton1_json_url.split('/').pop() || '';
         const npyFilename = filename.replace('.json', '.npy');
         const npyUrl = `data/npy/${npyFilename}`;
@@ -93,20 +94,27 @@ export class SkeletonMapper {
         const matches: Map<number, number>[] = [];
         this.matchGraphs(graphA, graphB, new Map(), matches);
 
-        console.log(`Found ${matches.length} possible matches`);
-        if (matches.length > 0) {
-            console.log("First match:", Array.from(matches[0].entries()));
-        }
+        const sortedMatches = matches.sort((a, b) => {
+            const scoreA = this.evaluateMatch(graphA, graphB, a);
+            const scoreB = this.evaluateMatch(graphA, graphB, b);
+            return scoreB - scoreA;  // Descending order (best first)
+            });
+        console.log("First match:", Array.from(sortedMatches[0].entries()), "Score: ", this.evaluateMatch(graphA, graphB, sortedMatches[0]));
+        
+
         let matchColors: Map<number, string> = new Map();
         let cI = 0;
-        if(matches.length !== 0) {
-            for(const m of matches[0].entries()) {  
+        if(sortedMatches.length !== 0) {
+            for(const m of sortedMatches[0].entries()) {  
                 const color: string = getNextColor(cI++);
                 matchColors.set(m[0], color);
                 matchColors.set(m[1], color);
                 console.log(`Match: ${m[0]} -> ${m[1]}, Color: ${color}`);
             }
         }
+
+        this.evaluateGraph(graphA, this.skeletonA);
+        this.evaluateGraph(graphB, this.skeletonB);
 
 
         this.graphVisualizer?.drawGraph(graphA, this.restposeA, -50, matchColors, scene);
@@ -131,7 +139,8 @@ export class SkeletonMapper {
         }
         
         // Build parent-child relationships
-        for (const [id, node] of nodeMap) {
+        for (const node of nodeMap.values()) {
+            //In some .json files, the root node has the same pid as id, which is why we have to check for that
             if (node.pid !== node.id && nodeMap.has(node.pid)) {
                 const parent = nodeMap.get(node.pid)!;
                 node.parent = parent;
@@ -161,11 +170,9 @@ export class SkeletonMapper {
         for (const branch of skeleton.topologicalBranches) {
             const startId = branch.start.id;
             const endId = branch.end.id;
-            const heuristics = new Map<BodyPart, number>();
-            this.getNamingHeuristic(branch, heuristics);
             //if start ID is not in the graph, add it with end ID as neighbour
             if(!coveredIDs.has(startId)) {
-                graph.push({ id: startId, neighbours: [endId] });
+                graph.push({ id: startId, neighbours: [endId], bodyPart: BodyPart.NONE });
                 coveredIDs.add(startId);
             }
             //if start ID is already in the graph, add end ID as neighbour if not already present
@@ -177,7 +184,7 @@ export class SkeletonMapper {
             }
             //same for end ID
             if(!coveredIDs.has(endId)) {
-                graph.push({ id: endId, neighbours: [startId] });
+                graph.push({ id: endId, neighbours: [startId], bodyPart: BodyPart.NONE });
                 coveredIDs.add(endId);
             }
             else {
@@ -200,15 +207,15 @@ export class SkeletonMapper {
         }
         
         // Find special nodes: root, leaves (valence 1), branches (valence > 2)
-        const specialNodes = skeleton.nodes.filter(node => {
-            const valence = (node as any).valence;
-            return node === skeleton.root || valence === 1 || valence > 2;
-        });
+        const leafNodes = skeleton.nodes.filter(node => (node as any).valence === 1);
+        const branchNodes = skeleton.nodes.filter(node => (node as any).valence > 2 || node === skeleton.root);
+        const specialNodes = [...leafNodes, ...branchNodes];
         
         const collapsedEdges: TopologicalBranch[] = [];
         
-        // For each special node, explore paths to other special nodes
-        for (const startNode of specialNodes) {
+        // For each branch node, we explore outwards to the next special node.
+        //This means that leaf nodes are always the end of a branch (and not a start node), which makes processing later easier
+        for (const startNode of branchNodes) {
             const neighbors = [...startNode.children];
             if (startNode.parent) {
                 neighbors.push(startNode.parent);
@@ -218,8 +225,8 @@ export class SkeletonMapper {
                 if (!neighbor) continue;
                 
                 const path: SkeletonNode[] = [startNode];
-                let current: SkeletonNode | null = neighbor;  // Allow null
-                let previous: SkeletonNode | null = startNode;  // Allow null
+                let current: SkeletonNode | null = neighbor; 
+                let previous: SkeletonNode | null = startNode;
                 
                 // Follow the path until we hit another special node
                 while (current && !specialNodes.includes(current)) {
@@ -238,19 +245,25 @@ export class SkeletonMapper {
                 if (current && specialNodes.includes(current) && current !== startNode) {
                     path.push(current);
                     
+                    //TODO: maybe just compare IDs here?
                     const isDuplicate = collapsedEdges.some(b => 
                         (b.start === startNode && b.end === current) ||
                         (b.start === current && b.end === startNode)
                     );
                     
                     if (!isDuplicate) {
-                        collapsedEdges.push({
+                        let collapsedEdge: TopologicalBranch = {
                             start: startNode,
                             end: current,
                             path: path,
                             nodeCount: path.length,
-                            bodyPart: BodyArea.NONE
-                        });
+                            bodyPart: BodyArea.NONE,
+                            branchHeuristics: new Map<BodyPart, number>()
+                            }
+                        //This fills the branchHeuristics object of this edge with the heuristic weightings for what body part it is
+                        this.getNamingHeuristic(collapsedEdge, collapsedEdge.branchHeuristics);
+                        // console.log("Collapsed edge goes from ", startNode.id, " to ", collapsedEdge.end.id)
+                        collapsedEdges.push(collapsedEdge);
                     }
                 }
             }
@@ -323,36 +336,87 @@ export class SkeletonMapper {
         return true;
     }
 
-    private evaluate(
+    //This takes in a match, meaning a possible matching between graph A and graph B
+    //It evaluates this match based on graph properties and naming and geometric heuristics, assigning it a score
+    //This score can then be used to compare different matches and find the best one
+    private evaluateMatch(
         graphA: GraphNode[],
         graphB: GraphNode[],
         match: Map<number, number>,
-        formerNodesA: Map<number, SkeletonNode[]>,  // node ID -> list of former nodes
-        formerNodesB: Map<number, SkeletonNode[]>   // node ID -> list of former nodes
+        // formerNodesA: Map<number, SkeletonNode[]>,  // node ID -> list of former nodes
+        // formerNodesB: Map<number, SkeletonNode[]>   // node ID -> list of former nodes
         ): number {
-            let error = 0;
-            
-            for (const nodeA of graphA) {
-                if (!match.has(nodeA.id)) {
-                    // Penalty for unmatched node: number of nodes in its collapsed path
-                    error += formerNodesA.get(nodeA.id)?.length || 0;
+            let score = 0;
+
+            // let nodeBId = match.get(nodeA.id)!;
+
+            // if (!match.has(nodeA.id)) {
+            //     // Penalty for unmatched node: number of nodes in its collapsed path
+            //     error += formerNodesA.get(nodeA.id)?.length || 0;
+            // } else {
+            //     const nodeB = graphB.find(n => n.id === nodeBId);
+            //     if (!nodeB) {
+            //         error += 100; // Big penalty for invalid match
+            //         continue;
+            //     }
+                
+            //     // Penalty for path length mismatch
+            //     const lenA = formerNodesA.get(nodeA.id)?.length || 0;
+            //     const lenB = formerNodesB.get(nodeB.id)?.length || 0;
+            //     error += Math.abs(lenB - lenA);
+            // }
+
+            for(const [aID, bID] of match) {
+                // Find nodes by ID, not by array index
+                const nodeA = graphA.find(n => n.id === aID);
+                const nodeB = graphB.find(n => n.id === bID);
+                
+                if (!nodeA || !nodeB) {
+                    score -= 10; // Big penalty for invalid match
+                    continue;
+                }
+                
+                if(nodeA.bodyPart === nodeB.bodyPart) {
+                    score++;
                 } else {
-                    const nodeBId = match.get(nodeA.id)!;
-                    const nodeB = graphB.find(n => n.id === nodeBId);
-                    if (!nodeB) {
-                        error += 100; // Big penalty for invalid match
-                        continue;
-                    }
-                    
-                    // Penalty for path length mismatch
-                    const lenA = formerNodesA.get(nodeA.id)?.length || 0;
-                    const lenB = formerNodesB.get(nodeB.id)?.length || 0;
-                    error += Math.abs(lenB - lenA);
+                    score -= 5;
                 }
             }
             
-            return error;
+            return score;
         }
+
+    //This assigns the 
+    private evaluateGraph(graph: GraphNode[], skeleton: Skeleton) {
+            for (const node of graph) {
+
+                // Get the highest value from the naming heuristics stored in the branches that include this node
+                const branchesA = skeleton.topologicalBranches.filter(branch => branch.start.id === node.id || branch.end.id === node.id) || [];
+                let estimatedBodyPart: BodyPart | null = null;
+                let heuristics: BranchHeuristics = new Map<BodyPart, number>();
+                branchesA.forEach(branch => {
+                    for (const [key, value] of branch.branchHeuristics.entries()) {
+                        heuristics.set(key, heuristics.get(key) || 0 + value);
+                        }
+                    })
+                
+                //leaf nodes cannot be the torso
+                if(node.neighbours.length === 1) {
+                    if(heuristics.get(BodyPart.TORSO)) {
+                        heuristics.delete(BodyPart.TORSO);
+                    }
+                }
+                console.log("Heuristics for nodeA:", node.id, heuristics);
+                let maxValue = 0;
+                heuristics.forEach((value, key) => {
+                    if (value > maxValue) {
+                        maxValue = value;
+                        estimatedBodyPart = key;
+                    }
+                })
+                console.log("Estimated body part for nodeA:", node.id, estimatedBodyPart);
+            }
+    }
 
     // HEURISTICS
     //************************************************************************************************************** */
@@ -375,8 +439,8 @@ export class SkeletonMapper {
         }
 
         // Sort branches by average height
-        heightsList.sort((a, b) => a.avgHeight - b.avgHeight);
-        console.log(heightsList);
+        // heightsList.sort((a, b) => a.avgHeight - b.avgHeight);
+        // console.log(heightsList);
 
         //TODO: This is just for testing and visualization, replace this with more robust height heuristic
         // heightsList[heightsList.length - 1].branch.bodyPart = BodyPart.HEAD;
@@ -388,14 +452,20 @@ export class SkeletonMapper {
     }
 
     private getNamingHeuristic(branch: TopologicalBranch, heuristics: BranchHeuristics) {
+        let identifiedNodes: number = 0;
         for (const node of branch.path) {
             // console.log(`Node name: ${node.name}, mapped body part: ${mapNameToLimb(node.name)}`);
             const bodyPart = mapNameToLimb(node.name);
+            
             if (bodyPart !== BodyPart.NONE) {
                 heuristics.set(bodyPart, (heuristics.get(bodyPart) || 0) + 1);
+                identifiedNodes++;
             }
         }
-         console.log(`Branch from ${branch.start.name} to ${branch.end.name} has heuristics:`, heuristics);
+        for (const [bodyPart, count] of heuristics.entries()) {
+            heuristics.set(bodyPart, count / identifiedNodes); // Normalize by the number of identified nodes
+        }
+        // console.log(`Branch from ${branch.start.name} to ${branch.end.name} has heuristics:`, heuristics);
     }
 
     private getAvgPathHeight(path: SkeletonNode[], restpose: number[][]): number {

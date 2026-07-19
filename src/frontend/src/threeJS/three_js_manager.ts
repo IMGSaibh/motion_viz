@@ -75,9 +75,10 @@ export class ThreeJSEngine {
 
     let skeletonMapper = new SkeletonMapper();
     //A_test.json 23 joints
+    //bhand_push.json 23 joints This is incorrectly labeled!!!
     //L02_S01_R04_A17_N01_norm_data.json Xsens 22 joints
     //POSE-adult009-punch_right-002_1.json 33 joints
-    skeletonMapper.mapSkeletons('http://localhost:8000/data/json/L02_S01_R04_A17_N01_norm_data.json', 'http://localhost:8000/data/json/A_test.json', this.scene);
+    skeletonMapper.mapSkeletons('http://localhost:8000/data/json/bhand_push.json', 'http://localhost:8000/data/json/A_test.json', this.scene);
 
   }
 

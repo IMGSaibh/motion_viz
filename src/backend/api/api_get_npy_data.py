@@ -111,6 +111,9 @@ async def get_rest_pose(filePath: str = Query(...)):
             # Assuming the first frame is the rest pose
             rest_pose = data[0]  # Shape: (joint_count, 3)
             
+            # Scale the model to exactly 100 units high
+            rest_pose = scale_to_height(rest_pose, target_height=100.0)
+            
             return {
                 "restPose": rest_pose.tolist()
             }
@@ -128,3 +131,25 @@ async def get_rest_pose(filePath: str = Query(...)):
             status_code=500,
             media_type="application/json"
         )
+
+def scale_to_height(rest_pose: np.ndarray, target_height: float = 200.0) -> np.ndarray:
+    rest_pose[:, 0] -= np.mean(rest_pose[:, 0])  # Center X
+    rest_pose[:, 1] -= np.mean(rest_pose[:, 1])  # Center Y
+    rest_pose[:, 2] -= np.mean(rest_pose[:, 2])  # Center Z
+
+    min_y = np.min(rest_pose[:, 1])
+    max_y = np.max(rest_pose[:, 1])
+    current_height = max_y - min_y
+    
+    if current_height == 0:
+        print("Warning: Model height is 0, cannot scale")
+        return rest_pose
+    
+    scale_factor = target_height / current_height
+    
+    scaled_rest_pose = rest_pose * scale_factor
+    
+    print(f"Original height: {current_height:.2f} → Scaled height: {target_height:.2f}")
+    print(f"Scale factor: {scale_factor:.4f}")
+    
+    return scaled_rest_pose
