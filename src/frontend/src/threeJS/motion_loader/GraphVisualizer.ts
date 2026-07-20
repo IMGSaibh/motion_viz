@@ -77,36 +77,24 @@ export class GraphVisualizer {
                         // Create smaller sphere for collapsed node (with transparency)
                         const collapsedGeometry = new THREE.SphereGeometry(1.2, 8, 8);
                         const collapsedMaterial = new THREE.MeshStandardMaterial({
-                            color: 0x888888, // Gray color
+                            color: 0x888888, 
                             roughness: 0.5,
                             metalness: 0.1,
                             transparent: true,
-                            opacity: 0.4 // Lower opacity for collapsed nodes
+                            opacity: 0.4 
                         });
                         const collapsedSphere = new THREE.Mesh(collapsedGeometry, collapsedMaterial);
                         collapsedSphere.position.copy(position);
                         scene.add(collapsedSphere);
+                        const textLabel = this.createTextLabel(
+                            String(intermediateNodes[i].id), 
+                            new THREE.Vector3(position.x, position.y + 7, position.z), 
+                            scene,
+                            3,
+                            0xff0000
+                        ); 
                         
-                        // Draw thin lines between collapsed nodes
-                        if (i === 0) {
-                            // Line from start to first collapsed node
-                            this.createThinLine(startPos, position, 0x888888, scene);
-                        } else {
-                            // Line between collapsed nodes
-                            const prevPos = new THREE.Vector3().copy(startPos).add(
-                                direction.clone().multiplyScalar((i) / (numIntermediate + 1) * totalLength)
-                            );
-                            this.createThinLine(prevPos, position, 0x888888, scene);
-                        }
-                        
-                        // Line from last collapsed node to end
-                        if (i === numIntermediate - 1) {
-                            this.createThinLine(position, endPos, 0x888888, scene);
-                        }
                     }
-                } else {
-                    // If no intermediate nodes, just draw a thin line between start and end
-                    this.createThinLine(startPos, endPos, 0x888888, scene);
                 }
             }
         }
@@ -156,22 +144,6 @@ export class GraphVisualizer {
         cylinder.quaternion.copy(quaternion);
 
         scene.add(cylinder);
-    }
-
-    /**
-     * Create a thin line between two points (for visualizing collapsed node paths)
-     */
-    private createThinLine(start: THREE.Vector3, end: THREE.Vector3, color: number, scene: THREE.Scene): void {
-        const points = [start, end];
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({
-            color: color,
-            transparent: true,
-            opacity: 0.3,
-            linewidth: 1
-        });
-        const line = new THREE.Line(geometry, material);
-        scene.add(line);
     }
 
     createTextLabel(text: string, position: THREE.Vector3, scene: THREE.Scene, fontSize: number = 8, color: number = 0x000000): Text {
