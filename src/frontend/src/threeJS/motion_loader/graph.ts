@@ -89,7 +89,7 @@ export class Graph {
             }
             
             node.bodyPart = estimatedBodyPart;
-            console.log("Node ", node.id, " has estimated body part ", node.bodyPart)
+            // console.log("Node ", node.id, " has estimated body part ", node.bodyPart)
         }
     }
 

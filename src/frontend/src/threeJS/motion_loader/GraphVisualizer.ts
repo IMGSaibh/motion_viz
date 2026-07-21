@@ -118,6 +118,116 @@ export class GraphVisualizer {
         }
     }
 
+public async drawUnionSkeleton(
+    skeleton_url: string, 
+    restPose: number[][], 
+    srcToDestMap: Map<number, number>, 
+    virtualNodes: number[],
+    scene: THREE.Scene,
+    offset: number = 0
+): Promise<void> {
+    // Fetch the skeleton JSON
+    const response = await fetch(skeleton_url);
+    const jsonData = await response.json();
+    const jointGraph = jsonData["joint-graph"];
+    
+    // Create a map for quick node lookup by ID
+    const nodeMap = new Map<number, any>();
+    for (const joint of jointGraph) {
+        nodeMap.set(joint.id, joint);
+    }
+    
+    const offsetVector = new THREE.Vector3(offset, 0, 0);
+    const nodePositions = new Map<number, THREE.Vector3>();
+    
+    // Create spheres for each node in the joint graph
+    for (const joint of jointGraph) {
+        const pos = restPose[joint.id];
+        if (!pos) continue;
+        
+        const position = new THREE.Vector3(pos[0], pos[1], pos[2]).add(offsetVector);
+        nodePositions.set(joint.id, position);
+        
+        // Determine node type and color
+        let color: string;
+        let isMapped = false;
+        let isVirtual = false;
+        let mappedSrcId: number | null = null;
+        
+        // Check if this node is mapped (as destination)
+        for (const [srcId, destId] of srcToDestMap) {
+            if (destId === joint.id) {
+                isMapped = true;
+                mappedSrcId = srcId;
+                break;
+            }
+        }
+        
+        // Check if this node is virtual
+        if (virtualNodes.includes(joint.id)) {
+            isVirtual = true;
+        }
+        
+        // Assign color based on type
+        if (isMapped) {
+            color = '#00ff88'; // Bright green for mapped nodes
+        } else if (isVirtual) {
+            color = '#ff8800'; // Orange for virtual nodes
+        } else {
+            color = '#888888'; // Gray for unmapped/uncovered nodes
+        }
+        
+        // Create sphere
+        const sphereGeometry = new THREE.SphereGeometry(2.0, 16, 16);
+        const sphereMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.3,
+            metalness: 0.1,
+        });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.copy(position);
+        scene.add(sphere);
+        
+        // Add text label
+        let labelText: string;
+        if (isMapped && mappedSrcId !== null) {
+            labelText = `${mappedSrcId} → ${joint.id}`;
+        } else if (isVirtual) {
+            labelText = `${joint.id}`;
+        } else {
+            labelText = `${joint.id}`;
+        }
+        
+        const textLabel = this.createTextLabel(
+            labelText,
+            new THREE.Vector3(pos[0], pos[1] + 8, pos[2]).add(offsetVector),
+            scene,
+            3,
+            isMapped ? 0x00ff88 : isVirtual ? 0xff8800 : 0x888888
+        );
+    }
+    
+    // Create cylinders for each connection (bones)
+    const connectionSet = new Set<string>();
+    for (const joint of jointGraph) {
+        const startPos = nodePositions.get(joint.id);
+        if (!startPos) continue;
+        
+        // Skip if parent is the same (root node)
+        if (joint.pid === joint.id) continue;
+        
+        const endPos = nodePositions.get(joint.pid);
+        if (!endPos) continue;
+        
+        const key = [joint.id, joint.pid].sort().join('-');
+        if (connectionSet.has(key)) continue;
+        connectionSet.add(key);
+        
+        let boneColor = 0x66ccff; // Default blue                
+        this.createCylinder(startPos, endPos, boneColor, scene);
+    }
+}
+
     public getNextColor(index: number): string { 
         return colors[index % colors.length];
     }

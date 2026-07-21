@@ -88,7 +88,7 @@ async def generate_animation_clip(filePath: str = Query(...)):
     
 @router.get("/get_rest_pose")
 async def get_rest_pose(filePath: str = Query(...)):
-    print("Rest pose request received!")
+    print(f"Rest pose request received for: {filePath}")
     
     try:
         file_path = Path(filePath)
@@ -100,30 +100,65 @@ async def get_rest_pose(filePath: str = Query(...)):
                 media_type="application/json"
             )
         
-        # Load numpy array
-        data = np.load(file_path, allow_pickle=True)
+        # Check file extension
+        file_extension = file_path.suffix.lower()
         
-        print(f"Data shape: {data.shape}")
-        print(f"Data dimensions: {data.ndim}")
+        rest_pose = None
         
-        # Handle 3D data: (frames, joints, 3)
-        if data.ndim == 3:
-            # Assuming the first frame is the rest pose
-            rest_pose = data[0]  # Shape: (joint_count, 3)
+        if file_extension == '.npy':
+            # Load numpy array
+            data = np.load(file_path, allow_pickle=True)
             
-            # Scale the model to exactly 100 units high
-            rest_pose = scale_to_height(rest_pose, target_height=100.0)
+            print(f"Data shape: {data.shape}")
+            print(f"Data dimensions: {data.ndim}")
             
-            return {
-                "restPose": rest_pose.tolist()
-            }
+            # Handle 3D data: (frames, joints, 3)
+            if data.ndim == 3:
+                rest_pose = data[0]  # Shape: (joint_count, 3)
+            else:
+                return Response(
+                    content=json.dumps({"error": f"Expected 3D array, got {data.ndim}D"}),
+                    status_code=400,
+                    media_type="application/json"
+                )
+                
+        elif file_extension == '.json':
+            # Load JSON file
+            with open(file_path, 'r') as f:
+                json_data = json.load(f)
+            
+            # Extract rest-pose from JSON
+            if 'rest-pose' not in json_data:
+                return Response(
+                    content=json.dumps({"error": "JSON file does not contain 'rest-pose' field"}),
+                    status_code=400,
+                    media_type="application/json"
+                )
+            
+            rest_pose = np.array(json_data['rest-pose'])
+            print(f"Rest pose shape from JSON: {rest_pose.shape}")
+            
         else:
             return Response(
-                content=json.dumps({"error": f"Expected 2D or 3D array, got {data.ndim}D"}),
+                content=json.dumps({"error": f"Unsupported file type: {file_extension}. Use .npy or .json"}),
                 status_code=400,
                 media_type="application/json"
             )
         
+        # Scale the model to exactly 100 units high
+        scaled_rest_pose = scale_to_height(rest_pose, target_height=100.0)
+        
+        return {
+            "restPose": scaled_rest_pose.tolist()
+        }
+        
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON: {e}")
+        return Response(
+            content=json.dumps({"error": f"Invalid JSON file: {str(e)}"}),
+            status_code=400,
+            media_type="application/json"
+        )
     except Exception as e:
         print(f"Error processing file: {e}")
         return Response(
@@ -132,11 +167,13 @@ async def get_rest_pose(filePath: str = Query(...)):
             media_type="application/json"
         )
 
-def scale_to_height(rest_pose: np.ndarray, target_height: float = 200.0) -> np.ndarray:
+def scale_to_height(rest_pose: np.ndarray, target_height: float = 100.0) -> np.ndarray:
+    # Center the model
     rest_pose[:, 0] -= np.mean(rest_pose[:, 0])  # Center X
     rest_pose[:, 1] -= np.mean(rest_pose[:, 1])  # Center Y
     rest_pose[:, 2] -= np.mean(rest_pose[:, 2])  # Center Z
-
+    
+    # Calculate height
     min_y = np.min(rest_pose[:, 1])
     max_y = np.max(rest_pose[:, 1])
     current_height = max_y - min_y
