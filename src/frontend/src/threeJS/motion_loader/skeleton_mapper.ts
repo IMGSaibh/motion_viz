@@ -24,7 +24,8 @@ export class SkeletonMapper {
         this.graphVisualizer = new GraphVisualizer();
     }
 
-    async mapSkeletons(skeleton1_json_url: string, skeleton2_json_url: string, scene: THREE.Scene) {
+    async mapSkeletons(skeleton1_json_url: string, skeleton2_json_url: string, scene: THREE.Scene) : 
+    Promise<[Map<number, number>, number[]]> {
         let response = await fetch(skeleton1_json_url);
         let json1 = await response.json();
         
@@ -99,6 +100,7 @@ export class SkeletonMapper {
 
         const [srcToDestMap, virtualNodes] = this.createUnionSkeleton(this.skeletonA, this.skeletonB, sortedMatches[0]);
         this.graphVisualizer?.drawUnionSkeleton(skeleton2_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
+        return [srcToDestMap, virtualNodes];
     }
 
     private matchGraphs(

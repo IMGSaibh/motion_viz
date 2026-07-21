@@ -19,6 +19,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { api_get_base_url } from '@/hooks/hook_endpoints';
 import Utils from '@/threeJS/utils';
 import * as THREE from 'three';
+import { Recorder } from './motion_loader/Recorder';
 
 export class ThreeJSEngine {
   private npy_loader: NPY_loader | null;
@@ -73,17 +74,35 @@ export class ThreeJSEngine {
     this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
     this.thumbnail_renderer.setSize(260, 190, false);
 
-    let skeletonMapper = new SkeletonMapper();
+    // let skeletonMapper = new SkeletonMapper();
     //A_test.json 23 joints
     //bhand_push.json 23 joints This is incorrectly labeled!!!
     //L02_S01_R04_A17_N01_norm_data.json Xsens 22 joints
     //POSE-adult009-punch_right-002_1.json 33 joints
-    skeletonMapper.mapSkeletons('http://localhost:8000/data/json/A_test.json', 'http://localhost:8000/data/target_format_descriptions/MoCapData.json', this.scene);
+    let recorder = new Recorder();
+    let skeletonMapper = new SkeletonMapper();
+    skeletonMapper.mapSkeletons(
+        'http://localhost:8000/data/json/A_test.json', 
+        'http://localhost:8000/data/target_format_descriptions/MoCapData.json', 
+        this.scene
+    ).then(([srcToDestMap, virtualNodes]) => {
+        // Use srcToDestMap and virtualNodes here
+        console.log("Mapping complete:", srcToDestMap, virtualNodes);
+        recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes).then(() => {
+          recorder.record()
+        }).catch(error => {
+          console.error("Recording failed:", error);
+        })
+    }).catch(error => {
+        console.error("Mapping failed:", error);
+    });
+
 
   }
 
-  start_engine_cycle() {
+  async start_engine_cycle() {
     this.loop.start();
+    
   }
 
   stop_engine_cycle() {
