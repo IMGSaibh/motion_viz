@@ -15,15 +15,18 @@ virtual_nodes: List[int] = []
 total_frames: int = 0
 current_frame: int = 0
 skeleton_json: Optional[dict] = None
+file_name: str
+target_format: str
 
 class SetupRecordingRequest(BaseModel):
     npy_url: str
     src_dest_map: List[Tuple[int, int]]
     virtual_nodes: List[int]
+    target_format: str
 
 @router.post("/setup_recording")
 async def setup_recording(request: SetupRecordingRequest):
-    global recording_buffer, is_recording, joint_count, src_to_dest_map, virtual_nodes, total_frames, current_frame
+    global recording_buffer, is_recording, joint_count, src_to_dest_map, virtual_nodes, total_frames, current_frame, file_name, target_format
     
     try:
         # Log the request for debugging
@@ -32,8 +35,10 @@ async def setup_recording(request: SetupRecordingRequest):
         print(f"  - src_dest_map length: {len(request.src_dest_map)}")
         print(f"  - virtual_nodes length: {len(request.virtual_nodes)}")
         
+        target_format = request.target_format
         # Fetch NPY data
         file_path = Path(request.npy_url)
+        file_name = file_path.stem
         if not file_path.exists():
             raise HTTPException(status_code=404, detail=f"NPY file not found: {request.npy_url}")
         npy_data = np.load(file_path, allow_pickle=True)
@@ -80,7 +85,7 @@ async def setup_recording(request: SetupRecordingRequest):
 
 @router.get("/record")
 async def record():
-    global recording_buffer, is_recording, current_frame, total_frames, joint_count, src_to_dest_map, virtual_nodes
+    global recording_buffer, is_recording, current_frame, total_frames, joint_count, src_to_dest_map, virtual_nodes, file_name
     
     if not is_recording:
         raise HTTPException(status_code=400, detail="Recording not set up. Call /setup_recording first.")
@@ -164,9 +169,8 @@ async def record():
         # Only save the frames that were processed (first max_frames frames)
         recorded_array = np.array(recording_buffer[:max_frames])
         
-        # Save with simple filename
-        filename = "recorded_motion_1.npy"
-        filepath = Path("data/recorded") / filename
+        # e.g. file_name is "a_test" and target format is "xsens"
+        filepath = Path("data/npy") / f"{file_name}_{target_format}.npy"
         
         # Ensure directory exists
         filepath.parent.mkdir(parents=True, exist_ok=True)

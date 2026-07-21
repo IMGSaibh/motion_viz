@@ -9,6 +9,8 @@ type NodeDistance = {
     distance: number
 }
 
+const RECORDINGS_ENDPOINT = "http://localhost:8000/data/target_format_descriptions/"
+
 export class SkeletonMapper {
     skeletonA: Skeleton | null = null;
     skeletonB: Skeleton | null = null;
@@ -24,12 +26,18 @@ export class SkeletonMapper {
         this.graphVisualizer = new GraphVisualizer();
     }
 
-    async mapSkeletons(skeleton1_json_url: string, skeleton2_json_url: string, scene: THREE.Scene) : 
+    async mapSkeletons(skeleton1_json_url: string, target_format_name: string, scene: THREE.Scene) : 
     Promise<[Map<number, number>, number[]]> {
         let response = await fetch(skeleton1_json_url);
         let json1 = await response.json();
         
-        response = await fetch(skeleton2_json_url);
+        const target_format_json_url = RECORDINGS_ENDPOINT + target_format_name + ".json";
+        console.log("Format description location: ", target_format_json_url)
+        response = await fetch(target_format_json_url);
+        if (!response.ok) {
+            throw new Error(`Failed to get the format description! status: ${response.status}`);
+        }
+
         let json2 = await response.json();
 
         for (const joint of json1["joint-graph"]) {
@@ -43,7 +51,7 @@ export class SkeletonMapper {
         this.skeletonA = new Skeleton(json1);
         this.skeletonB = new Skeleton(json2);
 
-        // Load rest poses
+        // For Source skeleton, load rest pose from npy motion data
         const filename = skeleton1_json_url.split('/').pop() || '';
         const npyFilename = filename.replace('.json', '.npy');
         const npyUrl = `data/npy/${npyFilename}`;
@@ -59,7 +67,7 @@ export class SkeletonMapper {
 
         // restPoseResponse = await getRestPose(npyUrl2);
         //TODO: Make this dynamic  
-        restPoseResponse = await getRestPose("data/target_format_descriptions/MoCapData.json")
+        restPoseResponse = await getRestPose(`data/target_format_descriptions/${target_format_name}.json`)
         this.restposeB = restPoseResponse.restPose;
         console.log("RestPose B: ", this.restposeB)
 
@@ -99,7 +107,7 @@ export class SkeletonMapper {
         this.graphVisualizer?.drawGraph(this.graphB.getNodes(), this.restposeB, 100, matchColors, scene, this.skeletonB.topologicalBranches);
 
         const [srcToDestMap, virtualNodes] = this.createUnionSkeleton(this.skeletonA, this.skeletonB, sortedMatches[0]);
-        this.graphVisualizer?.drawUnionSkeleton(skeleton2_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
+        this.graphVisualizer?.drawUnionSkeleton(target_format_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
         return [srcToDestMap, virtualNodes];
     }
 

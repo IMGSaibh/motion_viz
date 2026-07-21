@@ -7,6 +7,7 @@ export class Recorder {
         npy_url: string, 
         srcToDestMap: Map<number, number>, 
         virtualNodes: number[],
+        targetFormat: string
     ): Promise<boolean> {
         try {
             // Validate input data
@@ -31,6 +32,7 @@ export class Recorder {
                     npy_url: npy_url,
                     src_dest_map: srcToDestMapArray,
                     virtual_nodes: virtualNodes,
+                    target_format: targetFormat
                 })
             });
 

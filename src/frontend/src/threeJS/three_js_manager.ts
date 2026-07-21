@@ -83,12 +83,12 @@ export class ThreeJSEngine {
     let skeletonMapper = new SkeletonMapper();
     skeletonMapper.mapSkeletons(
         'http://localhost:8000/data/json/A_test.json', 
-        'http://localhost:8000/data/target_format_descriptions/MoCapData.json', 
+        'MoCapData', 
         this.scene
     ).then(([srcToDestMap, virtualNodes]) => {
         // Use srcToDestMap and virtualNodes here
         console.log("Mapping complete:", srcToDestMap, virtualNodes);
-        recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes).then(() => {
+        recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes, "MoCapData").then(() => {
           recorder.record()
         }).catch(error => {
           console.error("Recording failed:", error);
