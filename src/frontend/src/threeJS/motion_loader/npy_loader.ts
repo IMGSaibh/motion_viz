@@ -1,7 +1,6 @@
 import npyjs from 'npyjs';
 import * as THREE from 'three';
 import { Text } from 'troika-three-text';
-import { Bone_grouping } from './bone_grouping';
 import { JointCoordsystemLocal } from '@/threeJS/components/JointCoordSystemLocal';
 
 //lädt json und npy

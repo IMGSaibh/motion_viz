@@ -4,11 +4,6 @@ import { GraphVisualizer } from "./GraphVisualizer";
 import { Skeleton, TopologicalBranch, SkeletonNode } from "./skeleton";
 import { Graph, GraphNode } from "./graph";
 
-type NodeDistance = {
-    nodeID: number,
-    distance: number
-}
-
 const RECORDINGS_ENDPOINT = "http://localhost:8000/data/target_format_descriptions/"
 
 export class SkeletonMapper {
@@ -60,16 +55,9 @@ export class SkeletonMapper {
         let restPoseResponse = await getRestPose(npyUrl);
         this.restposeA = restPoseResponse.restPose;
 
-        // const fileName2 = skeleton2_json_url.split('/').pop() || '';
-        // const npyFilename2 = fileName2.replace('.json', '.npy');
-        // const npyUrl2 = `data/npy/${npyFilename2}`;
-        // console.log("Numpy URL 2:", npyUrl2);
-
-        // restPoseResponse = await getRestPose(npyUrl2);
-        //TODO: Make this dynamic  
         restPoseResponse = await getRestPose(`data/target_format_descriptions/${target_format_name}.json`)
         this.restposeB = restPoseResponse.restPose;
-        console.log("RestPose B: ", this.restposeB)
+        // console.log("RestPose B: ", this.restposeB)
 
         // Create graphs from skeletons
         this.graphA = new Graph(this.skeletonA);
@@ -194,8 +182,8 @@ export class SkeletonMapper {
     }
 
     /**
- * Creates a union skeleton by merging two matched skeletons
- * Following Algorithm 5 from the paper
+* The goal of this algorithm is to have a skeleton with the topology of destSkeleton, but some of the nodes are purely virtual, meaning computed via Inverse Kinematics
+* For each other node in this unionSkeleton, we should know exactly what node of srcSkeleton maps to it, so we can then record that motion
  */
 private createUnionSkeleton(
     srcSkeleton: Skeleton,
@@ -203,8 +191,6 @@ private createUnionSkeleton(
     match: Map<number, number> // Maps node IDs from srcSkeleton to destSkeleton
 ): [Map<number, number>, number[]] {
     const threshold = 0.2
-    //The goal of this algorithm is to have a skeleton with the topology of destSkeleton, but some of the nodes are purely virtual, meaning computed via Inverse Kinematics
-    //For each other node in this unionSkeleton, we should know exactly what node of srcSkeleton maps to it, so we can then record that motion
 
     //Step 1
     //For each topological branch in the source skeleton, get the graphNode that corresponds to the startNode and the one that corresponds to the endNode
@@ -247,11 +233,6 @@ private createUnionSkeleton(
             console.error(`No matching branch found in destination for ${srcStartId}->${srcEndId}`);
             throw new Error(`Cannot find corresponding branch in destination skeleton`);
         }
-        
-        
-        // Store the mapping from source branch to destination branch
-        // (srcBranch as any).destBranch = matchingDestBranch;
-        
         // console.log(`Mapped source branch ${srcStartId}->${srcEndId} to destination branch ${destStartId}->${destEndId}`);
 
         //Step 2
@@ -453,39 +434,4 @@ private calculateNodeDistances(
         
         return nodeDistances;
     }
-
-    // HEURISTICS
-    //************************************************************************************************************** */
-
-    // private getHeightHeuristic(branches: TopologicalBranch[], restpose: number[][]): void {
-    //     if (!restpose || restpose.length === 0) {
-    //         console.warn("Rest pose data is empty or undefined. Cannot compute height heuristic.");
-    //         return;
-    //     }
-
-    //     type HeightInfo = {
-    //         branch: TopologicalBranch,
-    //         avgHeight: number
-    //     };
-
-    //     let heightsList: HeightInfo[] = [];
-    //     for (const branch of branches) {
-    //         const avgHeight = this.getAvgPathHeight(branch.path, restpose);
-    //         heightsList.push({ branch, avgHeight });
-    //     }
-    // }
-
-    // private getAvgPathHeight(path: SkeletonNode[], restpose: number[][]): number {
-    //     if (path.length === 0) return 0;
-    //     let numNodes = 0;
-    //     let totalHeight = 0;
-    //     for (const node of path) {
-    //         if (restpose[node.id]) {
-    //             totalHeight += restpose[node.id][1]; // Assuming Y-axis is height
-    //             numNodes++;
-    //         }
-    //     }
-    //     if (numNodes === 0) return 0;
-    //     return totalHeight / numNodes;
-    // }
 }
