@@ -1,3 +1,5 @@
+import { VirtualNode } from "./skeleton_mapper";
+
 const ENDPOINT_PREFIX = '/api_recorder';
 
 export class Recorder {
@@ -6,7 +8,7 @@ export class Recorder {
     async setupRecording(
         npy_url: string, 
         srcToDestMap: Map<number, number>, 
-        virtualNodes: number[],
+        virtualNodes: VirtualNode[],
         targetFormat: string
     ): Promise<boolean> {
         try {

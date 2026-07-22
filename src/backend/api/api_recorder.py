@@ -11,17 +11,23 @@ recording_buffer: List[List[List[float]]] = []
 is_recording: bool = False
 joint_count: int = 0
 src_to_dest_map: dict = {}
-virtual_nodes: List[int] = []
+virtual_nodes: List[dict] = []  # Now stores dicts with id, leftNeighbour, rightNeighbour, weighting
 total_frames: int = 0
 current_frame: int = 0
 skeleton_json: Optional[dict] = None
-file_name: str
-target_format: str
+file_name: str = ""
+target_format: str = ""
+
+class VirtualNode(BaseModel):
+    id: int
+    leftNeighbour: int
+    rightNeighbour: int
+    weighting: float
 
 class SetupRecordingRequest(BaseModel):
     npy_url: str
     src_dest_map: List[Tuple[int, int]]
-    virtual_nodes: List[int]
+    virtual_nodes: List[VirtualNode]  # Now accepts list of VirtualNode objects
     target_format: str
 
 @router.post("/setup_recording")
@@ -46,7 +52,8 @@ async def setup_recording(request: SetupRecordingRequest):
         # Store all data
         recording_buffer = npy_data.tolist()
         src_to_dest_map = dict(request.src_dest_map)  # Convert list of tuples to dict
-        virtual_nodes = request.virtual_nodes
+        # Convert VirtualNode objects to dicts for easier access
+        virtual_nodes = [vn.dict() for vn in request.virtual_nodes]
         total_frames = len(recording_buffer)
         joint_count = len(recording_buffer[0]) if recording_buffer else 0
         current_frame = 0
@@ -85,7 +92,7 @@ async def setup_recording(request: SetupRecordingRequest):
 
 @router.get("/record")
 async def record():
-    global recording_buffer, is_recording, current_frame, total_frames, joint_count, src_to_dest_map, virtual_nodes, file_name
+    global recording_buffer, is_recording, current_frame, total_frames, joint_count, src_to_dest_map, virtual_nodes, file_name, target_format
     
     if not is_recording:
         raise HTTPException(status_code=400, detail="Recording not set up. Call /setup_recording first.")
@@ -113,50 +120,27 @@ async def record():
         if virtual_nodes:
             # Get all mapped destination IDs
             mapped_ids = sorted(src_to_dest_map.values())
-            all_nodes = sorted(mapped_ids + virtual_nodes)
+            # Get virtual node IDs
+            virtual_ids = [vn['id'] for vn in virtual_nodes]
+            all_nodes = sorted(mapped_ids + virtual_ids)
             
-            for virtual_id in virtual_nodes:
-                virtual_index = all_nodes.index(virtual_id)
+            for vn in virtual_nodes:
+                virtual_id = vn['id']
+                left_src_id = vn['leftNeighbour']
+                right_src_id = vn['rightNeighbour']
+                weighting = vn['weighting']
                 
-                # Find nearest mapped nodes before and after
-                left_mapped = None
-                right_mapped = None
-                
-                for i in range(virtual_index - 1, -1, -1):
-                    if all_nodes[i] in mapped_ids:
-                        left_mapped = all_nodes[i]
-                        break
-                
-                for i in range(virtual_index + 1, len(all_nodes)):
-                    if all_nodes[i] in mapped_ids:
-                        right_mapped = all_nodes[i]
-                        break
-                
-                if left_mapped is not None and right_mapped is not None:
-                    # Find source IDs for these destination IDs
-                    left_src_id = None
-                    right_src_id = None
-                    for src_id, dest_id in src_to_dest_map.items():
-                        if dest_id == left_mapped:
-                            left_src_id = src_id
-                        if dest_id == right_mapped:
-                            right_src_id = src_id
+                # Get positions from source frame using source IDs
+                if left_src_id < len(source_frame) and right_src_id < len(source_frame):
+                    left_pos = source_frame[left_src_id]
+                    right_pos = source_frame[right_src_id]
                     
-                    if left_src_id is not None and right_src_id is not None:
-                        left_pos = source_frame[left_src_id]
-                        right_pos = source_frame[right_src_id]
-                        
-                        left_idx = all_nodes.index(left_mapped)
-                        right_idx = all_nodes.index(right_mapped)
-                        virtual_idx = all_nodes.index(virtual_id)
-                        
-                        t = (virtual_idx - left_idx) / (right_idx - left_idx)
-                        
-                        dest_frame[virtual_id] = [
-                            left_pos[0] + t * (right_pos[0] - left_pos[0]),
-                            left_pos[1] + t * (right_pos[1] - left_pos[1]),
-                            left_pos[2] + t * (right_pos[2] - left_pos[2])
-                        ]
+                    # Interpolate using the stored weighting
+                    dest_frame[virtual_id] = [
+                        left_pos[0] + weighting * (right_pos[0] - left_pos[0]),
+                        left_pos[1] + weighting * (right_pos[1] - left_pos[1]),
+                        left_pos[2] + weighting * (right_pos[2] - left_pos[2])
+                    ]
         
         # Replace the source frame with the transformed destination frame
         recording_buffer[current_frame] = dest_frame

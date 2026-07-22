@@ -81,21 +81,25 @@ export class ThreeJSEngine {
     //POSE-adult009-punch_right-002_1.json 33 joints
     let recorder = new Recorder();
     let skeletonMapper = new SkeletonMapper();
-    skeletonMapper.mapSkeletons(
-        'http://localhost:8000/data/json/A_test.json', 
-        'MoCapData', 
-        this.scene
-    ).then(([srcToDestMap, virtualNodes]) => {
-        // Use srcToDestMap and virtualNodes here
-        console.log("Mapping complete:", srcToDestMap, virtualNodes);
-        recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes, "MoCapData").then(() => {
-          recorder.record()
-        }).catch(error => {
-          console.error("Recording failed:", error);
-        })
-    }).catch(error => {
-        console.error("Mapping failed:", error);
-    });
+    const targetFormat = 'LARA';
+    if(this.record) {
+      skeletonMapper.mapSkeletons(
+          'http://localhost:8000/data/json/A_test.json', 
+          targetFormat, 
+          this.scene
+      ).then(([srcToDestMap, virtualNodes]) => {
+          // Use srcToDestMap and virtualNodes here
+          console.log("Mapping complete:", srcToDestMap, virtualNodes);
+          recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes, targetFormat).then(() => {
+            recorder.record()
+          }).catch(error => {
+            console.error("Recording failed:", error);
+          })
+      }).catch(error => {
+          console.error("Mapping failed:", error);
+      });
+
+    }
 
 
   }

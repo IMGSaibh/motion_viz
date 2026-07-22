@@ -2,6 +2,7 @@ import { Text } from 'troika-three-text';
 import * as THREE from 'three';
 import { GraphNode } from './graph';
 import { TopologicalBranch } from './skeleton';
+import { VirtualNode } from './skeleton_mapper';
 
 export class GraphVisualizer {
     public drawGraph(
@@ -122,7 +123,7 @@ public async drawUnionSkeleton(
     skeleton_url: string, 
     restPose: number[][], 
     srcToDestMap: Map<number, number>, 
-    virtualNodes: number[],
+    virtualNodes: VirtualNode[],
     scene: THREE.Scene,
     offset: number = 0
 ): Promise<void> {
@@ -164,7 +165,7 @@ public async drawUnionSkeleton(
         }
         
         // Check if this node is virtual
-        if (virtualNodes.includes(joint.id)) {
+        if (virtualNodes.some((node) => node.id === joint.id)) {
             isVirtual = true;
         }
         

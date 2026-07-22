@@ -50,8 +50,8 @@ export class NPY_loader {
   //TODO: Maye rewrite this so that it only loads the npy data and returns it, instead of directly adding it to the scene
   //That way, it could be used more generically and we don't need to worry about the scene in this class, which is not really its responsibility
   async load_npy_animation(file_url: string) {
-    // const formatCreator = new FormatCreator();
-    // await formatCreator.createFormatFile("data/npy/P01_R01_short_1.npy", "Inhard");
+    const formatCreator = new FormatCreator();
+    await formatCreator.createFormatFile("data/npy/L02_S01_R04_A17_N01_norm_data.npy", "LARA");
 
     //TODO: lädt numpy aus dem backend
     const loader = new npyjs();

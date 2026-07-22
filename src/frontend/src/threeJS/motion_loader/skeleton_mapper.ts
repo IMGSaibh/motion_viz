@@ -6,6 +6,13 @@ import { Graph, GraphNode } from "./graph";
 
 const RECORDINGS_ENDPOINT = "http://localhost:8000/data/target_format_descriptions/"
 
+export type VirtualNode = {
+    id: number,
+    leftNeighbour: number,
+    rightNeighbour: number,
+    weighting: number
+}
+
 export class SkeletonMapper {
     skeletonA: Skeleton | null = null;
     skeletonB: Skeleton | null = null;
@@ -22,7 +29,7 @@ export class SkeletonMapper {
     }
 
     async mapSkeletons(skeleton1_json_url: string, target_format_name: string, scene: THREE.Scene) : 
-    Promise<[Map<number, number>, number[]]> {
+    Promise<[Map<number, number>, VirtualNode[]]> {
         let response = await fetch(skeleton1_json_url);
         let json1 = await response.json();
         
@@ -189,7 +196,7 @@ private createUnionSkeleton(
     srcSkeleton: Skeleton,
     destSkeleton: Skeleton,
     match: Map<number, number> // Maps node IDs from srcSkeleton to destSkeleton
-): [Map<number, number>, number[]] {
+): [Map<number, number>, VirtualNode[]] {
     const threshold = 0.2
 
     //Step 1
@@ -201,7 +208,7 @@ private createUnionSkeleton(
     for (const [srcId, destId] of match) {
         srcToDestMap.set(srcId, destId);
     }
-    let virtualNodes: number[] = []; //IDs of the destination skeleton that have no direct match from the source skeleton
+    let virtualNodes: VirtualNode[] = []; //IDs of the destination skeleton that have no direct match from the source skeleton
     
     // For each topological branch in the source skeleton
     for (const srcBranch of srcSkeleton.topologicalBranches) {
@@ -249,9 +256,20 @@ private createUnionSkeleton(
         }
         if(srcNodesInBetween === 0) {
             for (let i = 0; i < matchingDestBranch.path.length - 1; i++) {
-                if(!virtualNodes.includes(matchingDestBranch.path[i].id) && ![...srcToDestMap.values()].includes(matchingDestBranch.path[i].id)) virtualNodes.push(matchingDestBranch.path[i].id);
+                if(!virtualNodes.some(vn => vn.id === matchingDestBranch.path[i].id) && ![...srcToDestMap.values()].includes(matchingDestBranch.path[i].id)) {
+                    //TODO: This is a very bad approximation, because it always takes start and end node as neighbours. 
+                    const leftNeighbour = i > 0 ? srcStartId : srcStartId; // Left neighbour is always the source start node
+                    const rightNeighbour = srcEndId; // Right neighbour is always the source end node
+                    
+                    virtualNodes.push({
+                        id: matchingDestBranch.path[i].id,
+                        leftNeighbour: leftNeighbour,
+                        rightNeighbour: rightNeighbour,
+                        weighting: 0.5
+                    });
+                }
             }
-        } 
+        }        
         else {
         
         // Calculate the percentage distance for each node in the source path
@@ -324,19 +342,38 @@ private createUnionSkeleton(
             
             // Any remaining nodes in this segment are virtual nodes
             if (matchingDestNodes.length > 1) {
-                const newVirtualNodes = matchingDestNodes.slice(numCoveredNodes); //get all remaining nodes after the ones we have already processed
+                const newVirtualNodes = matchingDestNodes.slice(numCoveredNodes);
+
                 console.log(`  ${newVirtualNodes.length} virtual nodes in this segment:`, newVirtualNodes.map(n => n.id));
+                // Find left and right neighbours (source nodes) for weighting
+                const leftSrcNodeId = srcNodeDistances[i - 1][0]; //The ID of the source node before
+                const rightSrcNodeId = srcNodeDistances[i + 1][0]; //The ID of the sourc node after
+                
                 newVirtualNodes.forEach((node: any) => {
-                    if(!virtualNodes.includes(node.id) && ![...srcToDestMap.values()].includes(node.id)) virtualNodes.push(node.id);
-                })
-            }
-        }
+                    if(!virtualNodes.some(vn => vn.id === node.id) && ![...srcToDestMap.values()].includes(node.id)) {
+                        virtualNodes.push({
+                            id: node.id,
+                            leftNeighbour: leftSrcNodeId,
+                            rightNeighbour: rightSrcNodeId,
+                            weighting: 0.5
+                        });
+                    }
+                });
+}        }
 
         //All destination nodes that are not covered at all by the source nodes get added to virtual nodes
         for (const [destNodeId, destPercentage] of destNodeDistances) {
-            if(!virtualNodes.includes(destNodeId) && ![...srcToDestMap.values()].includes(destNodeId)) virtualNodes.push(destNodeId);
+            if(!virtualNodes.some(vn => vn.id === destNodeId) && ![...srcToDestMap.values()].includes(destNodeId)) {
+                const leftSrcNodeId = srcNodeDistances[srcNodeDistances.length - 2][0] //element before the last
+                const rightSrcNodeId = srcNodeDistances[srcNodeDistances.length - 1][0] //last element
+                virtualNodes.push({
+                    id: destNodeId,
+                    leftNeighbour: leftSrcNodeId,
+                    rightNeighbour: rightSrcNodeId,
+                    weighting: 0.5
+                });
+            }
         }
-        
         }
         
     }
@@ -354,7 +391,7 @@ private createUnionSkeleton(
         coveredDestNodeIds.add(destId);
     }
     for(const virtualID of virtualNodes) {
-        coveredDestNodeIds.add(virtualID);
+        coveredDestNodeIds.add(virtualID.id);
     }
 
     // Find any uncovered nodes
