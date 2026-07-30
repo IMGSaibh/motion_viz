@@ -57,13 +57,13 @@ export function ContainerTopbar() {
     try {
       const result = await file_upload.mutateAsync(files);
       if (result.unsupported_files.length > 0) {
-        error(`Upload teilweise erfolgreich; nicht unterstützt: ${result.unsupported_files.join(', ')}`);
+        error(`unsupported files: ${result.unsupported_files.join(', ')}`);
       } else if (result.skipped_existing_files.length > 0) {
-        warning(`Upload teilweise erfolgreich; übersprungen: ${result.skipped_existing_files.join(', ')}`);
+        warning(`Upload successful; Files skipped: ${result.skipped_existing_files.join(', ')}`);
       } else if (result.saved_count > 0) {
-        success(`Upload erfolgreich: ${result.saved_count} Datei(en) gespeichert`);
+        success(`Upload successful: ${result.saved_count} file(s) saved`);
       } else {
-        warning(result.warning || 'Keine Dateien hochgeladen.');
+        warning(result.warning || 'No files uploaded.');
       }
     } catch (requestError: unknown) {
       error(get_error_message(requestError, 'Upload failed'));

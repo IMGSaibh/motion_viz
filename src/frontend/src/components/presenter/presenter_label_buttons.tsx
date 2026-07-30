@@ -1,7 +1,7 @@
 import { Box, Grid, Tabs, Tab } from '@mui/material';
-import { WidgetRulaButtons } from '../widgets_ergo_methods/widget_rula_buttons';
-import { WidgetOwasButtons } from '../widgets_ergo_methods/widget_owas_buttons';
-import { WidgetLmmButtons } from '../widgets_ergo_methods/widget_lmm_label_buttons';
+import { WidgetRulaButtons } from '@/components/widgets_ergo_methods/widget_rula_buttons';
+import { WidgetOwasButtons } from '@/components/widgets_ergo_methods/widget_owas_buttons';
+import { WidgetLmmButtons } from '@/components/widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
 import type { ErgoLabel } from '@/domain/datatypes';
 
