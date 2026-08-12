@@ -74,13 +74,6 @@ export class GLTF_Player {
     }
   }
 
-  start_recording() {
-    console.log("Starting recording of motion data...");
-    fetch("/api_write_npy_data/start_recording", { method: "GET" })
-    .then(r => r.json())
-    .then(console.log)
-  }
-
   async play_pause() {
         // toggle play/pause
     if (this.frame_index >= this.frame_count) {

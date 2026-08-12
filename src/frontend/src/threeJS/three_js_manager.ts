@@ -3,7 +3,6 @@ import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
 import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 import { GLTF_Loader } from '@/threeJS/motion_loader/gltf_loader';
-import {MotionRecorder} from '@/threeJS/motion_loader/motion_recorder'
 import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
@@ -153,10 +152,6 @@ export class ThreeJSEngine {
         this.gltf_loader = new GLTF_Loader(this.scene);
         await this.gltf_loader.load_gltf_animation(fileUrl);
         this.gltf_player = new GLTF_Player(this.gltf_loader);
-        if(this.record) {
-          const motionRecorder: MotionRecorder = new MotionRecorder(this.gltf_loader);
-          await motionRecorder.convert_to_xsens_format()
-        }
         this.loop.updatables.push(this.gltf_player.gltf_player_object);
         break;
       }
