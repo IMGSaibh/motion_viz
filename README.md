@@ -12,6 +12,11 @@ backend and ThreeJS Engine frontend.
 
 # Installation (using vs code editor is recommended)
 
+## Create data folder
+```bash
+mkdir data
+```
+
 ## Frontend
 
 ```bash
