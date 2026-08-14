@@ -80,6 +80,16 @@ export function ContainerFrameSlider() {
         set_frame_slider_value(prevFrame);
         go_to_frame(prevFrame);
       }
+
+      if (e.code === 'ArrowLeft'&& e.shiftKey) {
+        e.preventDefault();
+        if (!frame_count) return;
+        const prevFrame = Math.max(0, frame_slider_value - 10);
+        pause();
+        set_frame_slider_value(prevFrame);
+        go_to_frame(prevFrame);
+      }
+
       if (e.code === 'KeyD') print_scene_components();
 
       if (e.code === 'KeyA') {
