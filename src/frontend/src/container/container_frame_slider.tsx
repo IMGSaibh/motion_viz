@@ -71,6 +71,15 @@ export function ContainerFrameSlider() {
         set_frame_slider_value(nextFrame);
         go_to_frame(nextFrame);
       }
+      if (e.code === 'ArrowRight'&& e.shiftKey) {
+        e.preventDefault();
+        if (!frame_count) return;
+        const maxIdx = Math.max(0, frame_count - 1);
+        const nextFrame = Math.min(maxIdx, frame_slider_value + 10);
+        pause();
+        set_frame_slider_value(nextFrame);
+        go_to_frame(nextFrame);
+      }
 
       if (e.code === 'ArrowLeft') {
         e.preventDefault();

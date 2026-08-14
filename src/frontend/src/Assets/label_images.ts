@@ -6,6 +6,90 @@ import pause_button from '@/Assets/pause-button.svg';
 import type { LabelImage } from '@/domain/datatypes';
 
 // rula images
+import btn_rula_ua_1 from '@/Assets/rula_images/rula_ua_1.png';
+import btn_rula_ua_2 from '@/Assets/rula_images/rula_ua_2.png';
+import btn_rula_ua_3 from '@/Assets/rula_images/rula_ua_3.png';
+import btn_rula_ua_4 from '@/Assets/rula_images/rula_ua_4.png';
+import btn_rula_ua_5 from '@/Assets/rula_images/rula_ua_5.png';
+import btn_rula_ua_6 from '@/Assets/rula_images/rula_plus.png';
+import btn_rula_ua_7 from '@/Assets/rula_images/rula_plus.png';
+import btn_rula_ua_8 from '@/Assets/rula_images/rula_minus.png';
+
+import btn_rula_la_1 from '@/Assets/rula_images/rula_la_1.png';
+import btn_rula_la_2 from '@/Assets/rula_images/rula_la_2.png';
+import btn_rula_la_3 from '@/Assets/rula_images/rula_la_3.png';
+
+import btn_rula_w_1 from '@/Assets/rula_images/rula_w_1.png';
+import btn_rula_w_2 from '@/Assets/rula_images/rula_w_2.png';
+import btn_rula_w_3 from '@/Assets/rula_images/rula_w_3.png';
+import btn_rula_w_4 from '@/Assets/rula_images/rula_w_4.png';
+
+import btn_rula_n_1 from '@/Assets/rula_images/rula_n_1.png';
+import btn_rula_n_2 from '@/Assets/rula_images/rula_n_2.png';
+import btn_rula_n_3 from '@/Assets/rula_images/rula_n_3.png';
+import btn_rula_n_4 from '@/Assets/rula_images/rula_n_4.png';
+import btn_rula_n_5 from '@/Assets/rula_images/rula_plus.png';
+import btn_rula_n_6 from '@/Assets/rula_images/rula_plus.png';
+
+import btn_rula_t_1 from '@/Assets/rula_images/rula_t_1.png';
+import btn_rula_t_2 from '@/Assets/rula_images/rula_t_2.png';
+import btn_rula_t_3 from '@/Assets/rula_images/rula_t_3.png';
+import btn_rula_t_4 from '@/Assets/rula_images/rula_t_4.png';
+import btn_rula_t_5 from '@/Assets/rula_images/rula_plus.png';
+import btn_rula_t_6 from '@/Assets/rula_images/rula_plus.png';
+
+import btn_rula_l_1 from '@/Assets/rula_images/rula_plus.png';
+
+// RULA IMAGES
+const LABEL_IMAGES_RULA_CAT_UA: ReadonlyArray<LabelImage> = [
+  { name: '20\u00B0 - 20\u00B0 ', src: btn_rula_ua_1, category: 'Cat_UpperArm' },
+  { name: '< 20\u00B0 ', src: btn_rula_ua_2, category: 'Cat_UpperArm' },
+  { name: '> 20\u00B0 - 45\u00B0 ', src: btn_rula_ua_3, category: 'Cat_UpperArm' },
+  { name: '> 45\u00B0 -90\u00B0 ', src: btn_rula_ua_4, category: 'Cat_UpperArm' },
+  { name: '> 90\u00B0 ', src: btn_rula_ua_5, category: 'Cat_UpperArm' },
+  { name: 'Shoulder raised ', src: btn_rula_ua_6, category: 'Cat_UpperArm' },
+  { name: 'Abducted', src: btn_rula_ua_7, category: 'Cat_UpperArm' },
+  { name: 'Leaning', src: btn_rula_ua_8, category: 'Cat_UpperArm' },
+];
+
+const LABEL_IMAGES_RULA_CAT_LA: ReadonlyArray<LabelImage> = [
+  { name: '60\u00B0 - 100\u00B0', src: btn_rula_la_1, category: 'Cat_LowerArm' },
+  { name: '<0\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'Cat_LowerArm' },
+  { name: 'Midline', src: btn_rula_la_3, category: 'Cat_LowerArm' },
+];
+
+const LABEL_IMAGES_RULA_CAT_W: ReadonlyArray<LabelImage> = [
+  { name: '0\u00B0', src: btn_rula_w_1, category: 'Cat_Wrist' },
+  { name: '15\u00B0 - 15\u00B0', src: btn_rula_w_2, category: 'Cat_Wrist' },
+  { name: '<15\u00B0 | >15\u00B0', src: btn_rula_w_3, category: 'Cat_Wrist' },
+  { name: 'Bent', src: btn_rula_w_4, category: 'Cat_Wrist' },
+];
+
+const LABEL_IMAGES_RULA_CAT_N: ReadonlyArray<LabelImage> = [
+  { name: '0\u00B0 - 10\u00B0', src: btn_rula_n_1, category: 'Cat_Neck' },
+  { name: '10\u00B0 - 20\u00B0', src: btn_rula_n_2, category: 'Cat_Neck' },
+  { name: '>20\u00B0 ', src: btn_rula_n_3, category: 'Cat_Neck' },
+  { name: '<0\u00B0 ', src: btn_rula_n_4, category: 'Cat_Neck' },
+  { name: 'Twist', src: btn_rula_n_5, category: 'Cat_Neck' },
+  { name: 'Side-Bend', src: btn_rula_n_6, category: 'Cat_Neck' },
+];
+
+
+const LABEL_IMAGES_RULA_CAT_T: ReadonlyArray<LabelImage> = [
+  { name: '0\u00B0', src: btn_rula_t_1, category: 'Cat_Trunk' },
+  { name: '0\u00B0 - 20\u00B0', src: btn_rula_t_2, category: 'Cat_Trunk' },
+  { name: '20\u00B0 - 60\u00B0', src: btn_rula_t_3, category: 'Cat_Trunk' },
+  { name: '>60\u00B0', src: btn_rula_t_4, category: 'Cat_Trunk' },
+  { name: 'Twist', src: btn_rula_t_5, category: 'Cat_Trunk' },
+  { name: 'Side-Bend', src: btn_rula_t_6, category: 'Cat_Trunk' },
+];
+
+const LABEL_IMAGES_RULA_CAT_L: ReadonlyArray<LabelImage> = [
+  { name: 'Not well', src: btn_rula_l_1, category: 'Cat_Legs' },
+];
+
+
+
 import btn1_rula from '@/Assets/rula_images/Label_1.png';
 import btn2_rula from '@/Assets/rula_images/Label_2.png';
 import btn3_rula from '@/Assets/rula_images/Label_3.png';
@@ -76,6 +160,31 @@ const LABEL_IMAGES_CAT3_RULA: ReadonlyArray<LabelImage> = [
   { name: 'Wdh. > 4 pro min', src: btn9_rula, category: 'Kategorie 3' },
   { name: 'Kraft/Last 2–10 kg', src: btn10_rula, category: 'Kategorie 3' },
 ];
+
+export function get_label_images_rula_cat_ua(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_UA;
+}
+
+export function get_label_images_rula_cat_la(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_LA;
+}
+
+export function get_label_images_rula_cat_w(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_W;
+}
+
+export function get_label_images_rula_cat_n(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_N;
+}
+
+export function get_label_images_rula_cat_t(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_T;
+}
+
+export function get_label_images_rula_cat_l(): ReadonlyArray<LabelImage> {
+  return LABEL_IMAGES_RULA_CAT_L;
+}
+
 
 export function get_label_images_cat1_rula(): ReadonlyArray<LabelImage> {
   return LABEL_IMAGES_CAT1_RULA;
@@ -185,3 +294,4 @@ export const PAUSE_BUTTON_IMAGE: LabelImage = {
   src: pause_button,
   category: 'Control',
 };
+

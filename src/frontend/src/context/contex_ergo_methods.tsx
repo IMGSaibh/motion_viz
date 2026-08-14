@@ -11,9 +11,12 @@ const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
   const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
+    CAT_UA: null,
+    CAT_LA: null,
+    CAT_W: null,
+    CAT_N: null,
+    CAT_T: null,
+    CAT_L: null,
   });
 
   const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({

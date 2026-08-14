@@ -2,16 +2,9 @@ import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
-  //get_label_images_cat1_rula,
+  get_label_images_cat1_rula,
   get_label_images_cat2_rula,
-  //get_label_images_cat3_rula,
-  get_label_images_rula_cat_l,
-  get_label_images_rula_cat_la,
-  get_label_images_rula_cat_n,
-  get_label_images_rula_cat_t,
-  get_label_images_rula_cat_ua,
-  get_label_images_rula_cat_w
-
+  get_label_images_cat3_rula,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -31,13 +24,11 @@ function CategoryGrid({
   onSelect,
   isLast,
 }: {
-  //cat: 'CAT1' | 'CAT2' | 'CAT3';
-  cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L';
+  cat: 'CAT1' | 'CAT2' | 'CAT3';
   title: string;
   rula_button_images: readonly LabelImage[];
   selected_cat_image: string | null;
-  // onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
-  onSelect: (slot: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L', img: LabelImage) => void;
+  onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -112,28 +103,19 @@ function CategoryGrid({
 }
 
 export function WidgetRulaButtons(props: Props) {
-  //const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
-  //const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
-  //const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
-  const label_images_rula_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
-  const label_images_rula_cat_la = useMemo(() => get_label_images_rula_cat_la(), []);
-  const label_images_rula_cat_w = useMemo(() => get_label_images_rula_cat_w(), []);
-  const label_images_rula_cat_n = useMemo(() => get_label_images_rula_cat_n(), []);
-  const label_images_rula_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
-  const label_images_rula_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
+  const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
+  const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
+  const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
 
   const { range, set_range } = use_frame_slider_context();
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
-  const allSelected = Boolean(
-    rula_selected.CAT_UA && rula_selected.CAT_LA && 
-    rula_selected.CAT_W && rula_selected.CAT_N && 
-    rula_selected.CAT_T && rula_selected.CAT_L);
+  const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
 
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L', img: LabelImage) => {
+  const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => {
     set_rula_selected({ ...rula_selected, [cat]: img });
   };
 
@@ -142,13 +124,9 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT_UA', image: rula_selected.CAT_UA! },
-      { name: 'CAT_LA', image: rula_selected.CAT_LA! },
-      { name: 'CAT_W', image: rula_selected.CAT_W! },
-      { name: 'CAT_N', image: rula_selected.CAT_N! },
-      { name: 'CAT_T', image: rula_selected.CAT_T! },
-      { name: 'CAT_L', image: rula_selected.CAT_L! }
-      
+      { name: 'CAT1', image: rula_selected.CAT1! },
+      { name: 'CAT2', image: rula_selected.CAT2! },
+      { name: 'CAT3', image: rula_selected.CAT3! },
     ];
 
     const from = Math.min(range[0], range[1]);
@@ -165,7 +143,7 @@ export function WidgetRulaButtons(props: Props) {
     };
 
     props.onClick?.(label);
-    set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
+    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
   };
 
   return (
@@ -178,59 +156,30 @@ export function WidgetRulaButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT_UA"
-            title="Upper Arm"
-            rula_button_images={label_images_rula_cat_ua}
-            selected_cat_image={rula_selected.CAT_UA?.name ?? null}
+            cat="CAT1"
+            title="Gruppe: Arm | Hand"
+            rula_button_images={label_images_cat1}
+            selected_cat_image={rula_selected.CAT1?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT_LA"
-            title="Lower Arm"
-            rula_button_images={label_images_rula_cat_la}
-            selected_cat_image={rula_selected.CAT_LA?.name ?? null}
+            cat="CAT2"
+            title="Gruppe: Nacken | Rumpf | Beine"
+            rula_button_images={label_images_cat2}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT_W"
-            title="Wrist"
-            rula_button_images={label_images_rula_cat_w}
-            selected_cat_image={rula_selected.CAT_W?.name ?? null}
-            onSelect={handleSelect}
-          />
-        </Grid>
-
-        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
-            cat="CAT_N"
-            title="Neck"
-            rula_button_images={label_images_rula_cat_n}
-            selected_cat_image={rula_selected.CAT_N?.name ?? null}
-            onSelect={handleSelect}
-          />
-        </Grid>
-
-        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
-            cat="CAT_T"
-            title="Trunk"
-            rula_button_images={label_images_rula_cat_t}
-            selected_cat_image={rula_selected.CAT_T?.name ?? null}
-            onSelect={handleSelect}
-          />
-        </Grid>
-        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
-            cat="CAT_L"
-            title="Legs"
-            rula_button_images={label_images_rula_cat_l}
-            selected_cat_image={rula_selected.CAT_L?.name ?? null}
+            cat="CAT3"
+            title="Gruppe: Muskelarbeit | Kraft"
+            rula_button_images={label_images_cat3}
+            selected_cat_image={rula_selected.CAT3?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
