@@ -6,7 +6,7 @@ authors = [
     { name = "mathias gewissen", email = "mathias.gewissen@htw-dresden.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.10,<3.11.dev0"
+requires-python = ">=3.10"
 
 dependencies = [
     "fastapi>=0.110.0",
