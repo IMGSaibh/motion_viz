@@ -2,18 +2,20 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 import os
 from pydantic import BaseModel
+from typing import Any, List
 
 router = APIRouter()
 
 class ClusterRequest(BaseModel):
     filename: str
+    labels: List[Any]  # List of ErgoLabel objects from frontend
 
 @router.post("/cluster_do")
 async def cluster_do_endpoint(request: ClusterRequest):
-    """Endpoint to call the print_ok function with the selected motion file"""
+    """Endpoint to call the print_ok function with the selected motion file and labels"""
     try:
         from backend.autolabel.test import print_ok
-        print_ok(request.filename)
+        print_ok(request.filename, request.labels)
         return JSONResponse(content={"status": "success", "message": "print_ok() called"})
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)

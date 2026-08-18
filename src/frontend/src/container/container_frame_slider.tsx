@@ -1,6 +1,6 @@
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx, use_get_labels_cxt } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
@@ -40,6 +40,8 @@ export function ContainerFrameSlider() {
     is_playing,
     selected_motion,
   } = use_three_js_engine_ctx();
+
+  const ergo_labels = use_get_labels_cxt();
 
   const on_click_play_toggle = useCallback(() => {
     play_pause();
@@ -127,7 +129,7 @@ export function ContainerFrameSlider() {
       if (e.code === 'KeyO') {
         e.preventDefault();
         if (selected_motion) {
-          call_cluster_do(selected_motion).catch((error) => console.error('Error calling cluster_do:', error));
+          call_cluster_do(selected_motion, ergo_labels).catch((error) => console.error('Error calling cluster_do:', error));
         }
       }
 
