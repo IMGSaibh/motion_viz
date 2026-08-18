@@ -5,6 +5,7 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
+import { call_cluster_do } from '@/api/cluster_api';
 
 export function ContainerFrameSlider() {
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
@@ -124,7 +125,7 @@ export function ContainerFrameSlider() {
 
       if (e.code === 'KeyO') {
         e.preventDefault();
-        // run code in backend
+        call_cluster_do().catch((error) => console.error('Error calling cluster_do:', error));
       }
 
 
