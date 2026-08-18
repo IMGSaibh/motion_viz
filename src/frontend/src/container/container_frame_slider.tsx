@@ -113,8 +113,21 @@ export function ContainerFrameSlider() {
         set_range([frame_slider_value, range[1]]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        set_range([range[0], frame_slider_value]);
+        set_range([range[0], frame_slider_value]);      }
+
+      if (e.code === 'KeyP') {
+        e.preventDefault();
+        const rnd_frame = Math.floor(Math.random() * frame_count);
+        set_frame_slider_value(rnd_frame);
+        go_to_frame(rnd_frame);
       }
+
+      if (e.code === 'KeyO') {
+        e.preventDefault();
+        // run code in backend
+      }
+
+
     };
 
     window.addEventListener('keydown', handleKeyDown);
