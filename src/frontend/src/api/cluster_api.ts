@@ -15,8 +15,12 @@ function parse_message_response(value: unknown, responseName: string): MessageRe
   return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };
 }
 
-export async function call_cluster_do(): Promise<MessageResponse> {
-  const response = await fetch(api_get_base_url(ENDPOINTS.clusterDo), { method: 'POST' });
+export async function call_cluster_do(filename: string): Promise<MessageResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.clusterDo), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename }),
+  });
   await assert_response_ok(response, 'Cluster do');
   return parse_message_response(await response.json(), 'Cluster do');
 }

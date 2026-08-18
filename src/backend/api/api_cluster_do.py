@@ -1,19 +1,19 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 import os
+from pydantic import BaseModel
 
 router = APIRouter()
 
-@router.post("/cluster_do")
-async def print_ok():
-    """Endpoint to call the print_ok function"""
-    # This assumes you have a function in your test.py file
-    # that you want to call
-    try:
-        # Import and call your function
+class ClusterRequest(BaseModel):
+    filename: str
 
+@router.post("/cluster_do")
+async def cluster_do_endpoint(request: ClusterRequest):
+    """Endpoint to call the print_ok function with the selected motion file"""
+    try:
         from backend.autolabel.test import print_ok
-        print_ok()
+        print_ok(request.filename)
         return JSONResponse(content={"status": "success", "message": "print_ok() called"})
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)

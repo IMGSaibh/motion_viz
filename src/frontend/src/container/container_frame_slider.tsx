@@ -38,6 +38,7 @@ export function ContainerFrameSlider() {
     cleanup_loop,
     cleanup_thumbnail_render,
     is_playing,
+    selected_motion,
   } = use_three_js_engine_ctx();
 
   const on_click_play_toggle = useCallback(() => {
@@ -125,7 +126,9 @@ export function ContainerFrameSlider() {
 
       if (e.code === 'KeyO') {
         e.preventDefault();
-        call_cluster_do().catch((error) => console.error('Error calling cluster_do:', error));
+        if (selected_motion) {
+          call_cluster_do(selected_motion).catch((error) => console.error('Error calling cluster_do:', error));
+        }
       }
 
 

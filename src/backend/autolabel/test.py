@@ -1,3 +1,3 @@
 
-def print_ok():
-    print("ok")
+def print_ok(filename: str):
+    print(f"ok: {filename}")
