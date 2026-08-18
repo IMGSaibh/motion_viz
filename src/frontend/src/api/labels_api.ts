@@ -20,6 +20,7 @@ export type LabelsDownload = {
 const ENDPOINTS = {
   save: '/api_save_labels/save_labels',
   download: '/api_download_labels/download_labels',
+  load: '/api_download_labels/load_labels',
 } as const;
 
 export async function save_labels(request: SaveLabelsRequest): Promise<SaveLabelsResponse> {
@@ -58,4 +59,16 @@ export function save_blob({ blob, file_name }: LabelsDownload): void {
     anchor.remove();
     URL.revokeObjectURL(url);
   }
+}
+
+export async function load_labels_for_file(filename: string): Promise<ErgoLabel[]> {
+  
+  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${filename}`), { method: 'GET' });
+  await assert_response_ok(response, 'Load labels');
+  const record = parse_record(await response.json(), 'load labels');
+  const labels = (record.labels ?? []) as ErgoLabel[];
+
+  console.log('Loaded labels:', labels);
+
+  return labels;
 }

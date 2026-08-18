@@ -5,7 +5,7 @@ import type { MotionDescriptorData } from '@/api/motion_api';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx, use_add_slider_label_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useBvhConversion } from '@/hooks/use_bvh_conversion';
@@ -13,13 +13,14 @@ import { useFileUpload } from '@/hooks/use_file_upload';
 import { useMotionDescriptor } from '@/hooks/use_motion_descriptor';
 import { useMotionFiles } from '@/hooks/use_motion_files';
 import { usePoseViewerConversion } from '@/hooks/use_pose_viewer_conversion';
+import { load_labels_for_file } from '@/api/labels_api';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
 export function ContainerTopbar() {
-  const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
+  const { set_selected_motion, load_motion_file, go_to_frame, stop } = use_three_js_engine_ctx();
   const { set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
   const { set_rula_selected, set_owas_selected } = use_ergo_methods_cxt();
@@ -50,6 +51,7 @@ export function ContainerTopbar() {
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
   const clear_slider_label_list = use_clear_label_list_ctx();
+  const add_slider_label = use_add_slider_label_ctx();
 
   async function handle_file_dialog_on_change(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files || []);
@@ -130,6 +132,27 @@ export function ContainerTopbar() {
     clear_slider_label_list();
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+
+    // Load corresponding labels from data/labels if available
+    try {
+      const loadedLabels = await load_labels_for_file(filename);
+      if (loadedLabels && loadedLabels.length > 0) {
+        loadedLabels.forEach((label) => {
+          // Ensure label has required fields (id and categories)
+          const completeLabel = {
+            ...label,
+            id: label.id || `label-${Date.now()}-${Math.random()}`,
+            categories: label.categories || [],
+          };
+          console.log('label:', label);
+          add_slider_label(completeLabel);
+        });
+        success(`Loaded ${loadedLabels.length} label(s) for ${filename}`);
+      }
+    } catch (labelError: unknown) {
+      // Labels not found or error loading - this is not critical
+      console.log('No labels found for this file or error loading labels');
+    }
   }
 
   async function handle_convert_with_pose_viewer() {
