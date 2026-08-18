@@ -57,9 +57,13 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           LabelImage | null
         >;
         set_rula_selected({
-          CAT1: by_name.CAT1 ?? null,
-          CAT2: by_name.CAT2 ?? null,
-          CAT3: by_name.CAT3 ?? null,
+          CAT_UA: by_name.CAT_UA ?? null,
+          CAT_LA: by_name.CAT_LA ?? null,
+          CAT_W: by_name.CAT_W ?? null,
+          CAT_N: by_name.CAT_N ?? null,
+          CAT_T: by_name.CAT_T ?? null,
+          CAT_L: by_name.CAT_L ?? null,
+
         });
       }
 
@@ -99,9 +103,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories =
       norm === 'RULA'
         ? [
-            { name: 'CAT1', image: rula_selected.CAT1 ?? null },
-            { name: 'CAT2', image: rula_selected.CAT2 ?? null },
-            { name: 'CAT3', image: rula_selected.CAT3 ?? null },
+            { name: 'CAT_UA', image: rula_selected.CAT_UA ?? null },
+            { name: 'CAT_LA', image: rula_selected.CAT_LA ?? null },
+            { name: 'CAT_W', image: rula_selected.CAT_W ?? null },
+            { name: 'CAT_N', image: rula_selected.CAT_N ?? null },
+            { name: 'CAT_T', image: rula_selected.CAT_T ?? null },
+            { name: 'CAT_L', image: rula_selected.CAT_L ?? null },
           ]
         : norm === 'OWAS'
           ? [
@@ -114,7 +121,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
     const rulaLabel =
       norm === 'RULA'
-        ? `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`
+        //? `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`
+        ? `${rula_selected.CAT_UA ?? ''} | ${rula_selected.CAT_LA ?? ''} | ${rula_selected.CAT_W ?? ''} 
+        | ${rula_selected.CAT_N ?? ''} | ${rula_selected.CAT_T ?? ''} | ${rula_selected.CAT_L ?? ''}`
         : undefined;
 
     dispatch({
@@ -129,14 +138,14 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     console.log('Saved edited label', ergo_labels);
 
     set_editing_id(null);
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
   }, [editing_id]);
 
   const value = useMemo<FrameSliderLabelListContext>(

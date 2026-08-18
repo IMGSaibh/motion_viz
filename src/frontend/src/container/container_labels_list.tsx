@@ -35,7 +35,7 @@ export function ContainerLabelsList() {
 
   const delete_label_list_on_click = useCallback(() => {
     clear_label_list();
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
 
