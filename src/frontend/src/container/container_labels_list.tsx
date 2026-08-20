@@ -46,6 +46,7 @@ export function ContainerLabelsList() {
       if (response.warning) warning(response.warning);
       else success(response.message || 'Labels erfolgreich gespeichert');
     } catch (requestError: unknown) {
+      console.log("labels to save", labels)
       error(get_error_message(requestError, 'Fehler beim Speichern der Labels'));
     }
   }, [error, labels, save_labels, selected_motion, success, warning]);

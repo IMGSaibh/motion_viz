@@ -10,10 +10,9 @@ class Image(BaseModel):
     name: str
     src: str
     category: str
-    element_id : int
 
 class Category(BaseModel):
-    name: str    
+    image: Image
     element_id : int
 
 class LabelItem(BaseModel):
@@ -43,7 +42,11 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
             {"ergo_method": item.ergo_method,
              "start_frame": a, 
              "end_frame": b,
-             "button_text": item.button_text,})
+             "categories": [{
+                "category": cat.image.category,
+                "element_id": cat.element_id} for cat in item.categories],
+            }
+             )
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)

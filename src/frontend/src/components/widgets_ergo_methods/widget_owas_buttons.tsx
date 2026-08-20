@@ -126,10 +126,10 @@ export function WidgetOwasButtons(props: Props) {
     if (!canSaveOwas) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT1', image: owas_selected.CAT1!, element_id: 1 },
-      { name: 'CAT2', image: owas_selected.CAT2!, element_id: 2 },
-      { name: 'CAT3', image: owas_selected.CAT3!, element_id: 3 },
-      { name: 'CAT4', image: owas_selected.CAT4!, element_id: 4 },
+      { image: owas_selected.CAT1!, element_id: 1 },
+      { image: owas_selected.CAT2!, element_id: 2 },
+      { image: owas_selected.CAT3!, element_id: 3 },
+      { image: owas_selected.CAT4!, element_id: 4 },
     ];
 
     const from = Math.min(range[0], range[1]);

@@ -1,16 +1,17 @@
 import { LabelImage } from '@/domain/datatypes';
+import { LabelCategory } from '@/domain/datatypes';
 import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
-  rula_selected: Record<string, LabelImage | null>;
-  set_rula_selected: (next: Record<string, LabelImage | null>) => void;
+  rula_selected: Record<string, LabelCategory | null>;
+  set_rula_selected: (next: Record<string, LabelCategory | null>) => void;
   owas_selected: Record<string, LabelImage | null>;
   set_owas_selected: (next: Record<string, LabelImage | null>) => void;
 };
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
-  const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
+  const [rula_selected, set_rula_selected] = useState<Record<string, LabelCategory | null>>({
     CAT_UA: null,
     CAT_LA: null,
     CAT_W: null,
@@ -38,6 +39,7 @@ export function ErgoMethodsContexProvider({ children }: { children: React.ReactN
 
 export const use_ergo_methods_cxt = () => {
   const ctx = useContext(ergo_methods_context);
+  //console.log('use_ergo_methods_cxt ctx:', ctx);
   if (!ctx) throw new Error('use_ergo_methods_ctx must be used within a ErgoMethodsContexProvider');
   return ctx;
 };

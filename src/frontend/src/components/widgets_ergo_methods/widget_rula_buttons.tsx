@@ -25,7 +25,8 @@ type Props = {
 function CategoryGrid({
   cat,
   title,
-  rula_button_images,
+  //rula_button_images,
+  rula_button_cat_values,
   selected_cat_image,
   onSelect,
   isLast,
@@ -33,10 +34,11 @@ function CategoryGrid({
   //cat: 'CAT1' | 'CAT2' | 'CAT3';
   cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L';
   title: string;
-  rula_button_images: readonly LabelImage[];
+  //rula_button_images: readonly LabelImage[];
+  rula_button_cat_values: readonly LabelCategory[];
   selected_cat_image: string | null;
   // onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
-  onSelect: (slot: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', img: LabelImage) => void;
+  onSelect: (rula_category: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', rula_cat_values: LabelCategory) => void;
   isLast?: boolean;
 }) {
   return (
@@ -60,12 +62,12 @@ function CategoryGrid({
           alignContent: 'start',
         }}
       >
-        {rula_button_images.map((item, i) => {
-          const isSelected = selected_cat_image === item.name;
+        {rula_button_cat_values.map((item, i) => {
+          const isSelected = selected_cat_image === item.image?.name;
           const isDimmed = selected_cat_image !== null && !isSelected;
           return (
             <ButtonBase
-              key={`${item.category}-${item.name}-${i}`}
+              key={`${item.element_id}-${item.image?.name}-${i}`}
               onClick={() => onSelect(cat, item)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
@@ -80,8 +82,8 @@ function CategoryGrid({
             >
               <Box
                 component="img"
-                src={item.src}
-                alt={item.name}
+                src={item.image?.src}
+                alt={item.image?.name}
                 sx={{
                   height: 40,
                   objectFit: 'contain',
@@ -100,7 +102,7 @@ function CategoryGrid({
                   py: 0.5,
                 }}
               >
-                {item.name}
+                {item.image?.name}
               </Box>
             </ButtonBase>
           );
@@ -111,6 +113,8 @@ function CategoryGrid({
 }
 
 export function WidgetRulaButtons(props: Props) {
+
+
   //const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
   //const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
   //const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
@@ -120,6 +124,32 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_rula_cat_n = useMemo(() => get_label_images_rula_cat_n(), []);
   const label_images_rula_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
   const label_images_rula_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
+
+  // Element IDs for RULA images
+  const label_cat_ua_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_ua.length }, (_, i) => i + 1),
+  [label_images_rula_cat_ua]);
+
+  const label_cat_la_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_la.length }, (_, i) => i + 1),
+  [label_images_rula_cat_la]);
+
+  const label_cat_w_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_w.length }, (_, i) => i + 1),
+  [label_images_rula_cat_w]);
+
+  const label_cat_n_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_n.length }, (_, i) => i + 1),
+  [label_images_rula_cat_n]);
+
+  const label_cat_t_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_t.length }, (_, i) => i + 1),
+  [label_images_rula_cat_t]);
+
+  const label_cat_l_element_ids = useMemo(
+  () => Array.from({ length: label_images_rula_cat_l.length }, (_, i) => i + 1),
+  [label_images_rula_cat_l]);
+
 
   const { range, set_range } = use_frame_slider_context();
 
@@ -136,23 +166,29 @@ export function WidgetRulaButtons(props: Props) {
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', img: LabelImage) => {
-    set_rula_selected({ ...rula_selected, [cat]: img });
-    
+  const handleSelect = (rula_cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', rula_cat_value: LabelCategory) => {
+    // set element_id to the current value if it exists, otherwise set to -1
+
+    set_rula_selected({ ...rula_selected, [rula_cat]: rula_cat_value });
+    console.log('rula_selected on select', rula_cat_value);
   };
 
   const on_handle_save = () => {
     if (!allSelected) return;
     if (!canSaveRula) return;
 
+    console.log('rula_selected on save', rula_selected);
+
     const categories: LabelCategory[] = [
-      { name: 'CAT_UA', image: rula_selected.CAT_UA!, element_id: 1 },
-      { name: 'CAT_LA', image: rula_selected.CAT_LA!, element_id: 2 },
-      { name: 'CAT_W', image: rula_selected.CAT_W!, element_id: 3 },
-      { name: 'CAT_N', image: rula_selected.CAT_N!, element_id: 4 },
-      { name: 'CAT_T', image: rula_selected.CAT_T!, element_id: 5 },
-      { name: 'CAT_L', image: rula_selected.CAT_L!, element_id: 6 },
+      { image: rula_selected.CAT_UA?.image!, element_id: rula_selected.CAT_UA?.element_id!},      
+      { image: rula_selected.CAT_LA?.image!, element_id: rula_selected.CAT_LA?.element_id!},
+      { image: rula_selected.CAT_W?.image!, element_id: rula_selected.CAT_W?.element_id! },
+      { image: rula_selected.CAT_N?.image!, element_id: rula_selected.CAT_N?.element_id! },
+      { image: rula_selected.CAT_T?.image!, element_id: rula_selected.CAT_T?.element_id! },
+      { image: rula_selected.CAT_L?.image!, element_id: rula_selected.CAT_L?.element_id!},
     ];
+
+    
 
     const from = Math.min(range[0], range[1]);
     const to = Math.max(range[0], range[1]);
@@ -172,7 +208,8 @@ export function WidgetRulaButtons(props: Props) {
     set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
   };
 
-  return (
+  //console.log("---->",rula_selected)
+  return (    
     <Box
       sx={(theme) => ({
         borderTop: `1px solid ${theme.palette.wip_color_theme[200]}`,
@@ -184,8 +221,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_UA"
             title="Upper Arm"
-            rula_button_images={label_images_rula_cat_ua}
-            selected_cat_image={rula_selected.CAT_UA?.name ?? null}
+            rula_button_cat_values={label_cat_ua_element_ids.map((id) => 
+              ({image: label_images_rula_cat_ua[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_UA?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -194,8 +232,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_LA"
             title="Lower Arm"
-            rula_button_images={label_images_rula_cat_la}
-            selected_cat_image={rula_selected.CAT_LA?.name ?? null}
+            rula_button_cat_values={label_cat_la_element_ids.map((id) => 
+              ({image: label_images_rula_cat_la[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_LA?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -204,8 +243,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_W"
             title="Wrist"
-            rula_button_images={label_images_rula_cat_w}
-            selected_cat_image={rula_selected.CAT_W?.name ?? null}
+            rula_button_cat_values={label_cat_w_element_ids.map((id) => 
+              ({image: label_images_rula_cat_w[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_W?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -214,8 +254,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_N"
             title="Neck"
-            rula_button_images={label_images_rula_cat_n}
-            selected_cat_image={rula_selected.CAT_N?.name ?? null}
+            rula_button_cat_values={label_cat_n_element_ids.map((id) => 
+              ({image: label_images_rula_cat_n[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_N?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -224,8 +265,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_T"
             title="Trunk"
-            rula_button_images={label_images_rula_cat_t}
-            selected_cat_image={rula_selected.CAT_T?.name ?? null}
+            rula_button_cat_values={label_cat_t_element_ids.map((id) => 
+              ({image: label_images_rula_cat_t[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_T?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -233,8 +275,9 @@ export function WidgetRulaButtons(props: Props) {
           <CategoryGrid
             cat="CAT_L"
             title="Legs"
-            rula_button_images={label_images_rula_cat_l}
-            selected_cat_image={rula_selected.CAT_L?.name ?? null}
+            rula_button_cat_values={label_cat_l_element_ids.map((id) => 
+              ({image: label_images_rula_cat_l[id-1], element_id: id }))}
+            selected_cat_image={rula_selected.CAT_l?.image?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
@@ -257,3 +300,4 @@ export function WidgetRulaButtons(props: Props) {
     </Box>
   );
 }
+

@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
+import type { LabelImage, ErgoLabel, LabelCategory } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
@@ -53,9 +53,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_editing_id(id);
 
       if (normalize_category(label.ergo_method) === 'RULA') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
+        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.image?.name, c.image])) as Record<
           string,
-          LabelImage | null
+          LabelCategory | null
         >;
         //console.log('by_name:', by_name);
         set_rula_selected({
@@ -70,7 +70,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       }
 
       if (normalize_category(label.ergo_method) === 'OWAS') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
+        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.image?.name, c.image])) as Record<
           string,
           LabelImage | null
         >;
@@ -105,19 +105,19 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories =
       norm === 'RULA'
         ? [
-            { name: 'CAT_UA', image: rula_selected.CAT_UA ?? null, element_id: null },
-            { name: 'CAT_LA', image: rula_selected.CAT_LA ?? null, element_id: null },
-            { name: 'CAT_W', image: rula_selected.CAT_W ?? null, element_id: null },
-            { name: 'CAT_N', image: rula_selected.CAT_N ?? null, element_id: null },
-            { name: 'CAT_T', image: rula_selected.CAT_T ?? null, element_id: null },
-            { name: 'CAT_L', image: rula_selected.CAT_L ?? null, element_id: null },
+            { image: rula_selected.CAT_UA?.image ?? null, element_id: -1 },
+            { image: rula_selected.CAT_LA?.image ?? null, element_id: -1 },
+            { image: rula_selected.CAT_W?.image ?? null, element_id: -1 },
+            {  image: rula_selected.CAT_N?.image ?? null, element_id: -1 },
+            { image: rula_selected.CAT_T?.image ?? null, element_id: -1 },
+            { image: rula_selected.CAT_L?.image ?? null, element_id: -1 },
           ]
         : norm === 'OWAS'
           ? [
-              { name: 'CAT1', image: owas_selected.CAT1 ?? null, element_id: null },
-              { name: 'CAT2', image: owas_selected.CAT2 ?? null, element_id: null },
-              { name: 'CAT3', image: owas_selected.CAT3 ?? null, element_id: null },
-              { name: 'CAT4', image: owas_selected.CAT4 ?? null, element_id: null },
+              { image: owas_selected.CAT1 ?? null, element_id: null },
+              { image: owas_selected.CAT2 ?? null, element_id: null },
+              { image: owas_selected.CAT3 ?? null, element_id: null },
+              { image: owas_selected.CAT4 ?? null, element_id: null },
             ]
           : undefined;
 
@@ -133,7 +133,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       id: editing_id,
       from: range[0],
       to: range[1],
-      
+
       ...(rulaLabel !== undefined ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
       ...(categories !== undefined ? { categories } : {}),
        
@@ -206,7 +206,7 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
       const to = Math.max(action.from, action.to);
       let changed = false;
 
-      console.log("->", action)
+      //console.log("->", action)
 
       const next = labels.map((x) => {
         if (x.id !== action.id) return x;
@@ -293,7 +293,7 @@ export function use_add_slider_label_ctx() {
   
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_add_slider_label_ctx must be used within <FrameSliderLabellistProvider>');
-    console.log('use_add_slider_label_ctx v:', v);
+    //console.log('use_add_slider_label_ctx v:', v);
     return v.add_slider_label;
   });
 }
