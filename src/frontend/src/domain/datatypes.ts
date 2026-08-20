@@ -17,6 +17,7 @@ export type LabelImage = {
 export type LabelCategory = {
   name: string;
   image: LabelImage | null;
+  element_id: number | null;
 };
 
 export type ErgoLabel = {

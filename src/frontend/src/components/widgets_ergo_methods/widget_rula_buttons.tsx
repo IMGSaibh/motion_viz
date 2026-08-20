@@ -3,15 +3,14 @@ import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
   //get_label_images_cat1_rula,
-  get_label_images_cat2_rula,
+  //get_label_images_cat2_rula,
   //get_label_images_cat3_rula,
   get_label_images_rula_cat_l,
   get_label_images_rula_cat_la,
   get_label_images_rula_cat_n,
   get_label_images_rula_cat_t,
   get_label_images_rula_cat_ua,
-  get_label_images_rula_cat_w
-
+  get_label_images_rula_cat_w,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -32,12 +31,12 @@ function CategoryGrid({
   isLast,
 }: {
   //cat: 'CAT1' | 'CAT2' | 'CAT3';
-  cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L';
+  cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L';
   title: string;
   rula_button_images: readonly LabelImage[];
   selected_cat_image: string | null;
   // onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
-  onSelect: (slot: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L', img: LabelImage) => void;
+  onSelect: (slot: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -126,15 +125,20 @@ export function WidgetRulaButtons(props: Props) {
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const allSelected = Boolean(
-    rula_selected.CAT_UA && rula_selected.CAT_LA && 
-    rula_selected.CAT_W && rula_selected.CAT_N && 
-    rula_selected.CAT_T && rula_selected.CAT_L);
+    rula_selected.CAT_UA &&
+    rula_selected.CAT_LA &&
+    rula_selected.CAT_W &&
+    rula_selected.CAT_N &&
+    rula_selected.CAT_T &&
+    rula_selected.CAT_L,
+  );
 
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W'| 'CAT_N'| 'CAT_T'| 'CAT_L', img: LabelImage) => {
+  const handleSelect = (cat: 'CAT_UA' | 'CAT_LA' | 'CAT_W' | 'CAT_N' | 'CAT_T' | 'CAT_L', img: LabelImage) => {
     set_rula_selected({ ...rula_selected, [cat]: img });
+    
   };
 
   const on_handle_save = () => {
@@ -142,13 +146,12 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT_UA', image: rula_selected.CAT_UA! },
-      { name: 'CAT_LA', image: rula_selected.CAT_LA! },
-      { name: 'CAT_W', image: rula_selected.CAT_W! },
-      { name: 'CAT_N', image: rula_selected.CAT_N! },
-      { name: 'CAT_T', image: rula_selected.CAT_T! },
-      { name: 'CAT_L', image: rula_selected.CAT_L! }
-      
+      { name: 'CAT_UA', image: rula_selected.CAT_UA!, element_id: 1 },
+      { name: 'CAT_LA', image: rula_selected.CAT_LA!, element_id: 2 },
+      { name: 'CAT_W', image: rula_selected.CAT_W!, element_id: 3 },
+      { name: 'CAT_N', image: rula_selected.CAT_N!, element_id: 4 },
+      { name: 'CAT_T', image: rula_selected.CAT_T!, element_id: 5 },
+      { name: 'CAT_L', image: rula_selected.CAT_L!, element_id: 6 },
     ];
 
     const from = Math.min(range[0], range[1]);
@@ -165,6 +168,7 @@ export function WidgetRulaButtons(props: Props) {
     };
 
     props.onClick?.(label);
+    console.log('Saved RULA label:', label);
     set_rula_selected({ CAT_UA: null, CAT_LA: null, CAT_W: null, CAT_N: null, CAT_T: null, CAT_L: null });
   };
 
