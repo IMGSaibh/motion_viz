@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
+import { uid } from '@/domain/label_logic';
+
 import type { MotionDescriptorData } from '@/api/motion_api';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -141,12 +143,16 @@ export function ContainerTopbar() {
           // Ensure label has required fields (id and categories)
           const completeLabel = {
             ...label,
-            id: label.id || `label-${Date.now()}-${Math.random()}`,
+            //id: label.id || `label-${Date.now()}-${Math.random()}`,
+            id: label.id || uid(),
+            // categories from button text?
             categories: label.categories || [],
           };
-          console.log('label:', label);
+          
           add_slider_label(completeLabel);
         });
+
+
         success(`Loaded ${loadedLabels.length} label(s) for ${filename}`);
       }
     } catch (labelError: unknown) {
