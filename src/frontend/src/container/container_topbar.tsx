@@ -14,8 +14,9 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { hook_file_upload } from '@/hooks/hook_file_upload';
-import { hook_list_motion_files } from '@/hooks/hook_select_motion_files';
+import { hook_list_motion_files, hook_list_topologies } from '@/hooks/hook_select_motion_files';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+import { SkeletonMapper } from '@/threeJS/motion_loader/skeleton_mapper';
 
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
@@ -45,6 +46,7 @@ export function ContainerTopbar() {
   // --- React Query hooks ---
   // const query_motion_files = select_motion_files({ enabled: false });
   const motion_files = hook_list_motion_files();
+  const motion_topologies = hook_list_topologies();
 
   const { upload_files } = hook_file_upload();
   const { create_motion_descriptor } = hook_motion_descriptor();
@@ -195,6 +197,7 @@ export function ContainerTopbar() {
         pv_file_dialog_on_change={handle_pv_file_dialog_on_change}
         convert_bvh_files_on_click={handle_convert_motion_file}
         motion_files={motion_files.data ?? []}
+        motion_topologies={motion_topologies.data ?? []}
         motion_file_selected={motion_file_selected}
         motion_file_list_on_change={handle_motion_file_list_on_change}
       />

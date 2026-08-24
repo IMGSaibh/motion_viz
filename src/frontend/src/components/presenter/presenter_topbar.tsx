@@ -2,6 +2,7 @@ import { WidgetUploadButton } from '@/components/widgets_topbar/widget_upload_bu
 import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_motion_descriptor';
 import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
 import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
+import { WidgetConvertFormat } from '../widgets_topbar/widget_convert_format';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 
@@ -21,6 +22,7 @@ type Props = {
   convert_bvh_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
 
   motion_files: Array<{ type: string; name: string }>;
+  motion_topologies: string[];
   motion_file_selected: string | null;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
@@ -55,6 +57,14 @@ export function PresenterTopbar(props: Props) {
                       motion_config_is_open: props.motion_config_is_open,
                       motion_config_on_click: props.motion_config_on_click,
                       motion_config_create_on_click: props.motion_config_create_on_click,
+                    }}
+                  />
+                  <WidgetConvertFormat
+                    {...{
+                      motion_files: props.motion_files,
+                      topologies: props.motion_topologies,
+                      file_dialog_reference: props.file_dialog_reference,
+                      file_dialog_on_change: props.file_dialog_on_change,
                     }}
                   />
                 </Box>

@@ -41,3 +41,23 @@ export function hook_list_motion_files() {
     refetchOnWindowFocus: false,
   });
 }
+
+export function hook_list_topologies() {
+  return useQuery({
+    queryKey: ['topologies'],
+    queryFn: async (): Promise<string[]> => {
+      const response = await fetch('/api_list_files/list_topologies', { method: 'GET' });
+
+      if (!response.ok) {
+        const ct = response.headers.get('content-type') || '';
+        const errText = ct.includes('application/json') ? JSON.stringify(await response.json()) : await response.text();
+        throw new Error(`List topologies failed (${response.status}): ${errText}`);
+      }
+
+      const data = (await response.json()) as string[];
+      return data;
+    },
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+}

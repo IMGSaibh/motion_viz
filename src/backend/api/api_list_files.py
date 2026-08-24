@@ -21,3 +21,13 @@ async def list_motion_files(response: Response):
 
     response.headers["Cache-Control"] = "max-age=30"
     return result
+
+@router.get("/list_topologies")
+async def list_topologies(response: Response):
+    base = workspacefolder / "data" / "target_format_descriptions"
+    base.mkdir(parents=True, exist_ok=True)
+
+    result = sorted(f.name for f in base.glob("*.json"))
+
+    response.headers["Cache-Control"] = "max-age=30"
+    return result
