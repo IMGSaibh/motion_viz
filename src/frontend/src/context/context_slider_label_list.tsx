@@ -53,18 +53,18 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_editing_id(id);
 
       if (normalize_category(label.ergo_method) === 'RULA') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.image?.name, c.image])) as Record<
+        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.image?.category, c])) as Record<
           string,
           LabelCategory | null
         >;
-        //console.log('by_name:', by_name);
+        console.log('by_name:', by_name);
         set_rula_selected({
-          CAT_UA: by_name.CAT_UA ?? null,
-          CAT_LA: by_name.CAT_LA ?? null,
-          CAT_W: by_name.CAT_W ?? null,
-          CAT_N: by_name.CAT_N ?? null,
-          CAT_T: by_name.CAT_T ?? null,
-          CAT_L: by_name.CAT_L ?? null,
+          CAT_UA: by_name.Cat_UpperArm ?? null,
+          CAT_LA: by_name.Cat_LowerArm ?? null,
+          CAT_W: by_name.Cat_Wrist ?? null,
+          CAT_N: by_name.Cat_Neck ?? null,
+          CAT_T: by_name.Cat_Trunk ?? null,
+          CAT_L: by_name.Cat_Legs ?? null,
 
         });
       }
