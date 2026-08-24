@@ -105,12 +105,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories =
       norm === 'RULA'
         ? [
-            { image: rula_selected.CAT_UA?.image ?? null, element_id: -1 },
-            { image: rula_selected.CAT_LA?.image ?? null, element_id: -1 },
-            { image: rula_selected.CAT_W?.image ?? null, element_id: -1 },
-            {  image: rula_selected.CAT_N?.image ?? null, element_id: -1 },
-            { image: rula_selected.CAT_T?.image ?? null, element_id: -1 },
-            { image: rula_selected.CAT_L?.image ?? null, element_id: -1 },
+            { image: rula_selected.CAT_UA?.image ?? null, element_id:  rula_selected.CAT_UA?.element_id ?? null },
+            { image: rula_selected.CAT_LA?.image ?? null, element_id: rula_selected.CAT_LA?.element_id ?? null },
+            { image: rula_selected.CAT_W?.image ?? null, element_id: rula_selected.CAT_W?.element_id ?? null },
+            {  image: rula_selected.CAT_N?.image ?? null, element_id: rula_selected.CAT_N?.element_id ?? null },
+            { image: rula_selected.CAT_T?.image ?? null, element_id: rula_selected.CAT_T?.element_id ?? null },
+            { image: rula_selected.CAT_L?.image ?? null, element_id: rula_selected.CAT_L?.element_id ?? null },
           ]
         : norm === 'OWAS'
           ? [
