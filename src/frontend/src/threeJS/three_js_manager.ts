@@ -7,7 +7,7 @@ import { BVH_Player } from '@/threeJS/motion_player/bvh_player';
 import { NPY_Player } from '@/threeJS/motion_player/npy_player';
 import { FBX_Player } from '@/threeJS/motion_player/fbx_player';
 import { GLTF_Player } from '@/threeJS/motion_player/gltf_player';
-import { SkeletonMapper } from './motion_loader/skeleton_mapper';
+import { SkeletonMapper, VirtualNode } from './motion_loader/skeleton_mapper';
 import { Loop } from '@/threeJS/system/loop';
 import { Resizer } from '@/threeJS/system/resizer';
 import { createScene } from '@/threeJS/components/scene';
@@ -44,6 +44,11 @@ export class ThreeJSEngine {
 
   loop: Loop;
   record: boolean = true;
+  srcToDestMap: Map<number, number> | null = null;
+  virtualNodes: VirtualNode[] | null = null
+
+  private sourceFile: string | null = null;
+  private targetFormat: string | null = null;
 
   constructor(scene_container: HTMLDivElement) {
     this.npy_player = null;
@@ -78,34 +83,62 @@ export class ThreeJSEngine {
     //bhand_push.json 23 joints This is incorrectly labeled!!!
     //L02_S01_R04_A17_N01_norm_data.json Xsens 22 joints
     //POSE-adult009-punch_right-002_1.json 33 joints
-    let recorder = new Recorder();
+  }
+  
+  // Handle visualization event
+  handle_visualize_skeletons = (sourceFile: string, targetFormat: string) => {
+    console.log("Event received:", { sourceFile, targetFormat });
+    if(!sourceFile || !targetFormat) {
+      console.error("Source file or target format were not received from the event.");
+      return;
+    }
+
+    this.sourceFile = sourceFile;
+    this.targetFormat = targetFormat;
+
     let skeletonMapper = new SkeletonMapper();
-    const targetFormat = 'LARA';
+    const sourceFileFolder = 'http://localhost:8000/data/json/';
+    const sourcePath = `${sourceFileFolder}${sourceFile}.json`;
+
     if(this.record) {
       skeletonMapper.mapSkeletons(
-          'http://localhost:8000/data/json/A_test.json', 
+          sourcePath, 
           targetFormat, 
           this.scene
       ).then(([srcToDestMap, virtualNodes]) => {
-          // Use srcToDestMap and virtualNodes here
-          console.log("Mapping complete:", srcToDestMap, virtualNodes);
-          recorder.setupRecording("data/npy/A_test.npy", srcToDestMap, virtualNodes, targetFormat).then(() => {
-            recorder.record()
-          }).catch(error => {
-            console.error("Recording failed:", error);
-          })
+          this.srcToDestMap = srcToDestMap;
+          this.virtualNodes = virtualNodes;
+          console.log("Mapping completed successfully.");
+
       }).catch(error => {
           console.error("Mapping failed:", error);
       });
-
     }
-
 
   }
 
+  async handle_convert_skeletons() {
+    if(!this.sourceFile || !this.targetFormat) {
+      console.error("Source file or target format not set.");
+      return;
+    }
+    if(!this.srcToDestMap || !this.virtualNodes) {
+      console.error("Source to destination map or virtual nodes not set.");
+      return;
+    }
+    const sourceFileFolder = 'data/npy/';
+    const sourcePath = `${sourceFileFolder}${this.sourceFile}.npy`;
+
+    let recorder = new Recorder();
+    recorder.setupRecording(sourcePath, this.srcToDestMap, this.virtualNodes, this.targetFormat).then(() => {
+      recorder.record();
+    }).catch(error => {
+      console.error("Recording failed:", error);
+    });
+   }
+
   async start_engine_cycle() {
     this.loop.start();
-    
   }
 
   stop_engine_cycle() {

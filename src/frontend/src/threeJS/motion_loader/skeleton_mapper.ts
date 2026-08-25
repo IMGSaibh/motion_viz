@@ -97,12 +97,9 @@ export class SkeletonMapper {
             }
         }
 
-        // Visualize
-        this.graphVisualizer?.drawGraph(this.graphA.getNodes(), this.restposeA, -100, matchColors, scene, this.skeletonA.topologicalBranches);
-        this.graphVisualizer?.drawGraph(this.graphB.getNodes(), this.restposeB, 100, matchColors, scene, this.skeletonB.topologicalBranches);
-
         const [srcToDestMap, virtualNodes] = this.createUnionSkeleton(this.skeletonA, this.skeletonB, sortedMatches[0]);
-        this.graphVisualizer?.drawUnionSkeleton(target_format_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
+        this.visualizeSkeletons(scene, matchColors)
+        // this.graphVisualizer?.drawUnionSkeleton(target_format_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
         return [srcToDestMap, virtualNodes];
     }
 
@@ -189,239 +186,239 @@ export class SkeletonMapper {
     }
 
     /**
-* The goal of this algorithm is to have a skeleton with the topology of destSkeleton, but some of the nodes are purely virtual, meaning computed via Inverse Kinematics
-* For each other node in this unionSkeleton, we should know exactly what node of srcSkeleton maps to it, so we can then record that motion
- */
-private createUnionSkeleton(
-    srcSkeleton: Skeleton,
-    destSkeleton: Skeleton,
-    match: Map<number, number> // Maps node IDs from srcSkeleton to destSkeleton
-): [Map<number, number>, VirtualNode[]] {
-    const threshold = 0.2
+    * The goal of this algorithm is to have a skeleton with the topology of destSkeleton, but some of the nodes are purely virtual, meaning computed via Inverse Kinematics
+    * For each other node in this unionSkeleton, we should know exactly what node of srcSkeleton maps to it, so we can then record that motion
+    */
+    private createUnionSkeleton(
+        srcSkeleton: Skeleton,
+        destSkeleton: Skeleton,
+        match: Map<number, number> // Maps node IDs from srcSkeleton to destSkeleton
+    ): [Map<number, number>, VirtualNode[]] {
+        const threshold = 0.2
 
-    //Step 1
-    //For each topological branch in the source skeleton, get the graphNode that corresponds to the startNode and the one that corresponds to the endNode
-    //We are then looking for the corresponding topological branch from the destination skeleton. If that path does not exist, the algorithm fails
-    
-    // Store the mapping from source node ID to destination node ID
-    const srcToDestMap = new Map<number, number>();
-    for (const [srcId, destId] of match) {
-        srcToDestMap.set(srcId, destId);
-    }
-    let virtualNodes: VirtualNode[] = []; //IDs of the destination skeleton that have no direct match from the source skeleton
-    
-    // For each topological branch in the source skeleton
-    for (const srcBranch of srcSkeleton.topologicalBranches) {
-        const srcStartId = srcBranch.start.id;
-        const srcEndId = srcBranch.end.id;
+        //Step 1
+        //For each topological branch in the source skeleton, get the graphNode that corresponds to the startNode and the one that corresponds to the endNode
+        //We are then looking for the corresponding topological branch from the destination skeleton. If that path does not exist, the algorithm fails
         
-        // Get the corresponding destination node IDs from the match
-        const destStartId = match.get(srcStartId);
-        const destEndId = match.get(srcEndId);
-        
-        // If either end of the branch is not matched, the algorithm fails
-        if (destStartId === undefined || destEndId === undefined) {
-            console.error(`Failed to find match for branch ${srcStartId}->${srcEndId}`);
-            throw new Error(`Cannot map branch: start ${srcStartId} or end ${srcEndId} not matched`);
+        // Store the mapping from source node ID to destination node ID
+        const srcToDestMap = new Map<number, number>();
+        for (const [srcId, destId] of match) {
+            srcToDestMap.set(srcId, destId);
         }
+        let virtualNodes: VirtualNode[] = []; //IDs of the destination skeleton that have no direct match from the source skeleton
         
-        // Find the topological branch in the destination skeleton that connects these two nodes
-        let matchingDestBranch: TopologicalBranch | null = null;
-        for (const destBranch of destSkeleton.topologicalBranches) {
-            if ((destBranch.start.id === destStartId && destBranch.end.id === destEndId) ||
-                (destBranch.start.id === destEndId && destBranch.end.id === destStartId)) {
-                matchingDestBranch = destBranch;
-                break;
+        // For each topological branch in the source skeleton
+        for (const srcBranch of srcSkeleton.topologicalBranches) {
+            const srcStartId = srcBranch.start.id;
+            const srcEndId = srcBranch.end.id;
+            
+            // Get the corresponding destination node IDs from the match
+            const destStartId = match.get(srcStartId);
+            const destEndId = match.get(srcEndId);
+            
+            // If either end of the branch is not matched, the algorithm fails
+            if (destStartId === undefined || destEndId === undefined) {
+                console.error(`Failed to find match for branch ${srcStartId}->${srcEndId}`);
+                throw new Error(`Cannot map branch: start ${srcStartId} or end ${srcEndId} not matched`);
             }
-        }
-        
-        // If no matching branch found in the destination skeleton, the algorithm fails
-        if (!matchingDestBranch) {
-            console.error(`No matching branch found in destination for ${srcStartId}->${srcEndId}`);
-            throw new Error(`Cannot find corresponding branch in destination skeleton`);
-        }
-        // console.log(`Mapped source branch ${srcStartId}->${srcEndId} to destination branch ${destStartId}->${destEndId}`);
+            
+            // Find the topological branch in the destination skeleton that connects these two nodes
+            let matchingDestBranch: TopologicalBranch | null = null;
+            for (const destBranch of destSkeleton.topologicalBranches) {
+                if ((destBranch.start.id === destStartId && destBranch.end.id === destEndId) ||
+                    (destBranch.start.id === destEndId && destBranch.end.id === destStartId)) {
+                    matchingDestBranch = destBranch;
+                    break;
+                }
+            }
+            
+            // If no matching branch found in the destination skeleton, the algorithm fails
+            if (!matchingDestBranch) {
+                console.error(`No matching branch found in destination for ${srcStartId}->${srcEndId}`);
+                throw new Error(`Cannot find corresponding branch in destination skeleton`);
+            }
+            // console.log(`Mapped source branch ${srcStartId}->${srcEndId} to destination branch ${destStartId}->${destEndId}`);
 
-        //Step 2
-        //For each collapsed node on the skeleton path from startNode and endNode, find its distance to the startNode, in percent
+            //Step 2
+            //For each collapsed node on the skeleton path from startNode and endNode, find its distance to the startNode, in percent
 
-        // Get the path of the source branch (includes start, intermediate, and end nodes)
-        const srcPath = srcBranch.path;
-        const srcNodesInBetween: number = srcPath.length - 2; // Number of segments between nodes (-2 because we substract startnode and endnode)
+            // Get the path of the source branch (includes start, intermediate, and end nodes)
+            const srcPath = srcBranch.path;
+            const srcNodesInBetween: number = srcPath.length - 2; // Number of segments between nodes (-2 because we substract startnode and endnode)
 
-        const destNodesInBetween: number = matchingDestBranch.path.length - 2;
-        //If the destination branch has no nodes, there is nothing to map to, so we can skip this branch
-        if(destNodesInBetween === 0) {
-            continue;
-        }
-        if(srcNodesInBetween === 0) {
-            for (let i = 0; i < matchingDestBranch.path.length - 1; i++) {
-                if(!virtualNodes.some(vn => vn.id === matchingDestBranch.path[i].id) && ![...srcToDestMap.values()].includes(matchingDestBranch.path[i].id)) {
-                    //TODO: This is a very bad approximation, because it always takes start and end node as neighbours. 
-                    const leftNeighbour = i > 0 ? srcStartId : srcStartId; // Left neighbour is always the source start node
-                    const rightNeighbour = srcEndId; // Right neighbour is always the source end node
+            const destNodesInBetween: number = matchingDestBranch.path.length - 2;
+            //If the destination branch has no nodes, there is nothing to map to, so we can skip this branch
+            if(destNodesInBetween === 0) {
+                continue;
+            }
+            if(srcNodesInBetween === 0) {
+                for (let i = 0; i < matchingDestBranch.path.length - 1; i++) {
+                    if(!virtualNodes.some(vn => vn.id === matchingDestBranch.path[i].id) && ![...srcToDestMap.values()].includes(matchingDestBranch.path[i].id)) {
+                        //TODO: This is a very bad approximation, because it always takes start and end node as neighbours. 
+                        const leftNeighbour = i > 0 ? srcStartId : srcStartId; // Left neighbour is always the source start node
+                        const rightNeighbour = srcEndId; // Right neighbour is always the source end node
+                        
+                        virtualNodes.push({
+                            id: matchingDestBranch.path[i].id,
+                            leftNeighbour: leftNeighbour,
+                            rightNeighbour: rightNeighbour,
+                            weighting: 0.5
+                        });
+                    }
+                }
+            }        
+            else {
+            
+            // Calculate the percentage distance for each node in the source path
+            const srcNodeDistances: [number, number][] = this.calculateNodeDistances(srcBranch, this.restposeA);
+            //  console.log(`SOURCE: Path from ${srcStartId} to ${srcEndId} has the following distances: `, srcNodeDistances);
+
+            const destNodeDistances: [number, number][] = this.calculateNodeDistances(matchingDestBranch, this.restposeB);
+            //  console.log(`DESTINATION: Path from ${matchingDestBranch.start.id} to ${matchingDestBranch.end.id} has the following distances: `, destNodeDistances);
+
+            //Step 3
+            //For each of the nodes computed in step 2, find nodes on the topological branch from destination skeleton, that fall into the segment covered by this node
+            //If there is no node in this segment in the destination branch, we can ignore this node (it does not need to be recorded, because there is no node in the destination skeleton corresponding to it)
+            //If there is more than one node in this segment in the destination branch, we take the closest as a direct mapping and the other as virtualNodes
+
+            // For each source node (excluding start and end, which are already matched)
+            for (let i = 1; i < srcNodeDistances.length - 1; i++) {
+                const [srcNodeId, srcPercentage] = srcNodeDistances[i];
+                
+                // Find the segment boundaries: previous source node percentage and current source node percentage
+                const prevSrcPercentage = srcNodeDistances[i - 1][1];
+                const currSrcPercentage = srcPercentage;
+                
+                // The segment is from prevSrcPercentage to currSrcPercentage + threshold
+                const segmentEnd = currSrcPercentage + threshold;
+                
+                // Find all destination nodes that fall within this segment
+                const matchingDestNodes: { id: number, percentage: number, distance: number }[] = [];
+                
+                for (const [destNodeId, destPercentage] of destNodeDistances) {
+                    // Skip start and end nodes (they're already matched)
+                    if (destNodeId === matchingDestBranch.start.id || destNodeId === matchingDestBranch.end.id) {
+                        continue;
+                    }
                     
+                    // Check if this destination node falls within the segment (with margin)
+                    if (destPercentage >= prevSrcPercentage && destPercentage <= segmentEnd) {
+                        //If we already have a direct map to this destination node, we do not override it
+                        if([...srcToDestMap.values()].includes(destNodeId)) {
+                            continue;
+                        }
+                        const distance = Math.abs(destPercentage - srcPercentage);
+                        matchingDestNodes.push({
+                            id: destNodeId,
+                            percentage: destPercentage,
+                            distance: distance
+                        });
+                    }
+                }
+                console.log(`Node ${srcNodeId} has the following destination nodes: `, matchingDestNodes)
+                // Sort matching destination nodes by distance to the source node
+                matchingDestNodes.sort((a, b) => a.distance - b.distance);
+                
+                if (matchingDestNodes.length === 0) {
+                    // No destination node in this segment, this source node has no direct mapping
+                    console.log(`Source node ${srcNodeId} has no direct mapping in destination segment`);
+                    continue;
+                }
+                
+                let numCoveredNodes = 0;
+                // Take the closest node as a direct mapping
+                for (let i = 0; i < matchingDestNodes.length; i++) {
+                    numCoveredNodes++;
+                    if(![...srcToDestMap.values()].includes(matchingDestNodes[i].id)) {
+                        srcToDestMap.set(srcNodeId, matchingDestNodes[i].id); //set direct map
+                        break;
+                    } 
+                    
+                }
+                // console.log(`Mapped source node ${srcNodeId} (${(srcPercentage * 100).toFixed(1)}%) -> destination node ${closestDest.id} (${(closestDest.percentage * 100).toFixed(1)}%), distance: ${closestDest.distance.toFixed(3)}`);
+                
+                // Any remaining nodes in this segment are virtual nodes
+                if (matchingDestNodes.length > 1) {
+                    const newVirtualNodes = matchingDestNodes.slice(numCoveredNodes);
+
+                    console.log(`  ${newVirtualNodes.length} virtual nodes in this segment:`, newVirtualNodes.map(n => n.id));
+                    // Find left and right neighbours (source nodes) for weighting
+                    const leftSrcNodeId = srcNodeDistances[i - 1][0]; //The ID of the source node before
+                    const rightSrcNodeId = srcNodeDistances[i + 1][0]; //The ID of the sourc node after
+                    
+                    newVirtualNodes.forEach((node: any) => {
+                        if(!virtualNodes.some(vn => vn.id === node.id) && ![...srcToDestMap.values()].includes(node.id)) {
+                            virtualNodes.push({
+                                id: node.id,
+                                leftNeighbour: leftSrcNodeId,
+                                rightNeighbour: rightSrcNodeId,
+                                weighting: 0.5
+                            });
+                        }
+                    });
+    }        }
+
+            //All destination nodes that are not covered at all by the source nodes get added to virtual nodes
+            for (const [destNodeId, destPercentage] of destNodeDistances) {
+                if(!virtualNodes.some(vn => vn.id === destNodeId) && ![...srcToDestMap.values()].includes(destNodeId)) {
+                    const leftSrcNodeId = srcNodeDistances[srcNodeDistances.length - 2][0] //element before the last
+                    const rightSrcNodeId = srcNodeDistances[srcNodeDistances.length - 1][0] //last element
                     virtualNodes.push({
-                        id: matchingDestBranch.path[i].id,
-                        leftNeighbour: leftNeighbour,
-                        rightNeighbour: rightNeighbour,
+                        id: destNodeId,
+                        leftNeighbour: leftSrcNodeId,
+                        rightNeighbour: rightSrcNodeId,
                         weighting: 0.5
                     });
                 }
             }
-        }        
-        else {
-        
-        // Calculate the percentage distance for each node in the source path
-        const srcNodeDistances: [number, number][] = this.calculateNodeDistances(srcBranch, this.restposeA);
-        //  console.log(`SOURCE: Path from ${srcStartId} to ${srcEndId} has the following distances: `, srcNodeDistances);
-
-        const destNodeDistances: [number, number][] = this.calculateNodeDistances(matchingDestBranch, this.restposeB);
-        //  console.log(`DESTINATION: Path from ${matchingDestBranch.start.id} to ${matchingDestBranch.end.id} has the following distances: `, destNodeDistances);
-
-        //Step 3
-        //For each of the nodes computed in step 2, find nodes on the topological branch from destination skeleton, that fall into the segment covered by this node
-        //If there is no node in this segment in the destination branch, we can ignore this node (it does not need to be recorded, because there is no node in the destination skeleton corresponding to it)
-        //If there is more than one node in this segment in the destination branch, we take the closest as a direct mapping and the other as virtualNodes
-
-        // For each source node (excluding start and end, which are already matched)
-        for (let i = 1; i < srcNodeDistances.length - 1; i++) {
-            const [srcNodeId, srcPercentage] = srcNodeDistances[i];
-            
-            // Find the segment boundaries: previous source node percentage and current source node percentage
-            const prevSrcPercentage = srcNodeDistances[i - 1][1];
-            const currSrcPercentage = srcPercentage;
-            
-            // The segment is from prevSrcPercentage to currSrcPercentage + threshold
-            const segmentEnd = currSrcPercentage + threshold;
-            
-            // Find all destination nodes that fall within this segment
-            const matchingDestNodes: { id: number, percentage: number, distance: number }[] = [];
-            
-            for (const [destNodeId, destPercentage] of destNodeDistances) {
-                // Skip start and end nodes (they're already matched)
-                if (destNodeId === matchingDestBranch.start.id || destNodeId === matchingDestBranch.end.id) {
-                    continue;
-                }
-                
-                // Check if this destination node falls within the segment (with margin)
-                if (destPercentage >= prevSrcPercentage && destPercentage <= segmentEnd) {
-                    //If we already have a direct map to this destination node, we do not override it
-                    if([...srcToDestMap.values()].includes(destNodeId)) {
-                        continue;
-                    }
-                    const distance = Math.abs(destPercentage - srcPercentage);
-                    matchingDestNodes.push({
-                        id: destNodeId,
-                        percentage: destPercentage,
-                        distance: distance
-                    });
-                }
-            }
-            console.log(`Node ${srcNodeId} has the following destination nodes: `, matchingDestNodes)
-            // Sort matching destination nodes by distance to the source node
-            matchingDestNodes.sort((a, b) => a.distance - b.distance);
-            
-            if (matchingDestNodes.length === 0) {
-                // No destination node in this segment, this source node has no direct mapping
-                console.log(`Source node ${srcNodeId} has no direct mapping in destination segment`);
-                continue;
             }
             
-            let numCoveredNodes = 0;
-            // Take the closest node as a direct mapping
-            for (let i = 0; i < matchingDestNodes.length; i++) {
-                numCoveredNodes++;
-                if(![...srcToDestMap.values()].includes(matchingDestNodes[i].id)) {
-                    srcToDestMap.set(srcNodeId, matchingDestNodes[i].id); //set direct map
-                    break;
-                } 
-                
-            }
-            // console.log(`Mapped source node ${srcNodeId} (${(srcPercentage * 100).toFixed(1)}%) -> destination node ${closestDest.id} (${(closestDest.percentage * 100).toFixed(1)}%), distance: ${closestDest.distance.toFixed(3)}`);
-            
-            // Any remaining nodes in this segment are virtual nodes
-            if (matchingDestNodes.length > 1) {
-                const newVirtualNodes = matchingDestNodes.slice(numCoveredNodes);
-
-                console.log(`  ${newVirtualNodes.length} virtual nodes in this segment:`, newVirtualNodes.map(n => n.id));
-                // Find left and right neighbours (source nodes) for weighting
-                const leftSrcNodeId = srcNodeDistances[i - 1][0]; //The ID of the source node before
-                const rightSrcNodeId = srcNodeDistances[i + 1][0]; //The ID of the sourc node after
-                
-                newVirtualNodes.forEach((node: any) => {
-                    if(!virtualNodes.some(vn => vn.id === node.id) && ![...srcToDestMap.values()].includes(node.id)) {
-                        virtualNodes.push({
-                            id: node.id,
-                            leftNeighbour: leftSrcNodeId,
-                            rightNeighbour: rightSrcNodeId,
-                            weighting: 0.5
-                        });
-                    }
-                });
-}        }
-
-        //All destination nodes that are not covered at all by the source nodes get added to virtual nodes
-        for (const [destNodeId, destPercentage] of destNodeDistances) {
-            if(!virtualNodes.some(vn => vn.id === destNodeId) && ![...srcToDestMap.values()].includes(destNodeId)) {
-                const leftSrcNodeId = srcNodeDistances[srcNodeDistances.length - 2][0] //element before the last
-                const rightSrcNodeId = srcNodeDistances[srcNodeDistances.length - 1][0] //last element
-                virtualNodes.push({
-                    id: destNodeId,
-                    leftNeighbour: leftSrcNodeId,
-                    rightNeighbour: rightSrcNodeId,
-                    weighting: 0.5
-                });
-            }
-        }
         }
         
-    }
-    
-    console.log(srcToDestMap)
-    console.log(virtualNodes)
+        console.log(srcToDestMap)
+        console.log(virtualNodes)
 
-    //Step 4
-    //Now, with the virtual nodes and the nodes that have a mapping combined, each node from the destination skeleton should be covered. 
-    //If that is not the case, the algorithm fails
-    const coveredDestNodeIds = new Set<number>();
+        //Step 4
+        //Now, with the virtual nodes and the nodes that have a mapping combined, each node from the destination skeleton should be covered. 
+        //If that is not the case, the algorithm fails
+        const coveredDestNodeIds = new Set<number>();
 
-    // Add all destination node IDs that are in the srcToDestMap (direct mappings)
-    for (const [srcId, destId] of srcToDestMap) {
-        coveredDestNodeIds.add(destId);
-    }
-    for(const virtualID of virtualNodes) {
-        coveredDestNodeIds.add(virtualID.id);
-    }
-
-    // Find any uncovered nodes
-    const uncoveredNodeIds: number[] = [];
-    for (const nodeId of this.skeletonBNodeIDs) {
-        if (!coveredDestNodeIds.has(nodeId)) {
-            uncoveredNodeIds.push(nodeId);
+        // Add all destination node IDs that are in the srcToDestMap (direct mappings)
+        for (const [srcId, destId] of srcToDestMap) {
+            coveredDestNodeIds.add(destId);
         }
+        for(const virtualID of virtualNodes) {
+            coveredDestNodeIds.add(virtualID.id);
+        }
+
+        // Find any uncovered nodes
+        const uncoveredNodeIds: number[] = [];
+        for (const nodeId of this.skeletonBNodeIDs) {
+            if (!coveredDestNodeIds.has(nodeId)) {
+                uncoveredNodeIds.push(nodeId);
+            }
+        }
+
+        if (uncoveredNodeIds.length > 0) {
+            console.error(`Algorithm failed: ${uncoveredNodeIds.length} nodes in destination skeleton are not covered`);
+            console.error(`Uncovered node IDs:`, uncoveredNodeIds);
+            console.error(`Total destination nodes: ${this.skeletonBNodeIDs.size}`);
+            console.error(`Covered nodes: ${coveredDestNodeIds.size}`);
+            throw new Error(`Cannot map all destination nodes. Uncovered: ${uncoveredNodeIds.join(', ')}`);
+        }
+
+        console.log(`All ${this.skeletonBNodeIDs.size} destination nodes are covered successfully!`);
+        console.log(`  - Direct matches: ${srcToDestMap.size}`);
+        console.log(`  - Virtual nodes: ${coveredDestNodeIds.size - srcToDestMap.size}`);
+
+        return [srcToDestMap, virtualNodes];
     }
 
-    if (uncoveredNodeIds.length > 0) {
-        console.error(`Algorithm failed: ${uncoveredNodeIds.length} nodes in destination skeleton are not covered`);
-        console.error(`Uncovered node IDs:`, uncoveredNodeIds);
-        console.error(`Total destination nodes: ${this.skeletonBNodeIDs.size}`);
-        console.error(`Covered nodes: ${coveredDestNodeIds.size}`);
-        throw new Error(`Cannot map all destination nodes. Uncovered: ${uncoveredNodeIds.join(', ')}`);
-    }
-
-    console.log(`All ${this.skeletonBNodeIDs.size} destination nodes are covered successfully!`);
-    console.log(`  - Direct matches: ${srcToDestMap.size}`);
-    console.log(`  - Virtual nodes: ${coveredDestNodeIds.size - srcToDestMap.size}`);
-
-    return [srcToDestMap, virtualNodes];
-}
-
-//TODO: The node distance calculation is something that can be done in the skeleton class and we can add it as an attribute to the Node type
-private calculateNodeDistances(
-        branch: TopologicalBranch, 
-        restpose: number[][]
-    ): [number, number][] {
+    //TODO: The node distance calculation is something that can be done in the skeleton class and we can add it as an attribute to the Node type
+    private calculateNodeDistances(
+            branch: TopologicalBranch, 
+            restpose: number[][]
+        ): [number, number][] {
         const nodeDistances: [number, number][] = []
         const path = branch.path;
         
@@ -470,5 +467,23 @@ private calculateNodeDistances(
         }
         
         return nodeDistances;
+    }
+
+    visualizeSkeletons(scene: THREE.Scene, matchColors: Map<number, string>) {
+        if(!this.graphA || !this.graphB ) {
+            console.error("Cannot visualize skeletons: Graphs are not initialized.");
+            return;
+        }
+        if(!this.restposeA || !this.restposeB) {
+            console.error("Cannot visualize skeletons: Rest poses are not initialized.");
+            return;
+        }
+        if(!this.skeletonA || !this.skeletonB) {
+            console.error("Cannot visualize skeletons: Skeletons are not initialized.");
+            return;
+        }
+        this.graphVisualizer?.drawGraph(this.graphA.getNodes(), this.restposeA, -100, matchColors, scene, this.skeletonA.topologicalBranches);
+        this.graphVisualizer?.drawGraph(this.graphB.getNodes(), this.restposeB, 100, matchColors, scene, this.skeletonB.topologicalBranches);
+
     }
 }

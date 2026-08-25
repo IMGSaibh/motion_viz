@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ThreeJSEngine } from '@/threeJS/three_js_manager';
+import { convertArray } from 'three/src/animation/AnimationUtils';
 
 type ThreeJSEngineContext = {
   threejs_scene_ref: React.RefObject<HTMLDivElement | null>;
@@ -15,6 +16,8 @@ type ThreeJSEngineContext = {
   pause: () => void;
   reset_engine: () => void;
   load_motion_file: (file: string) => Promise<void>;
+  visualize_skeletons: (sourceFile: string, targetFormat: string) => void;
+  convert_skeletons: () => Promise<void>;
   cleanup_player: () => void;
   cleanup_loop: () => void;
   cleanup_thumbnail_render: () => void;
@@ -73,6 +76,16 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     [sync_is_playing],
   );
 
+  const visualize_skeletons = useCallback((sourceFile: string, targetFormat: string) => {
+    console.log("Dispatching visualize_skeletons event");
+    threejs_mngr_ref.current?.handle_visualize_skeletons(sourceFile, targetFormat);
+  }, []);
+
+  const convert_skeletons = useCallback(async () => {
+    console.log("Dispatching convert_skeletons event");
+    await threejs_mngr_ref.current?.handle_convert_skeletons();
+  }, []);
+
   const get_thumbnail_for_frame = useCallback(
     (idx: number) => threejs_mngr_ref.current?.get_thumbnail_for_frame?.(idx) ?? Promise.resolve(null),
     [],
@@ -118,6 +131,8 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       current_frame,
 
       load_motion_file,
+      visualize_skeletons,
+      convert_skeletons,
       go_to_frame,
       play_pause,
       stop,
@@ -135,6 +150,8 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       frame_count,
       current_frame,
       load_motion_file,
+      visualize_skeletons,
+      convert_skeletons,
       go_to_frame,
       play_pause,
       stop,

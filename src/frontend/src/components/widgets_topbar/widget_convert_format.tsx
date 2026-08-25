@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import LoopIcon from '@mui/icons-material/Loop';
 import Menu from '@mui/material/Menu';
@@ -12,14 +12,18 @@ import InputLabel from '@mui/material/InputLabel';
 type Props = {
   topologies: string[];
   motion_files: Array<{ type: string; name: string }>;
+  
   file_dialog_reference: React.RefObject<HTMLInputElement | null>;
   file_dialog_on_change: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+  visualize_skeletons: (sourceFile: string, targetFormat: string) => void;
+  convert_skeletons: () => Promise<void>;
 };
 
 export function WidgetConvertFormat(props: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [sourceFile, setSourceFile] = useState('');
-  const [sourceFormat, setSourceFormat] = useState('');
+  // const [sourceFormat, setSourceFormat] = useState('');
   const [targetFormat, setTargetFormat] = useState('');
   
   const open = Boolean(anchorEl);
@@ -31,6 +35,18 @@ export function WidgetConvertFormat(props: Props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (sourceFile && targetFormat) {
+      const sourceFileStem = sourceFile.split('.')[0];
+      const targetFormatStem = targetFormat.split('.')[0];
+      console.log(`Ready to convert ${sourceFileStem} to ${targetFormatStem}`);
+
+      //This calls the visualize skeletons method in skeleton_mapper.ts, from three_js_manager.ts
+      props.visualize_skeletons(sourceFileStem, targetFormatStem);
+    }
+  }, [sourceFile, targetFormat]);
+  
 
   return (
     <>
@@ -105,7 +121,8 @@ export function WidgetConvertFormat(props: Props) {
             fullWidth 
             size="small"
             sx={{ mt: 1 }}
-            disabled={!sourceFile || !sourceFormat || !targetFormat}
+            disabled={!sourceFile || !targetFormat}
+            onClick={props.convert_skeletons}
             >
             Convert
           </Button>

@@ -24,6 +24,8 @@ type Props = {
   motion_files: Array<{ type: string; name: string }>;
   motion_topologies: string[];
   motion_file_selected: string | null;
+  visualize_skeletons: (sourceFile: string, targetFormat: string) => void;
+  convert_skeletons: () => Promise<void>;
   motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
 };
 
@@ -63,6 +65,9 @@ export function PresenterTopbar(props: Props) {
                     {...{
                       motion_files: props.motion_files,
                       topologies: props.motion_topologies,
+                      visualize_skeletons: props.visualize_skeletons,
+                      convert_skeletons: props.convert_skeletons,
+                      
                       file_dialog_reference: props.file_dialog_reference,
                       file_dialog_on_change: props.file_dialog_on_change,
                     }}

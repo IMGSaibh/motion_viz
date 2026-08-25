@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
-import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
+import { ThreeJSEngineProvider, use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 
 import type { MotionDescriptorData } from '@/hooks/hook_create_motion_file_descriptor';
@@ -16,10 +16,9 @@ import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { hook_file_upload } from '@/hooks/hook_file_upload';
 import { hook_list_motion_files, hook_list_topologies } from '@/hooks/hook_select_motion_files';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import { SkeletonMapper } from '@/threeJS/motion_loader/skeleton_mapper';
 
 export function ContainerTopbar() {
-  const { set_selected_motion, load_motion_file, go_to_frame } = use_three_js_engine_ctx();
+  const { set_selected_motion, load_motion_file, go_to_frame, visualize_skeletons, convert_skeletons } = use_three_js_engine_ctx();
   const { range, set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
   const { set_rula_selected, set_owas_selected } = use_ergo_methods_cxt();
@@ -196,8 +195,11 @@ export function ContainerTopbar() {
         pv_file_dialog_reference={pv_file_dialog_reference}        // ← ADD THIS
         pv_file_dialog_on_change={handle_pv_file_dialog_on_change}
         convert_bvh_files_on_click={handle_convert_motion_file}
+        visualize_skeletons={visualize_skeletons}
+        convert_skeletons={convert_skeletons}
         motion_files={motion_files.data ?? []}
         motion_topologies={motion_topologies.data ?? []}
+
         motion_file_selected={motion_file_selected}
         motion_file_list_on_change={handle_motion_file_list_on_change}
       />
