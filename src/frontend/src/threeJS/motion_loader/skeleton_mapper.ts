@@ -30,6 +30,8 @@ export class SkeletonMapper {
 
     async mapSkeletons(skeleton1_json_url: string, target_format_name: string, scene: THREE.Scene) : 
     Promise<[Map<number, number>, VirtualNode[]]> {
+        let matchColors: Map<number, string> = new Map();
+
         let response = await fetch(skeleton1_json_url);
         let json1 = await response.json();
         
@@ -54,6 +56,7 @@ export class SkeletonMapper {
         this.skeletonB = new Skeleton(json2);
 
         // For Source skeleton, load rest pose from npy motion data
+        // Here, it would be useful if the rest pose would be included in the .json description file of each .npy file
         const filename = skeleton1_json_url.split('/').pop() || '';
         const npyFilename = filename.replace('.json', '.npy');
         const npyUrl = `data/npy/${npyFilename}`;
@@ -70,6 +73,8 @@ export class SkeletonMapper {
         this.graphA = new Graph(this.skeletonA);
         this.graphB = new Graph(this.skeletonB);
 
+        this.visualizeSkeletons(scene, matchColors)
+
         // Match graphs
         const matches: Map<number, number>[] = [];
         this.matchGraphs(this.graphA, this.graphB, new Map(), matches);
@@ -84,9 +89,11 @@ export class SkeletonMapper {
             console.log("Best match:", Array.from(sortedMatches[0].entries()), 
                 "Score:", this.evaluateMatch(this.graphA!, this.graphB!, sortedMatches[0]));
         }
+        else {
+            throw new Error("No matches found between the two skeletons!");
+        }
 
         // Create match colors for visualization
-        let matchColors: Map<number, string> = new Map();
         let cI = 0;
         if (sortedMatches.length !== 0) {
             for (const m of sortedMatches[0].entries()) {
@@ -98,7 +105,6 @@ export class SkeletonMapper {
         }
 
         const [srcToDestMap, virtualNodes] = this.createUnionSkeleton(this.skeletonA, this.skeletonB, sortedMatches[0]);
-        this.visualizeSkeletons(scene, matchColors)
         // this.graphVisualizer?.drawUnionSkeleton(target_format_json_url, this.restposeB, srcToDestMap, virtualNodes, scene)
         return [srcToDestMap, virtualNodes];
     }

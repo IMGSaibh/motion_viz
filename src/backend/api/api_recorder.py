@@ -1,3 +1,6 @@
+import json
+import shutil
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pathlib import Path
@@ -155,12 +158,15 @@ async def record():
         
         # e.g. file_name is "a_test" and target format is "xsens"
         filepath = Path("data/npy") / f"{file_name}_{target_format}.npy"
+        jsonFilePath = Path("data/json") / f"{file_name}_{target_format}.json"
+        fileDescriptionPath = Path("data/target_format_descriptions") / f"{target_format}.json"
         
         # Ensure directory exists
         filepath.parent.mkdir(parents=True, exist_ok=True)
-        
-        # Save to file
-        np.save(filepath, recorded_array)
+        jsonFilePath.parent.mkdir(parents=True, exist_ok=True)
+
+        # also write the json description of the target format to the json folder
+        shutil.copy2(fileDescriptionPath, jsonFilePath)
         
         print(f"Recording saved to: {filepath}")
         print(f"  - Frames: {len(recorded_array)}")
