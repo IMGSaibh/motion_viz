@@ -31,6 +31,7 @@ export type ErgoLabel = {
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
+  | { type: 'replace'; labels: ErgoLabel[] }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
   | {

@@ -1,4 +1,5 @@
 import type { ErgoLabel } from '@/domain/datatypes';
+import { uid } from '@/domain/label_logic';
 import { api_get_base_url } from '@/utils/api_url';
 import { assert_response_ok, parse_record, read_string } from '@/api/api_response';
 
@@ -20,7 +21,40 @@ export type LabelsDownload = {
 const ENDPOINTS = {
   save: '/api_save_labels/save_labels',
   download: '/api_download_labels/download_labels',
+  load: '/api_list_files/load_labels',
 } as const;
+
+function parse_labels(value: unknown): ErgoLabel[] {
+  const record = parse_record(value, 'load labels');
+  if (!Array.isArray(record.labels)) throw new Error('Invalid load labels response field: labels');
+
+  return record.labels.map((value, index) => {
+    const label = parse_record(value, `label ${index + 1}`);
+    const startFrame = label.start_frame;
+    const endFrame = label.end_frame;
+    if (typeof startFrame !== 'number' || !Number.isFinite(startFrame)) {
+      throw new Error(`Invalid label ${index + 1} field: start_frame`);
+    }
+    if (typeof endFrame !== 'number' || !Number.isFinite(endFrame)) {
+      throw new Error(`Invalid label ${index + 1} field: end_frame`);
+    }
+    if (label.ergo_method !== undefined && typeof label.ergo_method !== 'string') {
+      throw new Error(`Invalid label ${index + 1} field: ergo_method`);
+    }
+    if (label.button_text !== undefined && typeof label.button_text !== 'string') {
+      throw new Error(`Invalid label ${index + 1} field: button_text`);
+    }
+
+    return {
+      id: uid(),
+      start_frame: startFrame,
+      end_frame: endFrame,
+      ergo_method: label.ergo_method,
+      button_text: label.button_text,
+      categories: [],
+    };
+  });
+}
 
 export async function save_labels(request: SaveLabelsRequest): Promise<SaveLabelsResponse> {
   const response = await fetch(api_get_base_url(ENDPOINTS.save), {
@@ -58,4 +92,10 @@ export function save_blob({ blob, file_name }: LabelsDownload): void {
     anchor.remove();
     URL.revokeObjectURL(url);
   }
+}
+
+export async function load_labels_for_file(filename: string): Promise<ErgoLabel[]> {
+  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${encodeURIComponent(filename)}`), { method: 'GET' });
+  await assert_response_ok(response, 'Load labels');
+  return parse_labels(await response.json());
 }

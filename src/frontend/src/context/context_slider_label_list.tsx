@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
@@ -10,6 +10,7 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 type FrameSliderLabelListContext = {
   ergo_labels: ErgoLabel[];
   add_slider_label: (m: ErgoLabel) => void;
+  add_slider_labels_from_file: (labels: ErgoLabel[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -42,6 +43,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [ergo_labels],
   );
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
+  const add_slider_labels_from_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
   const start_editing_label = useCallback(
     (id: string) => {
@@ -125,8 +127,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       ...(rulaLabel !== undefined ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
       ...(categories !== undefined ? { categories } : {}),
     });
-    console.log('label id', editing_id);
-    console.log('Saved edited label', ergo_labels);
 
     set_editing_id(null);
     set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
@@ -143,6 +143,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     () => ({
       ergo_labels,
       add_slider_label,
+      add_slider_labels_from_file: add_slider_labels_from_file,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
@@ -153,6 +154,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [
       ergo_labels,
       add_slider_label,
+      add_slider_labels_from_file,
       remove_label_rect,
       clear_label_rects,
       editing_id,
@@ -179,6 +181,9 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
       if (!label_bar_normalized.id) return labels;
       if (labels.some((x) => x.id === label_bar_normalized.id)) return labels;
       return [...labels, label_bar_normalized];
+    }
+    case 'replace': {
+      return action.labels.map(normalize_label_data);
     }
     case 'remove': {
       const next = labels.filter((x) => x.id !== action.id);
@@ -277,6 +282,13 @@ export function use_add_slider_label_ctx() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_add_slider_label_ctx must be used within <FrameSliderLabellistProvider>');
     return v.add_slider_label;
+  });
+}
+
+export function use_replace_slider_labels_ctx() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_replace_slider_labels_ctx must be used within <FrameSliderLabellistProvider>');
+    return v.add_slider_labels_from_file;
   });
 }
 
