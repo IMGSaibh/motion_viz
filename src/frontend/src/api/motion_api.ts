@@ -26,18 +26,6 @@ export type MotionFileItem = {
   name: string;
 };
 
-export type BvhConversionError = {
-  file: string;
-  error_type: string;
-  message: string;
-};
-
-export type BvhConversionResponse = {
-  message: string;
-  warning: string;
-  errors: BvhConversionError[];
-};
-
 export type MessageResponse = {
   message: string;
   warning: string;
@@ -51,7 +39,6 @@ export type FileUploadResponse = MessageResponse & {
 };
 
 const ENDPOINTS = {
-  bvhConversion: '/api_bvh_conversion/convert_bvh_to_npy',
   poseViewerConversion: '/api_pose_viewer_conversion/convert_pv_style',
   motionDescriptor: '/api_motion_descriptor/motion_descriptor',
   fileUpload: '/api_file_upload/upload',
@@ -61,23 +48,6 @@ const ENDPOINTS = {
 function parse_message_response(value: unknown, responseName: string): MessageResponse {
   const record = parse_record(value, responseName);
   return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };
-}
-
-export async function convert_bvh_to_npy(): Promise<BvhConversionResponse> {
-  const response = await fetch(api_get_base_url(ENDPOINTS.bvhConversion), { method: 'POST' });
-  await assert_response_ok(response, 'BVH conversion');
-  const record = parse_record(await response.json(), 'BVH conversion');
-  const rawErrors = record.errors ?? [];
-  if (!Array.isArray(rawErrors)) throw new Error('Invalid response field: errors');
-  const errors = rawErrors.map((value) => {
-    const error = parse_record(value, 'BVH conversion error');
-    return {
-      file: read_string(error, 'file'),
-      error_type: read_string(error, 'error_type'),
-      message: read_string(error, 'message'),
-    };
-  });
-  return { ...parse_message_response(record, 'BVH conversion'), errors };
 }
 
 export async function convert_pose_viewer_files(): Promise<MessageResponse> {

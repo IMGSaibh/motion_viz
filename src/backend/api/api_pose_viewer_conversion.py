@@ -30,25 +30,25 @@ async def convert_pv_style():
     # ======================================= Arbeitstätigkeiten =======================================
     file_pairs = [
 
-        # # aimove
-        # (f"{workspacefolder}/data/bvh/S3P03R3.bvh",
-        # "bvh_pos_100"),                                                                            
+        # aimove
+        (f"{workspacefolder}/data/bvh/S3P03R3.bvh",
+        "bvh_pos_100"),                                                                            
 
-        # # mmhd
-        # (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
-        #   "xsens_mvnx"),                                                                                 
+        # mmhd
+        (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
+          "xsens_mvnx"),                                                                                 
 
-        # # carda
-        # (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
-        #   "bvh_pos_1000"),                                                                          
+        # carda
+        (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
+          "bvh_pos_1000"),                                                                          
 
-        # # andy data
-        # (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
-        #                "xsens_mvnx"),                                                                 
+        # andy data
+        (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
+                       "xsens_mvnx"),                                                                 
 
-        # # inhard
-        # (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
-        # "bvh_pos_100"),                                                                                  
+        # inhard
+        (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
+        "bvh_pos_100"),                                                                                  
 
         # # Vicon Poeticon
         (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",

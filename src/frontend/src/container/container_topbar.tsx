@@ -8,7 +8,6 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
-import { useBvhConversion } from '@/hooks/use_bvh_conversion';
 import { useFileUpload } from '@/hooks/use_file_upload';
 import { useMotionDescriptor } from '@/hooks/use_motion_descriptor';
 import { useMotionFiles } from '@/hooks/use_motion_files';
@@ -46,7 +45,6 @@ export function ContainerTopbar() {
   const file_upload = useFileUpload();
   const motion_descriptor = useMotionDescriptor();
   const pose_viewer_conversion = usePoseViewerConversion();
-  const bvh_conversion = useBvhConversion();
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
   const clear_slider_label_list = use_clear_label_list_ctx();
@@ -142,18 +140,6 @@ export function ContainerTopbar() {
     }
   }
 
-  async function handle_convert_motion_file() {
-    try {
-      const response = await bvh_conversion.mutateAsync();
-      if (response.warning) warning(response.warning);
-      else if (response.errors.length > 0) {
-        error(response.errors.map((item) => `${item.file}: ${item.error_type} - ${item.message}`).join('\n'), 10000);
-      } else success(response.message || 'BVH ? NPY Konvertierung abgeschlossen');
-    } catch (requestError: unknown) {
-      error(get_error_message(requestError, 'Conversion failed'));
-    }
-  }
-
   return (
     <PresenterTopbar
       file_dialog_reference={file_dialog_reference}
@@ -165,8 +151,6 @@ export function ContainerTopbar() {
       motion_config_create_on_click={handle_motion_config_create_on_click}
       motion_descriptor_is_pending={motion_descriptor.isPending}
       convert_pv_files_on_click={handle_convert_with_pose_viewer}
-      convert_bvh_files_on_click={handle_convert_motion_file}
-      bvh_conversion_is_pending={bvh_conversion.isPending}
       pose_viewer_conversion_is_pending={pose_viewer_conversion.isPending}
       motion_files={motion_files.data ?? []}
       motion_file_selected={motion_file_selected}
