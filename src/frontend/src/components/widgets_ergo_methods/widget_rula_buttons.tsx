@@ -2,9 +2,12 @@ import { useMemo } from 'react';
 import { uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
-  get_label_images_cat1_rula,
-  get_label_images_cat2_rula,
-  get_label_images_cat3_rula,
+  get_label_images_rula_cat_l,
+  get_label_images_rula_cat_la,
+  get_label_images_rula_cat_n,
+  get_label_images_rula_cat_t,
+  get_label_images_rula_cat_ua,
+  get_label_images_rula_cat_w,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -103,9 +106,12 @@ function CategoryGrid({
 }
 
 export function WidgetRulaButtons(props: Props) {
-  const label_images_cat1 = useMemo(() => get_label_images_cat1_rula(), []);
-  const label_images_cat2 = useMemo(() => get_label_images_cat2_rula(), []);
-  const label_images_cat3 = useMemo(() => get_label_images_cat3_rula(), []);
+  const label_images_cat1 = useMemo(() => get_label_images_rula_cat_ua(), []);
+  const label_images_cat2 = useMemo(() => get_label_images_rula_cat_la(), []);
+  const label_images_cat3 = useMemo(() => get_label_images_rula_cat_w(), []);
+  const label_images_cat4 = useMemo(() => get_label_images_rula_cat_n(), []);
+  const label_images_cat5 = useMemo(() => get_label_images_rula_cat_t(), []);
+  const label_images_cat6 = useMemo(() => get_label_images_rula_cat_l(), []);
 
   const { range, set_range } = use_frame_slider_context();
 
