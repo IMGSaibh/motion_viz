@@ -43,7 +43,7 @@ export function ContainerLabelsList() {
       CAT_TRUNK: null,
       CAT_LEGS: null,
     });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+    set_owas_selected({ CATEGORY_1: null, CATEGORY_2: null, CATEGORY_3: null, CATEGORY_4: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
 
   const save_label_list_on_click = useCallback(async () => {

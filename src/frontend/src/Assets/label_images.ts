@@ -147,32 +147,32 @@ export function get_label_all_label_images_rula(): ReadonlyMap<string, LabelImag
 
 // OWAS IMAGES
 const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn1_owas, category: 'Kategorie 1' },
-  { name: 'Code 2', src: btn2_owas, category: 'Kategorie 1' },
-  { name: 'Code 3', src: btn3_owas, category: 'Kategorie 1' },
-  { name: 'Code 4', src: btn4_owas, category: 'Kategorie 1' },
+  { name: 'Code 1', src: btn1_owas, category: 'CATEGORY_1' },
+  { name: 'Code 2', src: btn2_owas, category: 'CATEGORY_1' },
+  { name: 'Code 3', src: btn3_owas, category: 'CATEGORY_1' },
+  { name: 'Code 4', src: btn4_owas, category: 'CATEGORY_1' },
 ];
 
 const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 2' },
-  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 2' },
-  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 2' },
+  { name: 'Code 1', src: btn5_owas, category: 'CATEGORY_2' },
+  { name: 'Code 2', src: btn6_owas, category: 'CATEGORY_2' },
+  { name: 'Code 3', src: btn7_owas, category: 'CATEGORY_2' },
 ];
 
 const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn8_owas, category: 'Kategorie 3' },
-  { name: 'Code 2', src: btn9_owas, category: 'Kategorie 3' },
-  { name: 'Code 3', src: btn10_owas, category: 'Kategorie 3' },
-  { name: 'Code 4', src: btn11_owas, category: 'Kategorie 3' },
-  { name: 'Code 5', src: btn12_owas, category: 'Kategorie 3' },
-  { name: 'Code 6', src: btn13_owas, category: 'Kategorie 3' },
-  { name: 'Code 7', src: btn14_owas, category: 'Kategorie 3' },
+  { name: 'Code 1', src: btn8_owas, category: 'CATEGORY_3' },
+  { name: 'Code 2', src: btn9_owas, category: 'CATEGORY_3' },
+  { name: 'Code 3', src: btn10_owas, category: 'CATEGORY_3' },
+  { name: 'Code 4', src: btn11_owas, category: 'CATEGORY_3' },
+  { name: 'Code 5', src: btn12_owas, category: 'CATEGORY_3' },
+  { name: 'Code 6', src: btn13_owas, category: 'CATEGORY_3' },
+  { name: 'Code 7', src: btn14_owas, category: 'CATEGORY_3' },
 ];
 
 const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 4' },
-  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 4' },
-  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 4' },
+  { name: 'Code 1', src: btn5_owas, category: 'CATEGORY_4' },
+  { name: 'Code 2', src: btn6_owas, category: 'CATEGORY_4' },
+  { name: 'Code 3', src: btn7_owas, category: 'CATEGORY_4' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {

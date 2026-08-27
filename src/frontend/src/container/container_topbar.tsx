@@ -143,7 +143,7 @@ export function ContainerTopbar() {
         CAT_TRUNK: null,
         CAT_LEGS: null,
       });
-      set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+      set_owas_selected({ CATEGORY_1: null, CATEGORY_2: null, CATEGORY_3: null, CATEGORY_4: null });
 
       if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${filename}`);
     } catch (requestError: unknown) {

@@ -24,6 +24,10 @@ export type RulaCategoryName =
 
 export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
 
+export type OwasCategoryName = 'CATEGORY_1' | 'CATEGORY_2' | 'CATEGORY_3' | 'CATEGORY_4';
+
+export type OwasSelection = Record<OwasCategoryName, LabelImage | null>;
+
 export type LabelCategory = {
   name: string;
   image: LabelImage | null;

@@ -74,10 +74,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           LabelImage | null
         >;
         set_owas_selected({
-          CAT1: by_name.CAT1 ?? null,
-          CAT2: by_name.CAT2 ?? null,
-          CAT3: by_name.CAT3 ?? null,
-          CAT4: by_name.CAT4 ?? null,
+          CATEGORY_1: by_name.CATEGORY_1 ?? null,
+          CATEGORY_2: by_name.CATEGORY_2 ?? null,
+          CATEGORY_3: by_name.CATEGORY_3 ?? null,
+          CATEGORY_4: by_name.CATEGORY_4 ?? null,
         });
       }
     },
@@ -113,10 +113,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           ]
         : norm === 'OWAS'
           ? [
-              { name: 'CAT1', image: owas_selected.CAT1 ?? null },
-              { name: 'CAT2', image: owas_selected.CAT2 ?? null },
-              { name: 'CAT3', image: owas_selected.CAT3 ?? null },
-              { name: 'CAT4', image: owas_selected.CAT4 ?? null },
+              { name: 'CATEGORY_1', image: owas_selected.CATEGORY_1 },
+              { name: 'CATEGORY_2', image: owas_selected.CATEGORY_2 },
+              { name: 'CATEGORY_3', image: owas_selected.CATEGORY_3 },
+              { name: 'CATEGORY_4', image: owas_selected.CATEGORY_4 },
             ]
           : undefined;
 
@@ -145,7 +145,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       CAT_TRUNK: null,
       CAT_LEGS: null,
     });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+    set_owas_selected({ CATEGORY_1: null, CATEGORY_2: null, CATEGORY_3: null, CATEGORY_4: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
