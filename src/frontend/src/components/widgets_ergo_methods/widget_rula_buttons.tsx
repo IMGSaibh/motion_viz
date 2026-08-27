@@ -106,12 +106,12 @@ function CategoryGrid({
 }
 
 export function WidgetRulaButtons(props: Props) {
-  const label_images_cat1 = useMemo(() => get_label_images_rula_cat_ua(), []);
-  const label_images_cat2 = useMemo(() => get_label_images_rula_cat_la(), []);
-  const label_images_cat3 = useMemo(() => get_label_images_rula_cat_w(), []);
-  const label_images_cat4 = useMemo(() => get_label_images_rula_cat_n(), []);
-  const label_images_cat5 = useMemo(() => get_label_images_rula_cat_t(), []);
-  const label_images_cat6 = useMemo(() => get_label_images_rula_cat_l(), []);
+  const label_images_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
+  const label_images_cat_la = useMemo(() => get_label_images_rula_cat_la(), []);
+  const label_images_cat_w = useMemo(() => get_label_images_rula_cat_w(), []);
+  const label_images_cat_n = useMemo(() => get_label_images_rula_cat_n(), []);
+  const label_images_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
+  const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
   const { range, set_range } = use_frame_slider_context();
 
@@ -160,32 +160,61 @@ export function WidgetRulaButtons(props: Props) {
       })}
     >
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
-        <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT1"
-            title="Gruppe: Arm | Hand"
-            rula_button_images={label_images_cat1}
+            title="Upper Arm"
+            rula_button_images={label_images_cat_ua}
             selected_cat_image={rula_selected.CAT1?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
-        <Grid size={{ md: 4 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT2"
-            title="Gruppe: Nacken | Rumpf | Beine"
-            rula_button_images={label_images_cat2}
+            title="Lower Arm"
+            rula_button_images={label_images_cat_la}
             selected_cat_image={rula_selected.CAT2?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
-        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT3"
-            title="Gruppe: Muskelarbeit | Kraft"
-            rula_button_images={label_images_cat3}
-            selected_cat_image={rula_selected.CAT3?.name ?? null}
+            cat="CAT2"
+            title="Wrist"
+            rula_button_images={label_images_cat_w}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            onSelect={handleSelect}
+          />
+        </Grid>
+
+        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+          <CategoryGrid
+            cat="CAT2"
+            title="Neck"
+            rula_button_images={label_images_cat_n}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            onSelect={handleSelect}
+          />
+        </Grid>
+        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+          <CategoryGrid
+            cat="CAT2"
+            title="Trunk"
+            rula_button_images={label_images_cat_t}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            onSelect={handleSelect}
+          />
+        </Grid>
+
+        <Grid size={{ md: 1 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+          <CategoryGrid
+            cat="CAT2"
+            title="Legs"
+            rula_button_images={label_images_cat_l}
+            selected_cat_image={rula_selected.CAT2?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
