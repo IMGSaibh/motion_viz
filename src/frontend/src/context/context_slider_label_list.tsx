@@ -59,9 +59,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           LabelImage | null
         >;
         set_rula_selected({
-          CAT1: by_name.CAT1 ?? null,
-          CAT2: by_name.CAT2 ?? null,
-          CAT3: by_name.CAT3 ?? null,
+          CAT_UPPERARM: by_name.CAT_UPPERARM ?? null,
+          CAT_LOWERARM: by_name.CAT_LOWERARM ?? null,
+          CAT_WRIST: by_name.CAT_WRIST ?? null,
+          CAT_NECK: by_name.CAT_NECK ?? null,
+          CAT_TRUNK: by_name.CAT_TRUNK ?? null,
+          CAT_LEGS: by_name.CAT_LEGS ?? null,
         });
       }
 
@@ -101,9 +104,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories =
       norm === 'RULA'
         ? [
-            { name: 'CAT1', image: rula_selected.CAT1 ?? null },
-            { name: 'CAT2', image: rula_selected.CAT2 ?? null },
-            { name: 'CAT3', image: rula_selected.CAT3 ?? null },
+            { name: 'CAT_UPPERARM', image: rula_selected.CAT_UPPERARM },
+            { name: 'CAT_LOWERARM', image: rula_selected.CAT_LOWERARM },
+            { name: 'CAT_WRIST', image: rula_selected.CAT_WRIST },
+            { name: 'CAT_NECK', image: rula_selected.CAT_NECK },
+            { name: 'CAT_TRUNK', image: rula_selected.CAT_TRUNK },
+            { name: 'CAT_LEGS', image: rula_selected.CAT_LEGS },
           ]
         : norm === 'OWAS'
           ? [
@@ -116,7 +122,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
     const rulaLabel =
       norm === 'RULA'
-        ? `${rula_selected.CAT1 ?? ''} | ${rula_selected.CAT2 ?? ''} | ${rula_selected.CAT3 ?? ''}`
+        ? Object.values(rula_selected)
+            .map((image) => image?.name ?? '')
+            .join(' | ')
         : undefined;
 
     dispatch({
@@ -129,14 +137,28 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     });
 
     set_editing_id(null);
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({
+      CAT_UPPERARM: null,
+      CAT_LOWERARM: null,
+      CAT_WRIST: null,
+      CAT_NECK: null,
+      CAT_TRUNK: null,
+      CAT_LEGS: null,
+    });
     set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({
+      CAT_UPPERARM: null,
+      CAT_LOWERARM: null,
+      CAT_WRIST: null,
+      CAT_NECK: null,
+      CAT_TRUNK: null,
+      CAT_LEGS: null,
+    });
   }, [editing_id]);
 
   const value = useMemo<FrameSliderLabelListContext>(

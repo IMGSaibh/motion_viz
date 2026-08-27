@@ -135,7 +135,14 @@ export function ContainerTopbar() {
 
       const loaded_labels = await load_labels.mutateAsync(filename);
       add_slider_labels_from_file(loaded_labels);
-      set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+      set_rula_selected({
+        CAT_UPPERARM: null,
+        CAT_LOWERARM: null,
+        CAT_WRIST: null,
+        CAT_NECK: null,
+        CAT_TRUNK: null,
+        CAT_LEGS: null,
+      });
       set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
 
       if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${filename}`);
