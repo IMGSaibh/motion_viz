@@ -63,49 +63,49 @@ import btn3_lmm from '@/Assets/lmm_images/Label_3.png';
 
 // RULA IMAGES
 const LABEL_IMAGES_RULA_CAT_UA: ReadonlyArray<LabelImage> = [
-  { name: '20\u00B0 - 20\u00B0 ', src: btn_rula_ua_1, category: 'Cat_UpperArm' },
-  { name: '< 20\u00B0 ', src: btn_rula_ua_2, category: 'Cat_UpperArm' },
-  { name: '> 20\u00B0 - 45\u00B0 ', src: btn_rula_ua_3, category: 'Cat_UpperArm' },
-  { name: '> 45\u00B0 -90\u00B0 ', src: btn_rula_ua_4, category: 'Cat_UpperArm' },
-  { name: '> 90\u00B0 ', src: btn_rula_ua_5, category: 'Cat_UpperArm' },
-  { name: 'Sh. Raised ', src: btn_rula_ua_6, category: 'Cat_UpperArm' },
-  { name: 'Abducted', src: btn_rula_ua_7, category: 'Cat_UpperArm' },
-  { name: 'Leaning', src: btn_rula_ua_8, category: 'Cat_UpperArm' },
+  { name: '20\u00B0 - 20\u00B0 ', src: btn_rula_ua_1, category: 'CAT_UPPERARM' },
+  { name: '< 20\u00B0 ', src: btn_rula_ua_2, category: 'CAT_UPPERARM' },
+  { name: '> 20\u00B0 - 45\u00B0 ', src: btn_rula_ua_3, category: 'CAT_UPPERARM' },
+  { name: '> 45\u00B0 -90\u00B0 ', src: btn_rula_ua_4, category: 'CAT_UPPERARM' },
+  { name: '> 90\u00B0 ', src: btn_rula_ua_5, category: 'CAT_UPPERARM' },
+  { name: 'Sh. Raised ', src: btn_rula_ua_6, category: 'CAT_UPPERARM' },
+  { name: 'Abducted', src: btn_rula_ua_7, category: 'CAT_UPPERARM' },
+  { name: 'Leaning', src: btn_rula_ua_8, category: 'CAT_UPPERARM' },
 ];
 
 const LABEL_IMAGES_RULA_CAT_LA: ReadonlyArray<LabelImage> = [
-  { name: '60\u00B0 - 100\u00B0', src: btn_rula_la_1, category: 'Cat_LowerArm' },
-  { name: '<0\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'Cat_LowerArm' },
-  { name: 'Midline', src: btn_rula_la_3, category: 'Cat_LowerArm' },
+  { name: '60\u00B0 - 100\u00B0', src: btn_rula_la_1, category: 'CAT_LOWERARM' },
+  { name: '<0\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'CAT_LOWERARM' },
+  { name: 'Midline', src: btn_rula_la_3, category: 'CAT_LOWERARM' },
 ];
 
 const LABEL_IMAGES_RULA_CAT_W: ReadonlyArray<LabelImage> = [
-  { name: '0\u00B0', src: btn_rula_w_1, category: 'Cat_Wrist' },
-  { name: '15\u00B0 - 15\u00B0', src: btn_rula_w_2, category: 'Cat_Wrist' },
-  { name: '<15\u00B0 | >15\u00B0', src: btn_rula_w_3, category: 'Cat_Wrist' },
-  { name: 'Bent', src: btn_rula_w_4, category: 'Cat_Wrist' },
+  { name: '0\u00B0', src: btn_rula_w_1, category: 'CAT_WRIST' },
+  { name: '15\u00B0 - 15\u00B0', src: btn_rula_w_2, category: 'CAT_WRIST' },
+  { name: '<15\u00B0 | >15\u00B0', src: btn_rula_w_3, category: 'CAT_WRIST' },
+  { name: 'Bent', src: btn_rula_w_4, category: 'CAT_WRIST' },
 ];
 
 const LABEL_IMAGES_RULA_CAT_N: ReadonlyArray<LabelImage> = [
-  { name: '0\u00B0 - 10\u00B0', src: btn_rula_n_1, category: 'Cat_Neck' },
-  { name: '10\u00B0 - 20\u00B0', src: btn_rula_n_2, category: 'Cat_Neck' },
-  { name: '>20\u00B0 ', src: btn_rula_n_3, category: 'Cat_Neck' },
-  { name: '<0\u00B0 ', src: btn_rula_n_4, category: 'Cat_Neck' },
-  { name: 'Twist', src: btn_rula_n_5, category: 'Cat_Neck' },
-  { name: 'Side-Bend', src: btn_rula_n_6, category: 'Cat_Neck' },
+  { name: '0\u00B0 - 10\u00B0', src: btn_rula_n_1, category: 'CAT_NECK' },
+  { name: '10\u00B0 - 20\u00B0', src: btn_rula_n_2, category: 'CAT_NECK' },
+  { name: '>20\u00B0 ', src: btn_rula_n_3, category: 'CAT_NECK' },
+  { name: '<0\u00B0 ', src: btn_rula_n_4, category: 'CAT_NECK' },
+  { name: 'Twist', src: btn_rula_n_5, category: 'CAT_NECK' },
+  { name: 'Side-Bend', src: btn_rula_n_6, category: 'CAT_NECK' },
 ];
 
 const LABEL_IMAGES_RULA_CAT_T: ReadonlyArray<LabelImage> = [
-  { name: '0\u00B0', src: btn_rula_t_1, category: 'Cat_Trunk' },
-  { name: '0\u00B0 - 20\u00B0', src: btn_rula_t_2, category: 'Cat_Trunk' },
-  { name: '20\u00B0 - 60\u00B0', src: btn_rula_t_3, category: 'Cat_Trunk' },
-  { name: '>60\u00B0', src: btn_rula_t_4, category: 'Cat_Trunk' },
-  { name: 'Twist', src: btn_rula_t_5, category: 'Cat_Trunk' },
-  { name: 'Side-Bend', src: btn_rula_t_6, category: 'Cat_Trunk' },
+  { name: '0\u00B0', src: btn_rula_t_1, category: 'CAT_TRUNK' },
+  { name: '0\u00B0 - 20\u00B0', src: btn_rula_t_2, category: 'CAT_TRUNK' },
+  { name: '20\u00B0 - 60\u00B0', src: btn_rula_t_3, category: 'CAT_TRUNK' },
+  { name: '>60\u00B0', src: btn_rula_t_4, category: 'CAT_TRUNK' },
+  { name: 'Twist', src: btn_rula_t_5, category: 'CAT_TRUNK' },
+  { name: 'Side-Bend', src: btn_rula_t_6, category: 'CAT_TRUNK' },
 ];
 
 const LABEL_IMAGES_RULA_CAT_L: ReadonlyArray<LabelImage> = [
-  { name: 'Not well', src: btn_rula_l_1, category: 'Cat_Legs' },
+  { name: 'Not well', src: btn_rula_l_1, category: 'CAT_LEGS' },
 ];
 
 export function get_label_images_rula_cat_ua(): ReadonlyArray<LabelImage> {

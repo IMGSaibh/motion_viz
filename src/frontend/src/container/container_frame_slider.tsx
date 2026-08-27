@@ -59,7 +59,14 @@ export function ContainerFrameSlider() {
         set_frame_slider_value(0);
         set_range([0, 0]);
         clear_slider_label_list();
-        set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+        set_rula_selected({
+          CAT_UPPERARM: null,
+          CAT_LOWERARM: null,
+          CAT_WRIST: null,
+          CAT_NECK: null,
+          CAT_TRUNK: null,
+          CAT_LEGS: null,
+        });
         set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
       }
       if (e.code === 'ArrowRight') {

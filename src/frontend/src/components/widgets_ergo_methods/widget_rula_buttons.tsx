@@ -11,7 +11,7 @@ import {
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, ErgoLabel, RulaCategoryName } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
@@ -27,11 +27,11 @@ function CategoryGrid({
   onSelect,
   isLast,
 }: {
-  cat: 'CAT1' | 'CAT2' | 'CAT3';
+  cat: RulaCategoryName;
   title: string;
   rula_button_images: readonly LabelImage[];
   selected_cat_image: string | null;
-  onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => void;
+  onSelect: (slot: RulaCategoryName, img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -116,12 +116,12 @@ export function WidgetRulaButtons(props: Props) {
   const { range, set_range } = use_frame_slider_context();
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
-  const allSelected = Boolean(rula_selected.CAT1 && rula_selected.CAT2 && rula_selected.CAT3);
+  const allSelected = Object.values(rula_selected).every(Boolean);
 
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3', img: LabelImage) => {
+  const handleSelect = (cat: RulaCategoryName, img: LabelImage) => {
     set_rula_selected({ ...rula_selected, [cat]: img });
   };
 
@@ -130,9 +130,12 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT1', image: rula_selected.CAT1! },
-      { name: 'CAT2', image: rula_selected.CAT2! },
-      { name: 'CAT3', image: rula_selected.CAT3! },
+      { name: 'CAT_UPPERARM', image: rula_selected.CAT_UPPERARM! },
+      { name: 'CAT_LOWERARM', image: rula_selected.CAT_LOWERARM! },
+      { name: 'CAT_WRIST', image: rula_selected.CAT_WRIST! },
+      { name: 'CAT_NECK', image: rula_selected.CAT_NECK! },
+      { name: 'CAT_TRUNK', image: rula_selected.CAT_TRUNK! },
+      { name: 'CAT_LEGS', image: rula_selected.CAT_LEGS! },
     ];
 
     const from = Math.min(range[0], range[1]);
@@ -149,7 +152,14 @@ export function WidgetRulaButtons(props: Props) {
     };
 
     props.onClick?.(label);
-    set_rula_selected({ CAT1: null, CAT2: null, CAT3: null });
+    set_rula_selected({
+      CAT_UPPERARM: null,
+      CAT_LOWERARM: null,
+      CAT_WRIST: null,
+      CAT_NECK: null,
+      CAT_TRUNK: null,
+      CAT_LEGS: null,
+    });
   };
 
   return (
@@ -162,59 +172,59 @@ export function WidgetRulaButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT1"
+            cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_cat_image={rula_selected.CAT1?.name ?? null}
+            selected_cat_image={rula_selected.CAT_UPPERARM?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            selected_cat_image={rula_selected.CAT_LOWERARM?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            selected_cat_image={rula_selected.CAT_WRIST?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            selected_cat_image={rula_selected.CAT_NECK?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            selected_cat_image={rula_selected.CAT_TRUNK?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 1 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_cat_image={rula_selected.CAT2?.name ?? null}
+            selected_cat_image={rula_selected.CAT_LEGS?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
