@@ -1,19 +1,22 @@
-import { LabelImage } from '@/domain/datatypes';
+import type { LabelImage, RulaSelection } from '@/domain/datatypes';
 import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
-  rula_selected: Record<string, LabelImage | null>;
-  set_rula_selected: (next: Record<string, LabelImage | null>) => void;
+  rula_selected: RulaSelection;
+  set_rula_selected: (next: RulaSelection) => void;
   owas_selected: Record<string, LabelImage | null>;
   set_owas_selected: (next: Record<string, LabelImage | null>) => void;
 };
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
-  const [rula_selected, set_rula_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
+  const [rula_selected, set_rula_selected] = useState<RulaSelection>({
+    CAT_UPPERARM: null,
+    CAT_LOWERARM: null,
+    CAT_WRIST: null,
+    CAT_NECK: null,
+    CAT_TRUNK: null,
+    CAT_LEGS: null,
   });
 
   const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({

@@ -14,6 +14,16 @@ export type LabelImage = {
   category: string;
 };
 
+export type RulaCategoryName =
+  | 'CAT_UPPERARM'
+  | 'CAT_LOWERARM'
+  | 'CAT_WRIST'
+  | 'CAT_NECK'
+  | 'CAT_TRUNK'
+  | 'CAT_LEGS';
+
+export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
+
 export type LabelCategory = {
   name: string;
   image: LabelImage | null;
@@ -31,6 +41,7 @@ export type ErgoLabel = {
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
+  | { type: 'replace'; labels: ErgoLabel[] }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
   | {
