@@ -72,10 +72,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           label.categories.map((category) => [category.name, category.features[0]?.image]),
         ) as Record<string, LabelImage | null>;
         set_owas_selected({
-          CATEGORY_1: by_name.CATEGORY_1 ?? null,
-          CATEGORY_2: by_name.CATEGORY_2 ?? null,
-          CATEGORY_3: by_name.CATEGORY_3 ?? null,
-          CATEGORY_4: by_name.CATEGORY_4 ?? null,
+          CAT_BACK: by_name.CATEGORY_1 ?? null,
+          CAT_ARMS: by_name.CATEGORY_2 ?? null,
+          CAT_LEGS: by_name.CATEGORY_3 ?? null,
+          CAT_LOAD: by_name.CATEGORY_4 ?? null,
         });
       }
     },
@@ -120,10 +120,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           ].filter((category): category is LabelCategory => category !== null)
         : norm === 'OWAS'
           ? [
-              createCategory(1, 'CATEGORY_1', owas_selected.CATEGORY_1),
-              createCategory(2, 'CATEGORY_2', owas_selected.CATEGORY_2),
-              createCategory(3, 'CATEGORY_3', owas_selected.CATEGORY_3),
-              createCategory(4, 'CATEGORY_4', owas_selected.CATEGORY_4),
+              createCategory(1, 'CAT_BACK', owas_selected.CAT_BACK),
+              createCategory(2, 'CAT_ARMS', owas_selected.CAT_ARMS),
+              createCategory(3, 'CAT_LEGS', owas_selected.CAT_LEGS),
+              createCategory(4, 'CAT_LOAD', owas_selected.CAT_LOAD),
             ].filter((category): category is LabelCategory => category !== null)
           : undefined;
 
@@ -145,7 +145,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       CAT_TRUNK: null,
       CAT_LEGS: null,
     });
-    set_owas_selected({ CATEGORY_1: null, CATEGORY_2: null, CATEGORY_3: null, CATEGORY_4: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
 
   const cancel_current_edit_label = useCallback(() => {

@@ -1,11 +1,35 @@
 import type { ErgoLabel, LabelCategory, LabelFeature, LabelImage } from '@/domain/datatypes';
+import {
+  get_label_images_cat1_owas,
+  get_label_images_cat2_owas,
+  get_label_images_cat3_owas,
+  get_label_images_cat4_owas,
+  get_label_images_rula_cat_l,
+  get_label_images_rula_cat_la,
+  get_label_images_rula_cat_n,
+  get_label_images_rula_cat_t,
+  get_label_images_rula_cat_ua,
+  get_label_images_rula_cat_w,
+} from '@/Assets/label_images';
 import { uid } from '@/domain/label_logic';
 import { api_get_base_url } from '@/utils/api_url';
 import { assert_response_ok, parse_record, read_string } from '@/api/api_response';
 
 export type SaveLabelsRequest = {
   motion_name: string;
-  labels: ErgoLabel[];
+  labels: LabelFileItem[];
+};
+
+export type LabelFileCategory = {
+  category: string;
+  feature_id: number[];
+};
+
+export type LabelFileItem = {
+  ergo_method: string;
+  start_frame: number;
+  end_frame: number;
+  categories: LabelFileCategory[];
 };
 
 export type SaveLabelsResponse = {
@@ -18,11 +42,57 @@ export type LabelsDownload = {
   file_name: string;
 };
 
+type CategoryDefinition = {
+  id: number;
+  cat_name: string;
+  // internalName: string;
+  images: readonly LabelImage[];
+};
+
 const ENDPOINTS = {
   save: '/api_save_labels/save_labels',
   download: '/api_download_labels/download_labels',
   load: '/api_list_files/load_labels',
 } as const;
+
+function get_category_definition(ergoMethod: string, categoryName: string): CategoryDefinition | undefined {
+  const definitions = ergoMethod.toUpperCase() === 'OWAS' ? OWAS_CATEGORY_DEFINITIONS : RULA_CATEGORY_DEFINITIONS;
+  return definitions.find((definition) => definition.cat_name === categoryName);
+}
+
+const OWAS_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
+  { id: 1, cat_name: 'CAT_BACK', images: get_label_images_cat1_owas() },
+  { id: 2, cat_name: 'CAT_ARMS', images: get_label_images_cat2_owas() },
+  { id: 3, cat_name: 'CAT_LEGS', images: get_label_images_cat3_owas() },
+  { id: 4, cat_name: 'CAT_LOAD', images: get_label_images_cat4_owas() },
+];
+
+const RULA_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
+  { id: 1, cat_name: 'CAT_UPPERARM', images: get_label_images_rula_cat_ua() },
+  { id: 2, cat_name: 'CAT_LOWERARM', images: get_label_images_rula_cat_la() },
+  { id: 3, cat_name: 'CAT_WRIST', images: get_label_images_rula_cat_w() },
+  { id: 4, cat_name: 'CAT_NECK', images: get_label_images_rula_cat_n() },
+  { id: 5, cat_name: 'CAT_TRUNK', images: get_label_images_rula_cat_t() },
+  { id: 6, cat_name: 'CAT_LEGS', images: get_label_images_rula_cat_l() },
+];
+
+export function serialize_labels(labels: ErgoLabel[]): LabelFileItem[] {
+  return labels.map((label) => ({
+    ergo_method: label.ergo_method ?? 'Uncategorized',
+    start_frame: label.start_frame,
+    end_frame: label.end_frame,
+    categories: label.categories.map((category) => {
+      const definition = get_category_definition(label.ergo_method ?? '', category.name);
+      return {
+        category: definition?.cat_name ?? category.name,
+        feature_id: category.features.map((feature) => {
+          const imageIndex = definition?.images.findIndex((image) => image.name === feature.image.name) ?? -1;
+          return imageIndex >= 0 ? imageIndex + 1 : feature.id;
+        }),
+      };
+    }),
+  }));
+}
 
 function parse_labels(value: unknown): ErgoLabel[] {
   const record = parse_record(value, 'load labels');
@@ -41,35 +111,33 @@ function parse_labels(value: unknown): ErgoLabel[] {
     if (label.ergo_method !== undefined && typeof label.ergo_method !== 'string') {
       throw new Error(`Invalid label ${index + 1} field: ergo_method`);
     }
+    const ergoMethod = label.ergo_method ?? '';
     if (!Array.isArray(label.categories)) throw new Error(`Invalid label ${index + 1} field: categories`);
 
     const categories: LabelCategory[] = label.categories.map((value, categoryIndex) => {
       const category = parse_record(value, `label ${index + 1} category ${categoryIndex + 1}`);
-      if (typeof category.id !== 'number' || typeof category.name !== 'string' || !Array.isArray(category.features)) {
+      if (typeof category.category !== 'string' || !Array.isArray(category.feature_id)) {
         throw new Error(`Invalid label ${index + 1} category ${categoryIndex + 1}`);
       }
+      const definition = get_category_definition(ergoMethod, category.category);
+      if (!definition) throw new Error(`Unknown category: ${category.category}`);
 
-      const features: LabelFeature[] = category.features.map((value, featureIndex) => {
-        const feature = parse_record(value, `label ${index + 1} feature ${featureIndex + 1}`);
-        const imageRecord = parse_record(feature.image, `label ${index + 1} feature image ${featureIndex + 1}`);
-        if (typeof feature.id !== 'number' || typeof feature.name !== 'string') {
+      const features: LabelFeature[] = category.feature_id.map((value, featureIndex) => {
+        if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
           throw new Error(`Invalid label ${index + 1} feature ${featureIndex + 1}`);
         }
-        const image: LabelImage = {
-          name: read_string(imageRecord, 'name'),
-          src: read_string(imageRecord, 'src'),
-          category: read_string(imageRecord, 'category'),
-        };
-        return { id: feature.id, name: feature.name, image };
+        const image = definition.images[value - 1];
+        if (!image) throw new Error(`Unknown feature_id ${value} for category ${category.category}`);
+        return { id: value, name: image.name, image };
       });
-      return { id: category.id, name: category.name, features };
+      return { id: definition.id, name: definition.cat_name, features };
     });
 
     return {
       id: uid(),
       start_frame: startFrame,
       end_frame: endFrame,
-      ergo_method: label.ergo_method,
+      ergo_method: ergoMethod,
       categories,
     };
   });
@@ -114,7 +182,9 @@ export function save_blob({ blob, file_name }: LabelsDownload): void {
 }
 
 export async function load_labels_for_file(filename: string): Promise<ErgoLabel[]> {
-  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${encodeURIComponent(filename)}`), { method: 'GET' });
+  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${encodeURIComponent(filename)}`), {
+    method: 'GET',
+  });
   await assert_response_ok(response, 'Load labels');
   return parse_labels(await response.json());
 }

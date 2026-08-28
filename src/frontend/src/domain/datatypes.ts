@@ -1,4 +1,5 @@
 // reine Datentypen (KEIN React)
+
 export type Range = [number, number];
 
 export type RectangleLabelBar = {
@@ -41,7 +42,7 @@ export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
 export type RulaOptionalsUpperArm = '';
 export type OptionalsNeckAndTrunk = '';
 
-export type OwasCategoryName = 'CATEGORY_1' | 'CATEGORY_2' | 'CATEGORY_3' | 'CATEGORY_4';
+export type OwasCategoryName = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
 
 export type OwasSelection = Record<OwasCategoryName, LabelImage | null>;
 

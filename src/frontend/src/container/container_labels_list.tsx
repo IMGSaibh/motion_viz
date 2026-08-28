@@ -11,6 +11,7 @@ import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useDownloadLabels } from '@/hooks/use_download_labels';
 import { useSaveLabels } from '@/hooks/use_save_labels';
+import { serialize_labels } from '@/api/labels_api';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -43,13 +44,16 @@ export function ContainerLabelsList() {
       CAT_TRUNK: null,
       CAT_LEGS: null,
     });
-    set_owas_selected({ CATEGORY_1: null, CATEGORY_2: null, CATEGORY_3: null, CATEGORY_4: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
 
   const save_label_list_on_click = useCallback(async () => {
     if (!selected_motion) return;
     try {
-      const response = await save_labels.mutateAsync({ motion_name: selected_motion, labels });
+      const response = await save_labels.mutateAsync({
+        motion_name: selected_motion,
+        labels: serialize_labels(labels),
+      });
       if (response.warning) warning(response.warning);
       else success(response.message || 'Labels erfolgreich gespeichert');
     } catch (requestError: unknown) {

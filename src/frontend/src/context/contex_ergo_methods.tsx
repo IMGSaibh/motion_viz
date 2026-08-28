@@ -20,10 +20,10 @@ export function ErgoMethodsContexProvider({ children }: { children: React.ReactN
   });
 
   const [owas_selected, set_owas_selected] = useState<OwasSelection>({
-    CATEGORY_1: null,
-    CATEGORY_2: null,
-    CATEGORY_3: null,
-    CATEGORY_4: null,
+    CAT_BACK: null,
+    CAT_ARMS: null,
+    CAT_LEGS: null,
+    CAT_LOAD: null,
   });
 
   // TODO: use memoized default value if needed

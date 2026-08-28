@@ -6,20 +6,9 @@ from pydantic import BaseModel, Field
 
 router = APIRouter()
 
-class LabelImage(BaseModel):
-    name: str
-    src: str
-    category: str
-
-class LabelFeature(BaseModel):
-    id: int
-    name: str
-    image: LabelImage
-
 class LabelCategory(BaseModel):
-    id: int
-    name: str
-    features: List[LabelFeature]
+    category: str
+    feature_id: List[int]
 
 class LabelItem(BaseModel):
     ergo_method: str
