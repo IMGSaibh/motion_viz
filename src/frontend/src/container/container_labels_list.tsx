@@ -11,7 +11,6 @@ import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useDownloadLabels } from '@/hooks/use_download_labels';
 import { useSaveLabels } from '@/hooks/use_save_labels';
-import { serialize_labels } from '@/api/labels_api';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -52,7 +51,7 @@ export function ContainerLabelsList() {
     try {
       const response = await save_labels.mutateAsync({
         motion_name: selected_motion,
-        labels: serialize_labels(labels),
+        labels,
       });
       if (response.warning) warning(response.warning);
       else success(response.message || 'Labels erfolgreich gespeichert');

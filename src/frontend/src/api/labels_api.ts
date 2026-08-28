@@ -17,15 +17,15 @@ import { assert_response_ok, parse_record, read_string } from '@/api/api_respons
 
 export type SaveLabelsRequest = {
   motion_name: string;
-  labels: LabelFileItem[];
+  labels: ErgoLabel[];
 };
 
-export type LabelFileCategory = {
+type LabelFileCategory = {
   category: string;
   feature_id: number[];
 };
 
-export type LabelFileItem = {
+type LabelFileItem = {
   ergo_method: string;
   start_frame: number;
   end_frame: number;
@@ -75,24 +75,6 @@ const RULA_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
   { id: 5, cat_name: 'CAT_TRUNK', images: get_label_images_rula_cat_t() },
   { id: 6, cat_name: 'CAT_LEGS', images: get_label_images_rula_cat_l() },
 ];
-
-export function serialize_labels(labels: ErgoLabel[]): LabelFileItem[] {
-  return labels.map((label) => ({
-    ergo_method: label.ergo_method ?? 'Uncategorized',
-    start_frame: label.start_frame,
-    end_frame: label.end_frame,
-    categories: label.categories.map((category) => {
-      const definition = get_category_definition(label.ergo_method ?? '', category.name);
-      return {
-        category: definition?.cat_name ?? category.name,
-        feature_id: category.features.map((feature) => {
-          const imageIndex = definition?.images.findIndex((image) => image.name === feature.image.name) ?? -1;
-          return imageIndex >= 0 ? imageIndex + 1 : feature.id;
-        }),
-      };
-    }),
-  }));
-}
 
 function parse_labels(value: unknown): ErgoLabel[] {
   const record = parse_record(value, 'load labels');
@@ -144,10 +126,29 @@ function parse_labels(value: unknown): ErgoLabel[] {
 }
 
 export async function save_labels(request: SaveLabelsRequest): Promise<SaveLabelsResponse> {
+  const labels: LabelFileItem[] = request.labels.map((label) => ({
+    ergo_method: label.ergo_method ?? 'Uncategorized',
+    start_frame: label.start_frame,
+    end_frame: label.end_frame,
+    categories: label.categories.map((category) => {
+      const definition = get_category_definition(label.ergo_method ?? '', category.name);
+      return {
+        category: definition?.cat_name ?? category.name,
+        feature_id: category.features.map((feature) => {
+          const imageIndex = definition?.images.findIndex((image) => image.name === feature.image.name) ?? -1;
+          return imageIndex >= 0 ? imageIndex + 1 : feature.id;
+        }),
+      };
+    }),
+  }));
+
   const response = await fetch(api_get_base_url(ENDPOINTS.save), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
+    body: JSON.stringify({
+      motion_name: request.motion_name,
+      labels,
+    }),
   });
   await assert_response_ok(response, 'Save labels');
   const record = parse_record(await response.json(), 'save labels');
