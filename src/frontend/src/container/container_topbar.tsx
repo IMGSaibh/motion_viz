@@ -1,14 +1,10 @@
 import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
-
-import type { MotionDescriptorData } from '@/api/motion_api';
+import type { MotionDescriptorData } from '@/api/api_motion_files';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import {
-  use_clear_label_list_ctx,
-  use_replace_slider_labels_ctx as use_add_slider_labels_from_file_ctx,
-} from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx, use_load_slider_labels_for_file_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useFileUpload } from '@/hooks/use_file_upload';
@@ -53,7 +49,7 @@ export function ContainerTopbar() {
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
   const clear_slider_label_list = use_clear_label_list_ctx();
-  const add_slider_labels_from_file = use_add_slider_labels_from_file_ctx();
+  const load_slider_labels_for_file = use_load_slider_labels_for_file_ctx();
 
   async function handle_file_dialog_on_change(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files || []);
@@ -134,7 +130,7 @@ export function ContainerTopbar() {
       set_range([0, 0]);
 
       const loaded_labels = await load_labels.mutateAsync(filename);
-      add_slider_labels_from_file(loaded_labels);
+      load_slider_labels_for_file(loaded_labels);
       set_rula_selected({
         CAT_UPPERARM: null,
         CAT_LOWERARM: null,

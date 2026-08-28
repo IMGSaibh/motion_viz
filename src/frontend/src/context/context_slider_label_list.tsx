@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
-import { normalize_category, can_save_for_range } from '@/domain/label_logic';
+import { can_save_for_range } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -10,7 +10,7 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 type FrameSliderLabelListContext = {
   ergo_labels: ErgoLabel[];
   add_slider_label: (m: ErgoLabel) => void;
-  add_slider_labels_from_file: (labels: ErgoLabel[]) => void;
+  load_slider_labels_for_file: (labels: ErgoLabel[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -30,20 +30,12 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const add_slider_label = useCallback(
     (label: ErgoLabel) => {
-      const ok = can_save_for_range({
-        labels: ergo_labels,
-        category: label.ergo_method,
-        from: label.start_frame,
-        to: label.end_frame,
-        ignore_id: null,
-      });
-      if (!ok) return; // blockiert Speichern im Context
       dispatch({ type: 'add', label: label });
     },
     [ergo_labels],
   );
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
-  const add_slider_labels_from_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
+  const load_slider_labels_for_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
   const start_editing_label = useCallback(
     (id: string) => {
@@ -53,7 +45,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_range([label.start_frame, label.end_frame]);
       set_editing_id(id);
 
-      if (normalize_category(label.ergo_method) === 'RULA') {
+      if (label.ergo_method === 'RULA') {
         const by_name = Object.fromEntries(
           (label.categories ?? []).map((c) => [c.name, c.features[0]?.image]),
         ) as Record<string, LabelImage | null>;
@@ -67,7 +59,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         });
       }
 
-      if (normalize_category(label.ergo_method) === 'OWAS') {
+      if (label.ergo_method === 'OWAS') {
         const by_name = Object.fromEntries(
           label.categories.map((category) => [category.name, category.features[0]?.image]),
         ) as Record<string, LabelImage | null>;
@@ -93,11 +85,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       category: editingLabel.ergo_method,
       from: range[0],
       to: range[1],
-      ignore_id: editing_id,
+      id: editing_id,
     });
     if (!ok) return;
-
-    const norm = normalize_category(editingLabel.ergo_method);
 
     const createCategory = (id: number, name: string, image: LabelImage | null): LabelCategory | null =>
       image
@@ -109,7 +99,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         : null;
 
     const categories: LabelCategory[] | undefined =
-      norm === 'RULA'
+      editingLabel.ergo_method === 'RULA'
         ? [
             createCategory(1, 'CAT_UPPERARM', rula_selected.CAT_UPPERARM),
             createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
@@ -118,7 +108,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
             createCategory(5, 'CAT_TRUNK', rula_selected.CAT_TRUNK),
             createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
           ].filter((category): category is LabelCategory => category !== null)
-        : norm === 'OWAS'
+        : editingLabel.ergo_method === 'OWAS'
           ? [
               createCategory(1, 'CAT_BACK', owas_selected.CAT_BACK),
               createCategory(2, 'CAT_ARMS', owas_selected.CAT_ARMS),
@@ -165,7 +155,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     () => ({
       ergo_labels,
       add_slider_label,
-      add_slider_labels_from_file: add_slider_labels_from_file,
+      load_slider_labels_for_file,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
@@ -176,7 +166,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [
       ergo_labels,
       add_slider_label,
-      add_slider_labels_from_file,
+      load_slider_labels_for_file,
       remove_label_rect,
       clear_label_rects,
       editing_id,
@@ -299,10 +289,10 @@ export function use_add_slider_label_ctx() {
   });
 }
 
-export function use_replace_slider_labels_ctx() {
+export function use_load_slider_labels_for_file_ctx() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_replace_slider_labels_ctx must be used within <FrameSliderLabellistProvider>');
-    return v.add_slider_labels_from_file;
+    if (!v) throw new Error('use_load_slider_labels_for_file_ctx must be used within <FrameSliderLabellistProvider>');
+    return v.load_slider_labels_for_file;
   });
 }
 
@@ -361,7 +351,7 @@ export function use_can_save_label_cxt() {
         category: targetCategory,
         from: range[0],
         to: range[1],
-        ignore_id: v.editing_id,
+        id: v.editing_id,
       });
     };
   });
