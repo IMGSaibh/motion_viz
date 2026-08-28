@@ -1,4 +1,4 @@
-import type { ErgoLabel } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelFeature, LabelImage } from '@/domain/datatypes';
 import { uid } from '@/domain/label_logic';
 import { api_get_base_url } from '@/utils/api_url';
 import { assert_response_ok, parse_record, read_string } from '@/api/api_response';
@@ -41,17 +41,36 @@ function parse_labels(value: unknown): ErgoLabel[] {
     if (label.ergo_method !== undefined && typeof label.ergo_method !== 'string') {
       throw new Error(`Invalid label ${index + 1} field: ergo_method`);
     }
-    if (label.button_text !== undefined && typeof label.button_text !== 'string') {
-      throw new Error(`Invalid label ${index + 1} field: button_text`);
-    }
+    if (!Array.isArray(label.categories)) throw new Error(`Invalid label ${index + 1} field: categories`);
+
+    const categories: LabelCategory[] = label.categories.map((value, categoryIndex) => {
+      const category = parse_record(value, `label ${index + 1} category ${categoryIndex + 1}`);
+      if (typeof category.id !== 'number' || typeof category.name !== 'string' || !Array.isArray(category.features)) {
+        throw new Error(`Invalid label ${index + 1} category ${categoryIndex + 1}`);
+      }
+
+      const features: LabelFeature[] = category.features.map((value, featureIndex) => {
+        const feature = parse_record(value, `label ${index + 1} feature ${featureIndex + 1}`);
+        const imageRecord = parse_record(feature.image, `label ${index + 1} feature image ${featureIndex + 1}`);
+        if (typeof feature.id !== 'number' || typeof feature.name !== 'string') {
+          throw new Error(`Invalid label ${index + 1} feature ${featureIndex + 1}`);
+        }
+        const image: LabelImage = {
+          name: read_string(imageRecord, 'name'),
+          src: read_string(imageRecord, 'src'),
+          category: read_string(imageRecord, 'category'),
+        };
+        return { id: feature.id, name: feature.name, image };
+      });
+      return { id: category.id, name: category.name, features };
+    });
 
     return {
       id: uid(),
       start_frame: startFrame,
       end_frame: endFrame,
       ergo_method: label.ergo_method,
-      button_text: label.button_text,
-      categories: [],
+      categories,
     };
   });
 }

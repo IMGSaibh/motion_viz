@@ -7,7 +7,9 @@ type Props = {
 };
 
 export function WidgetLabelPreview(props: Props) {
-  const categoryImages = (props.categories ?? []).map((c) => c.image).filter(Boolean) as LabelImage[];
+  const categoryImages = (props.categories ?? []).flatMap((category) =>
+    category.features.map((feature) => feature.image),
+  );
 
   const imagesToShow =
     categoryImages.length > 0 ? categoryImages.slice(0, 4) : props.label_image ? [props.label_image] : [];

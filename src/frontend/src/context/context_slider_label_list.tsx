@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
 import { normalize_category, can_save_for_range } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
@@ -54,10 +54,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_editing_id(id);
 
       if (normalize_category(label.ergo_method) === 'RULA') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
-          string,
-          LabelImage | null
-        >;
+        const by_name = Object.fromEntries(
+          (label.categories ?? []).map((c) => [c.name, c.features[0]?.image]),
+        ) as Record<string, LabelImage | null>;
         set_rula_selected({
           CAT_UPPERARM: by_name.CAT_UPPERARM ?? null,
           CAT_LOWERARM: by_name.CAT_LOWERARM ?? null,
@@ -69,10 +68,9 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       }
 
       if (normalize_category(label.ergo_method) === 'OWAS') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
-          string,
-          LabelImage | null
-        >;
+        const by_name = Object.fromEntries(
+          label.categories.map((category) => [category.name, category.features[0]?.image]),
+        ) as Record<string, LabelImage | null>;
         set_owas_selected({
           CATEGORY_1: by_name.CATEGORY_1 ?? null,
           CATEGORY_2: by_name.CATEGORY_2 ?? null,
@@ -101,38 +99,40 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
     const norm = normalize_category(editingLabel.ergo_method);
 
-    const categories =
+    const createCategory = (id: number, name: string, image: LabelImage | null): LabelCategory | null =>
+      image
+        ? {
+            id,
+            name,
+            features: [{ id: 1, name: image.name, image }],
+          }
+        : null;
+
+    const categories: LabelCategory[] | undefined =
       norm === 'RULA'
         ? [
-            { name: 'CAT_UPPERARM', image: rula_selected.CAT_UPPERARM },
-            { name: 'CAT_LOWERARM', image: rula_selected.CAT_LOWERARM },
-            { name: 'CAT_WRIST', image: rula_selected.CAT_WRIST },
-            { name: 'CAT_NECK', image: rula_selected.CAT_NECK },
-            { name: 'CAT_TRUNK', image: rula_selected.CAT_TRUNK },
-            { name: 'CAT_LEGS', image: rula_selected.CAT_LEGS },
-          ]
+            createCategory(1, 'CAT_UPPERARM', rula_selected.CAT_UPPERARM),
+            createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
+            createCategory(3, 'CAT_WRIST', rula_selected.CAT_WRIST),
+            createCategory(4, 'CAT_NECK', rula_selected.CAT_NECK),
+            createCategory(5, 'CAT_TRUNK', rula_selected.CAT_TRUNK),
+            createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
+          ].filter((category): category is LabelCategory => category !== null)
         : norm === 'OWAS'
           ? [
-              { name: 'CATEGORY_1', image: owas_selected.CATEGORY_1 },
-              { name: 'CATEGORY_2', image: owas_selected.CATEGORY_2 },
-              { name: 'CATEGORY_3', image: owas_selected.CATEGORY_3 },
-              { name: 'CATEGORY_4', image: owas_selected.CATEGORY_4 },
-            ]
+              createCategory(1, 'CATEGORY_1', owas_selected.CATEGORY_1),
+              createCategory(2, 'CATEGORY_2', owas_selected.CATEGORY_2),
+              createCategory(3, 'CATEGORY_3', owas_selected.CATEGORY_3),
+              createCategory(4, 'CATEGORY_4', owas_selected.CATEGORY_4),
+            ].filter((category): category is LabelCategory => category !== null)
           : undefined;
-
-    const rulaLabel =
-      norm === 'RULA'
-        ? Object.values(rula_selected)
-            .map((image) => image?.name ?? '')
-            .join(' | ')
-        : undefined;
 
     dispatch({
       type: 'update',
       id: editing_id,
       from: range[0],
       to: range[1],
-      ...(rulaLabel !== undefined ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
+      ergo_method: editingLabel.ergo_method,
       ...(categories !== undefined ? { categories } : {}),
     });
 
@@ -228,16 +228,8 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
           patch.end_frame = to;
           changed = true;
         }
-        if (action.label !== undefined && x.button_text !== action.label) {
-          patch.button_text = action.label;
-          changed = true;
-        }
         if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
           patch.ergo_method = action.ergo_method;
-          changed = true;
-        }
-        if (action.color !== undefined && x.color !== action.color) {
-          patch.color = action.color;
           changed = true;
         }
         if (action.categories !== undefined && x.categories !== action.categories) {

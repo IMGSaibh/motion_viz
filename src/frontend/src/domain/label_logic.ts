@@ -1,4 +1,8 @@
-import { ErgoLabel } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
+
+export function create_label_category(id: number, name: string, image: LabelImage): LabelCategory {
+  return { id, name, features: [{ id: 1, name: image.name, image }] };
+}
 
 export function uid() {
   // Browser: crypto.randomUUID; fallback wenn nicht vorhanden

@@ -6,7 +6,7 @@ import {
 } from '@/Assets/label_images';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
-import { uid } from '@/domain/label_logic';
+import { create_label_category, uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, LabelCategory, ErgoLabel, OwasCategoryName } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
@@ -126,22 +126,19 @@ export function WidgetOwasButtons(props: Props) {
     if (!canSaveOwas) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CATEGORY_1', image: owas_selected.CATEGORY_1! },
-      { name: 'CATEGORY_2', image: owas_selected.CATEGORY_2! },
-      { name: 'CATEGORY_3', image: owas_selected.CATEGORY_3! },
-      { name: 'CATEGORY_4', image: owas_selected.CATEGORY_4! },
+      create_label_category(1, 'CATEGORY_1', owas_selected.CATEGORY_1!),
+      create_label_category(2, 'CATEGORY_2', owas_selected.CATEGORY_2!),
+      create_label_category(3, 'CATEGORY_3', owas_selected.CATEGORY_3!),
+      create_label_category(4, 'CATEGORY_4', owas_selected.CATEGORY_4!),
     ];
 
     const from = Math.min(range[0], range[1]);
     const to = Math.max(range[0], range[1]);
-    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
-
     const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
       end_frame: to,
       ergo_method: 'OWAS',
-      button_text: labelText,
       categories,
     };
 

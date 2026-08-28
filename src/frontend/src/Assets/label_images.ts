@@ -75,7 +75,7 @@ const LABEL_IMAGES_RULA_CAT_UA: ReadonlyArray<LabelImage> = [
 
 const LABEL_IMAGES_RULA_CAT_LA: ReadonlyArray<LabelImage> = [
   { name: '60\u00B0 - 100\u00B0', src: btn_rula_la_1, category: 'CAT_LOWERARM' },
-  { name: '<0\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'CAT_LOWERARM' },
+  { name: '<0\u00B0 - 60\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'CAT_LOWERARM' },
   { name: 'Midline', src: btn_rula_la_3, category: 'CAT_LOWERARM' },
 ];
 

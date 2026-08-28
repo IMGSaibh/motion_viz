@@ -42,7 +42,7 @@ export function WidgetFrameLabelBar(props: Props) {
             aria-hidden
           >
             {/* saved labels */}
-            {saved_labels.map(({ id, start_frame: vf, end_frame: vt, color }) => {
+            {saved_labels.map(({ id, start_frame: vf, end_frame: vt }) => {
               const vvFrom = clamp(Math.min(vf, vt));
               const vvTo = clamp(Math.max(vf, vt));
               const vvLen = Math.max(0, vvTo - vvFrom + 1);
@@ -62,7 +62,6 @@ export function WidgetFrameLabelBar(props: Props) {
                     transformOrigin: isRtl ? 'right center' : 'left center',
                     transform: `scaleX(${vScale})`,
                     ...(isRtl ? { right: `${vLeft}%` } : { left: `${vLeft}%` }),
-                    background: color ?? theme.palette.wip_color_theme[600],
                     pointerEvents: 'none',
                   })}
                 />

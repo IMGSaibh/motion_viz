@@ -6,11 +6,26 @@ from pydantic import BaseModel, Field
 
 router = APIRouter()
 
+class LabelImage(BaseModel):
+    name: str
+    src: str
+    category: str
+
+class LabelFeature(BaseModel):
+    id: int
+    name: str
+    image: LabelImage
+
+class LabelCategory(BaseModel):
+    id: int
+    name: str
+    features: List[LabelFeature]
+
 class LabelItem(BaseModel):
-    ergo_method: str 
+    ergo_method: str
     start_frame: int = Field(..., ge=0)
     end_frame: int = Field(..., ge=0)
-    button_text: str
+    categories: List[LabelCategory]
 
 class SaveLabelsRequest(BaseModel):
     motion_name: str          
@@ -27,7 +42,12 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     labels = []
     for item in payload.labels:
         a, b = sorted((item.start_frame, item.end_frame))
-        labels.append({"ergo_method": item.ergo_method,"start_frame": a, "end_frame": b,"button_text": item.button_text,})
+        labels.append({
+            "ergo_method": item.ergo_method,
+            "start_frame": a,
+            "end_frame": b,
+            "categories": [category.model_dump() for category in item.categories],
+        })
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)
