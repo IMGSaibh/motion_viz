@@ -6,9 +6,9 @@ import {
 } from '@/Assets/label_images';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
-import { uid } from '@/domain/label_logic';
+import { create_label_category, uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
-import type { LabelImage, LabelCategory, ErgoLabel } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, ErgoLabel, OwasCategoryName } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
@@ -25,11 +25,11 @@ function CategoryGrid({
   onSelect,
   isLast,
 }: {
-  cat: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4';
+  cat: OwasCategoryName;
   title: string;
   owas_button_images: readonly LabelImage[];
   selected_cat_images: string | null;
-  onSelect: (slot: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4', img: LabelImage) => void;
+  onSelect: (slot: OwasCategoryName, img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -114,10 +114,10 @@ export function WidgetOwasButtons(props: Props) {
   const can_save_label = use_can_save_label_cxt();
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
 
-  const allSelected = Boolean(owas_selected.CAT1 && owas_selected.CAT2 && owas_selected.CAT3 && owas_selected.CAT4);
+  const allSelected = Object.values(owas_selected).every(Boolean);
   const canSaveOwas = can_save_label('OWAS');
 
-  const handleSelect = (cat: 'CAT1' | 'CAT2' | 'CAT3' | 'CAT4', img: LabelImage) => {
+  const handleSelect = (cat: OwasCategoryName, img: LabelImage) => {
     set_owas_selected({ ...owas_selected, [cat]: img });
   };
 
@@ -126,27 +126,24 @@ export function WidgetOwasButtons(props: Props) {
     if (!canSaveOwas) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT1', image: owas_selected.CAT1! },
-      { name: 'CAT2', image: owas_selected.CAT2! },
-      { name: 'CAT3', image: owas_selected.CAT3! },
-      { name: 'CAT4', image: owas_selected.CAT4! },
+      create_label_category(1, 'CAT_BACK', owas_selected.CAT_BACK!),
+      create_label_category(2, 'CAT_ARMS', owas_selected.CAT_ARMS!),
+      create_label_category(3, 'CAT_LEGS', owas_selected.CAT_LEGS!),
+      create_label_category(4, 'CAT_LOAD', owas_selected.CAT_LOAD!),
     ];
 
     const from = Math.min(range[0], range[1]);
     const to = Math.max(range[0], range[1]);
-    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
-
     const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
       end_frame: to,
       ergo_method: 'OWAS',
-      button_text: labelText,
       categories,
     };
 
     props.on_click_save_label?.(label);
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   };
 
   return (
@@ -159,39 +156,39 @@ export function WidgetOwasButtons(props: Props) {
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT1"
+            cat="CAT_BACK"
             title="Kategorie Rücken"
             owas_button_images={label_images_cat1}
-            selected_cat_images={owas_selected.CAT1?.name ?? null}
+            selected_cat_images={owas_selected.CAT_BACK?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT2"
+            cat="CAT_ARMS"
             title="Kategorie Arme"
             owas_button_images={label_images_cat2}
-            selected_cat_images={owas_selected.CAT2?.name ?? null}
+            selected_cat_images={owas_selected.CAT_ARMS?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
 
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT3"
+            cat="CAT_LEGS"
             title="Kategorie Beine"
             owas_button_images={label_images_cat3}
-            selected_cat_images={owas_selected.CAT3?.name ?? null}
+            selected_cat_images={owas_selected.CAT_LEGS?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
-            cat="CAT4"
+            cat="CAT_LOAD"
             title="Kategorie Last"
             owas_button_images={label_images_cat4}
-            selected_cat_images={owas_selected.CAT4?.name ?? null}
+            selected_cat_images={owas_selected.CAT_LOAD?.name ?? null}
             onSelect={handleSelect}
           />
         </Grid>

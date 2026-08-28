@@ -1,11 +1,11 @@
-import type { LabelImage, RulaSelection } from '@/domain/datatypes';
+import type { OwasSelection, RulaSelection } from '@/domain/datatypes';
 import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
   rula_selected: RulaSelection;
   set_rula_selected: (next: RulaSelection) => void;
-  owas_selected: Record<string, LabelImage | null>;
-  set_owas_selected: (next: Record<string, LabelImage | null>) => void;
+  owas_selected: OwasSelection;
+  set_owas_selected: (next: OwasSelection) => void;
 };
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
@@ -19,11 +19,11 @@ export function ErgoMethodsContexProvider({ children }: { children: React.ReactN
     CAT_LEGS: null,
   });
 
-  const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
-    CAT4: null,
+  const [owas_selected, set_owas_selected] = useState<OwasSelection>({
+    CAT_BACK: null,
+    CAT_ARMS: null,
+    CAT_LEGS: null,
+    CAT_LOAD: null,
   });
 
   // TODO: use memoized default value if needed

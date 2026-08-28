@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { list_motion_files } from '@/api/motion_api';
+import { list_motion_files } from '@/api/api_motion_files';
 
 export const MOTION_FILES_QUERY_KEY = ['motion_files'] as const;
 

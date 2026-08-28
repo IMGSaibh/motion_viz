@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { upload_motion_files } from '@/api/motion_api';
+import { upload_motion_files } from '@/api/api_motion_files';
 import { MOTION_FILES_QUERY_KEY } from '@/hooks/use_motion_files';
 
 export function useFileUpload() {

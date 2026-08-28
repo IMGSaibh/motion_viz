@@ -123,9 +123,9 @@ export function WidgetLabelList(props: Props) {
                       })}
                     >
                       <Typography variant="body2" noWrap>
-                        {ergoLabel.categories?.map((cat) => (
-                          <span key={cat.name}>{cat.image?.name}</span>
-                        ))}
+                        {ergoLabel.categories.flatMap((category) =>
+                          category.features.map((feature) => feature.name),
+                        ).join(' | ')}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Methode ${ergoLabel.ergo_method}`}
@@ -165,7 +165,7 @@ export function WidgetLabelList(props: Props) {
                             </IconButton>
                             <IconButton
                               size="small"
-                              onClick={() => props.delete_label_from_list_on_click?.(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && props.delete_label_from_list_on_click?.(ergoLabel.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
@@ -176,7 +176,7 @@ export function WidgetLabelList(props: Props) {
                           <>
                             <IconButton
                               size="small"
-                              onClick={() => startEdit(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && startEdit(ergoLabel.id)}
                               aria-label="Edit label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
@@ -185,7 +185,7 @@ export function WidgetLabelList(props: Props) {
 
                             <IconButton
                               size="small"
-                              onClick={() => props.delete_label_from_list_on_click?.(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && props.delete_label_from_list_on_click?.(ergoLabel.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >

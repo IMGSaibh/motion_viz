@@ -1,4 +1,5 @@
 // reine Datentypen (KEIN React)
+
 export type Range = [number, number];
 
 export type RectangleLabelBar = {
@@ -8,36 +9,40 @@ export type RectangleLabelBar = {
   scaleX: number;
 };
 
+export type ErgoLabel = {
+  id: string | undefined;
+  start_frame: number;
+  end_frame: number;
+  ergo_method?: string;
+  categories: LabelCategory[];
+};
+
+export type LabelCategory = {
+  id: number;
+  name: string;
+  features: LabelFeature[];
+};
+
+export type LabelFeature = {
+  id: number;
+  name: string;
+  image: LabelImage;
+};
+
 export type LabelImage = {
   name: string;
   src: string;
   category: string;
 };
 
-export type RulaCategoryName =
-  | 'CAT_UPPERARM'
-  | 'CAT_LOWERARM'
-  | 'CAT_WRIST'
-  | 'CAT_NECK'
-  | 'CAT_TRUNK'
-  | 'CAT_LEGS';
+export type RulaCategoryName = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
+export type OwasCategoryName = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
 
 export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
+export type OwasSelection = Record<OwasCategoryName, LabelImage | null>;
 
-export type LabelCategory = {
-  name: string;
-  image: LabelImage | null;
-};
-
-export type ErgoLabel = {
-  id: string;
-  start_frame: number;
-  end_frame: number;
-  color?: string;
-  button_text?: string;
-  ergo_method?: string;
-  categories: LabelCategory[];
-};
+export type RulaOptionalsUpperArm = '';
+export type OptionalsNeckAndTrunk = '';
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
@@ -49,9 +54,6 @@ export type MarkerAction =
       id: string;
       from: number;
       to: number;
-      label?: string;
       ergo_method?: string;
-      color?: string;
-      framecount?: number;
       categories?: LabelCategory[];
     };

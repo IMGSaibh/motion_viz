@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { uid } from '@/domain/label_logic';
+import { create_label_category, uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
   get_label_images_rula_cat_l,
@@ -130,24 +130,21 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      { name: 'CAT_UPPERARM', image: rula_selected.CAT_UPPERARM! },
-      { name: 'CAT_LOWERARM', image: rula_selected.CAT_LOWERARM! },
-      { name: 'CAT_WRIST', image: rula_selected.CAT_WRIST! },
-      { name: 'CAT_NECK', image: rula_selected.CAT_NECK! },
-      { name: 'CAT_TRUNK', image: rula_selected.CAT_TRUNK! },
-      { name: 'CAT_LEGS', image: rula_selected.CAT_LEGS! },
+      create_label_category(1, 'CAT_UPPERARM', rula_selected.CAT_UPPERARM!),
+      create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM!),
+      create_label_category(3, 'CAT_WRIST', rula_selected.CAT_WRIST!),
+      create_label_category(4, 'CAT_NECK', rula_selected.CAT_NECK!),
+      create_label_category(5, 'CAT_TRUNK', rula_selected.CAT_TRUNK!),
+      create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS!),
     ];
 
     const from = Math.min(range[0], range[1]);
     const to = Math.max(range[0], range[1]);
-    const labelText = categories.map((c) => c.image?.name ?? '').join(' | ');
-
     const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
       end_frame: to,
       ergo_method: 'RULA',
-      button_text: labelText,
       categories,
     };
 

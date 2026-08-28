@@ -1,15 +1,14 @@
-import { ErgoLabel } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
+
+export function create_label_category(id: number, name: string, image: LabelImage): LabelCategory {
+  return { id, name, features: [{ id: 1, name: image.name, image }] };
+}
 
 export function uid() {
   // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const c: any = typeof crypto !== 'undefined' ? crypto : null;
   return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-// normalize categorie string to make it comparable
-export function normalize_category(categorie?: string) {
-  return (categorie ?? 'Uncategorized').trim() || 'Uncategorized';
 }
 
 export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
@@ -21,16 +20,12 @@ export function can_save_for_range(args: {
   category?: string;
   from: number;
   to: number;
-  ignore_id?: string | null;
+  id?: string | null;
 }) {
   const fromN = Math.min(args.from, args.to);
   const toN = Math.max(args.from, args.to);
-  const target_category = normalize_category(args.category);
-
   const hasOverlapSameCategory = args.labels.some((label) => {
-    if (args.ignore_id && label.id === args.ignore_id) return false;
-    const mCat = normalize_category(label.ergo_method);
-    if (mCat !== target_category) return false;
+    if (args.id && label.id === args.id) return false;
     const mf = Math.min(label.start_frame, label.end_frame);
     const mt = Math.max(label.start_frame, label.end_frame);
     return fromN < mt && toN > mf;

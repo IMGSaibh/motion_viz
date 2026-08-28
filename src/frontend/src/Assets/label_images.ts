@@ -75,7 +75,7 @@ const LABEL_IMAGES_RULA_CAT_UA: ReadonlyArray<LabelImage> = [
 
 const LABEL_IMAGES_RULA_CAT_LA: ReadonlyArray<LabelImage> = [
   { name: '60\u00B0 - 100\u00B0', src: btn_rula_la_1, category: 'CAT_LOWERARM' },
-  { name: '<0\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'CAT_LOWERARM' },
+  { name: '<0\u00B0 - 60\u00B0 | >100\u00B0', src: btn_rula_la_2, category: 'CAT_LOWERARM' },
   { name: 'Midline', src: btn_rula_la_3, category: 'CAT_LOWERARM' },
 ];
 
@@ -147,32 +147,32 @@ export function get_label_all_label_images_rula(): ReadonlyMap<string, LabelImag
 
 // OWAS IMAGES
 const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn1_owas, category: 'Kategorie 1' },
-  { name: 'Code 2', src: btn2_owas, category: 'Kategorie 1' },
-  { name: 'Code 3', src: btn3_owas, category: 'Kategorie 1' },
-  { name: 'Code 4', src: btn4_owas, category: 'Kategorie 1' },
+  { name: 'Code 2', src: btn2_owas, category: 'CAT_BACK' },
+  { name: 'Code 1', src: btn1_owas, category: 'CAT_BACK' },
+  { name: 'Code 3', src: btn3_owas, category: 'CAT_BACK' },
+  { name: 'Code 4', src: btn4_owas, category: 'CAT_BACK' },
 ];
 
 const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 2' },
-  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 2' },
-  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 2' },
+  { name: 'Code 1', src: btn5_owas, category: 'CAT_ARMS' },
+  { name: 'Code 2', src: btn6_owas, category: 'CAT_ARMS' },
+  { name: 'Code 3', src: btn7_owas, category: 'CAT_ARMS' },
 ];
 
 const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn8_owas, category: 'Kategorie 3' },
-  { name: 'Code 2', src: btn9_owas, category: 'Kategorie 3' },
-  { name: 'Code 3', src: btn10_owas, category: 'Kategorie 3' },
-  { name: 'Code 4', src: btn11_owas, category: 'Kategorie 3' },
-  { name: 'Code 5', src: btn12_owas, category: 'Kategorie 3' },
-  { name: 'Code 6', src: btn13_owas, category: 'Kategorie 3' },
-  { name: 'Code 7', src: btn14_owas, category: 'Kategorie 3' },
+  { name: 'Code 1', src: btn8_owas, category: 'CAT_LEGS' },
+  { name: 'Code 2', src: btn9_owas, category: 'CAT_LEGS' },
+  { name: 'Code 3', src: btn10_owas, category: 'CAT_LEGS' },
+  { name: 'Code 4', src: btn11_owas, category: 'CAT_LEGS' },
+  { name: 'Code 5', src: btn12_owas, category: 'CAT_LEGS' },
+  { name: 'Code 6', src: btn13_owas, category: 'CAT_LEGS' },
+  { name: 'Code 7', src: btn14_owas, category: 'CAT_LEGS' },
 ];
 
 const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'Kategorie 4' },
-  { name: 'Code 2', src: btn6_owas, category: 'Kategorie 4' },
-  { name: 'Code 3', src: btn7_owas, category: 'Kategorie 4' },
+  { name: 'Code 1', src: btn5_owas, category: 'CAT_LOAD' },
+  { name: 'Code 2', src: btn6_owas, category: 'CAT_LOAD' },
+  { name: 'Code 3', src: btn7_owas, category: 'CAT_LOAD' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {
@@ -203,9 +203,9 @@ export function get_label_all_label_images_owas(): ReadonlyMap<string, LabelImag
 
 // LMM IMAGES
 const LABEL_IMAGES_CAT1_LLM: ReadonlyArray<LabelImage> = [
-  { name: 'Button_1', src: btn1_lmm, category: 'Kategorie 1' },
-  { name: 'Button_2', src: btn2_lmm, category: 'Kategorie 1' },
-  { name: 'Button_3', src: btn3_lmm, category: 'Kategorie 1' },
+  { name: 'Button_1', src: btn1_lmm, category: 'CAT_1' },
+  { name: 'Button_2', src: btn2_lmm, category: 'CAT_1' },
+  { name: 'Button_3', src: btn3_lmm, category: 'CAT_1' },
 ];
 
 export function get_label_images_cat1_llm(): ReadonlyArray<LabelImage> {

@@ -67,7 +67,7 @@ export function ContainerFrameSlider() {
           CAT_TRUNK: null,
           CAT_LEGS: null,
         });
-        set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+        set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
       if (e.code === 'ArrowRight') {
         e.preventDefault();

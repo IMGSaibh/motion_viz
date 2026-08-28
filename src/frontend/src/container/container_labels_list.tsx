@@ -43,13 +43,16 @@ export function ContainerLabelsList() {
       CAT_TRUNK: null,
       CAT_LEGS: null,
     });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
 
   const save_label_list_on_click = useCallback(async () => {
     if (!selected_motion) return;
     try {
-      const response = await save_labels.mutateAsync({ motion_name: selected_motion, labels });
+      const response = await save_labels.mutateAsync({
+        motion_name: selected_motion,
+        labels,
+      });
       if (response.warning) warning(response.warning);
       else success(response.message || 'Labels erfolgreich gespeichert');
     } catch (requestError: unknown) {
