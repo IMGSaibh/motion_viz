@@ -64,10 +64,10 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           label.categories.map((category) => [category.name, category.features[0]?.image]),
         ) as Record<string, LabelImage | null>;
         set_owas_selected({
-          CAT_BACK: by_name.CATEGORY_1 ?? null,
-          CAT_ARMS: by_name.CATEGORY_2 ?? null,
-          CAT_LEGS: by_name.CATEGORY_3 ?? null,
-          CAT_LOAD: by_name.CATEGORY_4 ?? null,
+          CAT_BACK: by_name.CAT_BACK ?? null,
+          CAT_ARMS: by_name.CAT_ARMS ?? null,
+          CAT_LEGS: by_name.CAT_LEGS ?? null,
+          CAT_LOAD: by_name.CAT_LOAD ?? null,
         });
       }
     },
