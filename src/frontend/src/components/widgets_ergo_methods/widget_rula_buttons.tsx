@@ -11,7 +11,7 @@ import {
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import type { LabelImage, LabelCategory, ErgoLabel, RulaCategoryName } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, ErgoLabel, RulaCategory } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
@@ -27,11 +27,11 @@ function CategoryGrid({
   onSelect,
   isLast,
 }: {
-  cat: RulaCategoryName;
+  cat: RulaCategory;
   title: string;
   rula_button_images: readonly LabelImage[];
   selected_cat_image: string | null;
-  onSelect: (slot: RulaCategoryName, img: LabelImage) => void;
+  onSelect: (slot: RulaCategory, img: LabelImage) => void;
   isLast?: boolean;
 }) {
   return (
@@ -121,7 +121,7 @@ export function WidgetRulaButtons(props: Props) {
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: RulaCategoryName, img: LabelImage) => {
+  const handleSelect = (cat: RulaCategory, img: LabelImage) => {
     set_rula_selected({ ...rula_selected, [cat]: img });
   };
 

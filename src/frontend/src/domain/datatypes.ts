@@ -35,14 +35,14 @@ export type LabelImage = {
   category: string;
 };
 
-export type RulaCategoryName = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
-export type OwasCategoryName = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
+export type RulaCategory = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
+export type OwasCategory = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
 
-export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
-export type OwasSelection = Record<OwasCategoryName, LabelImage | null>;
+export type RulaSelection = Record<RulaCategory, LabelImage | null>;
+export type OwasSelection = Record<OwasCategory, LabelImage | null>;
 
-export type RulaOptionalsUpperArm = '';
-export type OptionalsNeckAndTrunk = '';
+export type RulaOptionalsUpperArm = 'Shoulder Raised' | 'Leaning' | 'Abducted';
+export type OptionalsNeckAndTrunk = 'Twist' | 'Side-Bend';
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
