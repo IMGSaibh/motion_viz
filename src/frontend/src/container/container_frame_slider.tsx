@@ -3,7 +3,6 @@ import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
-import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 
@@ -58,7 +57,7 @@ export function ContainerFrameSlider() {
       if (e.code === 'KeyR') {
         reset_engine();
         set_frame_slider_value(0);
-        set_range([0, 0]);
+        set_range(null);
         clear_slider_label_list();
         set_rula_selected(create_empty_rula_selection());
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
@@ -83,19 +82,23 @@ export function ContainerFrameSlider() {
       }
       if (e.code === 'KeyD') print_scene_components();
 
+      if (e.code === 'Escape') {
+        set_range(null);
+      }
+
       if (e.code === 'KeyA') {
         e.preventDefault();
-        set_range([frame_slider_value, range[1]]);
+        set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
       }
       if (e.code === 'KeyE') {
         e.preventDefault();
-        set_range([range[0], frame_slider_value]);
+        set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
       }
       if (e.code === 'Digit1' && e.location === 0) {
-        set_range([frame_slider_value, range[1]]);
+        set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        set_range([range[0], frame_slider_value]);
+        set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
       }
     };
 
@@ -216,7 +219,7 @@ export function ContainerFrameSlider() {
     () => ({
       frame_slider_value,
       frame_count: frame_count ?? 0,
-      frame_slider_range: range as Range,
+      frame_slider_range: range as [number, number],
       hover_frame: frame_slider_track_hovered_frame,
       slider_track_ref: frame_slider_track_reference,
       on_mouse_down_slider_track: on_mouse_down_slider_track,

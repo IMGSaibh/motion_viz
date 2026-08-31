@@ -107,7 +107,7 @@ export function ContainerTopbar() {
     stop();
     go_to_frame(0);
     set_frame_slider_value(0);
-    set_range([0, 0]);
+    set_range(null);
     clear_slider_label_list();
   }
 
@@ -128,7 +128,7 @@ export function ContainerTopbar() {
       stop();
       go_to_frame(0);
       set_frame_slider_value(0);
-      set_range([0, 0]);
+      set_range(null);
 
       const loaded_labels = await load_labels.mutateAsync(filename);
       load_slider_labels_for_file(loaded_labels);

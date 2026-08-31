@@ -23,6 +23,7 @@ import type {
   RulaCategory,
   RulaOptionalsUpperArm,
   OptionalsNeckAndTrunk,
+  Range,
   OptionalsWrist,
   RulaFeatureSelection,
 } from '@/domain/datatypes';
@@ -147,7 +148,7 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
   const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
-  const { range, set_range } = use_frame_slider_context();
+  const { range, frame_slider_value } = use_frame_slider_context();
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const allSelected =
@@ -159,7 +160,8 @@ export function WidgetRulaButtons(props: Props) {
     rula_selected.CAT_LEGS !== null;
 
   const can_save_label = use_can_save_label_cxt();
-  const canSaveRula = can_save_label('RULA');
+  const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
+  const canSaveRula = can_save_label('RULA', effectiveRange);
 
   const handleSelect = (cat: RulaCategory, img: LabelImage, isOptional: boolean) => {
     if (cat === 'CAT_UPPERARM' && isOptional) {
@@ -235,8 +237,8 @@ export function WidgetRulaButtons(props: Props) {
       create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS!),
     ];
 
-    const from = Math.min(range[0], range[1]);
-    const to = Math.max(range[0], range[1]);
+    const from = Math.min(effectiveRange[0], effectiveRange[1]);
+    const to = Math.max(effectiveRange[0], effectiveRange[1]);
     const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
