@@ -157,7 +157,7 @@ export function WidgetOwasButtons(props: Props) {
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT_BACK"
-            title="Kategorie Rücken"
+            title="Back Category"
             owas_button_images={label_images_cat1}
             selected_cat_images={owas_selected.CAT_BACK?.name ?? null}
             onSelect={handleSelect}
@@ -167,7 +167,7 @@ export function WidgetOwasButtons(props: Props) {
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT_ARMS"
-            title="Kategorie Arme"
+            title="Arms Category"
             owas_button_images={label_images_cat2}
             selected_cat_images={owas_selected.CAT_ARMS?.name ?? null}
             onSelect={handleSelect}
@@ -177,7 +177,7 @@ export function WidgetOwasButtons(props: Props) {
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT_LEGS"
-            title="Kategorie Beine"
+            title="Legs Category"
             owas_button_images={label_images_cat3}
             selected_cat_images={owas_selected.CAT_LEGS?.name ?? null}
             onSelect={handleSelect}
@@ -186,7 +186,7 @@ export function WidgetOwasButtons(props: Props) {
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
           <CategoryGrid
             cat="CAT_LOAD"
-            title="Kategorie Last"
+            title="Load Category"
             owas_button_images={label_images_cat4}
             selected_cat_images={owas_selected.CAT_LOAD?.name ?? null}
             onSelect={handleSelect}

@@ -11,7 +11,7 @@ export class SkeletonJointDescription {
     this.scene.add(this.group);
   }
 
-  //   /** Einmal aufrufen, nachdem das Skeleton erzeugt wurde */
+  //   /** Call once after the skeleton has been created */
   //   create(jointCount: Number) {
   //     for (let j = 0; j < jointCount; j++) {
   //       const joint_label = new Text();
@@ -20,14 +20,14 @@ export class SkeletonJointDescription {
   //       joint_label.anchorX = 'center';
   //       joint_label.anchorY = 'bottom';
 
-  //       // Typing-Workaround falls Troika/Three Typen nicht matchen:
+  //       // Typing workaround if the Troika and Three types do not match:
   //       this.group.add(joint_label as unknown as THREE.Object3D);
   //       this.labels.push(joint_label);
   //     }
   //   }
 
   //   updatePositions(position: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
-  //     const joints = this.loader.joints as THREE.Object3D[]; // Joint-Meshes vom Loader
+  //     const joints = this.loader.joints as THREE.Object3D[]; // Joint meshes from the loader
   //     for (let j = 0; j < this.labels.length; j++) {
   //       this.labels[j].position.copy(position);
   //     }

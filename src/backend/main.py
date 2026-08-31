@@ -20,7 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     
-    #wichtig für filename aus Header
+    # Required for the filename from the header
     # expose_headers=["Content-Disposition"],  
 )
 

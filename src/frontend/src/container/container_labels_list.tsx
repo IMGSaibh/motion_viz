@@ -48,18 +48,18 @@ export function ContainerLabelsList() {
         labels,
       });
       if (response.warning) warning(response.warning);
-      else success(response.message || 'Labels erfolgreich gespeichert');
+      else success(response.message || 'Labels saved successfully');
     } catch (requestError: unknown) {
-      error(get_error_message(requestError, 'Fehler beim Speichern der Labels'));
+      error(get_error_message(requestError, 'Failed to save labels'));
     }
   }, [error, labels, save_labels, selected_motion, success, warning]);
 
   const download_labels_on_click = useCallback(async () => {
     try {
       const result = await labels_download.mutateAsync();
-      success(`Labels erfolgreich heruntergeladen (${result.file_name})`);
+      success(`Labels downloaded successfully (${result.file_name})`);
     } catch (requestError: unknown) {
-      error(get_error_message(requestError, 'Fehler beim Herunterladen der Labels'));
+      error(get_error_message(requestError, 'Failed to download labels'));
     }
   }, [error, labels_download, success]);
 

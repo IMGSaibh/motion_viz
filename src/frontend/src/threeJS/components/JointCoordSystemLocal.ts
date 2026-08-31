@@ -29,7 +29,7 @@ export class JointCoordsystemLocal
     
     if (joints.length !== this.jointCount)
     {
-      console.warn(`[JointAxesVisualizer] Erwartet ${this.jointCount} Joints, erhalten ${joints.length}.`);
+      console.warn(`[JointAxesVisualizer] Expected ${this.jointCount} joints, received ${joints.length}.`);
     }
 
     for (let i = 0; i < n; i++) 

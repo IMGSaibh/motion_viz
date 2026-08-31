@@ -1,4 +1,4 @@
-// reine Datentypen (KEIN React)
+// Pure data types (NO React)
 
 export type Range = [number, number];
 

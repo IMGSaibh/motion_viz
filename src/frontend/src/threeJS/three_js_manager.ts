@@ -188,7 +188,7 @@ export class ThreeJSEngine {
 
   print_scene_components() {
     if (!this.scene || !this.loop || !this.camera) {
-      console.log('Scene, loop oder camera nicht bereit.');
+      console.log('Scene, loop, or camera is not ready.');
       return;
     }
     Utils.print_scene_components(this.scene, this.loop, this.camera);

@@ -28,7 +28,7 @@ export function create_label_category_with_features(
 }
 
 export function uid() {
-  // Browser: crypto.randomUUID; fallback wenn nicht vorhanden
+  // Browser: crypto.randomUUID; fallback when unavailable
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const c: any = typeof crypto !== 'undefined' ? crypto : null;
   return c?.randomUUID ? c.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
