@@ -93,7 +93,7 @@ export class NPY_loader {
       this.joint_indices_names[i].anchorX = 'center';
       this.joint_indices_names[i].anchorY = 'middle';
       this.joint_indices_names[i].color = 0x000000;
-      this.joint_indices_names[i].sync(); // <— wichtig
+      this.joint_indices_names[i].sync(); // Important
       this.joint_indices_names_text.add(this.joint_indices_names[i] as unknown as THREE.Object3D);
       this.joint_indices_names_text.name = 'joint_indices_text';
     }
@@ -116,7 +116,7 @@ export class NPY_loader {
 
     const jointGraph = skeleton['joint-graph'];
     if (!jointGraph) {
-      console.error("ERROR: Skeleton JSON besitzt kein 'joint-graph'!");
+      console.error("ERROR: Skeleton JSON does not contain a 'joint-graph'!");
       return;
     }
 
@@ -127,7 +127,7 @@ export class NPY_loader {
       const childIdx = joint.id;
       const parentIdx = joint.pid;
 
-      // Parent -1? → Root, diesen überspringen wir für Bones
+      // Parent -1 is the root; skip it when creating bones
       if (parentIdx === -1) continue;
 
       const bone = new THREE.Mesh(boneGeometry, boneMaterial);
@@ -135,12 +135,12 @@ export class NPY_loader {
 
       this.npy_motion.add(bone);
 
-      // wir speichern exakt das, was die update_skeleton() erwartet
+      // Store exactly what update_skeleton() expects
       this.npy_skeleton.push({
         childIdx,
         parentIdx,
-        parentJoint: null, // brauchst du nicht mehr
-        childJoint: null, // brauchst du nicht mehr
+        parentJoint: null, // No longer needed
+        childJoint: null, // No longer needed
         bone,
       });
     }

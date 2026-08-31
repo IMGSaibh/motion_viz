@@ -1,11 +1,59 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
-import { can_save_for_range } from '@/domain/label_logic';
+import type {
+  ErgoLabel,
+  LabelCategory,
+  LabelFeature,
+  LabelImage,
+  OptionalsNeckAndTrunk,
+  OptionalsWrist,
+  RulaFeatureSelection,
+  RulaOptionalsUpperArm,
+} from '@/domain/datatypes';
+import {
+  can_save_for_range,
+  create_empty_rula_selection,
+  create_label_category_with_features,
+} from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
+import {
+  get_label_images_rula_cat_n,
+  get_label_images_rula_cat_t,
+  get_label_images_rula_cat_ua,
+  get_label_images_rula_cat_w,
+} from '@/Assets/label_images';
+
+const RULA_UPPER_ARM_OPTIONALS: readonly RulaOptionalsUpperArm[] = ['Shoulder Raised', 'Leaning', 'Abducted'];
+const RULA_NECK_AND_TRUNK_OPTIONALS: readonly OptionalsNeckAndTrunk[] = ['Twist', 'Side-Bend'];
+const RULA_WRIST_OPTIONALS: readonly OptionalsWrist[] = ['Bent'];
+
+function createRulaFeatureSelection<TOptional extends string>(
+  features: readonly LabelFeature[],
+  optionalNames: readonly TOptional[],
+): RulaFeatureSelection<TOptional> {
+  return {
+    feature: features.find((feature) => !optionalNames.includes(feature.name as TOptional))?.image ?? null,
+    optionals: features
+      .map((feature) => feature.name)
+      .filter((name): name is TOptional => optionalNames.includes(name as TOptional)),
+  };
+}
+
+function getSelectedImages(
+  selection: RulaFeatureSelection<string>,
+  availableImages: readonly LabelImage[],
+): LabelImage[] {
+  return [
+    ...(selection.feature ? [selection.feature] : []),
+    ...selection.optionals.flatMap((name) => {
+      const image = availableImages.find((candidate) => candidate.name === name);
+      return image ? [image] : [];
+    }),
+  ];
+}
 
 type FrameSliderLabelListContext = {
   ergo_labels: ErgoLabel[];
@@ -46,15 +94,19 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       set_editing_id(id);
 
       if (label.ergo_method === 'RULA') {
+        const upperArmFeatures = label.categories.find((category) => category.name === 'CAT_UPPERARM')?.features ?? [];
+        const wristFeatures = label.categories.find((category) => category.name === 'CAT_WRIST')?.features ?? [];
+        const neckFeatures = label.categories.find((category) => category.name === 'CAT_NECK')?.features ?? [];
+        const trunkFeatures = label.categories.find((category) => category.name === 'CAT_TRUNK')?.features ?? [];
         const by_name = Object.fromEntries(
           (label.categories ?? []).map((c) => [c.name, c.features[0]?.image]),
         ) as Record<string, LabelImage | null>;
         set_rula_selected({
-          CAT_UPPERARM: by_name.CAT_UPPERARM ?? null,
+          CAT_UPPERARM: createRulaFeatureSelection(upperArmFeatures, RULA_UPPER_ARM_OPTIONALS),
           CAT_LOWERARM: by_name.CAT_LOWERARM ?? null,
-          CAT_WRIST: by_name.CAT_WRIST ?? null,
-          CAT_NECK: by_name.CAT_NECK ?? null,
-          CAT_TRUNK: by_name.CAT_TRUNK ?? null,
+          CAT_WRIST: createRulaFeatureSelection(wristFeatures, RULA_WRIST_OPTIONALS),
+          CAT_NECK: createRulaFeatureSelection(neckFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
+          CAT_TRUNK: createRulaFeatureSelection(trunkFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
           CAT_LEGS: by_name.CAT_LEGS ?? null,
         });
       }
@@ -101,11 +153,27 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories: LabelCategory[] | undefined =
       editingLabel.ergo_method === 'RULA'
         ? [
-            createCategory(1, 'CAT_UPPERARM', rula_selected.CAT_UPPERARM),
+            create_label_category_with_features(
+              1,
+              'CAT_UPPERARM',
+              getSelectedImages(rula_selected.CAT_UPPERARM, get_label_images_rula_cat_ua()),
+            ),
             createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
-            createCategory(3, 'CAT_WRIST', rula_selected.CAT_WRIST),
-            createCategory(4, 'CAT_NECK', rula_selected.CAT_NECK),
-            createCategory(5, 'CAT_TRUNK', rula_selected.CAT_TRUNK),
+            create_label_category_with_features(
+              3,
+              'CAT_WRIST',
+              getSelectedImages(rula_selected.CAT_WRIST, get_label_images_rula_cat_w()),
+            ),
+            create_label_category_with_features(
+              4,
+              'CAT_NECK',
+              getSelectedImages(rula_selected.CAT_NECK, get_label_images_rula_cat_n()),
+            ),
+            create_label_category_with_features(
+              5,
+              'CAT_TRUNK',
+              getSelectedImages(rula_selected.CAT_TRUNK, get_label_images_rula_cat_t()),
+            ),
             createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
           ].filter((category): category is LabelCategory => category !== null)
         : editingLabel.ergo_method === 'OWAS'
@@ -127,28 +195,14 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     });
 
     set_editing_id(null);
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
+    set_rula_selected(create_empty_rula_selection());
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
+    set_rula_selected(create_empty_rula_selection());
   }, [editing_id]);
 
   const value = useMemo<FrameSliderLabelListContext>(

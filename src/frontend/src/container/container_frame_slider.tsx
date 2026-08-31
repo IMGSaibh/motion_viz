@@ -5,6 +5,7 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 
 export function ContainerFrameSlider() {
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
@@ -59,14 +60,7 @@ export function ContainerFrameSlider() {
         set_frame_slider_value(0);
         set_range([0, 0]);
         clear_slider_label_list();
-        set_rula_selected({
-          CAT_UPPERARM: null,
-          CAT_LOWERARM: null,
-          CAT_WRIST: null,
-          CAT_NECK: null,
-          CAT_TRUNK: null,
-          CAT_LEGS: null,
-        });
+        set_rula_selected(create_empty_rula_selection());
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
       if (e.code === 'ArrowRight') {

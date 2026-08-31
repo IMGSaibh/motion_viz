@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { create_label_category, uid } from '@/domain/label_logic';
+import {
+  create_empty_rula_selection,
+  create_label_category,
+  create_label_category_with_features,
+  uid,
+} from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
   get_label_images_rula_cat_l,
@@ -11,7 +16,16 @@ import {
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import type { LabelImage, LabelCategory, ErgoLabel, RulaCategoryName } from '@/domain/datatypes';
+import type {
+  LabelImage,
+  LabelCategory,
+  ErgoLabel,
+  RulaCategory,
+  RulaOptionalsUpperArm,
+  OptionalsNeckAndTrunk,
+  OptionalsWrist,
+  RulaFeatureSelection,
+} from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
@@ -19,19 +33,35 @@ type Props = {
   onClick?: (label: ErgoLabel) => void;
 };
 
+function getSelectedImageNames(selection: RulaFeatureSelection<string>): string[] {
+  return [...(selection.feature ? [selection.feature.name] : []), ...selection.optionals];
+}
+
+function getSelectedImages(
+  selection: RulaFeatureSelection<string>,
+  availableImages: readonly LabelImage[],
+): LabelImage[] {
+  return [
+    ...(selection.feature ? [selection.feature] : []),
+    ...availableImages.filter((image) => selection.optionals.includes(image.name)),
+  ];
+}
+
 function CategoryGrid({
   cat,
   title,
   rula_button_images,
-  selected_cat_image,
+  selected_cat_images,
   onSelect,
+  optionalStartIndex,
   isLast,
 }: {
-  cat: RulaCategoryName;
+  cat: RulaCategory;
   title: string;
   rula_button_images: readonly LabelImage[];
-  selected_cat_image: string | null;
-  onSelect: (slot: RulaCategoryName, img: LabelImage) => void;
+  selected_cat_images: readonly string[];
+  onSelect: (slot: RulaCategory, img: LabelImage, isOptional: boolean) => void;
+  optionalStartIndex?: number;
   isLast?: boolean;
 }) {
   return (
@@ -56,12 +86,16 @@ function CategoryGrid({
         }}
       >
         {rula_button_images.map((item, i) => {
-          const isSelected = selected_cat_image === item.name;
-          const isDimmed = selected_cat_image !== null && !isSelected;
+          const isOptional = optionalStartIndex !== undefined && i >= optionalStartIndex;
+          const isSelected = selected_cat_images.includes(item.name);
+          const hasSelectedRequiredFeature = rula_button_images
+            .slice(0, optionalStartIndex)
+            .some((image) => selected_cat_images.includes(image.name));
+          const isDimmed = !isOptional && hasSelectedRequiredFeature && !isSelected;
           return (
             <ButtonBase
               key={`${item.category}-${item.name}-${i}`}
-              onClick={() => onSelect(cat, item)}
+              onClick={() => onSelect(cat, item, isOptional)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
                 borderRadius: 0,
@@ -116,12 +150,71 @@ export function WidgetRulaButtons(props: Props) {
   const { range, set_range } = use_frame_slider_context();
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
-  const allSelected = Object.values(rula_selected).every(Boolean);
+  const allSelected =
+    rula_selected.CAT_UPPERARM.feature !== null &&
+    rula_selected.CAT_LOWERARM !== null &&
+    rula_selected.CAT_WRIST.feature !== null &&
+    rula_selected.CAT_NECK.feature !== null &&
+    rula_selected.CAT_TRUNK.feature !== null &&
+    rula_selected.CAT_LEGS !== null;
 
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
 
-  const handleSelect = (cat: RulaCategoryName, img: LabelImage) => {
+  const handleSelect = (cat: RulaCategory, img: LabelImage, isOptional: boolean) => {
+    if (cat === 'CAT_UPPERARM' && isOptional) {
+      const optional = img.name as RulaOptionalsUpperArm;
+      const isSelected = rula_selected.CAT_UPPERARM.optionals.includes(optional);
+      set_rula_selected({
+        ...rula_selected,
+        CAT_UPPERARM: {
+          ...rula_selected.CAT_UPPERARM,
+          optionals: isSelected
+            ? rula_selected.CAT_UPPERARM.optionals.filter((item) => item !== optional)
+            : [...rula_selected.CAT_UPPERARM.optionals, optional],
+        },
+      });
+      return;
+    }
+    if (cat === 'CAT_UPPERARM') {
+      set_rula_selected({
+        ...rula_selected,
+        CAT_UPPERARM: { ...rula_selected.CAT_UPPERARM, feature: img },
+      });
+      return;
+    }
+    if (cat === 'CAT_WRIST') {
+      const optional = img.name as OptionalsWrist;
+      const optionals = rula_selected.CAT_WRIST.optionals;
+      set_rula_selected({
+        ...rula_selected,
+        CAT_WRIST: isOptional
+          ? {
+              ...rula_selected.CAT_WRIST,
+              optionals: optionals.includes(optional)
+                ? optionals.filter((item) => item !== optional)
+                : [...optionals, optional],
+            }
+          : { ...rula_selected.CAT_WRIST, feature: img },
+      });
+      return;
+    }
+    if (cat === 'CAT_NECK' || cat === 'CAT_TRUNK') {
+      const optional = img.name as OptionalsNeckAndTrunk;
+      const selection = rula_selected[cat];
+      set_rula_selected({
+        ...rula_selected,
+        [cat]: isOptional
+          ? {
+              ...selection,
+              optionals: selection.optionals.includes(optional)
+                ? selection.optionals.filter((item) => item !== optional)
+                : [...selection.optionals, optional],
+            }
+          : { ...selection, feature: img },
+      });
+      return;
+    }
     set_rula_selected({ ...rula_selected, [cat]: img });
   };
 
@@ -130,11 +223,15 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      create_label_category(1, 'CAT_UPPERARM', rula_selected.CAT_UPPERARM!),
+      create_label_category_with_features(
+        1,
+        'CAT_UPPERARM',
+        getSelectedImages(rula_selected.CAT_UPPERARM, label_images_cat_ua),
+      ),
       create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM!),
-      create_label_category(3, 'CAT_WRIST', rula_selected.CAT_WRIST!),
-      create_label_category(4, 'CAT_NECK', rula_selected.CAT_NECK!),
-      create_label_category(5, 'CAT_TRUNK', rula_selected.CAT_TRUNK!),
+      create_label_category_with_features(3, 'CAT_WRIST', getSelectedImages(rula_selected.CAT_WRIST, label_images_cat_w)),
+      create_label_category_with_features(4, 'CAT_NECK', getSelectedImages(rula_selected.CAT_NECK, label_images_cat_n)),
+      create_label_category_with_features(5, 'CAT_TRUNK', getSelectedImages(rula_selected.CAT_TRUNK, label_images_cat_t)),
       create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS!),
     ];
 
@@ -149,14 +246,7 @@ export function WidgetRulaButtons(props: Props) {
     };
 
     props.onClick?.(label);
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
+    set_rula_selected(create_empty_rula_selection());
   };
 
   return (
@@ -172,8 +262,9 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_cat_image={rula_selected.CAT_UPPERARM?.name ?? null}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_UPPERARM)}
             onSelect={handleSelect}
+            optionalStartIndex={5}
           />
         </Grid>
 
@@ -182,7 +273,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_cat_image={rula_selected.CAT_LOWERARM?.name ?? null}
+            selected_cat_images={rula_selected.CAT_LOWERARM ? [rula_selected.CAT_LOWERARM.name] : []}
             onSelect={handleSelect}
           />
         </Grid>
@@ -192,8 +283,9 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_cat_image={rula_selected.CAT_WRIST?.name ?? null}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_WRIST)}
             onSelect={handleSelect}
+            optionalStartIndex={3}
           />
         </Grid>
 
@@ -202,8 +294,9 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_cat_image={rula_selected.CAT_NECK?.name ?? null}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_NECK)}
             onSelect={handleSelect}
+            optionalStartIndex={4}
           />
         </Grid>
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
@@ -211,8 +304,9 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_cat_image={rula_selected.CAT_TRUNK?.name ?? null}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_TRUNK)}
             onSelect={handleSelect}
+            optionalStartIndex={4}
           />
         </Grid>
 
@@ -221,7 +315,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_cat_image={rula_selected.CAT_LEGS?.name ?? null}
+            selected_cat_images={rula_selected.CAT_LEGS ? [rula_selected.CAT_LEGS.name] : []}
             onSelect={handleSelect}
           />
         </Grid>

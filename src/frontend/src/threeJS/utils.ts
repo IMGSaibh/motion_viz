@@ -31,7 +31,7 @@ export default class Utils {
 
   static print_scene_components(scene: THREE.Scene, loop: Loop, camera: THREE.Camera) {
     if (!scene || !loop || !camera) {
-      console.log('Scene, loop oder camera nicht bereit.');
+      console.log('Scene, loop, or camera is not ready.');
       return;
     }
 

@@ -45,7 +45,7 @@ class JSONGenerator:
         return ret
 
     def from_config(self, config: MotionConfig):
-        # Nutzt alle Felder aus MotionConfig und erzeugt daraus die Struktur
+        # Uses all MotionConfig fields to create the structure
         self.data = {
             "format": config.format,
             "abbrev": config.abbrev,

@@ -1,4 +1,4 @@
-// reine Datentypen (KEIN React)
+// Pure data types (NO React)
 
 export type Range = [number, number];
 
@@ -35,14 +35,27 @@ export type LabelImage = {
   category: string;
 };
 
-export type RulaCategoryName = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
-export type OwasCategoryName = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
+export type RulaCategory = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
+export type OwasCategory = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
 
-export type RulaSelection = Record<RulaCategoryName, LabelImage | null>;
-export type OwasSelection = Record<OwasCategoryName, LabelImage | null>;
+export type RulaFeatureSelection<TOptional extends string> = {
+  feature: LabelImage | null;
+  optionals: TOptional[];
+};
 
-export type RulaOptionalsUpperArm = '';
-export type OptionalsNeckAndTrunk = '';
+export type RulaSelection = {
+  CAT_UPPERARM: RulaFeatureSelection<RulaOptionalsUpperArm>;
+  CAT_LOWERARM: LabelImage | null;
+  CAT_WRIST: RulaFeatureSelection<OptionalsWrist>;
+  CAT_NECK: RulaFeatureSelection<OptionalsNeckAndTrunk>;
+  CAT_TRUNK: RulaFeatureSelection<OptionalsNeckAndTrunk>;
+  CAT_LEGS: LabelImage | null;
+};
+export type OwasSelection = Record<OwasCategory, LabelImage | null>;
+
+export type RulaOptionalsUpperArm = 'Shoulder Raised' | 'Leaning' | 'Abducted';
+export type OptionalsNeckAndTrunk = 'Twist' | 'Side-Bend';
+export type OptionalsWrist = 'Bent';
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }

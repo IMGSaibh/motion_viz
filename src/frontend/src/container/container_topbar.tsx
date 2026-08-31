@@ -12,6 +12,7 @@ import { useMotionDescriptor } from '@/hooks/use_motion_descriptor';
 import { useMotionFiles } from '@/hooks/use_motion_files';
 import { usePoseViewerConversion } from '@/hooks/use_pose_viewer_conversion';
 import { useLoadLabels } from '@/hooks/use_load_labels';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -131,14 +132,7 @@ export function ContainerTopbar() {
 
       const loaded_labels = await load_labels.mutateAsync(filename);
       load_slider_labels_for_file(loaded_labels);
-      set_rula_selected({
-        CAT_UPPERARM: null,
-        CAT_LOWERARM: null,
-        CAT_WRIST: null,
-        CAT_NECK: null,
-        CAT_TRUNK: null,
-        CAT_LEGS: null,
-      });
+      set_rula_selected(create_empty_rula_selection());
       set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
 
       if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${filename}`);

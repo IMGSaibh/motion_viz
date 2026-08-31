@@ -84,7 +84,7 @@ export class FBX_Player {
     // Safety clamp
     this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
 
-    // Berechne den Zeitwert aus dem Keyframe-Index
+    // Calculate the time value from the keyframe index
     const track = this.fbx_loader_object.clipAction.getClip().tracks[0];
     const time = track.times[this.frame_index];
     // we need to handle last keyframe specially, because it leeds to reset the animation

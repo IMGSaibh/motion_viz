@@ -5,7 +5,7 @@ import { PerspectiveCamera, WebGLRenderer } from 'three';
 declare module 'three/examples/jsm/controls/OrbitControls.js' {
   interface OrbitControls {
     /**
-     * Wird einmal pro Frame vom Haupt‑Loop aufgerufen.
+     * Called once per frame by the main loop.
      */
     tick(delta: number): void
   }
