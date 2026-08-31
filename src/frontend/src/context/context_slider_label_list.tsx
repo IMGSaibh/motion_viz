@@ -17,6 +17,7 @@ import {
 } from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
+import type { Range } from '@/domain/datatypes';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import {
@@ -128,6 +129,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
+    if (!range) return;
 
     const editingLabel = ergo_labels.find((m) => m.id === editing_id);
     if (!editingLabel) return;
@@ -195,15 +197,17 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     });
 
     set_editing_id(null);
+    set_range(null);
     set_rula_selected(create_empty_rula_selection());
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
-  }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
+  }, [editing_id, range, ergo_labels, rula_selected, owas_selected, set_range]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
+    set_range(null);
     set_rula_selected(create_empty_rula_selection());
-  }, [editing_id]);
+  }, [editing_id, set_range]);
 
   const value = useMemo<FrameSliderLabelListContext>(
     () => ({
@@ -301,6 +305,10 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
       return { from: 0, to: 0, leftPct: 0, scaleX: 0 };
     }
 
+    if (!range) {
+      return { from: 0, to: 0, leftPct: 0, scaleX: 0 };
+    }
+
     const maxIdx = fc - 1;
     const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
 
@@ -393,18 +401,21 @@ export function use_cancel_edit_label_cxt() {
 }
 
 export function use_can_save_label_cxt() {
+  const { range, frame_slider_value } = use_frame_slider_context();
+
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
-    return (category?: string) => {
+    return (category?: string, rangeOverride?: Range) => {
       const editingMarker = v.editing_id ? v.ergo_labels.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
-      const { range, set_range } = use_frame_slider_context();
+      const targetRange = rangeOverride ?? range;
+      const effectiveRange: Range = targetRange ?? [frame_slider_value, frame_slider_value];
       return can_save_for_range({
         labels: v.ergo_labels,
         category: targetCategory,
-        from: range[0],
-        to: range[1],
+        from: effectiveRange[0],
+        to: effectiveRange[1],
         id: v.editing_id,
       });
     };

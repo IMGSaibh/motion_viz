@@ -3,7 +3,6 @@ import type { ErgoLabel } from '@/domain/datatypes';
 import { use_add_slider_label_ctx } from '@/context/context_slider_label_list';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import { use_snackbar_ctx } from '@/context/context_snackbar';
 
 type Props = {
   // TODO: remove logix from widgets to container
@@ -12,14 +11,14 @@ type Props = {
 
 export function ContainerLabelButtons(props: Props) {
   const add_label = use_add_slider_label_ctx();
-  const { range } = use_frame_slider_context();
-  const { error } = use_snackbar_ctx();
+  const { set_range } = use_frame_slider_context();
 
   const on_click_save_label = useCallback(
     (label: ErgoLabel) => {
       add_label(label);
+      set_range(null);
     },
-    [add_label, error, range],
+    [add_label, set_range],
   );
 
   return <PresenterLabelButtons on_click_save_label={on_click_save_label} />;

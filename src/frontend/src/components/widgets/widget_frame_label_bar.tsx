@@ -42,9 +42,9 @@ export function WidgetFrameLabelBar(props: Props) {
             aria-hidden
           >
             {/* saved labels */}
-            {saved_labels.map(({ id, start_frame: vf, end_frame: vt }) => {
-              const vvFrom = clamp(Math.min(vf, vt));
-              const vvTo = clamp(Math.max(vf, vt));
+            {saved_labels.map(({ id, start_frame: start_frame, end_frame: end_frame }) => {
+              const vvFrom = clamp(Math.min(start_frame, end_frame));
+              const vvTo = clamp(Math.max(start_frame, end_frame));
               const vvLen = Math.max(0, vvTo - vvFrom + 1);
 
               const vLeft = pct(vvFrom, props.frame_count);
@@ -54,6 +54,7 @@ export function WidgetFrameLabelBar(props: Props) {
               return (
                 <Box
                   key={id}
+                  className={id}
                   sx={(theme) => ({
                     bgcolor: theme.palette.wip_color_theme[600],
                     position: 'absolute',

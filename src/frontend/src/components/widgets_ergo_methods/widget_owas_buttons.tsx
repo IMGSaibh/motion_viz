@@ -8,7 +8,7 @@ import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
 import { create_label_category, uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
-import type { LabelImage, LabelCategory, ErgoLabel, OwasCategory } from '@/domain/datatypes';
+import type { LabelImage, LabelCategory, ErgoLabel, OwasCategory, Range } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
@@ -109,13 +109,14 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
 
-  const { range, set_range } = use_frame_slider_context();
+  const { range, frame_slider_value } = use_frame_slider_context();
 
   const can_save_label = use_can_save_label_cxt();
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
 
   const allSelected = Object.values(owas_selected).every(Boolean);
-  const canSaveOwas = can_save_label('OWAS');
+  const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
+  const canSaveOwas = can_save_label('OWAS', effectiveRange);
 
   const handleSelect = (cat: OwasCategory, img: LabelImage) => {
     set_owas_selected({ ...owas_selected, [cat]: img });
@@ -132,8 +133,8 @@ export function WidgetOwasButtons(props: Props) {
       create_label_category(4, 'CAT_LOAD', owas_selected.CAT_LOAD!),
     ];
 
-    const from = Math.min(range[0], range[1]);
-    const to = Math.max(range[0], range[1]);
+    const from = Math.min(effectiveRange[0], effectiveRange[1]);
+    const to = Math.max(effectiveRange[0], effectiveRange[1]);
     const label: ErgoLabel = {
       id: uid(),
       start_frame: from,
