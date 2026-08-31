@@ -1,4 +1,5 @@
 import type { OwasSelection, RulaSelection } from '@/domain/datatypes';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
@@ -10,14 +11,7 @@ type ErgoMethodsContext = {
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
-  const [rula_selected, set_rula_selected] = useState<RulaSelection>({
-    CAT_UPPERARM: null,
-    CAT_LOWERARM: null,
-    CAT_WRIST: null,
-    CAT_NECK: null,
-    CAT_TRUNK: null,
-    CAT_LEGS: null,
-  });
+  const [rula_selected, set_rula_selected] = useState<RulaSelection>(create_empty_rula_selection);
 
   const [owas_selected, set_owas_selected] = useState<OwasSelection>({
     CAT_BACK: null,

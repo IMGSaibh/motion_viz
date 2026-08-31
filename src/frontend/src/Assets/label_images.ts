@@ -68,7 +68,7 @@ const LABEL_IMAGES_RULA_CAT_UA: ReadonlyArray<LabelImage> = [
   { name: '> 20\u00B0 - 45\u00B0 ', src: btn_rula_ua_3, category: 'CAT_UPPERARM' },
   { name: '> 45\u00B0 -90\u00B0 ', src: btn_rula_ua_4, category: 'CAT_UPPERARM' },
   { name: '> 90\u00B0 ', src: btn_rula_ua_5, category: 'CAT_UPPERARM' },
-  { name: 'Sh. Raised ', src: btn_rula_ua_6, category: 'CAT_UPPERARM' },
+  { name: 'Shoulder Raised', src: btn_rula_ua_6, category: 'CAT_UPPERARM' },
   { name: 'Abducted', src: btn_rula_ua_7, category: 'CAT_UPPERARM' },
   { name: 'Leaning', src: btn_rula_ua_8, category: 'CAT_UPPERARM' },
 ];

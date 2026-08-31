@@ -1,7 +1,30 @@
-import type { ErgoLabel, LabelCategory, LabelImage } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelImage, RulaSelection } from '@/domain/datatypes';
+
+export function create_empty_rula_selection(): RulaSelection {
+  return {
+    CAT_UPPERARM: { feature: null, optionals: [] },
+    CAT_LOWERARM: null,
+    CAT_WRIST: { feature: null, optionals: [] },
+    CAT_NECK: { feature: null, optionals: [] },
+    CAT_TRUNK: { feature: null, optionals: [] },
+    CAT_LEGS: null,
+  };
+}
 
 export function create_label_category(id: number, name: string, image: LabelImage): LabelCategory {
   return { id, name, features: [{ id: 1, name: image.name, image }] };
+}
+
+export function create_label_category_with_features(
+  id: number,
+  name: string,
+  images: readonly LabelImage[],
+): LabelCategory {
+  return {
+    id,
+    name,
+    features: images.map((image, index) => ({ id: index + 1, name: image.name, image })),
+  };
 }
 
 export function uid() {
