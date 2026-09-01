@@ -6,6 +6,13 @@ type Props = {
   label_image?: LabelImage | null; // optional fallback
 };
 
+/**
+ * Displays a compact image preview for the features associated with one ergonomic label.
+ *
+ * This is a presentation-only widget: it selects a small display set from already prepared
+ * image metadata. Feature selection and label construction belong in method-specific logic,
+ * while preview sizing and arrangement belong here.
+ */
 export function WidgetLabelPreview(props: Props) {
   const categoryImages = (props.categories ?? []).flatMap((category) =>
     category.features.map((feature) => feature.image),

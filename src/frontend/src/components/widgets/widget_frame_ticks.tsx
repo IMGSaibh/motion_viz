@@ -15,6 +15,13 @@ type Props = {
   frame_count: number;
 };
 
+/**
+ * Renders a readable set of frame-number ticks for the current motion length.
+ *
+ * Tick-density and tick-layout behavior belong here because they are isolated visual
+ * concerns. Playback state, seeking, and range selection must remain in the slider
+ * container and contexts.
+ */
 export function WidgetFrameTicks(props: Props) {
   const frameCount = props.frame_count;
   const ticks: number[] = [];

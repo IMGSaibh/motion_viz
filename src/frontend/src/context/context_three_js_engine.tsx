@@ -25,6 +25,14 @@ type ThreeJSEngineContext = {
 
 const three_js_engine_context = createContext<ThreeJSEngineContext | null>(null);
 
+/**
+ * Owns the imperative Three.js engine and exposes React-safe playback state and commands.
+ *
+ * The mutable engine instance lives in a ref, while UI-observable snapshots are synchronized
+ * into React state. Components should use this context instead of importing engine objects
+ * directly. Add React-to-engine lifecycle integration here; rendering and format-specific
+ * playback implementation remain in the Three.js layer.
+ */
 export function ThreeJSEngineProvider({ children }: { children: React.ReactNode }) {
   // The mutable engine stays outside React state; only UI-observable snapshots trigger renders.
   const threejs_scene_ref = useRef<HTMLDivElement | null>(null);

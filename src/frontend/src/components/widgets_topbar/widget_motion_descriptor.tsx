@@ -16,6 +16,13 @@ type Props = {
   is_pending: boolean;
 };
 
+/**
+ * Renders the motion-descriptor dialog and exposes its form fields through provided refs.
+ *
+ * This widget owns dialog and form presentation only. Reading values, creating the request,
+ * calling the backend, and displaying outcomes belong in `ContainerTopbar` and API hooks.
+ * Add descriptor form controls here when the backend contract gains corresponding fields.
+ */
 export function WidgetMotionDescriptorBar(props: Props) {
   return (
     <>

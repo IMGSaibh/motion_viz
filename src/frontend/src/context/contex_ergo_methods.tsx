@@ -10,6 +10,13 @@ type ErgoMethodsContext = {
 };
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
+/**
+ * Provides the current RULA and OWAS input selections to distant labeling components.
+ *
+ * This context stores in-progress method selections only. Completed label records belong in
+ * the slider-label context, label validation and construction in the domain layer, and the
+ * controls that modify these values in method-specific widgets.
+ */
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
   const [rula_selected, set_rula_selected] = useState<RulaSelection>(create_empty_rula_selection);
 

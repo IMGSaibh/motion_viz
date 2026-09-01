@@ -10,6 +10,14 @@ import {
 type Props = {
   frame_count: number;
 };
+
+/**
+ * Visualizes saved label intervals and the active editable range below the frame slider.
+ *
+ * This widget derives only render geometry and overlap styling from context data. Label
+ * mutation rules belong in the label context/domain layer, while slider interaction belongs
+ * in its container. Extend this component only for range-bar presentation behavior.
+ */
 export function WidgetFrameLabelBar(props: Props) {
   // Saved labels and the transient editing range share the same frame-to-percentage coordinate system.
   const saved_labels = use_get_labels_cxt();

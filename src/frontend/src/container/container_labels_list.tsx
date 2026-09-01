@@ -17,6 +17,13 @@ function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+/**
+ * Orchestrates label-list actions between contexts, backend hooks, and notifications.
+ *
+ * The container translates user intent into label mutations and save/download requests,
+ * then supplies state and callbacks to `PresenterLabelList`. Add workflow and side-effect
+ * handling here; list layout belongs in the presenter and reusable row UI in widgets.
+ */
 export function ContainerLabelsList() {
   const { selected_motion } = use_three_js_engine_ctx();
   const labels = use_get_labels_cxt();

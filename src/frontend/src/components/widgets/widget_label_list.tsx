@@ -65,6 +65,14 @@ type Props = {
   toggle_list: boolean;
 };
 
+/**
+ * Renders the collapsible list of ergonomic labels and their row-level edit controls.
+ *
+ * This widget consumes focused context actions for the interactive rows but does not own
+ * persistence or backend communication. Add reusable label-row presentation here; list-wide
+ * save/download workflows belong in the container and label mutation rules in the context
+ * or domain layer.
+ */
 export function WidgetLabelList(props: Props) {
   const startEdit = use_start_edit_label_cxt();
   const saveEdit = use_save_edit_label_cxt();

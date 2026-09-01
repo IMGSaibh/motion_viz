@@ -17,6 +17,14 @@ type Props = {
   download_is_pending: boolean;
 };
 
+/**
+ * Composes the label-list section from MUI controls and the reusable label-list widget.
+ *
+ * This presenter owns only local display state, such as whether the list is expanded, and
+ * delegates persistence and label mutations through props. Add layout and presentation
+ * changes here; API calls, notifications, and shared label state belong in the container,
+ * hooks, or label context.
+ */
 export function PresenterLabelList(props: Props) {
   const [open, set_open] = useState<boolean>(true);
   return (

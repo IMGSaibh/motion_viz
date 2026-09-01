@@ -71,6 +71,14 @@ type FrameSliderLabelListContext = {
 
 const frame_slider_label_list_context = createContext<FrameSliderLabelListContext | null>(null);
 
+/**
+ * Owns the client-side label collection and coordinates label creation and editing state.
+ *
+ * The provider combines persisted label records with the active slider range and ergonomic
+ * method selections. Its selector hooks expose narrow state/actions to widgets and containers
+ * without rerendering every consumer. Add shared label mutation workflows here, pure overlap
+ * and validation rules in the domain layer, and backend persistence in hooks/containers.
+ */
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
   // This provider coordinates label persistence state with the currently selected slider range and method inputs.
   const { range, set_range } = use_frame_slider_context();

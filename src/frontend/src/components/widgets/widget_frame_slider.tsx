@@ -20,6 +20,13 @@ type Props = {
   on_click_play_toggle?: () => void;
 };
 
+/**
+ * Renders the frame track, play control, playhead, hover marker, and active-range overlay.
+ *
+ * The widget owns visual calculations tied directly to its rendered track and forwards
+ * pointer events to the container. Playback commands, scrubbing state, and thumbnail work
+ * stay in `ContainerFrameSlider`; reusable frame-track visuals belong here.
+ */
 export function WidgetFrameSlider(props: Props) {
   const hasFrames = props.frame_count > 0;
   const clamped_frame = hasFrames ? Math.min(Math.max(props.frame_slider_value, 0), props.frame_count - 1) : 0;
