@@ -7,16 +7,22 @@ from pydantic import BaseModel, Field
 router = APIRouter()
 
 class LabelCategory(BaseModel):
+    """Represent one ergonomic label category and its selected feature identifiers."""
+
     category: str
     feature_id: List[int]
 
 class LabelItem(BaseModel):
+    """Validate one labeled frame interval received by the label API."""
+
     ergo_method: str
     start_frame: int = Field(..., ge=0)
     end_frame: int = Field(..., ge=0)
     categories: List[LabelCategory]
 
 class SaveLabelsRequest(BaseModel):
+    """Define the complete request contract for persisting labels for one motion file."""
+
     motion_name: str          
     labels: List[LabelItem]   
 

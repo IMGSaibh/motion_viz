@@ -6,6 +6,14 @@ import * as THREE from 'three';
     quaternion?: [number, number, number, number];
   }
 
+/**
+ * Owns a set of local-axis helpers used to visualize joint transforms in a Three.js scene.
+ *
+ * This is a scene-object component: callers provide pose data, while the class creates,
+ * updates, resizes, and removes the corresponding helpers. Motion parsing and playback
+ * timing do not belong here. Add joint-axis presentation behavior here and mirror any new
+ * scene or GPU resource ownership in `dispose()`.
+ */
 export class JointCoordsystemLocal 
 {
   scene: THREE.Scene;

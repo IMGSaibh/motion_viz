@@ -2,6 +2,16 @@ import { BVH_loader } from '@/threeJS/motion_loader/bvh_loader';
 import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 
+/**
+ * Provides the application-facing playback API for motion loaded by `BVH_loader`.
+ *
+ * This class coordinates the BVH animation mixer with the central Three.js update loop
+ * and converts mixer time to the frame-based model expected by UI and manager code.
+ * Seeking, playback state, and frame notifications belong here. BVH parsing, scene
+ * construction, and resource ownership belong in the loader, while React concerns stay
+ * in containers and hooks. Extend this class for BVH-specific playback semantics, not
+ * for file loading or component state.
+ */
 export class BVH_Player {
   public is_playing: boolean;
   public bvh_player_object: Updatable;

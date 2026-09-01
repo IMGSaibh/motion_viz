@@ -15,6 +15,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { api_get_base_url } from '@/utils/api_url';
 import Utils from '@/threeJS/utils';
 
+/**
+ * Manager that owns the application's Three.js runtime and isolates it from React.
+ *
+ * The engine creates the scene, camera, renderers, controls, and central update loop. It
+ * also selects the matching loader/player pair for each supported motion format and
+ * exposes one format-independent playback API to containers and hooks. New motion formats
+ * are wired into the application here after their parsing and playback behavior have been
+ * implemented in dedicated loader and player classes. React UI state must remain outside
+ * this class, while all engine-owned resources must be released through its cleanup path.
+ */
 export class ThreeJSEngine {
   // Exactly one loader/player pair is active. The manager hides format-specific behavior from React.
   private npy_loader: NPY_loader | null;

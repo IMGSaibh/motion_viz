@@ -10,6 +10,16 @@ export interface SkeletonData {
   joints: unknown[];
 }
 
+/**
+ * Loads NPY joint-position data and builds its Three.js skeleton representation.
+ *
+ * The loader owns the NPY scene group, generated joints, bones, labels, and their GPU
+ * resources. It converts transport data into scene objects and applies a requested frame
+ * to those objects. Playback timing and user controls belong in `NPY_Player`; React state
+ * and backend orchestration belong in hooks, containers, or managers. Implement changes
+ * to NPY parsing, skeleton topology, joint visualization, or per-frame pose application
+ * here, and release every newly owned Three.js resource in `dispose()`.
+ */
 export class NPY_loader {
   npy_motion: THREE.Group;
   numpy_data: any;

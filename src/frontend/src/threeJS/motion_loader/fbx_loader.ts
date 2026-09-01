@@ -1,6 +1,16 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
+/**
+ * Loads an FBX asset and prepares the Three.js objects required for playback.
+ *
+ * This loader owns the FBX scene group, animation mixer/action, skeleton helper, and
+ * resources created during loading. It exposes animation metadata to `FBX_Player`, which
+ * is responsible for timing, seeking, and play/pause behavior. React components should
+ * access this layer through existing managers, containers, or hooks rather than handling
+ * Three.js objects directly. Add FBX import, scene-setup, or resource-lifecycle behavior
+ * here, and mirror new resource ownership in `dispose()`.
+ */
 export class FBX_Loader {
   fbx_loader: FBXLoader;
   fbx_motion: THREE.Group | null;

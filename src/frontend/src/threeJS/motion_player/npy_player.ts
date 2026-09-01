@@ -2,6 +2,17 @@ import { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 
+/**
+ * Controls playback for an NPY motion that has already been prepared by `NPY_loader`.
+ *
+ * This class is the playback layer between UI/manager code and the NPY scene data. It
+ * translates time from the central Three.js update loop into discrete frame changes,
+ * exposes seeking and playback state, and reports frame changes back to consumers.
+ * NPY parsing, skeleton creation, and scene-resource ownership belong in `NPY_loader`;
+ * shared UI state and user interaction belong in the calling container or manager.
+ * Add NPY-specific playback behavior here when it concerns timing, seeking, or frame
+ * selection rather than file loading or rendering the skeleton itself.
+ */
 export class NPY_Player {
   public npy_player_object: Updatable;
   public is_playing: boolean = false;

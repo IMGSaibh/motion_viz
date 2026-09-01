@@ -2,6 +2,16 @@ import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
 
+/**
+ * Controls playback of the animation objects created and owned by `FBX_Loader`.
+ *
+ * The player adapts Three.js mixer time and irregular FBX keyframes to the discrete
+ * frame interface used by the rest of the application. It is also the integration
+ * point for the central `Updatable` loop, seeking, play/pause behavior, and frame-change
+ * notifications. Loading FBX data and managing scene resources remain loader concerns;
+ * React state and event handling remain in containers, hooks, or the motion manager.
+ * Implement FBX-specific timing or keyframe-navigation changes in this class.
+ */
 export class FBX_Player {
   public fbx_player_object: Updatable;
   public is_playing: boolean = false;
