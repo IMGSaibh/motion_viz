@@ -54,7 +54,7 @@ export class FBX_Loader {
           if (this.fbx_motion) {
             this.fbx_motion.add(result);
           }
-          // terminate Promise and return this.fbxObject
+          // Resolve only after the scene object and animation metadata are ready.
           resolve(this.fbx_motion);
         },
         undefined,
@@ -70,7 +70,7 @@ export class FBX_Loader {
       this.mixer = null;
     }
 
-    // free gpu‑ressources
+    // Release GPU resources owned by this loader.
     this.fbx_motion.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;

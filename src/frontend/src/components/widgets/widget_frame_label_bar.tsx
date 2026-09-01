@@ -11,6 +11,7 @@ type Props = {
   frame_count: number;
 };
 export function WidgetFrameLabelBar(props: Props) {
+  // Saved labels and the transient editing range share the same frame-to-percentage coordinate system.
   const saved_labels = use_get_labels_cxt();
   const editing_id = use_editing_label_id_cxt();
   const isRtl = theme.direction === 'rtl';
@@ -41,7 +42,7 @@ export function WidgetFrameLabelBar(props: Props) {
             }}
             aria-hidden
           >
-            {/* saved labels */}
+            {/* Persisted labels remain visible independently of the transient range selection. */}
             {saved_labels.map(({ id, start_frame: start_frame, end_frame: end_frame }) => {
               const vvFrom = clamp(Math.min(start_frame, end_frame));
               const vvTo = clamp(Math.max(start_frame, end_frame));
@@ -69,7 +70,7 @@ export function WidgetFrameLabelBar(props: Props) {
               );
             })}
 
-            {/* current labels */}
+            {/* The transient range previews a new label or the label currently being edited. */}
             <Box
               sx={(theme) => ({
                 position: 'absolute',

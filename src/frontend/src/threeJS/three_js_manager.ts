@@ -16,6 +16,7 @@ import { api_get_base_url } from '@/utils/api_url';
 import Utils from '@/threeJS/utils';
 
 export class ThreeJSEngine {
+  // Exactly one loader/player pair is active. The manager hides format-specific behavior from React.
   private npy_loader: NPY_loader | null;
   private npy_player: NPY_Player | null;
 
@@ -31,7 +32,7 @@ export class ThreeJSEngine {
   private camera: PerspectiveCamera;
   private thumbnail_renderer: WebGLRenderer;
 
-  // copy to remove updateables from scene loop
+  // Orbit controls survive motion changes; cleanup_loop removes every other updatable object.
   private _orbitControls: OrbitControls | null;
 
   loop: Loop;
@@ -79,6 +80,7 @@ export class ThreeJSEngine {
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
     const fileUrl = api_get_base_url(`/data/${file_extension}/${filename}`);
 
+    // Loaders own scene objects and parsing; players expose a common playback contract to this manager.
     switch (file_extension) {
       case 'bvh':
         this.bvh_loader = new BVH_loader(this.scene);
@@ -195,6 +197,7 @@ export class ThreeJSEngine {
   }
 
   cleanup_player() {
+    // Dispose both playback state and the scene resources created by its matching loader.
     if (this.npy_player) {
       this.npy_player.dispose();
       this.npy_loader?.dispose();

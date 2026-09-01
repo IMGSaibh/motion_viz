@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-# allow CORS for React-Vite
+# Development CORS allows the Vite frontend to call the API directly.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://141.56.132.116:5173", "http://localhost:8000",  "http://127.0.0.1:8000"],
@@ -33,10 +33,11 @@ favicon_path = 'src/frontend/public/human.ico'
 async def favicon() -> FileResponse:
     return FileResponse(favicon_path)
 
-# reachable e.g. http://localhost:8000/data/bvh/myFile.bvh
+# Motion loaders fetch source files through this static route, for example /data/bvh/myFile.bvh.
 app.mount("/data", StaticFiles(directory="data"), name="data")
 app.mount("/src", StaticFiles(directory="src/frontend/public"), name="favicon")
 
+# Feature routers keep HTTP and persistence concerns out of the application bootstrap.
 app.include_router(api_list_files.router, prefix="/api_list_files")
 app.include_router(api_file_upload.router, prefix="/api_file_upload")
 app.include_router(api_file_delete.router, prefix="/api_file_delete")

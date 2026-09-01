@@ -30,7 +30,7 @@ export function WidgetMotionDescriptorBar(props: Props) {
         onClose={props.motion_config_on_click}
         fullWidth
         maxWidth="md"
-        keepMounted // keeps contents/Refs mountet
+        keepMounted // Preserve panel state and refs while the modal is closed.
       >
         <DialogTitle>Motion Configuration</DialogTitle>
 

@@ -54,7 +54,7 @@ export class BVH_loader {
       this.mixer = null;
     }
 
-    // free gpu‑ressources
+    // Release GPU resources owned by this loader.
     this.bvh_motion.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;

@@ -11,6 +11,7 @@ const frame_slider_context = createContext<FrameSliderContext | null>(null);
 
 export function FrameSliderContexProvider({ children }: { children: React.ReactNode }) {
   const [frame_slider_value, set_frame_slider_value] = useState(0);
+  // null means that no explicit range is selected. Consumers then treat the current frame as a one-frame target.
   const [range, set_range] = useState<Range | null>(null);
 
   // TODO: use memoized default value if needed

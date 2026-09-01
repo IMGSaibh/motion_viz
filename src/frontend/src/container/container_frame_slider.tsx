@@ -7,6 +7,7 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 
 export function ContainerFrameSlider() {
+  // The container translates browser input into engine commands and serializable UI state.
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
   const frame_slider_track_scrubbing_reference = useRef(false);
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
@@ -122,7 +123,7 @@ export function ContainerFrameSlider() {
   useEffect(() => {
     if (!frame_count) return;
 
-    // do not override during scrubbing
+    // Playback may advance the playhead, but it must not override an active user scrub.
     if (frame_slider_track_scrubbing_reference.current) return;
 
     if (!is_playing) return;
@@ -191,6 +192,7 @@ export function ContainerFrameSlider() {
         }
 
         get_thumbnail_for_frame(idx).then((data_url) => {
+          // Ignore thumbnails that completed after a newer hover request.
           if (seqRef.current !== mySeq) return;
           if (preview_render_img_ref.current && data_url) {
             preview_render_img_ref.current.src = data_url;

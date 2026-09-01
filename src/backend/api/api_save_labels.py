@@ -53,6 +53,7 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     }
 
 
+    # One label document is maintained per motion file.
     label_json_file_path.write_text(json.dumps(label_file, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {

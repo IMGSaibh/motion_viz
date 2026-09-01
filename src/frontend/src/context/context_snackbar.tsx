@@ -16,7 +16,7 @@ type SnackbarCtx = {
 
 const Ctx = createContext<SnackbarCtx | null>(null);
 
-// Check if providers can be summerized
+// TODO: Reassess whether these notification helpers need a dedicated provider.
 export function SnackbarProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string>('');

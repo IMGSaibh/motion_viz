@@ -72,6 +72,7 @@ type FrameSliderLabelListContext = {
 const frame_slider_label_list_context = createContext<FrameSliderLabelListContext | null>(null);
 
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
+  // This provider coordinates label persistence state with the currently selected slider range and method inputs.
   const { range, set_range } = use_frame_slider_context();
   const [ergo_labels, dispatch] = useReducer(markerReducer, [] as ErgoLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
@@ -91,6 +92,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       const label = ergo_labels.find((x) => x.id === id);
       if (!label) return;
 
+      // Editing projects the persisted label back into the same state used by the creation UI.
       set_range([label.start_frame, label.end_frame]);
       set_editing_id(id);
 
@@ -197,6 +199,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     });
 
     set_editing_id(null);
+    // A completed edit must not leak its range into the next label creation.
     set_range(null);
     set_rula_selected(create_empty_rula_selection());
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
@@ -318,6 +321,7 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
     const from = Math.min(a, b);
     const to = Math.max(a, b);
 
+    // Frame ranges are inclusive, so equal endpoints still occupy exactly one frame.
     const framesCovered = Math.max(1, to - from + 1);
 
     return {
@@ -410,6 +414,7 @@ export function use_can_save_label_cxt() {
       const editingMarker = v.editing_id ? v.ergo_labels.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
       const targetRange = rangeOverride ?? range;
+      // With no explicit range, overlap validation applies to the current frame only.
       const effectiveRange: Range = targetRange ?? [frame_slider_value, frame_slider_value];
       return can_save_for_range({
         labels: v.ergo_labels,

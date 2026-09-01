@@ -87,7 +87,7 @@ export class BVH_Player {
     this.bvh_loader_object.mixer = null;
   }
 
-  // needs to be a seperate class with dispose and pi pa po
+  // Thumbnail rendering temporarily changes the player frame and restores it before returning.
   async render_thumbnail(
     frameIndex: number,
     scene: Scene,
@@ -97,7 +97,7 @@ export class BVH_Player {
     renderer: WebGLRenderer,
   ): Promise<string> {
     renderer.setSize(width, height, false);
-    // save frame
+    // Preserve interactive playback state while rendering the requested frame off-screen.
     const previous_frame = this.frame_index;
     this.go_to_frame(frameIndex);
 

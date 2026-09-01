@@ -27,8 +27,7 @@ export class NPY_Player {
     this.frame_index = 0;
     this.elapsedTime = 0;
     this.fps = npy_loader_object.fps;
-    // 1 / fps gives us the duration of one frame in seconds
-    // cause we use three.js delta, we need to convert it to seconds
+    // Three.js supplies delta time in seconds, so 1 / fps is the playback duration of one frame.
     this.frameDuration = 1 / this.fps;
   }
 
@@ -77,19 +76,18 @@ export class NPY_Player {
 
   go_to_frame(frame_index: number) {
     this.frame_index = Math.max(0, Math.min(frame_index, this.frame_count));
-    // avoid index mismatch in set_sphere_for_joint_positions()
-    // last frame_index leads to  last undefined joint positions
+    // The terminal frame index marks playback completion and has no matching joint-position entry.
     if (this.frame_index < this.frame_count) {
       this.npy_loader_object.update_skeleton(this.frame_index);
     }
   }
 
   dispose() {
-    // TODO: remove cause loader dispose is called in three js manager
+    // TODO: Let only the manager dispose the loader to keep resource ownership unambiguous.
     this.npy_loader_object.dispose();
   }
 
-  // needs to be a seperate class with dispose and pi pa po
+  // Thumbnail rendering temporarily changes the player frame and restores it before returning.
   async render_thumbnail(
     frame_index: number,
     scene: Scene,
@@ -100,7 +98,7 @@ export class NPY_Player {
   ): Promise<string> {
     renderer.setSize(width, height, false);
 
-    // save frame
+    // Preserve interactive playback state while rendering the requested frame off-screen.
     const previous_frame = this.frame_index;
     this.go_to_frame(frame_index);
 

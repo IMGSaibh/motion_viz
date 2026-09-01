@@ -117,8 +117,8 @@ export function WidgetLabelList(props: Props) {
                         display: 'flex',
                         flexDirection: 'column',
                         minWidth: 0,
-                        alignItems: 'center', // vertikal
-                        justifyContent: 'center', // optional horizontal
+                        alignItems: 'center', // Center controls vertically within the label row.
+                        justifyContent: 'center', // Center the action group horizontally.
                         borderLeft: `1px solid ${theme.palette.wip_color_theme[200]}`,
                       })}
                     >

@@ -26,6 +26,7 @@ type ThreeJSEngineContext = {
 const three_js_engine_context = createContext<ThreeJSEngineContext | null>(null);
 
 export function ThreeJSEngineProvider({ children }: { children: React.ReactNode }) {
+  // The mutable engine stays outside React state; only UI-observable snapshots trigger renders.
   const threejs_scene_ref = useRef<HTMLDivElement | null>(null);
   const threejs_mngr_ref = useRef<ThreeJSEngine | null>(null);
   const [selected_motion, set_selected_motion] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
     set_is_playing(threejs_mngr_ref.current?.is_playing?.() ?? false);
   }, []);
 
-  // start engine at App-Start
+  // The provider owns the engine and therefore also owns its render loop and disposal lifecycle.
   useEffect(() => {
     if (!threejs_scene_ref.current) return;
     const three_manager = new ThreeJSEngine(threejs_scene_ref.current);
@@ -65,6 +66,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       set_frame_count(framecount);
 
       const player = threejs_mngr_ref.current.get_current_player?.();
+      // Players push frame changes into React; React does not create a second animation loop.
       player?.set_on_frame_changed_callback?.((idx: number) => {
         set_current_frame(idx);
       });

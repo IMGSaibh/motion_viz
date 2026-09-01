@@ -5,7 +5,7 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
-  // TODO: remove logix from widgets to container
+  // TODO: Move the remaining label-construction logic from widgets into this container.
   // on_click_save_label?: (label: ErgoLabel) => void;
 };
 

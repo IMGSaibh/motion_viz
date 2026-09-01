@@ -35,7 +35,7 @@ export function WidgetFrameSlider(props: Props) {
 
   const innerTrackRef = React.useRef<HTMLDivElement | null>(null);
 
-  // TODO: remove useEffect
+  // Expose the rendered track to the container without moving pointer calculations into this widget.
   React.useEffect(() => {
     if (!props.slider_track_ref) return;
     props.slider_track_ref.current = innerTrackRef.current;
@@ -57,7 +57,7 @@ export function WidgetFrameSlider(props: Props) {
           sx={{
             width: '100%',
             height: '100%',
-            minHeight: 40, // same hight as slider
+            minHeight: 40, // Keep the playback control aligned with the slider track.
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -122,7 +122,7 @@ export function WidgetFrameSlider(props: Props) {
             }),
           })}
         >
-          {/* transparent overlay for the current (unsaved) label-range */}
+          {/* The translucent overlay represents only the current, unsaved range. */}
           {hasFrames && currentLabelGeom.scaleX > 0 && (
             <Box
               sx={(theme) => ({
