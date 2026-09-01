@@ -5,6 +5,8 @@ from typing import Optional, Dict, Any
 # from jsonschema import validate, ValidationError
 
 class MotionConfig(BaseModel):
+    """Describe how tabular motion data maps to the generated motion JSON schema."""
+
     format: str
     abbrev: Optional[str] = ""
     scale: float = 1
@@ -18,6 +20,13 @@ class MotionConfig(BaseModel):
     dimsize: int = 3
 
 class JSONGenerator:
+    """Build and persist motion metadata consumed by backend parsers and the frontend.
+
+    Extend this class when generation rules or joint-column mappings change. Request
+    validation belongs in API models, while raw motion parsing belongs in the dedicated
+    parser modules.
+    """
+
     def __init__(self, schema_path=None):
         self.schema = None
         if schema_path:

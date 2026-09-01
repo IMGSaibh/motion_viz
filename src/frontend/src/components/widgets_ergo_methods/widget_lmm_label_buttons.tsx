@@ -26,6 +26,13 @@ type Props = {
   onClick?: (label: ErgoLabel) => void;
 };
 
+/**
+ * Hosts the method-specific UI entry point for LMM labels.
+ *
+ * The current implementation presents an explicit placeholder. Future LMM control layout
+ * and label construction should be implemented here, while shared range validation remains
+ * in the label context/domain layer and storing completed labels remains in the container.
+ */
 export function WidgetLmmButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_llm();

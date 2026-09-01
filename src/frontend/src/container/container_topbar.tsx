@@ -18,6 +18,14 @@ function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+/**
+ * Coordinates the top-bar workflows across API hooks, shared state, and the Three.js engine.
+ *
+ * File upload, descriptor creation, conversion, motion selection, related state resets, and
+ * user feedback are orchestrated here. The component passes render-ready data and callbacks
+ * to `PresenterTopbar`; transport details stay in hooks and top-bar layout stays in the
+ * presenter/widgets.
+ */
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame, stop } = use_three_js_engine_ctx();
   const { set_range } = use_frame_slider_context();

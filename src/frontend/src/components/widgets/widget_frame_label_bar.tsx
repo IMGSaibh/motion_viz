@@ -10,7 +10,16 @@ import {
 type Props = {
   frame_count: number;
 };
+
+/**
+ * Visualizes saved label intervals and the active editable range below the frame slider.
+ *
+ * This widget derives only render geometry and overlap styling from context data. Label
+ * mutation rules belong in the label context/domain layer, while slider interaction belongs
+ * in its container. Extend this component only for range-bar presentation behavior.
+ */
 export function WidgetFrameLabelBar(props: Props) {
+  // Saved labels and the transient editing range share the same frame-to-percentage coordinate system.
   const saved_labels = use_get_labels_cxt();
   const editing_id = use_editing_label_id_cxt();
   const isRtl = theme.direction === 'rtl';
@@ -41,7 +50,7 @@ export function WidgetFrameLabelBar(props: Props) {
             }}
             aria-hidden
           >
-            {/* saved labels */}
+            {/* Persisted labels remain visible independently of the transient range selection. */}
             {saved_labels.map(({ id, start_frame: start_frame, end_frame: end_frame }) => {
               const vvFrom = clamp(Math.min(start_frame, end_frame));
               const vvTo = clamp(Math.max(start_frame, end_frame));
@@ -69,7 +78,7 @@ export function WidgetFrameLabelBar(props: Props) {
               );
             })}
 
-            {/* current labels */}
+            {/* The transient range previews a new label or the label currently being edited. */}
             <Box
               sx={(theme) => ({
                 position: 'absolute',

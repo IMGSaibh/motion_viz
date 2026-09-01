@@ -140,6 +140,14 @@ function CategoryGrid({
   );
 }
 
+/**
+ * Renders the RULA category controls and assembles a completed RULA label selection.
+ *
+ * Method-specific selection UI and conversion of selected images into RULA label categories
+ * belong here. Shared in-progress selections remain in the ergonomic-method context, generic
+ * overlap rules in the label context/domain layer, and storing the emitted label in the
+ * label-buttons container.
+ */
 export function WidgetRulaButtons(props: Props) {
   const label_images_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
   const label_images_cat_la = useMemo(() => get_label_images_rula_cat_la(), []);

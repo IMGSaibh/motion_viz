@@ -2,6 +2,16 @@ import { Updatable } from '@/threeJS/system/loop';
 import { PerspectiveCamera, WebGLRenderer, Scene } from 'three';
 import { FBX_Loader } from '@/threeJS/motion_loader/fbx_loader';
 
+/**
+ * Controls playback of the animation objects created and owned by `FBX_Loader`.
+ *
+ * The player adapts Three.js mixer time and irregular FBX keyframes to the discrete
+ * frame interface used by the rest of the application. It is also the integration
+ * point for the central `Updatable` loop, seeking, play/pause behavior, and frame-change
+ * notifications. Loading FBX data and managing scene resources remain loader concerns;
+ * React state and event handling remain in containers, hooks, or the motion manager.
+ * Implement FBX-specific timing or keyframe-navigation changes in this class.
+ */
 export class FBX_Player {
   public fbx_player_object: Updatable;
   public is_playing: boolean = false;
@@ -13,8 +23,7 @@ export class FBX_Player {
 
   constructor(fbx_loader_object: FBX_Loader) {
     this.fbx_loader_object = fbx_loader_object;
-    // -1 because the last keyframe is not included in the slider
-    // fbx is keyframe based, so the keyframe count is the number of keyframes minus one
+    // The terminal FBX keyframe represents the clip boundary and is excluded from the slider.
     this.frame_count = fbx_loader_object.keyframeCount - 1;
     this.is_playing = false;
     this.frame_index = 0;
@@ -33,7 +42,7 @@ export class FBX_Player {
   update(delta: number) {
     this.fbx_loader_object.mixer!.update(delta);
     const time = this.fbx_loader_object.mixer!.time;
-    // get the closest keyframe index based on the current time
+    // Convert mixer time back to the nearest discrete slider frame.
     const track = this.fbx_loader_object.clipAction!.getClip().tracks[0];
 
     let closest_index = 0;
@@ -87,10 +96,7 @@ export class FBX_Player {
     // Calculate the time value from the keyframe index
     const track = this.fbx_loader_object.clipAction.getClip().tracks[0];
     const time = track.times[this.frame_index];
-    // we need to handle last keyframe specially, because it leeds to reset the animation
-    // three js doenst work with keyframes, so last keyfram jumps beyond setTime(animation duration)
-    // and resets the animation, maybe three js restart animation from the beginning when time is
-    // greater or euqal than duration
+    // Avoid seeking exactly to the clip duration because Three.js wraps it to the animation start.
     if (time >= this.fbx_loader_object.duration) {
       this.fbx_loader_object.mixer.setTime(this.fbx_loader_object.duration - 0.01);
       return;
@@ -111,7 +117,7 @@ export class FBX_Player {
     this.fbx_loader_object.mixer!.stopAllAction();
   }
 
-  // needs to be a seperate class with dispose and pi pa po
+  // Thumbnail rendering temporarily changes the player frame and restores it before returning.
   async render_thumbnail(
     frameIndex: number,
     scene: Scene,
@@ -121,7 +127,7 @@ export class FBX_Player {
     renderer: WebGLRenderer,
   ): Promise<string> {
     renderer.setSize(width, height, false);
-    // save frame
+    // Preserve interactive playback state while rendering the requested frame off-screen.
     const previous_frame = this.frame_index;
     this.go_to_frame(frameIndex);
 

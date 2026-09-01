@@ -5,10 +5,18 @@ import { PresenterLabelButtons } from '@/components/presenter/presenter_label_bu
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
-  // TODO: remove logix from widgets to container
+  // TODO: Move the remaining label-construction logic from widgets into this container.
   // on_click_save_label?: (label: ErgoLabel) => void;
 };
 
+/**
+ * Connects ergonomic label controls to the shared label and frame-range contexts.
+ *
+ * It receives completed labels from the presenter, persists them in client state, and
+ * clears the consumed frame range. Label construction rules belong in domain utilities or
+ * method-specific orchestration; button layout and method tabs belong in the presenter and
+ * widgets.
+ */
 export function ContainerLabelButtons(props: Props) {
   const add_label = use_add_slider_label_ctx();
   const { set_range } = use_frame_slider_context();

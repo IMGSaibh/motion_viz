@@ -2,6 +2,14 @@ import * as THREE from 'three';
 import { Text } from 'troika-three-text';
 import type { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 
+/**
+ * Owns text labels that describe skeleton joints in the Three.js scene.
+ *
+ * This component is intended to contain label creation, positioning, and disposal only.
+ * Skeleton data should be supplied by a loader, playback updates by a player or engine
+ * adapter, and UI controls by React containers. Any label resources added here must also
+ * be removed in `dispose()`.
+ */
 export class SkeletonJointDescription {
   private group = new THREE.Group();
   private labels: Text[] = [];

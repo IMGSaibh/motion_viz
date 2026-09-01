@@ -103,6 +103,13 @@ function CategoryGrid({
   );
 }
 
+/**
+ * Renders the OWAS category controls and assembles a completed OWAS label selection.
+ *
+ * Keep OWAS-specific control layout and label-category mapping here. Shared method state is
+ * provided by the ergonomic-method context, generic range validation by the label context,
+ * and persistence of the emitted label by `ContainerLabelButtons`.
+ */
 export function WidgetOwasButtons(props: Props) {
   const label_images_cat1 = useMemo(() => get_label_images_cat1_owas(), []);
   const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);

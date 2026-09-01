@@ -23,6 +23,14 @@ type Props = {
   on_click_play_toggle?: () => void;
 };
 
+/**
+ * Arranges the frame ticks, interactive slider, and label range bar as one UI section.
+ *
+ * The presenter receives prepared values and event handlers from its container and only
+ * composes widgets. Pointer calculations, keyboard behavior, engine commands, and shared
+ * state belong in `ContainerFrameSlider` or the relevant context; visual arrangement and
+ * widget selection belong here.
+ */
 export function PresenterFrameSlider(props: Props) {
   return (
     <Box

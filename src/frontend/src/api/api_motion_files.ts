@@ -45,6 +45,7 @@ const ENDPOINTS = {
   motionFiles: '/api_list_files/list_files',
 } as const;
 
+// API modules own transport details and runtime validation; hooks only manage request state and caching.
 function parse_message_response(value: unknown, responseName: string): MessageResponse {
   const record = parse_record(value, responseName);
   return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };

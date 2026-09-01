@@ -16,7 +16,14 @@ type SnackbarCtx = {
 
 const Ctx = createContext<SnackbarCtx | null>(null);
 
-// Check if providers can be summerized
+// TODO: Reassess whether these notification helpers need a dedicated provider.
+/**
+ * Provides one application-wide notification surface and severity-specific helper actions.
+ *
+ * Containers and hooks report user-facing outcomes through this context without owning
+ * Snackbar rendering state. Request error interpretation stays with the calling workflow;
+ * notification display behavior and lifecycle belong here.
+ */
 export function SnackbarProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string>('');

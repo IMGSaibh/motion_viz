@@ -4,6 +4,8 @@ from pathlib import Path
 from mocap_loader import MotionDataReader
 
 class PVParser:
+    """Convert Pose Viewer data into the NPY positions and JSON skeleton consumed by the frontend."""
+
     def __init__(self, file_path: str, descriptor_file: str):
         reader = MotionDataReader(file_path, descriptor_file)
         if reader.positions is None:

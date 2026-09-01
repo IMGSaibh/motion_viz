@@ -7,6 +7,12 @@ type Props = {
   is_pending: boolean;
 };
 
+/**
+ * Renders the file-upload trigger and its hidden native file input.
+ *
+ * File selection is forwarded through props; upload requests, validation, and user feedback
+ * belong in `ContainerTopbar` and its API hooks. Keep only upload-control presentation here.
+ */
 export function WidgetFileOperations(props: Props) {
   return (
     <>

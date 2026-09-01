@@ -10,6 +10,16 @@ export interface SkeletonData {
   joints: unknown[];
 }
 
+/**
+ * Loads NPY joint-position data and builds its Three.js skeleton representation.
+ *
+ * The loader owns the NPY scene group, generated joints, bones, labels, and their GPU
+ * resources. It converts transport data into scene objects and applies a requested frame
+ * to those objects. Playback timing and user controls belong in `NPY_Player`; React state
+ * and backend orchestration belong in hooks, containers, or managers. Implement changes
+ * to NPY parsing, skeleton topology, joint visualization, or per-frame pose application
+ * here, and release every newly owned Three.js resource in `dispose()`.
+ */
 export class NPY_loader {
   npy_motion: THREE.Group;
   numpy_data: any;
@@ -120,7 +130,7 @@ export class NPY_loader {
       return;
     }
 
-    // npy_skeleton neu aufbauen
+    // Rebuild the NPY skeleton from the parent-child graph.
     this.npy_skeleton = [];
 
     for (const joint of jointGraph) {
@@ -171,7 +181,7 @@ export class NPY_loader {
       const start = this.joints[elem.parentIdx].position;
       const end = this.joints[elem.childIdx].position;
 
-      // cylinder direction parent → child
+      // Align each bone cylinder from its parent toward its child.
       direction.subVectors(end, start);
       const length = direction.length();
       direction.normalize();
@@ -181,7 +191,7 @@ export class NPY_loader {
       elem.bone.position.copy(middle_point);
       elem.bone.quaternion.setFromUnitVectors(y_axis, direction);
 
-      // only scale height
+      // Only the cylinder height changes; its radius remains constant.
       elem.bone.scale.set(1, length, 1);
       elem.bone.updateMatrix();
 
@@ -202,7 +212,7 @@ export class NPY_loader {
   dispose() {
     if (!this.npy_motion) return;
 
-    // free gpu‑ressources
+    // Release GPU resources owned by this loader.
     this.npy_motion.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
         obj.geometry.dispose();

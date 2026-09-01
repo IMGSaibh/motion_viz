@@ -1,5 +1,12 @@
 import {PerspectiveCamera, WebGLRenderer } from 'three'
 
+/**
+ * Synchronizes a Three.js camera and renderer with the size of their DOM container.
+ *
+ * This system-level class is the integration point for viewport resize behavior. Camera
+ * composition belongs in the camera component, renderer creation belongs in the renderer
+ * module, and React layout decisions remain outside the Three.js engine layer.
+ */
 class Resizer
 {
   constructor(container: HTMLDivElement, camera: PerspectiveCamera, renderer: WebGLRenderer) 
