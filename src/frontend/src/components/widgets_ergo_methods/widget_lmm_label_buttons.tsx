@@ -26,13 +26,20 @@ type Props = {
   onClick?: (label: ErgoLabel) => void;
 };
 
+/**
+ * Hosts the method-specific UI entry point for LMM labels.
+ *
+ * The current implementation presents an explicit placeholder. Future LMM control layout
+ * and label construction should be implemented here, while shared range validation remains
+ * in the label context/domain layer and storing completed labels remains in the container.
+ */
 export function WidgetLmmButtons({ onClick }: Props) {
   const can_save_label = use_can_save_label_cxt();
   const label_images_cat1 = get_label_images_cat1_llm();
 
-  const category_1_llm = 'Kategorie LLM A (Arm/Hand)';
-  const category_2_llm = 'Bestimmung der Wichtungen der weiteren Merkmale';
-  const category_3_llm = 'Kategorie LLM C (sonstige)';
+  const category_1_llm = 'LLM Category A (Arm/Hand)';
+  const category_2_llm = 'Determine the weights of the additional characteristics';
+  const category_3_llm = 'LLM Category C (Other)';
 
   const render_lmm_images = (items: typeof label_images_cat1) => (
     <Box
@@ -71,15 +78,15 @@ export function WidgetLmmButtons({ onClick }: Props) {
       {/* <Grid container spacing={0} alignItems="center" wrap="nowrap">
         <Grid size={{ md: 2 }}>
           <FormControl fullWidth>
-            <InputLabel id="scroll-select-label">Bestimmung der Zeitwichtung</InputLabel>
+            <InputLabel id="scroll-select-label">Determine the time weighting</InputLabel>
             <Select
               labelId="scroll-select-label"
               value={'value'}
-              label="Bestimmung der Zeitwichtung"
+              label="Determine the time weighting"
               MenuProps={{
                 PaperProps: {
                   style: {
-                    maxHeight: 200, // <== Scrollbar ab hier
+                    maxHeight: 200, // Show the scrollbar beyond this height
                   },
                 },
               }}

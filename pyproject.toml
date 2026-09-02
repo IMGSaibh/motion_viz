@@ -1,7 +1,7 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Visualisierung von Motion-Capture-Daten"
+description = "Visualization of motion-capture data"
 authors = [
     { name = "mathias gewissen", email = "mathias.gewissen@htw-dresden.de" },
 ]

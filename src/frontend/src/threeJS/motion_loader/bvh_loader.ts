@@ -1,6 +1,15 @@
 import * as THREE from 'three';
 import { BVHLoader } from 'three/examples/jsm/loaders/BVHLoader.js';
 
+/**
+ * Loads BVH motion data and creates the Three.js objects needed to animate it.
+ *
+ * This class owns the BVH scene group, skeleton helper, mixer, and animation action. It
+ * exposes frame metadata to `BVH_Player`, while playback timing and seeking stay in that
+ * player. React code should reach this loader through the engine layer. Add BVH parsing,
+ * scene setup, or resource-lifecycle changes here and update `dispose()` for every newly
+ * owned Three.js resource.
+ */
 export class BVH_loader {
   private bvh_loader: BVHLoader;
   private bvh_motion: THREE.Group;
@@ -54,7 +63,7 @@ export class BVH_loader {
       this.mixer = null;
     }
 
-    // free gpu‑ressources
+    // Release GPU resources owned by this loader.
     this.bvh_motion.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;

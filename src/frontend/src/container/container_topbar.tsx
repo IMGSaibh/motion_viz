@@ -1,14 +1,10 @@
 import { useRef, useState } from 'react';
 import type { SelectChangeEvent } from '@mui/material/Select';
-
-import type { MotionDescriptorData } from '@/api/motion_api';
+import type { MotionDescriptorData } from '@/api/api_motion_files';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import {
-  use_clear_label_list_ctx,
-  use_replace_slider_labels_ctx as use_add_slider_labels_from_file_ctx,
-} from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx, use_load_slider_labels_for_file_ctx } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useFileUpload } from '@/hooks/use_file_upload';
@@ -16,11 +12,20 @@ import { useMotionDescriptor } from '@/hooks/use_motion_descriptor';
 import { useMotionFiles } from '@/hooks/use_motion_files';
 import { usePoseViewerConversion } from '@/hooks/use_pose_viewer_conversion';
 import { useLoadLabels } from '@/hooks/use_load_labels';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+/**
+ * Coordinates the top-bar workflows across API hooks, shared state, and the Three.js engine.
+ *
+ * File upload, descriptor creation, conversion, motion selection, related state resets, and
+ * user feedback are orchestrated here. The component passes render-ready data and callbacks
+ * to `PresenterTopbar`; transport details stay in hooks and top-bar layout stays in the
+ * presenter/widgets.
+ */
 export function ContainerTopbar() {
   const { set_selected_motion, load_motion_file, go_to_frame, stop } = use_three_js_engine_ctx();
   const { set_range } = use_frame_slider_context();
@@ -53,7 +58,7 @@ export function ContainerTopbar() {
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
   const clear_slider_label_list = use_clear_label_list_ctx();
-  const add_slider_labels_from_file = use_add_slider_labels_from_file_ctx();
+  const load_slider_labels_for_file = use_load_slider_labels_for_file_ctx();
 
   async function handle_file_dialog_on_change(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files || []);
@@ -110,7 +115,7 @@ export function ContainerTopbar() {
     stop();
     go_to_frame(0);
     set_frame_slider_value(0);
-    set_range([0, 0]);
+    set_range(null);
     clear_slider_label_list();
   }
 
@@ -131,19 +136,12 @@ export function ContainerTopbar() {
       stop();
       go_to_frame(0);
       set_frame_slider_value(0);
-      set_range([0, 0]);
+      set_range(null);
 
       const loaded_labels = await load_labels.mutateAsync(filename);
-      add_slider_labels_from_file(loaded_labels);
-      set_rula_selected({
-        CAT_UPPERARM: null,
-        CAT_LOWERARM: null,
-        CAT_WRIST: null,
-        CAT_NECK: null,
-        CAT_TRUNK: null,
-        CAT_LEGS: null,
-      });
-      set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+      load_slider_labels_for_file(loaded_labels);
+      set_rula_selected(create_empty_rula_selection());
+      set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
 
       if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${filename}`);
     } catch (requestError: unknown) {

@@ -2,6 +2,14 @@ import * as THREE from 'three';
 import { Text } from 'troika-three-text';
 import type { NPY_loader } from '@/threeJS/motion_loader/npy_loader';
 
+/**
+ * Owns text labels that describe skeleton joints in the Three.js scene.
+ *
+ * This component is intended to contain label creation, positioning, and disposal only.
+ * Skeleton data should be supplied by a loader, playback updates by a player or engine
+ * adapter, and UI controls by React containers. Any label resources added here must also
+ * be removed in `dispose()`.
+ */
 export class SkeletonJointDescription {
   private group = new THREE.Group();
   private labels: Text[] = [];
@@ -11,7 +19,7 @@ export class SkeletonJointDescription {
     this.scene.add(this.group);
   }
 
-  //   /** Einmal aufrufen, nachdem das Skeleton erzeugt wurde */
+  //   /** Call once after the skeleton has been created */
   //   create(jointCount: Number) {
   //     for (let j = 0; j < jointCount; j++) {
   //       const joint_label = new Text();
@@ -20,14 +28,14 @@ export class SkeletonJointDescription {
   //       joint_label.anchorX = 'center';
   //       joint_label.anchorY = 'bottom';
 
-  //       // Typing-Workaround falls Troika/Three Typen nicht matchen:
+  //       // Typing workaround if the Troika and Three types do not match:
   //       this.group.add(joint_label as unknown as THREE.Object3D);
   //       this.labels.push(joint_label);
   //     }
   //   }
 
   //   updatePositions(position: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
-  //     const joints = this.loader.joints as THREE.Object3D[]; // Joint-Meshes vom Loader
+  //     const joints = this.loader.joints as THREE.Object3D[]; // Joint meshes from the loader
   //     for (let j = 0; j < this.labels.length; j++) {
   //       this.labels[j].position.copy(position);
   //     }

@@ -65,6 +65,14 @@ type Props = {
   toggle_list: boolean;
 };
 
+/**
+ * Renders the collapsible list of ergonomic labels and their row-level edit controls.
+ *
+ * This widget consumes focused context actions for the interactive rows but does not own
+ * persistence or backend communication. Add reusable label-row presentation here; list-wide
+ * save/download workflows belong in the container and label mutation rules in the context
+ * or domain layer.
+ */
 export function WidgetLabelList(props: Props) {
   const startEdit = use_start_edit_label_cxt();
   const saveEdit = use_save_edit_label_cxt();
@@ -117,15 +125,15 @@ export function WidgetLabelList(props: Props) {
                         display: 'flex',
                         flexDirection: 'column',
                         minWidth: 0,
-                        alignItems: 'center', // vertikal
-                        justifyContent: 'center', // optional horizontal
+                        alignItems: 'center', // Center controls vertically within the label row.
+                        justifyContent: 'center', // Center the action group horizontally.
                         borderLeft: `1px solid ${theme.palette.wip_color_theme[200]}`,
                       })}
                     >
                       <Typography variant="body2" noWrap>
-                        {ergoLabel.categories?.map((cat) => (
-                          <span key={cat.name}>{cat.image?.name}</span>
-                        ))}
+                        {ergoLabel.categories.flatMap((category) =>
+                          category.features.map((feature) => feature.name),
+                        ).join(' | ')}
                       </Typography>
                       <Typography variant="caption" noWrap>
                         {`Methode ${ergoLabel.ergo_method}`}
@@ -165,7 +173,7 @@ export function WidgetLabelList(props: Props) {
                             </IconButton>
                             <IconButton
                               size="small"
-                              onClick={() => props.delete_label_from_list_on_click?.(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && props.delete_label_from_list_on_click?.(ergoLabel.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
@@ -176,7 +184,7 @@ export function WidgetLabelList(props: Props) {
                           <>
                             <IconButton
                               size="small"
-                              onClick={() => startEdit(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && startEdit(ergoLabel.id)}
                               aria-label="Edit label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >
@@ -185,7 +193,7 @@ export function WidgetLabelList(props: Props) {
 
                             <IconButton
                               size="small"
-                              onClick={() => props.delete_label_from_list_on_click?.(ergoLabel.id)}
+                              onClick={() => ergoLabel.id && props.delete_label_from_list_on_click?.(ergoLabel.id)}
                               aria-label="Delete label"
                               sx={{ width: 28, height: 28, border: 1, borderRadius: 2, flexShrink: 0 }}
                             >

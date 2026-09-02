@@ -9,6 +9,14 @@ type Props = {
   on_click_save_label?: (label: ErgoLabel) => void;
 };
 
+/**
+ * Presents the ergonomic-method tabs and selects the matching method-specific widget.
+ *
+ * Local tab selection is presentation state. Completed labels are emitted through props
+ * so persistence and shared-state updates remain in `ContainerLabelButtons` and its
+ * contexts. Add method-section layout here and method-specific controls in the matching
+ * widget module.
+ */
 export function PresenterLabelButtons(props: Props) {
   const [method, setMethod] = useState<string>('RULA');
 

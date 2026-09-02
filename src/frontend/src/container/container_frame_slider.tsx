@@ -3,10 +3,19 @@ import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
-import type { Range } from '@/domain/datatypes';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 
+/**
+ * Connects frame-slider presentation to shared slider state and the Three.js engine.
+ *
+ * This container owns browser-event orchestration, keyboard shortcuts, scrubbing, and
+ * asynchronous thumbnail coordination. It converts those interactions into context and
+ * engine commands, then passes render-ready props to `PresenterFrameSlider`. Keep visual
+ * styling in presenters/widgets and low-level playback behavior in the motion players.
+ */
 export function ContainerFrameSlider() {
+  // The container translates browser input into engine commands and serializable UI state.
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
   const frame_slider_track_scrubbing_reference = useRef(false);
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
@@ -57,17 +66,10 @@ export function ContainerFrameSlider() {
       if (e.code === 'KeyR') {
         reset_engine();
         set_frame_slider_value(0);
-        set_range([0, 0]);
+        set_range(null);
         clear_slider_label_list();
-        set_rula_selected({
-          CAT_UPPERARM: null,
-          CAT_LOWERARM: null,
-          CAT_WRIST: null,
-          CAT_NECK: null,
-          CAT_TRUNK: null,
-          CAT_LEGS: null,
-        });
-        set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+        set_rula_selected(create_empty_rula_selection());
+        set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
       if (e.code === 'ArrowRight') {
         e.preventDefault();
@@ -89,19 +91,23 @@ export function ContainerFrameSlider() {
       }
       if (e.code === 'KeyD') print_scene_components();
 
+      if (e.code === 'Escape') {
+        set_range(null);
+      }
+
       if (e.code === 'KeyA') {
         e.preventDefault();
-        set_range([frame_slider_value, range[1]]);
+        set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
       }
       if (e.code === 'KeyE') {
         e.preventDefault();
-        set_range([range[0], frame_slider_value]);
+        set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
       }
       if (e.code === 'Digit1' && e.location === 0) {
-        set_range([frame_slider_value, range[1]]);
+        set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
       }
       if (e.code === 'Digit2' && e.location === 0) {
-        set_range([range[0], frame_slider_value]);
+        set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
       }
     };
 
@@ -125,7 +131,7 @@ export function ContainerFrameSlider() {
   useEffect(() => {
     if (!frame_count) return;
 
-    // do not override during scrubbing
+    // Playback may advance the playhead, but it must not override an active user scrub.
     if (frame_slider_track_scrubbing_reference.current) return;
 
     if (!is_playing) return;
@@ -194,6 +200,7 @@ export function ContainerFrameSlider() {
         }
 
         get_thumbnail_for_frame(idx).then((data_url) => {
+          // Ignore thumbnails that completed after a newer hover request.
           if (seqRef.current !== mySeq) return;
           if (preview_render_img_ref.current && data_url) {
             preview_render_img_ref.current.src = data_url;
@@ -222,7 +229,7 @@ export function ContainerFrameSlider() {
     () => ({
       frame_slider_value,
       frame_count: frame_count ?? 0,
-      frame_slider_range: range as Range,
+      frame_slider_range: range as [number, number],
       hover_frame: frame_slider_track_hovered_frame,
       slider_track_ref: frame_slider_track_reference,
       on_mouse_down_slider_track: on_mouse_down_slider_track,

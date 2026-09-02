@@ -26,8 +26,8 @@ async def convert_pv_style():
         }
     
 
-    # pairs of descriptor_file und mocap_file
-    # ======================================= Arbeitstätigkeiten =======================================
+    # Pairs of descriptor_file and mocap_file
+    # ======================================= Work activities =======================================
     file_pairs = [
 
         # aimove

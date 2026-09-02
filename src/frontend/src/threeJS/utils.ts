@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { Loop } from '@/threeJS/system/loop';
 
+/**
+ * Stateless diagnostics and scene-inspection helpers for the Three.js layer.
+ *
+ * Keep helpers here only when they do not own resources or application state and are
+ * useful across multiple engine modules. Format-specific behavior belongs in its loader
+ * or player, and production orchestration belongs in `ThreeJSEngine`.
+ */
 export default class Utils {
   static is_in_scene(obj: THREE.Object3D | null | undefined, scene: THREE.Scene | null | undefined): boolean {
     if (!obj || !scene) return false;
@@ -31,7 +38,7 @@ export default class Utils {
 
   static print_scene_components(scene: THREE.Scene, loop: Loop, camera: THREE.Camera) {
     if (!scene || !loop || !camera) {
-      console.log('Scene, loop oder camera nicht bereit.');
+      console.log('Scene, loop, or camera is not ready.');
       return;
     }
 

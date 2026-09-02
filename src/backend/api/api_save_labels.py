@@ -6,13 +6,23 @@ from pydantic import BaseModel, Field
 
 router = APIRouter()
 
+class LabelCategory(BaseModel):
+    """Represent one ergonomic label category and its selected feature identifiers."""
+
+    category: str
+    feature_id: List[int]
+
 class LabelItem(BaseModel):
-    ergo_method: str 
+    """Validate one labeled frame interval received by the label API."""
+
+    ergo_method: str
     start_frame: int = Field(..., ge=0)
     end_frame: int = Field(..., ge=0)
-    button_text: str
+    categories: List[LabelCategory]
 
 class SaveLabelsRequest(BaseModel):
+    """Define the complete request contract for persisting labels for one motion file."""
+
     motion_name: str          
     labels: List[LabelItem]   
 
@@ -27,7 +37,12 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     labels = []
     for item in payload.labels:
         a, b = sorted((item.start_frame, item.end_frame))
-        labels.append({"ergo_method": item.ergo_method,"start_frame": a, "end_frame": b,"button_text": item.button_text,})
+        labels.append({
+            "ergo_method": item.ergo_method,
+            "start_frame": a,
+            "end_frame": b,
+            "categories": [category.model_dump() for category in item.categories],
+        })
 
     target_dir = Path("data/labels")
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -44,6 +59,7 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
     }
 
 
+    # One label document is maintained per motion file.
     label_json_file_path.write_text(json.dumps(label_file, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {

@@ -1,16 +1,65 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { LabelImage, ErgoLabel } from '@/domain/datatypes';
-import { normalize_category, can_save_for_range } from '@/domain/label_logic';
+import type {
+  ErgoLabel,
+  LabelCategory,
+  LabelFeature,
+  LabelImage,
+  OptionalsNeckAndTrunk,
+  OptionalsWrist,
+  RulaFeatureSelection,
+  RulaOptionalsUpperArm,
+} from '@/domain/datatypes';
+import {
+  can_save_for_range,
+  create_empty_rula_selection,
+  create_label_category_with_features,
+} from '@/domain/label_logic';
 import type { MarkerAction } from '@/domain/datatypes';
 import type { RectangleLabelBar } from '@/domain/datatypes';
+import type { Range } from '@/domain/datatypes';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
+import {
+  get_label_images_rula_cat_n,
+  get_label_images_rula_cat_t,
+  get_label_images_rula_cat_ua,
+  get_label_images_rula_cat_w,
+} from '@/Assets/label_images';
+
+const RULA_UPPER_ARM_OPTIONALS: readonly RulaOptionalsUpperArm[] = ['Shoulder Raised', 'Leaning', 'Abducted'];
+const RULA_NECK_AND_TRUNK_OPTIONALS: readonly OptionalsNeckAndTrunk[] = ['Twist', 'Side-Bend'];
+const RULA_WRIST_OPTIONALS: readonly OptionalsWrist[] = ['Bent'];
+
+function createRulaFeatureSelection<TOptional extends string>(
+  features: readonly LabelFeature[],
+  optionalNames: readonly TOptional[],
+): RulaFeatureSelection<TOptional> {
+  return {
+    feature: features.find((feature) => !optionalNames.includes(feature.name as TOptional))?.image ?? null,
+    optionals: features
+      .map((feature) => feature.name)
+      .filter((name): name is TOptional => optionalNames.includes(name as TOptional)),
+  };
+}
+
+function getSelectedImages(
+  selection: RulaFeatureSelection<string>,
+  availableImages: readonly LabelImage[],
+): LabelImage[] {
+  return [
+    ...(selection.feature ? [selection.feature] : []),
+    ...selection.optionals.flatMap((name) => {
+      const image = availableImages.find((candidate) => candidate.name === name);
+      return image ? [image] : [];
+    }),
+  ];
+}
 
 type FrameSliderLabelListContext = {
   ergo_labels: ErgoLabel[];
   add_slider_label: (m: ErgoLabel) => void;
-  add_slider_labels_from_file: (labels: ErgoLabel[]) => void;
+  load_slider_labels_for_file: (labels: ErgoLabel[]) => void;
   remove_slider_label: (id: string) => void;
   clear_slider_label_list: () => void;
 
@@ -22,7 +71,16 @@ type FrameSliderLabelListContext = {
 
 const frame_slider_label_list_context = createContext<FrameSliderLabelListContext | null>(null);
 
+/**
+ * Owns the client-side label collection and coordinates label creation and editing state.
+ *
+ * The provider combines persisted label records with the active slider range and ergonomic
+ * method selections. Its selector hooks expose narrow state/actions to widgets and containers
+ * without rerendering every consumer. Add shared label mutation workflows here, pure overlap
+ * and validation rules in the domain layer, and backend persistence in hooks/containers.
+ */
 export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
+  // This provider coordinates label persistence state with the currently selected slider range and method inputs.
   const { range, set_range } = use_frame_slider_context();
   const [ergo_labels, dispatch] = useReducer(markerReducer, [] as ErgoLabel[]);
   const [editing_id, set_editing_id] = useState<string | null>(null);
@@ -30,54 +88,49 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const add_slider_label = useCallback(
     (label: ErgoLabel) => {
-      const ok = can_save_for_range({
-        labels: ergo_labels,
-        category: label.ergo_method,
-        from: label.start_frame,
-        to: label.end_frame,
-        ignore_id: null,
-      });
-      if (!ok) return; // blockiert Speichern im Context
       dispatch({ type: 'add', label: label });
     },
     [ergo_labels],
   );
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
-  const add_slider_labels_from_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
+  const load_slider_labels_for_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
   const start_editing_label = useCallback(
     (id: string) => {
       const label = ergo_labels.find((x) => x.id === id);
       if (!label) return;
 
+      // Editing projects the persisted label back into the same state used by the creation UI.
       set_range([label.start_frame, label.end_frame]);
       set_editing_id(id);
 
-      if (normalize_category(label.ergo_method) === 'RULA') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
-          string,
-          LabelImage | null
-        >;
+      if (label.ergo_method === 'RULA') {
+        const upperArmFeatures = label.categories.find((category) => category.name === 'CAT_UPPERARM')?.features ?? [];
+        const wristFeatures = label.categories.find((category) => category.name === 'CAT_WRIST')?.features ?? [];
+        const neckFeatures = label.categories.find((category) => category.name === 'CAT_NECK')?.features ?? [];
+        const trunkFeatures = label.categories.find((category) => category.name === 'CAT_TRUNK')?.features ?? [];
+        const by_name = Object.fromEntries(
+          (label.categories ?? []).map((c) => [c.name, c.features[0]?.image]),
+        ) as Record<string, LabelImage | null>;
         set_rula_selected({
-          CAT_UPPERARM: by_name.CAT_UPPERARM ?? null,
+          CAT_UPPERARM: createRulaFeatureSelection(upperArmFeatures, RULA_UPPER_ARM_OPTIONALS),
           CAT_LOWERARM: by_name.CAT_LOWERARM ?? null,
-          CAT_WRIST: by_name.CAT_WRIST ?? null,
-          CAT_NECK: by_name.CAT_NECK ?? null,
-          CAT_TRUNK: by_name.CAT_TRUNK ?? null,
+          CAT_WRIST: createRulaFeatureSelection(wristFeatures, RULA_WRIST_OPTIONALS),
+          CAT_NECK: createRulaFeatureSelection(neckFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
+          CAT_TRUNK: createRulaFeatureSelection(trunkFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
           CAT_LEGS: by_name.CAT_LEGS ?? null,
         });
       }
 
-      if (normalize_category(label.ergo_method) === 'OWAS') {
-        const by_name = Object.fromEntries((label.categories ?? []).map((c) => [c.name, c.image])) as Record<
-          string,
-          LabelImage | null
-        >;
+      if (label.ergo_method === 'OWAS') {
+        const by_name = Object.fromEntries(
+          label.categories.map((category) => [category.name, category.features[0]?.image]),
+        ) as Record<string, LabelImage | null>;
         set_owas_selected({
-          CAT1: by_name.CAT1 ?? null,
-          CAT2: by_name.CAT2 ?? null,
-          CAT3: by_name.CAT3 ?? null,
-          CAT4: by_name.CAT4 ?? null,
+          CAT_BACK: by_name.CAT_BACK ?? null,
+          CAT_ARMS: by_name.CAT_ARMS ?? null,
+          CAT_LEGS: by_name.CAT_LEGS ?? null,
+          CAT_LOAD: by_name.CAT_LOAD ?? null,
         });
       }
     },
@@ -86,6 +139,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
 
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
+    if (!range) return;
 
     const editingLabel = ergo_labels.find((m) => m.id === editing_id);
     if (!editingLabel) return;
@@ -95,77 +149,82 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       category: editingLabel.ergo_method,
       from: range[0],
       to: range[1],
-      ignore_id: editing_id,
+      id: editing_id,
     });
     if (!ok) return;
 
-    const norm = normalize_category(editingLabel.ergo_method);
+    const createCategory = (id: number, name: string, image: LabelImage | null): LabelCategory | null =>
+      image
+        ? {
+            id,
+            name,
+            features: [{ id: 1, name: image.name, image }],
+          }
+        : null;
 
-    const categories =
-      norm === 'RULA'
+    const categories: LabelCategory[] | undefined =
+      editingLabel.ergo_method === 'RULA'
         ? [
-            { name: 'CAT_UPPERARM', image: rula_selected.CAT_UPPERARM },
-            { name: 'CAT_LOWERARM', image: rula_selected.CAT_LOWERARM },
-            { name: 'CAT_WRIST', image: rula_selected.CAT_WRIST },
-            { name: 'CAT_NECK', image: rula_selected.CAT_NECK },
-            { name: 'CAT_TRUNK', image: rula_selected.CAT_TRUNK },
-            { name: 'CAT_LEGS', image: rula_selected.CAT_LEGS },
-          ]
-        : norm === 'OWAS'
+            create_label_category_with_features(
+              1,
+              'CAT_UPPERARM',
+              getSelectedImages(rula_selected.CAT_UPPERARM, get_label_images_rula_cat_ua()),
+            ),
+            createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
+            create_label_category_with_features(
+              3,
+              'CAT_WRIST',
+              getSelectedImages(rula_selected.CAT_WRIST, get_label_images_rula_cat_w()),
+            ),
+            create_label_category_with_features(
+              4,
+              'CAT_NECK',
+              getSelectedImages(rula_selected.CAT_NECK, get_label_images_rula_cat_n()),
+            ),
+            create_label_category_with_features(
+              5,
+              'CAT_TRUNK',
+              getSelectedImages(rula_selected.CAT_TRUNK, get_label_images_rula_cat_t()),
+            ),
+            createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
+          ].filter((category): category is LabelCategory => category !== null)
+        : editingLabel.ergo_method === 'OWAS'
           ? [
-              { name: 'CAT1', image: owas_selected.CAT1 ?? null },
-              { name: 'CAT2', image: owas_selected.CAT2 ?? null },
-              { name: 'CAT3', image: owas_selected.CAT3 ?? null },
-              { name: 'CAT4', image: owas_selected.CAT4 ?? null },
-            ]
+              createCategory(1, 'CAT_BACK', owas_selected.CAT_BACK),
+              createCategory(2, 'CAT_ARMS', owas_selected.CAT_ARMS),
+              createCategory(3, 'CAT_LEGS', owas_selected.CAT_LEGS),
+              createCategory(4, 'CAT_LOAD', owas_selected.CAT_LOAD),
+            ].filter((category): category is LabelCategory => category !== null)
           : undefined;
-
-    const rulaLabel =
-      norm === 'RULA'
-        ? Object.values(rula_selected)
-            .map((image) => image?.name ?? '')
-            .join(' | ')
-        : undefined;
 
     dispatch({
       type: 'update',
       id: editing_id,
       from: range[0],
       to: range[1],
-      ...(rulaLabel !== undefined ? { label: rulaLabel, ergo_method: 'RULA' } : {}),
+      ergo_method: editingLabel.ergo_method,
       ...(categories !== undefined ? { categories } : {}),
     });
 
     set_editing_id(null);
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
-  }, [editing_id, range, ergo_labels, rula_selected, owas_selected]);
+    // A completed edit must not leak its range into the next label creation.
+    set_range(null);
+    set_rula_selected(create_empty_rula_selection());
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
+  }, [editing_id, range, ergo_labels, rula_selected, owas_selected, set_range]);
 
   const cancel_current_edit_label = useCallback(() => {
     if (!editing_id) return;
     set_editing_id(null);
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
-  }, [editing_id]);
+    set_range(null);
+    set_rula_selected(create_empty_rula_selection());
+  }, [editing_id, set_range]);
 
   const value = useMemo<FrameSliderLabelListContext>(
     () => ({
       ergo_labels,
       add_slider_label,
-      add_slider_labels_from_file: add_slider_labels_from_file,
+      load_slider_labels_for_file,
       remove_slider_label: remove_label_rect,
       clear_slider_label_list: clear_label_rects,
       editing_id,
@@ -176,7 +235,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [
       ergo_labels,
       add_slider_label,
-      add_slider_labels_from_file,
+      load_slider_labels_for_file,
       remove_label_rect,
       clear_label_rects,
       editing_id,
@@ -228,16 +287,8 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
           patch.end_frame = to;
           changed = true;
         }
-        if (action.label !== undefined && x.button_text !== action.label) {
-          patch.button_text = action.label;
-          changed = true;
-        }
         if (action.ergo_method !== undefined && x.ergo_method !== action.ergo_method) {
           patch.ergo_method = action.ergo_method;
-          changed = true;
-        }
-        if (action.color !== undefined && x.color !== action.color) {
-          patch.color = action.color;
           changed = true;
         }
         if (action.categories !== undefined && x.categories !== action.categories) {
@@ -265,6 +316,10 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
       return { from: 0, to: 0, leftPct: 0, scaleX: 0 };
     }
 
+    if (!range) {
+      return { from: 0, to: 0, leftPct: 0, scaleX: 0 };
+    }
+
     const maxIdx = fc - 1;
     const clamp = (n: number) => Math.max(0, Math.min(n, maxIdx));
 
@@ -274,6 +329,7 @@ export function use_current_label_range_geometry_cxt(frame_count: number): Recta
     const from = Math.min(a, b);
     const to = Math.max(a, b);
 
+    // Frame ranges are inclusive, so equal endpoints still occupy exactly one frame.
     const framesCovered = Math.max(1, to - from + 1);
 
     return {
@@ -307,10 +363,10 @@ export function use_add_slider_label_ctx() {
   });
 }
 
-export function use_replace_slider_labels_ctx() {
+export function use_load_slider_labels_for_file_ctx() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
-    if (!v) throw new Error('use_replace_slider_labels_ctx must be used within <FrameSliderLabellistProvider>');
-    return v.add_slider_labels_from_file;
+    if (!v) throw new Error('use_load_slider_labels_for_file_ctx must be used within <FrameSliderLabellistProvider>');
+    return v.load_slider_labels_for_file;
   });
 }
 
@@ -357,19 +413,23 @@ export function use_cancel_edit_label_cxt() {
 }
 
 export function use_can_save_label_cxt() {
+  const { range, frame_slider_value } = use_frame_slider_context();
+
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_can_save_label_cxt must be used within <FrameSliderLabellistProvider>');
 
-    return (category?: string) => {
+    return (category?: string, rangeOverride?: Range) => {
       const editingMarker = v.editing_id ? v.ergo_labels.find((m) => m.id === v.editing_id) : null;
       const targetCategory = category ?? editingMarker?.ergo_method;
-      const { range, set_range } = use_frame_slider_context();
+      const targetRange = rangeOverride ?? range;
+      // With no explicit range, overlap validation applies to the current frame only.
+      const effectiveRange: Range = targetRange ?? [frame_slider_value, frame_slider_value];
       return can_save_for_range({
         labels: v.ergo_labels,
         category: targetCategory,
-        from: range[0],
-        to: range[1],
-        ignore_id: v.editing_id,
+        from: effectiveRange[0],
+        to: effectiveRange[1],
+        id: v.editing_id,
       });
     };
   });

@@ -4,10 +4,12 @@ from pathlib import Path
 from mocap_loader import MotionDataReader
 
 class PVParser:
+    """Convert Pose Viewer data into the NPY positions and JSON skeleton consumed by the frontend."""
+
     def __init__(self, file_path: str, descriptor_file: str):
         reader = MotionDataReader(file_path, descriptor_file)
         if reader.positions is None:
-            raise ValueError("reader.positions ist None – Datei wurde nicht korrekt geladen")
+            raise ValueError("reader.positions is None; the file was not loaded correctly")
         self.positions = reader.positions * 100 # Convert from centimeters to meters
         self.r_hierarchy = reader.generateJointHierarchyArray()
         self.joint_names = reader.generateNameList()
@@ -24,8 +26,8 @@ class PVParser:
         pass
         arr = self.positions
         if arr is None:
-            raise ValueError("self.positions ist None – es wurde keine Datenmatrix gesetzt.")
+            raise ValueError("self.positions is None; no data matrix has been set")
         a = np.ascontiguousarray(arr)
         np.save(out_path, a)
         print(f"Saved global positions array with shape {arr.shape}")
-        print(f"Datei gespeichert: {out_path}")
+        print(f"File saved: {out_path}")

@@ -25,6 +25,13 @@ type Props = {
   motion_file_list_on_open: () => void;
 };
 
+/**
+ * Composes the application top bar from file, conversion, descriptor, and selection widgets.
+ *
+ * All data and event handlers enter through props, keeping this component independent of
+ * API hooks and global state. Add top-bar layout and widget composition here; file workflow,
+ * request handling, and cross-feature resets belong in `ContainerTopbar`.
+ */
 export function PresenterTopbar(props: Props) {
   return (
     <>

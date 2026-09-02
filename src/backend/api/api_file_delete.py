@@ -15,6 +15,8 @@ ALLOWED_TARGET_DIRS = {
 }
 
 class DeleteFilesRequest(BaseModel):
+    """Validate the list of motion-data filenames accepted by the delete endpoint."""
+
     filenames: List[str]
 
 @router.post("/delete")

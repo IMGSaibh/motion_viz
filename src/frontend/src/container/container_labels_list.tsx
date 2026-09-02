@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { PresenterLabelList } from '@/components/presenter/presenter_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 import {
   use_clear_label_list_ctx,
   use_get_labels_cxt,
@@ -16,6 +17,13 @@ function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
+/**
+ * Orchestrates label-list actions between contexts, backend hooks, and notifications.
+ *
+ * The container translates user intent into label mutations and save/download requests,
+ * then supplies state and callbacks to `PresenterLabelList`. Add workflow and side-effect
+ * handling here; list layout belongs in the presenter and reusable row UI in widgets.
+ */
 export function ContainerLabelsList() {
   const { selected_motion } = use_three_js_engine_ctx();
   const labels = use_get_labels_cxt();
@@ -35,34 +43,30 @@ export function ContainerLabelsList() {
 
   const delete_label_list_on_click = useCallback(() => {
     clear_label_list();
-    set_rula_selected({
-      CAT_UPPERARM: null,
-      CAT_LOWERARM: null,
-      CAT_WRIST: null,
-      CAT_NECK: null,
-      CAT_TRUNK: null,
-      CAT_LEGS: null,
-    });
-    set_owas_selected({ CAT1: null, CAT2: null, CAT3: null, CAT4: null });
+    set_rula_selected(create_empty_rula_selection());
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
 
   const save_label_list_on_click = useCallback(async () => {
     if (!selected_motion) return;
     try {
-      const response = await save_labels.mutateAsync({ motion_name: selected_motion, labels });
+      const response = await save_labels.mutateAsync({
+        motion_name: selected_motion,
+        labels,
+      });
       if (response.warning) warning(response.warning);
-      else success(response.message || 'Labels erfolgreich gespeichert');
+      else success(response.message || 'Labels saved successfully');
     } catch (requestError: unknown) {
-      error(get_error_message(requestError, 'Fehler beim Speichern der Labels'));
+      error(get_error_message(requestError, 'Failed to save labels'));
     }
   }, [error, labels, save_labels, selected_motion, success, warning]);
 
   const download_labels_on_click = useCallback(async () => {
     try {
       const result = await labels_download.mutateAsync();
-      success(`Labels erfolgreich heruntergeladen (${result.file_name})`);
+      success(`Labels downloaded successfully (${result.file_name})`);
     } catch (requestError: unknown) {
-      error(get_error_message(requestError, 'Fehler beim Herunterladen der Labels'));
+      error(get_error_message(requestError, 'Failed to download labels'));
     }
   }, [error, labels_download, success]);
 

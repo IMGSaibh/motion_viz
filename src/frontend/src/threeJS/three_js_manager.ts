@@ -15,7 +15,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { api_get_base_url } from '@/utils/api_url';
 import Utils from '@/threeJS/utils';
 
+/**
+ * Manager that owns the application's Three.js runtime and isolates it from React.
+ *
+ * The engine creates the scene, camera, renderers, controls, and central update loop. It
+ * also selects the matching loader/player pair for each supported motion format and
+ * exposes one format-independent playback API to containers and hooks. New motion formats
+ * are wired into the application here after their parsing and playback behavior have been
+ * implemented in dedicated loader and player classes. React UI state must remain outside
+ * this class, while all engine-owned resources must be released through its cleanup path.
+ */
 export class ThreeJSEngine {
+  // Exactly one loader/player pair is active. The manager hides format-specific behavior from React.
   private npy_loader: NPY_loader | null;
   private npy_player: NPY_Player | null;
 
@@ -31,7 +42,7 @@ export class ThreeJSEngine {
   private camera: PerspectiveCamera;
   private thumbnail_renderer: WebGLRenderer;
 
-  // copy to remove updateables from scene loop
+  // Orbit controls survive motion changes; cleanup_loop removes every other updatable object.
   private _orbitControls: OrbitControls | null;
 
   loop: Loop;
@@ -79,6 +90,7 @@ export class ThreeJSEngine {
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
     const fileUrl = api_get_base_url(`/data/${file_extension}/${filename}`);
 
+    // Loaders own scene objects and parsing; players expose a common playback contract to this manager.
     switch (file_extension) {
       case 'bvh':
         this.bvh_loader = new BVH_loader(this.scene);
@@ -188,13 +200,14 @@ export class ThreeJSEngine {
 
   print_scene_components() {
     if (!this.scene || !this.loop || !this.camera) {
-      console.log('Scene, loop oder camera nicht bereit.');
+      console.log('Scene, loop, or camera is not ready.');
       return;
     }
     Utils.print_scene_components(this.scene, this.loop, this.camera);
   }
 
   cleanup_player() {
+    // Dispose both playback state and the scene resources created by its matching loader.
     if (this.npy_player) {
       this.npy_player.dispose();
       this.npy_loader?.dispose();

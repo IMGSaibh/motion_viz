@@ -1,29 +1,30 @@
-import type { LabelImage, RulaSelection } from '@/domain/datatypes';
+import type { OwasSelection, RulaSelection } from '@/domain/datatypes';
+import { create_empty_rula_selection } from '@/domain/label_logic';
 import { createContext, useState, useContext } from 'react';
 
 type ErgoMethodsContext = {
   rula_selected: RulaSelection;
   set_rula_selected: (next: RulaSelection) => void;
-  owas_selected: Record<string, LabelImage | null>;
-  set_owas_selected: (next: Record<string, LabelImage | null>) => void;
+  owas_selected: OwasSelection;
+  set_owas_selected: (next: OwasSelection) => void;
 };
 const ergo_methods_context = createContext<ErgoMethodsContext | null>(null);
 
+/**
+ * Provides the current RULA and OWAS input selections to distant labeling components.
+ *
+ * This context stores in-progress method selections only. Completed label records belong in
+ * the slider-label context, label validation and construction in the domain layer, and the
+ * controls that modify these values in method-specific widgets.
+ */
 export function ErgoMethodsContexProvider({ children }: { children: React.ReactNode }) {
-  const [rula_selected, set_rula_selected] = useState<RulaSelection>({
-    CAT_UPPERARM: null,
-    CAT_LOWERARM: null,
-    CAT_WRIST: null,
-    CAT_NECK: null,
-    CAT_TRUNK: null,
-    CAT_LEGS: null,
-  });
+  const [rula_selected, set_rula_selected] = useState<RulaSelection>(create_empty_rula_selection);
 
-  const [owas_selected, set_owas_selected] = useState<Record<string, LabelImage | null>>({
-    CAT1: null,
-    CAT2: null,
-    CAT3: null,
-    CAT4: null,
+  const [owas_selected, set_owas_selected] = useState<OwasSelection>({
+    CAT_BACK: null,
+    CAT_ARMS: null,
+    CAT_LEGS: null,
+    CAT_LOAD: null,
   });
 
   // TODO: use memoized default value if needed

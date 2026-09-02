@@ -16,6 +16,13 @@ type Props = {
   is_pending: boolean;
 };
 
+/**
+ * Renders the motion-descriptor dialog and exposes its form fields through provided refs.
+ *
+ * This widget owns dialog and form presentation only. Reading values, creating the request,
+ * calling the backend, and displaying outcomes belong in `ContainerTopbar` and API hooks.
+ * Add descriptor form controls here when the backend contract gains corresponding fields.
+ */
 export function WidgetMotionDescriptorBar(props: Props) {
   return (
     <>
@@ -30,7 +37,7 @@ export function WidgetMotionDescriptorBar(props: Props) {
         onClose={props.motion_config_on_click}
         fullWidth
         maxWidth="md"
-        keepMounted // keeps contents/Refs mountet
+        keepMounted // Preserve panel state and refs while the modal is closed.
       >
         <DialogTitle>Motion Configuration</DialogTitle>
 

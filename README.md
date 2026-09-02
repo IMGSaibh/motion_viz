@@ -7,7 +7,7 @@ backend and ThreeJS Engine frontend.
 
 - Python 3.10
 - Node.js 18+ (npm)
-- Poetry (für Python-Env-Management)
+- Poetry (for Python environment management)
 - Visual Studio Build Tools 2022
 
 # Installation (using vs code editor is recommended)

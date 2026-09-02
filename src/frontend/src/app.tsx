@@ -13,12 +13,14 @@ import { ErgoMethodsContexProvider } from './context/contex_ergo_methods';
 export default function App() {
   return (
     <>
+      {/* Providers are ordered by dependency: feature contexts may consume engine and slider state. */}
       <SnackbarProvider>
         <ThreeJSEngineProvider>
           <ThreeJSScene />
           <FrameSliderContexProvider>
             <ErgoMethodsContexProvider>
               <FrameSliderLabellistProvider>
+                {/* Containers own orchestration; presenters and widgets remain focused on rendering. */}
                 <ContainerTopbar />
                 <Box
                   sx={(theme) => ({

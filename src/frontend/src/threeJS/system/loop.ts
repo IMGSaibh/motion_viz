@@ -5,6 +5,14 @@ export interface Updatable
   tick(delta: number): void
 }
 
+/**
+ * Owns the single render loop shared by all animated Three.js objects.
+ *
+ * Engine-managed objects participate by implementing `Updatable` and registering in
+ * `updatables`; they must not create competing animation loops. Keep frame scheduling and
+ * scene rendering here, while format-specific animation logic stays in motion players and
+ * registration/lifecycle orchestration stays in `ThreeJSEngine`.
+ */
 class Loop 
 {
     private readonly camera: Camera

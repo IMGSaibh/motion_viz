@@ -11,6 +11,13 @@ type Props = {
   motion_file_list_on_open: () => void;
 };
 
+/**
+ * Presents the available motion files as a controlled MUI selection field.
+ *
+ * Refreshing the file list, loading a selected motion, and resetting related application
+ * state are container responsibilities. Option rendering and selection-field presentation
+ * belong in this widget.
+ */
 export function WidgetListFiles(props: Props) {
   return (
     <FormControl fullWidth size="small">
