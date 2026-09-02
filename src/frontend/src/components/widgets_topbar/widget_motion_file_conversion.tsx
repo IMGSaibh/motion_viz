@@ -1,8 +1,8 @@
 import Button from '@mui/material/Button';
 
 type Props = {
-  convert_pv_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  pose_viewer_conversion_is_pending: boolean;
+  convert_motionstack_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  motionstack_conversion_is_pending: boolean;
 };
 
 /**
@@ -15,7 +15,7 @@ type Props = {
 export function WidgetConvertMotionFile(props: Props) {
   return (
     <>
-      <Button onClick={props.convert_pv_files_on_click} disabled={props.pose_viewer_conversion_is_pending}>
+      <Button onClick={props.convert_motionstack_files_on_click} disabled={props.motionstack_conversion_is_pending}>
         Convert via Pose Viewer
       </Button>
     </>

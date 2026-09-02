@@ -16,8 +16,8 @@ type Props = {
   motion_config_create_on_click: () => void;
   motion_descriptor_is_pending: boolean;
 
-  convert_pv_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  pose_viewer_conversion_is_pending: boolean;
+  convert_motionstack_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  motionstack_conversion_is_pending: boolean;
 
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
@@ -52,8 +52,8 @@ export function PresenterTopbar(props: Props) {
                   />
                   <WidgetConvertMotionFile
                     {...{
-                      convert_pv_files_on_click: props.convert_pv_files_on_click,
-                      pose_viewer_conversion_is_pending: props.pose_viewer_conversion_is_pending,
+                      convert_motionstack_files_on_click: props.convert_motionstack_files_on_click,
+                      motionstack_conversion_is_pending: props.motionstack_conversion_is_pending,
                     }}
                   />
                   <WidgetMotionDescriptorBar

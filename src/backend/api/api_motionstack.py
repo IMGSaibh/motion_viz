@@ -1,12 +1,13 @@
 from pathlib import Path
 from fastapi import APIRouter
-from backend.motion_parser.pv_parser import PVParser
-
+from motionstack.reader import MotionReader
+import numpy as np
 router = APIRouter()
 workspacefolder = Path.cwd()
 
-@router.post("/convert_pv_style")
-async def convert_pv_style():
+@router.post("/convert_with_motionstack")
+async def convert_with_motionstack():
+   
     workspacefolder = Path.cwd()
     mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
     npy_dir_path = Path.joinpath(workspacefolder, "data/npy")
@@ -59,15 +60,28 @@ async def convert_pv_style():
         "lara_csv"),                                                                                        
 
     ]
-    
-    for mocap_file, descriptor_file in file_pairs:
-        print(f"processing {mocap_file}")
-        print(f"processing {descriptor_file}")
 
-        pv_parser = PVParser(mocap_file, descriptor_file)
-        save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
-        pv_parser.save_npy(str(save_npy_path))
-        
+    for mfile in mvnx_files:
+            file_pairs.append((mfile,"xsens_mvnx"))
+
+    print("Start converting files")
+    for mocap_file, descriptor_file in file_pairs:
+        print(f"processing {mocap_file} with {descriptor_file}")
+
+        reader = None
+
+        try:
+            reader = MotionReader(mocap_file, descriptor_file)
+        except:
+            print(f"Could not load motion file {mocap_file}")
+
+        if reader:
+            
+            save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
+            position_array = np.ascontiguousarray(reader.motion.get_positions())
+            np.save(save_npy_path, position_array)
+            print(f"Successful converted {mocap_file} to {save_npy_path}")
+
 
     return {
         "message": "pose viewer compatible files converted",

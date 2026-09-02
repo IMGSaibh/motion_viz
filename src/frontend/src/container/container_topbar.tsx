@@ -10,7 +10,7 @@ import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { useFileUpload } from '@/hooks/use_file_upload';
 import { useMotionDescriptor } from '@/hooks/use_motion_descriptor';
 import { useMotionFiles } from '@/hooks/use_motion_files';
-import { usePoseViewerConversion } from '@/hooks/use_pose_viewer_conversion';
+import { useMotionstackConversion } from '@/hooks/use_motionstack_conversion';
 import { useLoadLabels } from '@/hooks/use_load_labels';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 
@@ -53,7 +53,7 @@ export function ContainerTopbar() {
   const motion_files = useMotionFiles();
   const file_upload = useFileUpload();
   const motion_descriptor = useMotionDescriptor();
-  const pose_viewer_conversion = usePoseViewerConversion();
+  const motionstack_conversion = useMotionstackConversion();
   const load_labels = useLoadLabels();
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
@@ -150,11 +150,11 @@ export function ContainerTopbar() {
     }
   }
 
-  async function handle_convert_with_pose_viewer() {
+  async function handle_convert_with_motionstack() {
     try {
-      const response = await pose_viewer_conversion.mutateAsync();
+      const response = await motionstack_conversion.mutateAsync();
       if (response.warning) warning(response.warning);
-      else success(response.message || 'Pose Viewer Conversion abgeschlossen');
+      else success(response.message || 'Conversion with motionstack completed.');
     } catch (requestError: unknown) {
       error(get_error_message(requestError, 'Conversion failed'));
     }
@@ -170,8 +170,8 @@ export function ContainerTopbar() {
       motion_config_on_click={handle_motion_config_on_click}
       motion_config_create_on_click={handle_motion_config_create_on_click}
       motion_descriptor_is_pending={motion_descriptor.isPending}
-      convert_pv_files_on_click={handle_convert_with_pose_viewer}
-      pose_viewer_conversion_is_pending={pose_viewer_conversion.isPending}
+      convert_motionstack_files_on_click={handle_convert_with_motionstack}
+      motionstack_conversion_is_pending={motionstack_conversion.isPending}
       motion_files={motion_files.data ?? []}
       motion_file_selected={motion_file_selected}
       motion_file_list_on_change={handle_motion_file_list_on_change}
