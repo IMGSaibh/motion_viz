@@ -39,7 +39,7 @@ export type FileUploadResponse = MessageResponse & {
 };
 
 const ENDPOINTS = {
-  poseViewerConversion: '/api_pose_viewer_conversion/convert_pv_style',
+  motionstackConversion: '/api_motionstack/convert_with_motionstack',
   motionDescriptor: '/api_motion_descriptor/motion_descriptor',
   fileUpload: '/api_file_upload/upload',
   motionFiles: '/api_list_files/list_files',
@@ -51,10 +51,10 @@ function parse_message_response(value: unknown, responseName: string): MessageRe
   return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };
 }
 
-export async function convert_pose_viewer_files(): Promise<MessageResponse> {
-  const response = await fetch(api_get_base_url(ENDPOINTS.poseViewerConversion), { method: 'POST' });
-  await assert_response_ok(response, 'Pose Viewer conversion');
-  return parse_message_response(await response.json(), 'Pose Viewer conversion');
+export async function convert_motionstack_files(): Promise<MessageResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.motionstackConversion), { method: 'POST' });
+  await assert_response_ok(response, 'Motionstack conversion');
+  return parse_message_response(await response.json(), 'Motionstack conversion');
 }
 
 export async function create_motion_descriptor(config: MotionDescriptorData): Promise<MessageResponse> {
