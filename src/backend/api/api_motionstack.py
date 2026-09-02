@@ -5,8 +5,8 @@ import numpy as np
 router = APIRouter()
 workspacefolder = Path.cwd()
 
-@router.post("/convert_pv_style")
-async def convert_pv_style():
+@router.post("/convert_with_motionstack")
+async def convert_with_motionstack():
    
     workspacefolder = Path.cwd()
     mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
