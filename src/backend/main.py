@@ -3,7 +3,7 @@ from backend.api import api_list_files
 from backend.api import api_file_upload
 from backend.api import api_file_delete
 from backend.api import api_motion_descriptor
-from backend.api import api_pose_viewer_conversion
+from backend.api import api_motionstack
 from backend.api import api_save_labels
 from backend.api import api_download_labels
 from fastapi.staticfiles import StaticFiles
@@ -42,7 +42,7 @@ app.include_router(api_list_files.router, prefix="/api_list_files")
 app.include_router(api_file_upload.router, prefix="/api_file_upload")
 app.include_router(api_file_delete.router, prefix="/api_file_delete")
 app.include_router(api_motion_descriptor.router, prefix="/api_motion_descriptor")
-app.include_router(api_pose_viewer_conversion.router, prefix="/api_pose_viewer_conversion")
+app.include_router(api_motionstack.router, prefix="/api_pose_viewer_conversion")
 app.include_router(api_save_labels.router, prefix="/api_save_labels")
 app.include_router(api_download_labels.router, prefix="/api_download_labels")
 
