@@ -7,7 +7,13 @@ import { create_empty_rula_selection } from '@/domain/label_logic';
 
 /** Coordinates application-wide keyboard input with shared state and the Three.js engine. */
 export function ContainerKeyboardShortcuts(): null {
-  const { frame_slider_value, range, set_frame_slider_value, set_range } = use_frame_slider_context();
+  const {
+    frame_slider_value,
+    range,
+    set_frame_slider_value,
+    set_range,
+    set_is_review_rending_active,
+  } = use_frame_slider_context();
   const { set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
   const { frame_count, go_to_frame, pause, play_pause, print_scene_components, reset_engine, stop } =
@@ -34,6 +40,7 @@ export function ContainerKeyboardShortcuts(): null {
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
 
+      // TODO: refactor min and max logic. Maybe not needed.
       if (event.code === 'ArrowRight') {
         event.preventDefault();
         if (!frame_count) return;
@@ -43,6 +50,7 @@ export function ContainerKeyboardShortcuts(): null {
         go_to_frame(next_frame);
       }
 
+      // TODO: refactor min and max logic. Maybe not needed.
       if (event.code === 'ArrowLeft') {
         event.preventDefault();
         if (!frame_count) return;
@@ -60,14 +68,18 @@ export function ContainerKeyboardShortcuts(): null {
         set_range(null);
       }
 
-      if (event.code === 'KeyA' || (event.code === 'Digit1' && event.location === 0)) {
-        if (event.code === 'KeyA') event.preventDefault();
+      if (event.code === 'KeyA') {
+        event.preventDefault();
         set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
       }
 
-      if (event.code === 'KeyE' || (event.code === 'Digit2' && event.location === 0)) {
+      if (event.code === 'KeyE') {
         if (event.code === 'KeyE') event.preventDefault();
         set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
+      }
+
+      if (event.code === 'KeyP') {
+        set_is_review_rending_active((is_active) => !is_active);
       }
     }
 
@@ -84,6 +96,7 @@ export function ContainerKeyboardShortcuts(): null {
     range,
     reset_engine,
     set_frame_slider_value,
+    set_is_review_rending_active,
     set_owas_selected,
     set_range,
     set_rula_selected,

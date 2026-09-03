@@ -17,23 +17,14 @@ export function ContainerFrameSlider() {
   const frame_slider_track_scrubbing_reference = useRef(false);
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
 
-  const { range, set_range } = use_frame_slider_context();
-
-  const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
+  const { frame_slider_value, is_review_rending_active, range, set_frame_slider_value } = use_frame_slider_context();
 
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const seqRef = useRef(0);
 
-  const {
-    frame_count,
-    current_frame,
-    go_to_frame,
-    pause,
-    play_pause,
-    get_thumbnail_for_frame,
-    is_playing,
-  } = use_three_js_engine_ctx();
+  const { frame_count, current_frame, go_to_frame, pause, play_pause, get_thumbnail_for_frame, is_playing } =
+    use_three_js_engine_ctx();
 
   const on_click_play_toggle = useCallback(() => {
     play_pause();
@@ -49,6 +40,21 @@ export function ContainerFrameSlider() {
 
     set_frame_slider_value(current_frame);
   }, [current_frame, frame_count, is_playing, set_frame_slider_value]);
+
+  // we need this for now! otherwise the preview image will stay on the screen
+  //  when the user is not hovering over the slider track
+  useEffect(() => {
+    if (is_review_rending_active) return;
+
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    seqRef.current++;
+
+    if (preview_render_img_ref.current) {
+      preview_render_img_ref.current.style.display = 'none';
+      preview_render_img_ref.current.removeAttribute('src');
+    }
+  }, [is_review_rending_active]);
 
   const compute_slider_track_frame = useCallback(
     (clientX: number) => {
@@ -93,6 +99,8 @@ export function ContainerFrameSlider() {
         update_slider_track_frame_tick(frame_idx);
       }
 
+      if (!is_review_rending_active) return;
+
       const rect = frame_slider_track_reference.current?.getBoundingClientRect();
       if (!rect || !frame_count) return;
 
@@ -119,7 +127,13 @@ export function ContainerFrameSlider() {
         });
       });
     },
-    [frame_count, compute_slider_track_frame, update_slider_track_frame_tick, get_thumbnail_for_frame],
+    [
+      frame_count,
+      compute_slider_track_frame,
+      update_slider_track_frame_tick,
+      get_thumbnail_for_frame,
+      is_review_rending_active,
+    ],
   );
 
   const on_mouse_up_slider_track = useCallback(() => {

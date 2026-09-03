@@ -6,6 +6,8 @@ type FrameSliderContext = {
   set_frame_slider_value: (frame_idx: number) => void;
   range: Range | null;
   set_range: (range: Range | null) => void;
+  is_review_rending_active: boolean;
+  set_is_review_rending_active: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const frame_slider_context = createContext<FrameSliderContext | null>(null);
 
@@ -20,6 +22,7 @@ export function FrameSliderContexProvider({ children }: { children: React.ReactN
   const [frame_slider_value, set_frame_slider_value] = useState(0);
   // null means that no explicit range is selected. Consumers then treat the current frame as a one-frame target.
   const [range, set_range] = useState<Range | null>(null);
+  const [is_review_rending_active, set_is_review_rending_active] = useState(false);
 
   // TODO: use memoized default value if needed
   const value: FrameSliderContext = {
@@ -27,6 +30,8 @@ export function FrameSliderContexProvider({ children }: { children: React.ReactN
     set_frame_slider_value,
     range,
     set_range,
+    is_review_rending_active,
+    set_is_review_rending_active,
   };
   return <frame_slider_context.Provider value={value}>{children}</frame_slider_context.Provider>;
 }
