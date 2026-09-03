@@ -2,7 +2,6 @@ import { WidgetFileOperations } from '@/components/widgets_topbar/widget_file_op
 import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_motion_descriptor';
 import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
 import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
-import { SelectChangeEvent } from '@mui/material/Select';
 import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 
 type Props = {
@@ -21,7 +20,7 @@ type Props = {
 
   motion_files: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
-  motion_file_list_on_change: (event: SelectChangeEvent<string>) => void;
+  motion_file_list_on_select: (filename: string) => void;
   motion_file_list_on_open: () => void;
 };
 
@@ -74,7 +73,7 @@ export function PresenterTopbar(props: Props) {
                 <WidgetListFiles
                   motion_files={props.motion_files}
                   motion_file_selected={props.motion_file_selected}
-                  motion_file_list_on_change={props.motion_file_list_on_change}
+                  motion_file_list_on_select={props.motion_file_list_on_select}
                   motion_file_list_on_open={props.motion_file_list_on_open}
                 />
               </Box>

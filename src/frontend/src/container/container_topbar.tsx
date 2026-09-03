@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import type { SelectChangeEvent } from '@mui/material/Select';
 import type { MotionDescriptorData } from '@/api/api_motion_files';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -124,8 +123,7 @@ export function ContainerTopbar() {
     if (result.error) error(get_error_message(result.error, 'Could not refresh file list'));
   }
 
-  async function handle_motion_file_list_on_change(event: SelectChangeEvent<string>) {
-    const filename = event.target.value;
+  async function handle_motion_file_list_on_select(filename: string) {
     reset_current_motion();
     if (!filename) return;
 
@@ -174,7 +172,7 @@ export function ContainerTopbar() {
       motionstack_conversion_is_pending={motionstack_conversion.isPending}
       motion_files={motion_files.data ?? []}
       motion_file_selected={motion_file_selected}
-      motion_file_list_on_change={handle_motion_file_list_on_change}
+      motion_file_list_on_select={handle_motion_file_list_on_select}
       motion_file_list_on_open={handle_motion_file_list_on_open}
     />
   );
