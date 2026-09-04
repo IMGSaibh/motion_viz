@@ -16,6 +16,8 @@ import {
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 import {
   INITIAL_RULA_HOTKEY_STATE,
+  RulaHotkeyCommandType,
+  RulaHotkeyContext,
   resolve_rula_hotkey_command,
   transition_rula_hotkey_state,
 } from '@/domain/rula_hotkey_commands';
@@ -42,7 +44,10 @@ export function ContainerKeyboardShortcuts(): null {
 
   useEffect(() => {
     function handle_key_down(event: KeyboardEvent): void {
-      if (event.code === 'Tab' && (hotkeyMode === HotkeyProfile.PLAY_PROFILE || rula_hotkey_state.context === 'ROOT')) {
+      if (
+        event.code === 'Tab' &&
+        (hotkeyMode === HotkeyProfile.PLAY_PROFILE || rula_hotkey_state.context === RulaHotkeyContext.ROOT)
+      ) {
         event.preventDefault();
         set_hotkeyMode(toggle_hotkey_profile(hotkeyMode));
         return;
@@ -54,14 +59,14 @@ export function ContainerKeyboardShortcuts(): null {
           event.preventDefault();
 
           if (
-            rula_command.type === 'COMMIT_CATEGORY' &&
-            rula_hotkey_state.context !== 'ROOT' &&
+            rula_command.type === RulaHotkeyCommandType.COMMIT_CATEGORY &&
+            rula_hotkey_state.context !== RulaHotkeyContext.ROOT &&
             !commit_rula_category(rula_hotkey_state.context)
           ) {
             return;
           }
 
-          if (rula_command.type === 'COMMIT_LABEL' && !commit_rula_label()) {
+          if (rula_command.type === RulaHotkeyCommandType.COMMIT_LABEL && !commit_rula_label()) {
             return;
           }
 
@@ -141,7 +146,9 @@ export function ContainerKeyboardShortcuts(): null {
       }
     }
 
-    function commit_rula_category(category: Exclude<typeof rula_hotkey_state.context, 'ROOT'>): boolean {
+    function commit_rula_category(
+      category: Exclude<typeof rula_hotkey_state.context, RulaHotkeyContext.ROOT>,
+    ): boolean {
       const primary =
         rula_hotkey_state.pending_primary_index === null ? null : rula_hotkey_state.pending_primary_index + 1;
       const optionals = rula_hotkey_state.pending_optional_indices.map((index) => index + 1);

@@ -1,29 +1,46 @@
 import type { RulaCategory } from '@/domain/datatypes';
 
-export type RulaHotkeyContext = 'ROOT' | RulaCategory;
-export type RulaFeatureMode = 'PRIMARY' | 'OPTIONAL';
+export enum RulaHotkeyContext {
+  ROOT = 'ROOT',
+}
+
+export enum RulaFeatureMode {
+  PRIMARY = 'PRIMARY',
+  OPTIONAL = 'OPTIONAL',
+}
+
+export type RulaHotkeyContextValue = RulaHotkeyContext | RulaCategory;
+
+export enum RulaHotkeyCommandType {
+  OPEN_CATEGORY = 'OPEN_CATEGORY',
+  SELECT_FEATURE = 'SELECT_FEATURE',
+  ENABLE_OPTIONALS = 'ENABLE_OPTIONALS',
+  COMMIT_CATEGORY = 'COMMIT_CATEGORY',
+  COMMIT_LABEL = 'COMMIT_LABEL',
+  BACK = 'BACK',
+}
 
 export type RulaHotkeyState = {
-  context: RulaHotkeyContext;
+  context: RulaHotkeyContextValue;
   feature_mode: RulaFeatureMode;
   pending_primary_index: number | null;
   pending_optional_indices: readonly number[];
 };
 
 export type RulaHotkeyCommand =
-  | { type: 'OPEN_CATEGORY'; category: RulaCategory }
-  | { type: 'SELECT_FEATURE'; feature_index: number; optional: boolean }
-  | { type: 'ENABLE_OPTIONALS' }
-  | { type: 'COMMIT_CATEGORY'; next_context: RulaHotkeyContext }
-  | { type: 'COMMIT_LABEL' }
-  | { type: 'BACK' };
+  | { type: RulaHotkeyCommandType.OPEN_CATEGORY; category: RulaCategory }
+  | { type: RulaHotkeyCommandType.SELECT_FEATURE; feature_index: number; optional: boolean }
+  | { type: RulaHotkeyCommandType.ENABLE_OPTIONALS }
+  | { type: RulaHotkeyCommandType.COMMIT_CATEGORY; next_context: RulaHotkeyContextValue }
+  | { type: RulaHotkeyCommandType.COMMIT_LABEL }
+  | { type: RulaHotkeyCommandType.BACK };
 
 type CategoryCommandConfig = {
   open_code: string;
   category: RulaCategory;
   primary_count: number;
   optional_count?: number;
-  next_context: RulaHotkeyContext;
+  next_context: RulaHotkeyContextValue;
 };
 
 export const RULA_CATEGORY_COMMANDS: readonly CategoryCommandConfig[] = [
@@ -61,53 +78,54 @@ export const RULA_CATEGORY_COMMANDS: readonly CategoryCommandConfig[] = [
     optional_count: 2,
     next_context: 'CAT_LEGS',
   },
-  { open_code: 'Digit6', category: 'CAT_LEGS', primary_count: 1, next_context: 'ROOT' },
+  { open_code: 'Digit6', category: 'CAT_LEGS', primary_count: 1, next_context: RulaHotkeyContext.ROOT },
 ];
 
 export const INITIAL_RULA_HOTKEY_STATE: RulaHotkeyState = {
-  context: 'ROOT',
-  feature_mode: 'PRIMARY',
+  context: RulaHotkeyContext.ROOT,
+  feature_mode: RulaFeatureMode.PRIMARY,
   pending_primary_index: null,
   pending_optional_indices: [],
 };
 
 export function resolve_rula_hotkey_command(state: RulaHotkeyState, code: string): RulaHotkeyCommand | null {
-  if (code === 'Escape') return { type: 'BACK' };
+  if (code === 'Escape') return { type: RulaHotkeyCommandType.BACK };
 
-  if (state.context === 'ROOT') {
-    const normalized_code = code.replace('Numpad', 'Digit');
-    const category = RULA_CATEGORY_COMMANDS.find((candidate) => candidate.open_code === normalized_code);
-    if (category) return { type: 'OPEN_CATEGORY', category: category.category };
-    if (code === 'Enter') return { type: 'COMMIT_LABEL' };
+  if (state.context === RulaHotkeyContext.ROOT) {
+    const category = RULA_CATEGORY_COMMANDS.find((candidate) => candidate.open_code === code);
+    if (category) return { type: RulaHotkeyCommandType.OPEN_CATEGORY, category: category.category };
+    if (code === 'Enter') return { type: RulaHotkeyCommandType.COMMIT_LABEL };
     return null;
   }
 
   const config = RULA_CATEGORY_COMMANDS.find((candidate) => candidate.category === state.context);
   if (!config) return null;
-  if (code === 'Tab' && config.optional_count) return { type: 'ENABLE_OPTIONALS' };
-  if (code === 'Enter') return { type: 'COMMIT_CATEGORY', next_context: config.next_context };
+  if (code === 'Tab' && config.optional_count) return { type: RulaHotkeyCommandType.ENABLE_OPTIONALS };
+  if (code === 'Enter') {
+    return { type: RulaHotkeyCommandType.COMMIT_CATEGORY, next_context: config.next_context };
+  }
 
-  const match = /^(?:Digit|Numpad)([1-9])$/.exec(code);
+  const match = /^Digit([1-9])$/.exec(code);
   if (!match) return null;
   const keyed_index = Number(match[1]) - 1;
-  const optional = state.feature_mode === 'OPTIONAL';
+  const optional = state.feature_mode === RulaFeatureMode.OPTIONAL;
   const available_count = optional ? (config.optional_count ?? 0) : config.primary_count;
   if (keyed_index >= available_count) return null;
   const feature_index = optional ? config.primary_count + keyed_index : keyed_index;
-  return { type: 'SELECT_FEATURE', feature_index, optional };
+  return { type: RulaHotkeyCommandType.SELECT_FEATURE, feature_index, optional };
 }
 
 export function transition_rula_hotkey_state(state: RulaHotkeyState, command: RulaHotkeyCommand): RulaHotkeyState {
   switch (command.type) {
-    case 'OPEN_CATEGORY':
+    case RulaHotkeyCommandType.OPEN_CATEGORY:
       return {
         ...state,
         context: command.category,
-        feature_mode: 'PRIMARY',
+        feature_mode: RulaFeatureMode.PRIMARY,
         pending_primary_index: null,
         pending_optional_indices: [],
       };
-    case 'SELECT_FEATURE':
+    case RulaHotkeyCommandType.SELECT_FEATURE:
       if (!command.optional) return { ...state, pending_primary_index: command.feature_index };
       return {
         ...state,
@@ -115,25 +133,25 @@ export function transition_rula_hotkey_state(state: RulaHotkeyState, command: Ru
           ? state.pending_optional_indices.filter((index) => index !== command.feature_index)
           : [...state.pending_optional_indices, command.feature_index],
       };
-    case 'ENABLE_OPTIONALS':
-      return { ...state, feature_mode: 'OPTIONAL' };
-    case 'COMMIT_CATEGORY':
+    case RulaHotkeyCommandType.ENABLE_OPTIONALS:
+      return { ...state, feature_mode: RulaFeatureMode.OPTIONAL };
+    case RulaHotkeyCommandType.COMMIT_CATEGORY:
       return {
         ...state,
         context: command.next_context,
-        feature_mode: 'PRIMARY',
+        feature_mode: RulaFeatureMode.PRIMARY,
         pending_primary_index: null,
         pending_optional_indices: [],
       };
-    case 'COMMIT_LABEL':
+    case RulaHotkeyCommandType.COMMIT_LABEL:
       return { ...INITIAL_RULA_HOTKEY_STATE };
-    case 'BACK':
-      return state.context === 'ROOT'
+    case RulaHotkeyCommandType.BACK:
+      return state.context === RulaHotkeyContext.ROOT
         ? { ...INITIAL_RULA_HOTKEY_STATE }
         : {
             ...state,
-            context: 'ROOT',
-            feature_mode: 'PRIMARY',
+            context: RulaHotkeyContext.ROOT,
+            feature_mode: RulaFeatureMode.PRIMARY,
             pending_primary_index: null,
             pending_optional_indices: [],
           };
