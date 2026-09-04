@@ -19,10 +19,16 @@ import {
   resolve_rula_hotkey_command,
   transition_rula_hotkey_state,
 } from '@/domain/rula_hotkey_commands';
-import { toggle_hotkey_profile } from '@/domain/hotkey_mode';
+import { HotkeyProfile, toggle_hotkey_profile } from '@/domain/hotkey_profile';
 import type { LabelCategory, RulaSelection } from '@/domain/datatypes';
 
-/** Coordinates application-wide keyboard input with shared state and the Three.js engine. */
+/**
+ * Orchestrates application-wide keyboard commands between shared contexts and the Three.js engine.
+ *
+ * This container owns keyboard event registration, hotkey profile routing, playback commands,
+ * and label workflow actions. Keep key mapping and side effects here; presentation remains in
+ * the UI containers and widgets, while RULA command transitions remain in the domain layer.
+ */
 export function ContainerKeyboardShortcuts(): null {
   const { frame_slider_value, range, set_frame_slider_value, set_range, set_is_review_rending_active } =
     use_frame_slider_context();
@@ -36,13 +42,13 @@ export function ContainerKeyboardShortcuts(): null {
 
   useEffect(() => {
     function handle_key_down(event: KeyboardEvent): void {
-      if (event.code === 'Tab' && (hotkeyMode === 'PLAY_MODE' || rula_hotkey_state.context === 'ROOT')) {
+      if (event.code === 'Tab' && (hotkeyMode === HotkeyProfile.PLAY_PROFILE || rula_hotkey_state.context === 'ROOT')) {
         event.preventDefault();
         set_hotkeyMode(toggle_hotkey_profile(hotkeyMode));
         return;
       }
 
-      if (hotkeyMode === 'RULA_LABELING') {
+      if (hotkeyMode === HotkeyProfile.RULA_PROFILE) {
         const rula_command = resolve_rula_hotkey_command(rula_hotkey_state, event.code);
         if (rula_command) {
           event.preventDefault();
@@ -137,9 +143,7 @@ export function ContainerKeyboardShortcuts(): null {
 
     function commit_rula_category(category: Exclude<typeof rula_hotkey_state.context, 'ROOT'>): boolean {
       const primary =
-        rula_hotkey_state.pending_primary_index === null
-          ? null
-          : rula_hotkey_state.pending_primary_index + 1;
+        rula_hotkey_state.pending_primary_index === null ? null : rula_hotkey_state.pending_primary_index + 1;
       const optionals = rula_hotkey_state.pending_optional_indices.map((index) => index + 1);
       if (!primary) return false;
 
@@ -182,27 +186,11 @@ export function ContainerKeyboardShortcuts(): null {
         ...selection.optional_feature_ids,
       ];
       const categories: LabelCategory[] = [
-        create_label_category_with_features(
-          1,
-          'CAT_UPPERARM',
-          selected_feature_ids(rula_selected.CAT_UPPERARM),
-        ),
+        create_label_category_with_features(1, 'CAT_UPPERARM', selected_feature_ids(rula_selected.CAT_UPPERARM)),
         create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
-        create_label_category_with_features(
-          3,
-          'CAT_WRIST',
-          selected_feature_ids(rula_selected.CAT_WRIST),
-        ),
-        create_label_category_with_features(
-          4,
-          'CAT_NECK',
-          selected_feature_ids(rula_selected.CAT_NECK),
-        ),
-        create_label_category_with_features(
-          5,
-          'CAT_TRUNK',
-          selected_feature_ids(rula_selected.CAT_TRUNK),
-        ),
+        create_label_category_with_features(3, 'CAT_WRIST', selected_feature_ids(rula_selected.CAT_WRIST)),
+        create_label_category_with_features(4, 'CAT_NECK', selected_feature_ids(rula_selected.CAT_NECK)),
+        create_label_category_with_features(5, 'CAT_TRUNK', selected_feature_ids(rula_selected.CAT_TRUNK)),
         create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
       ];
       add_slider_label({

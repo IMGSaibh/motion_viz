@@ -36,7 +36,7 @@ export function ContainerFrameSlider() {
     // Playback may advance the playhead, but it must not override an active user scrub.
     if (frame_slider_track_scrubbing_reference.current) return;
 
-    if (!is_playing) return;
+    if (!is_playing && current_frame !== 0) return;
 
     set_frame_slider_value(current_frame);
   }, [current_frame, frame_count, is_playing, set_frame_slider_value]);

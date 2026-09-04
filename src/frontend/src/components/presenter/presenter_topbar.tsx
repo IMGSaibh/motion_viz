@@ -3,7 +3,7 @@ import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_mo
 import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
 import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
 import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
-import { WidgetHotkeyMode } from '@/components/widgets_topbar/widget_hotkey_mode';
+import { WidgetHotkeyProfile } from '@/components/widgets_topbar/widget_hotkey_profile';
 
 type Props = {
   file_dialog_reference: React.RefObject<HTMLInputElement | null>;
@@ -43,7 +43,7 @@ export function PresenterTopbar(props: Props) {
               {/* LEFT: Buttons */}
               <Stack direction="row" spacing={2} alignItems="center" flexWrap="nowrap">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <WidgetHotkeyMode />
+                  <WidgetHotkeyProfile />
                   <WidgetFileOperations
                     {...{
                       file_dialog_reference: props.file_dialog_reference,
