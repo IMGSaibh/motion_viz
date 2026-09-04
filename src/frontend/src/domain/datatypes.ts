@@ -25,8 +25,6 @@ export type LabelCategory = {
 
 export type LabelFeature = {
   id: number;
-  name: string;
-  image: LabelImage;
 };
 
 export type LabelImage = {
@@ -38,24 +36,20 @@ export type LabelImage = {
 export type RulaCategory = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
 export type OwasCategory = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
 
-export type RulaFeatureSelection<TOptional extends string> = {
-  feature: LabelImage | null;
-  optionals: TOptional[];
+export type RulaFeatureSelection = {
+  feature_id: number | null;
+  optional_feature_ids: number[];
 };
 
 export type RulaSelection = {
-  CAT_UPPERARM: RulaFeatureSelection<RulaOptionalsUpperArm>;
-  CAT_LOWERARM: LabelImage | null;
-  CAT_WRIST: RulaFeatureSelection<OptionalsWrist>;
-  CAT_NECK: RulaFeatureSelection<OptionalsNeckAndTrunk>;
-  CAT_TRUNK: RulaFeatureSelection<OptionalsNeckAndTrunk>;
-  CAT_LEGS: LabelImage | null;
+  CAT_UPPERARM: RulaFeatureSelection;
+  CAT_LOWERARM: number | null;
+  CAT_WRIST: RulaFeatureSelection;
+  CAT_NECK: RulaFeatureSelection;
+  CAT_TRUNK: RulaFeatureSelection;
+  CAT_LEGS: number | null;
 };
-export type OwasSelection = Record<OwasCategory, LabelImage | null>;
-
-export type RulaOptionalsUpperArm = 'Shoulder Raised' | 'Leaning' | 'Abducted';
-export type OptionalsNeckAndTrunk = 'Twist' | 'Side-Bend';
-export type OptionalsWrist = 'Bent';
+export type OwasSelection = Record<OwasCategory, number | null>;
 
 export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }

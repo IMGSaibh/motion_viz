@@ -21,15 +21,15 @@ function CategoryGrid({
   cat,
   title,
   owas_button_images,
-  selected_cat_images,
+  selected_feature_id,
   onSelect,
   isLast,
 }: {
   cat: OwasCategory;
   title: string;
   owas_button_images: readonly LabelImage[];
-  selected_cat_images: string | null;
-  onSelect: (slot: OwasCategory, img: LabelImage) => void;
+  selected_feature_id: number | null;
+  onSelect: (slot: OwasCategory, featureId: number) => void;
   isLast?: boolean;
 }) {
   return (
@@ -54,12 +54,12 @@ function CategoryGrid({
         }}
       >
         {owas_button_images.map((item, i) => {
-          const isSelected = selected_cat_images === item.name;
-          const isDimmed = selected_cat_images !== null && !isSelected;
+          const isSelected = selected_feature_id === i + 1;
+          const isDimmed = selected_feature_id !== null && !isSelected;
           return (
             <ButtonBase
               key={`${item.category}-${item.name}-${i}`}
-              onClick={() => onSelect(cat, item)}
+              onClick={() => onSelect(cat, i + 1)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
                 borderRadius: 0,
@@ -125,8 +125,8 @@ export function WidgetOwasButtons(props: Props) {
   const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
   const canSaveOwas = can_save_label('OWAS', effectiveRange);
 
-  const handleSelect = (cat: OwasCategory, img: LabelImage) => {
-    set_owas_selected({ ...owas_selected, [cat]: img });
+  const handleSelect = (cat: OwasCategory, featureId: number) => {
+    set_owas_selected({ ...owas_selected, [cat]: featureId });
   };
 
   const handleSave = () => {
@@ -167,7 +167,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_BACK"
             title="Back Category"
             owas_button_images={label_images_cat1}
-            selected_cat_images={owas_selected.CAT_BACK?.name ?? null}
+            selected_feature_id={owas_selected.CAT_BACK}
             onSelect={handleSelect}
           />
         </Grid>
@@ -177,7 +177,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_ARMS"
             title="Arms Category"
             owas_button_images={label_images_cat2}
-            selected_cat_images={owas_selected.CAT_ARMS?.name ?? null}
+            selected_feature_id={owas_selected.CAT_ARMS}
             onSelect={handleSelect}
           />
         </Grid>
@@ -187,7 +187,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs Category"
             owas_button_images={label_images_cat3}
-            selected_cat_images={owas_selected.CAT_LEGS?.name ?? null}
+            selected_feature_id={owas_selected.CAT_LEGS}
             onSelect={handleSelect}
           />
         </Grid>
@@ -196,7 +196,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_LOAD"
             title="Load Category"
             owas_button_images={label_images_cat4}
-            selected_cat_images={owas_selected.CAT_LOAD?.name ?? null}
+            selected_feature_id={owas_selected.CAT_LOAD}
             onSelect={handleSelect}
           />
         </Grid>

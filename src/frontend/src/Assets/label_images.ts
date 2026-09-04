@@ -219,6 +219,34 @@ export function get_label_all_label_images_llm(): ReadonlyMap<string, LabelImage
   return map;
 }
 
+const RULA_IMAGES_BY_CATEGORY: Readonly<Record<string, readonly LabelImage[]>> = {
+  CAT_UPPERARM: LABEL_IMAGES_RULA_CAT_UA,
+  CAT_LOWERARM: LABEL_IMAGES_RULA_CAT_LA,
+  CAT_WRIST: LABEL_IMAGES_RULA_CAT_W,
+  CAT_NECK: LABEL_IMAGES_RULA_CAT_N,
+  CAT_TRUNK: LABEL_IMAGES_RULA_CAT_T,
+  CAT_LEGS: LABEL_IMAGES_RULA_CAT_L,
+};
+
+const OWAS_IMAGES_BY_CATEGORY: Readonly<Record<string, readonly LabelImage[]>> = {
+  CAT_BACK: LABEL_IMAGES_CAT1_OWAS,
+  CAT_ARMS: LABEL_IMAGES_CAT2_OWAS,
+  CAT_LEGS: LABEL_IMAGES_CAT3_OWAS,
+  CAT_LOAD: LABEL_IMAGES_CAT4_OWAS,
+};
+
+export function get_label_image_by_feature_id(
+  ergo_method: string | undefined,
+  category: string,
+  feature_id: number,
+): LabelImage | undefined {
+  const images =
+    ergo_method?.toUpperCase() === 'OWAS'
+      ? OWAS_IMAGES_BY_CATEGORY[category]
+      : RULA_IMAGES_BY_CATEGORY[category];
+  return images?.[feature_id - 1];
+}
+
 // PLAYER IMAGES
 export const PLAY_BUTTON_IMAGE: LabelImage = {
   name: 'Play_Button',

@@ -1,16 +1,4 @@
-import type { ErgoLabel, LabelCategory, LabelFeature, LabelImage } from '@/domain/datatypes';
-import {
-  get_label_images_cat1_owas,
-  get_label_images_cat2_owas,
-  get_label_images_cat3_owas,
-  get_label_images_cat4_owas,
-  get_label_images_rula_cat_l,
-  get_label_images_rula_cat_la,
-  get_label_images_rula_cat_n,
-  get_label_images_rula_cat_t,
-  get_label_images_rula_cat_ua,
-  get_label_images_rula_cat_w,
-} from '@/Assets/label_images';
+import type { ErgoLabel, LabelCategory, LabelFeature } from '@/domain/datatypes';
 import { uid } from '@/domain/label_logic';
 import { api_get_base_url } from '@/utils/api_url';
 import { assert_response_ok, parse_record, read_string } from '@/api/api_response';
@@ -45,8 +33,6 @@ export type LabelsDownload = {
 type CategoryDefinition = {
   id: number;
   cat_name: string;
-  // internalName: string;
-  images: readonly LabelImage[];
 };
 
 const ENDPOINTS = {
@@ -61,19 +47,19 @@ function get_category_definition(ergoMethod: string, categoryName: string): Cate
 }
 
 const OWAS_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
-  { id: 1, cat_name: 'CAT_BACK', images: get_label_images_cat1_owas() },
-  { id: 2, cat_name: 'CAT_ARMS', images: get_label_images_cat2_owas() },
-  { id: 3, cat_name: 'CAT_LEGS', images: get_label_images_cat3_owas() },
-  { id: 4, cat_name: 'CAT_LOAD', images: get_label_images_cat4_owas() },
+  { id: 1, cat_name: 'CAT_BACK' },
+  { id: 2, cat_name: 'CAT_ARMS' },
+  { id: 3, cat_name: 'CAT_LEGS' },
+  { id: 4, cat_name: 'CAT_LOAD' },
 ];
 
 const RULA_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
-  { id: 1, cat_name: 'CAT_UPPERARM', images: get_label_images_rula_cat_ua() },
-  { id: 2, cat_name: 'CAT_LOWERARM', images: get_label_images_rula_cat_la() },
-  { id: 3, cat_name: 'CAT_WRIST', images: get_label_images_rula_cat_w() },
-  { id: 4, cat_name: 'CAT_NECK', images: get_label_images_rula_cat_n() },
-  { id: 5, cat_name: 'CAT_TRUNK', images: get_label_images_rula_cat_t() },
-  { id: 6, cat_name: 'CAT_LEGS', images: get_label_images_rula_cat_l() },
+  { id: 1, cat_name: 'CAT_UPPERARM' },
+  { id: 2, cat_name: 'CAT_LOWERARM' },
+  { id: 3, cat_name: 'CAT_WRIST' },
+  { id: 4, cat_name: 'CAT_NECK' },
+  { id: 5, cat_name: 'CAT_TRUNK' },
+  { id: 6, cat_name: 'CAT_LEGS' },
 ];
 
 function parse_labels(value: unknown): ErgoLabel[] {
@@ -108,9 +94,7 @@ function parse_labels(value: unknown): ErgoLabel[] {
         if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
           throw new Error(`Invalid label ${index + 1} feature ${featureIndex + 1}`);
         }
-        const image = definition.images[value - 1];
-        if (!image) throw new Error(`Unknown feature_id ${value} for category ${category.category}`);
-        return { id: value, name: image.name, image };
+        return { id: value };
       });
       return { id: definition.id, name: definition.cat_name, features };
     });
@@ -131,13 +115,9 @@ export async function save_labels(request: SaveLabelsRequest): Promise<SaveLabel
     start_frame: label.start_frame,
     end_frame: label.end_frame,
     categories: label.categories.map((category) => {
-      const definition = get_category_definition(label.ergo_method ?? '', category.name);
       return {
-        category: definition?.cat_name ?? category.name,
-        feature_id: category.features.map((feature) => {
-          const imageIndex = definition?.images.findIndex((image) => image.name === feature.image.name) ?? -1;
-          return imageIndex >= 0 ? imageIndex + 1 : feature.id;
-        }),
+        category: category.name,
+        feature_id: category.features.map((feature) => feature.id),
       };
     }),
   }));

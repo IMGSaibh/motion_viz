@@ -4,11 +4,7 @@ import type {
   ErgoLabel,
   LabelCategory,
   LabelFeature,
-  LabelImage,
-  OptionalsNeckAndTrunk,
-  OptionalsWrist,
   RulaFeatureSelection,
-  RulaOptionalsUpperArm,
 } from '@/domain/datatypes';
 import {
   can_save_for_range,
@@ -20,40 +16,15 @@ import type { RectangleLabelBar } from '@/domain/datatypes';
 import type { Range } from '@/domain/datatypes';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import {
-  get_label_images_rula_cat_n,
-  get_label_images_rula_cat_t,
-  get_label_images_rula_cat_ua,
-  get_label_images_rula_cat_w,
-} from '@/Assets/label_images';
-
-const RULA_UPPER_ARM_OPTIONALS: readonly RulaOptionalsUpperArm[] = ['Shoulder Raised', 'Leaning', 'Abducted'];
-const RULA_NECK_AND_TRUNK_OPTIONALS: readonly OptionalsNeckAndTrunk[] = ['Twist', 'Side-Bend'];
-const RULA_WRIST_OPTIONALS: readonly OptionalsWrist[] = ['Bent'];
-
-function createRulaFeatureSelection<TOptional extends string>(
-  features: readonly LabelFeature[],
-  optionalNames: readonly TOptional[],
-): RulaFeatureSelection<TOptional> {
+function createRulaFeatureSelection(features: readonly LabelFeature[]): RulaFeatureSelection {
   return {
-    feature: features.find((feature) => !optionalNames.includes(feature.name as TOptional))?.image ?? null,
-    optionals: features
-      .map((feature) => feature.name)
-      .filter((name): name is TOptional => optionalNames.includes(name as TOptional)),
+    feature_id: features[0]?.id ?? null,
+    optional_feature_ids: features.slice(1).map((feature) => feature.id),
   };
 }
 
-function getSelectedImages(
-  selection: RulaFeatureSelection<string>,
-  availableImages: readonly LabelImage[],
-): LabelImage[] {
-  return [
-    ...(selection.feature ? [selection.feature] : []),
-    ...selection.optionals.flatMap((name) => {
-      const image = availableImages.find((candidate) => candidate.name === name);
-      return image ? [image] : [];
-    }),
-  ];
+function getSelectedFeatureIds(selection: RulaFeatureSelection): number[] {
+  return [...(selection.feature_id ? [selection.feature_id] : []), ...selection.optional_feature_ids];
 }
 
 type FrameSliderLabelListContext = {
@@ -110,22 +81,22 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
         const neckFeatures = label.categories.find((category) => category.name === 'CAT_NECK')?.features ?? [];
         const trunkFeatures = label.categories.find((category) => category.name === 'CAT_TRUNK')?.features ?? [];
         const by_name = Object.fromEntries(
-          (label.categories ?? []).map((c) => [c.name, c.features[0]?.image]),
-        ) as Record<string, LabelImage | null>;
+          (label.categories ?? []).map((category) => [category.name, category.features[0]?.id ?? null]),
+        ) as Record<string, number | null>;
         set_rula_selected({
-          CAT_UPPERARM: createRulaFeatureSelection(upperArmFeatures, RULA_UPPER_ARM_OPTIONALS),
+          CAT_UPPERARM: createRulaFeatureSelection(upperArmFeatures),
           CAT_LOWERARM: by_name.CAT_LOWERARM ?? null,
-          CAT_WRIST: createRulaFeatureSelection(wristFeatures, RULA_WRIST_OPTIONALS),
-          CAT_NECK: createRulaFeatureSelection(neckFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
-          CAT_TRUNK: createRulaFeatureSelection(trunkFeatures, RULA_NECK_AND_TRUNK_OPTIONALS),
+          CAT_WRIST: createRulaFeatureSelection(wristFeatures),
+          CAT_NECK: createRulaFeatureSelection(neckFeatures),
+          CAT_TRUNK: createRulaFeatureSelection(trunkFeatures),
           CAT_LEGS: by_name.CAT_LEGS ?? null,
         });
       }
 
       if (label.ergo_method === 'OWAS') {
         const by_name = Object.fromEntries(
-          label.categories.map((category) => [category.name, category.features[0]?.image]),
-        ) as Record<string, LabelImage | null>;
+          label.categories.map((category) => [category.name, category.features[0]?.id ?? null]),
+        ) as Record<string, number | null>;
         set_owas_selected({
           CAT_BACK: by_name.CAT_BACK ?? null,
           CAT_ARMS: by_name.CAT_ARMS ?? null,
@@ -153,14 +124,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     });
     if (!ok) return;
 
-    const createCategory = (id: number, name: string, image: LabelImage | null): LabelCategory | null =>
-      image
-        ? {
-            id,
-            name,
-            features: [{ id: 1, name: image.name, image }],
-          }
-        : null;
+    const createCategory = (id: number, name: string, featureId: number | null): LabelCategory | null =>
+      featureId ? create_label_category_with_features(id, name, [featureId]) : null;
 
     const categories: LabelCategory[] | undefined =
       editingLabel.ergo_method === 'RULA'
@@ -168,23 +133,23 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
             create_label_category_with_features(
               1,
               'CAT_UPPERARM',
-              getSelectedImages(rula_selected.CAT_UPPERARM, get_label_images_rula_cat_ua()),
+              getSelectedFeatureIds(rula_selected.CAT_UPPERARM),
             ),
             createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
             create_label_category_with_features(
               3,
               'CAT_WRIST',
-              getSelectedImages(rula_selected.CAT_WRIST, get_label_images_rula_cat_w()),
+              getSelectedFeatureIds(rula_selected.CAT_WRIST),
             ),
             create_label_category_with_features(
               4,
               'CAT_NECK',
-              getSelectedImages(rula_selected.CAT_NECK, get_label_images_rula_cat_n()),
+              getSelectedFeatureIds(rula_selected.CAT_NECK),
             ),
             create_label_category_with_features(
               5,
               'CAT_TRUNK',
-              getSelectedImages(rula_selected.CAT_TRUNK, get_label_images_rula_cat_t()),
+              getSelectedFeatureIds(rula_selected.CAT_TRUNK),
             ),
             createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
           ].filter((category): category is LabelCategory => category !== null)

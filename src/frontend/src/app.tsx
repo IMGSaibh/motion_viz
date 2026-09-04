@@ -10,6 +10,7 @@ import { ContainerLabelButtons } from './container/container_label_buttons';
 import { FrameSliderContexProvider } from './context/context_frame_slider';
 import { ErgoMethodsContexProvider } from './context/contex_ergo_methods';
 import { ContainerKeyboardShortcuts } from '@/container/container_keyboard_shortcuts';
+import { RulaHotkeyProvider } from '@/context/context_rula_hotkeys';
 
 export default function App() {
   return (
@@ -21,20 +22,22 @@ export default function App() {
           <FrameSliderContexProvider>
             <ErgoMethodsContexProvider>
               <FrameSliderLabellistProvider>
-                <ContainerKeyboardShortcuts />
-                {/* Containers own orchestration; presenters and widgets remain focused on rendering. */}
-                <ContainerTopbar />
-                <Box
-                  sx={(theme) => ({
-                    position: 'absolute',
-                    width: '100%',
-                    bottom: '0vw',
-                  })}
-                >
-                  <ContainerFrameSlider />
-                  <ContainerLabelButtons />
-                  <ContainerLabelsList />
-                </Box>
+                <RulaHotkeyProvider>
+                  <ContainerKeyboardShortcuts />
+                  {/* Containers own orchestration; presenters and widgets remain focused on rendering. */}
+                  <ContainerTopbar />
+                  <Box
+                    sx={(theme) => ({
+                      position: 'absolute',
+                      width: '100%',
+                      bottom: '0vw',
+                    })}
+                  >
+                    <ContainerFrameSlider />
+                    <ContainerLabelButtons />
+                    <ContainerLabelsList />
+                  </Box>
+                </RulaHotkeyProvider>
               </FrameSliderLabellistProvider>
             </ErgoMethodsContexProvider>
           </FrameSliderContexProvider>
