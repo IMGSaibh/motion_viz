@@ -38,7 +38,7 @@ export function ContainerKeyboardShortcuts(): null {
   const clear_slider_label_list = use_clear_label_list_ctx();
   const add_slider_label = use_add_slider_label_ctx();
   const can_save_label = use_can_save_label_cxt();
-  const { rula_hotkey_state, set_rula_hotkey_state, hotkeyMode, set_hotkeyMode } = use_rula_hotkey_context();
+  const { rula_hotkey_state, set_rula_hotkey_state, hotkey_profile, set_hotkey_profile } = use_rula_hotkey_context();
   const { frame_count, go_to_frame, pause, play_pause, print_scene_components, reset_engine, stop } =
     use_three_js_engine_ctx();
 
@@ -46,14 +46,19 @@ export function ContainerKeyboardShortcuts(): null {
     function handle_key_down(event: KeyboardEvent): void {
       if (
         event.code === 'Tab' &&
-        (hotkeyMode === HotkeyProfile.PLAY_PROFILE || rula_hotkey_state.context === RulaHotkeyContext.ROOT)
+        (hotkey_profile === HotkeyProfile.PLAY_PROFILE || rula_hotkey_state.context === RulaHotkeyContext.ROOT)
       ) {
         event.preventDefault();
-        set_hotkeyMode(toggle_hotkey_profile(hotkeyMode));
+        set_hotkey_profile(toggle_hotkey_profile(hotkey_profile));
         return;
       }
 
-      if (hotkeyMode === HotkeyProfile.RULA_PROFILE) {
+      if (event.code === 'Escape') {
+        event.preventDefault();
+        set_range(null);
+      }
+
+      if (hotkey_profile === HotkeyProfile.RULA_PROFILE) {
         const rula_command = resolve_rula_hotkey_command(rula_hotkey_state, event.code);
         if (rula_command) {
           event.preventDefault();
@@ -123,11 +128,6 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'KeyD') {
         event.preventDefault();
         print_scene_components();
-      }
-
-      if (event.code === 'Escape') {
-        event.preventDefault();
-        set_range(null);
       }
 
       if (event.code === 'KeyP') {
@@ -215,7 +215,7 @@ export function ContainerKeyboardShortcuts(): null {
     play_pause,
     print_scene_components,
     range,
-    hotkeyMode,
+    hotkey_profile,
     rula_hotkey_state,
     rula_selected,
     reset_engine,
@@ -225,7 +225,7 @@ export function ContainerKeyboardShortcuts(): null {
     set_range,
     set_rula_selected,
     set_rula_hotkey_state,
-    set_hotkeyMode,
+    set_hotkey_profile,
     stop,
   ]);
 

@@ -5,17 +5,24 @@ import { HotkeyProfile, INITIAL_HOTKEY_PROFILE } from '@/domain/hotkey_profile';
 type RulaHotkeyContextValue = {
   rula_hotkey_state: RulaHotkeyState;
   set_rula_hotkey_state: React.Dispatch<React.SetStateAction<RulaHotkeyState>>;
-  hotkeyMode: HotkeyProfile;
-  set_hotkeyMode: React.Dispatch<React.SetStateAction<HotkeyProfile>>;
+  hotkey_profile: HotkeyProfile;
+  set_hotkey_profile: React.Dispatch<React.SetStateAction<HotkeyProfile>>;
 };
 
 const rula_hotkey_context = createContext<RulaHotkeyContextValue | null>(null);
 
 export function RulaHotkeyProvider({ children }: { children: React.ReactNode }) {
   const [rula_hotkey_state, set_rula_hotkey_state] = useState<RulaHotkeyState>(INITIAL_RULA_HOTKEY_STATE);
-  const [hotkeyMode, set_hotkeyMode] = useState<HotkeyProfile>(INITIAL_HOTKEY_PROFILE);
+  const [hotkey_profile, set_hotkey_profile] = useState<HotkeyProfile>(INITIAL_HOTKEY_PROFILE);
   return (
-    <rula_hotkey_context.Provider value={{ rula_hotkey_state, set_rula_hotkey_state, hotkeyMode, set_hotkeyMode }}>
+    <rula_hotkey_context.Provider
+      value={{
+        rula_hotkey_state,
+        set_rula_hotkey_state,
+        hotkey_profile,
+        set_hotkey_profile,
+      }}
+    >
       {children}
     </rula_hotkey_context.Provider>
   );

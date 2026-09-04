@@ -22,7 +22,7 @@ export function ContainerFrameSlider() {
 
   const { frame_slider_value, is_review_rending_active, range, set_frame_slider_value, set_range } =
     use_frame_slider_context();
-  const { hotkeyMode } = use_rula_hotkey_context();
+  const { hotkey_profile } = use_rula_hotkey_context();
 
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -90,10 +90,10 @@ export function ContainerFrameSlider() {
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
       frame_slider_drag_start_reference.current =
-        e.button === 0 && hotkeyMode === HotkeyProfile.RULA_PROFILE ? frame : null;
+        e.button === 0 && hotkey_profile === HotkeyProfile.RULA_PROFILE ? frame : null;
       update_slider_track_frame_tick(frame);
     },
-    [frame_count, compute_slider_track_frame, hotkeyMode, update_slider_track_frame_tick],
+    [frame_count, compute_slider_track_frame, hotkey_profile, update_slider_track_frame_tick],
   );
 
   const on_mouse_move_slider_track = useCallback(
@@ -105,7 +105,7 @@ export function ContainerFrameSlider() {
         update_slider_track_frame_tick(frame_idx);
         const drag_start_frame = frame_slider_drag_start_reference.current;
         if (
-          hotkeyMode === HotkeyProfile.RULA_PROFILE &&
+          hotkey_profile === HotkeyProfile.RULA_PROFILE &&
           (e.buttons & 1) !== 0 &&
           drag_start_frame !== null &&
           frame_idx !== drag_start_frame
@@ -146,7 +146,7 @@ export function ContainerFrameSlider() {
       frame_count,
       compute_slider_track_frame,
       update_slider_track_frame_tick,
-      hotkeyMode,
+      hotkey_profile,
       set_range,
       get_thumbnail_for_frame,
       is_review_rending_active,
