@@ -58,6 +58,32 @@ export function ContainerKeyboardShortcuts(): null {
         set_range(null);
       }
 
+      if (hotkey_profile === HotkeyProfile.RULA_PROFILE && range && frame_count) {
+        const last_frame = Math.max(0, frame_count - 1);
+
+        if (event.code === 'ArrowLeft') {
+          event.preventDefault();
+          const next_frame = event.ctrlKey ? Math.max(range[0], range[1] - 1) : Math.max(0, range[0] - 1);
+          const next_range = event.ctrlKey ? [range[0], next_frame] : [next_frame, range[1]];
+          set_range(next_range as [number, number]);
+          pause();
+          set_frame_slider_value(next_frame);
+          go_to_frame(next_frame);
+          return;
+        }
+
+        if (event.code === 'ArrowRight') {
+          event.preventDefault();
+          const next_frame = event.ctrlKey ? Math.min(range[1], range[0] + 1) : Math.min(last_frame, range[1] + 1);
+          const next_range = event.ctrlKey ? [next_frame, range[1]] : [range[0], next_frame];
+          set_range(next_range as [number, number]);
+          pause();
+          set_frame_slider_value(next_frame);
+          go_to_frame(next_frame);
+          return;
+        }
+      }
+
       if (hotkey_profile === HotkeyProfile.RULA_PROFILE) {
         const rula_command = resolve_rula_hotkey_command(rula_hotkey_state, event.code);
         if (rula_command) {
