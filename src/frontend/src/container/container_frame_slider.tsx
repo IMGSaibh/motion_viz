@@ -1,4 +1,6 @@
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
+import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
+import { HotkeyProfile } from '@/domain/hotkey_profile';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { PresenterFrameSlider } from '@/components/presenter/presenter_frame_slider';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
@@ -15,9 +17,12 @@ export function ContainerFrameSlider() {
   // The container translates browser input into engine commands and serializable UI state.
   const frame_slider_track_reference = useRef<HTMLDivElement | null>(null);
   const frame_slider_track_scrubbing_reference = useRef(false);
+  const frame_slider_drag_start_reference = useRef<number | null>(null);
   const [frame_slider_track_hovered_frame, set_frame_slider_track_hovered_frame] = useState<number | null>(null);
 
-  const { frame_slider_value, is_review_rending_active, range, set_frame_slider_value } = use_frame_slider_context();
+  const { frame_slider_value, is_review_rending_active, range, set_frame_slider_value, set_range } =
+    use_frame_slider_context();
+  const { hotkeyMode } = use_rula_hotkey_context();
 
   const preview_render_img_ref = useRef<HTMLImageElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -84,10 +89,11 @@ export function ContainerFrameSlider() {
       if (!frame_count) return;
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
+      frame_slider_drag_start_reference.current =
+        e.button === 0 && hotkeyMode === HotkeyProfile.RULA_PROFILE ? frame : null;
       update_slider_track_frame_tick(frame);
-      // pause();
     },
-    [frame_count, compute_slider_track_frame, update_slider_track_frame_tick, is_playing, pause],
+    [frame_count, compute_slider_track_frame, hotkeyMode, update_slider_track_frame_tick],
   );
 
   const on_mouse_move_slider_track = useCallback(
@@ -97,6 +103,15 @@ export function ContainerFrameSlider() {
       set_frame_slider_track_hovered_frame(frame_idx);
       if (frame_slider_track_scrubbing_reference.current) {
         update_slider_track_frame_tick(frame_idx);
+        const drag_start_frame = frame_slider_drag_start_reference.current;
+        if (
+          hotkeyMode === HotkeyProfile.RULA_PROFILE &&
+          (e.buttons & 1) !== 0 &&
+          drag_start_frame !== null &&
+          frame_idx !== drag_start_frame
+        ) {
+          set_range([Math.min(drag_start_frame, frame_idx), Math.max(drag_start_frame, frame_idx)]);
+        }
       }
 
       if (!is_review_rending_active) return;
@@ -131,6 +146,8 @@ export function ContainerFrameSlider() {
       frame_count,
       compute_slider_track_frame,
       update_slider_track_frame_tick,
+      hotkeyMode,
+      set_range,
       get_thumbnail_for_frame,
       is_review_rending_active,
     ],
@@ -138,10 +155,12 @@ export function ContainerFrameSlider() {
 
   const on_mouse_up_slider_track = useCallback(() => {
     frame_slider_track_scrubbing_reference.current = false;
+    frame_slider_drag_start_reference.current = null;
   }, []);
 
   const on_mouse_leave_slider_track = useCallback(() => {
     frame_slider_track_scrubbing_reference.current = false;
+    frame_slider_drag_start_reference.current = null;
     set_frame_slider_track_hovered_frame(null);
     if (preview_render_img_ref.current) {
       preview_render_img_ref.current.style.display = 'none';

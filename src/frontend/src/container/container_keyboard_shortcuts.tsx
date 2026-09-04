@@ -130,16 +130,6 @@ export function ContainerKeyboardShortcuts(): null {
         set_range(null);
       }
 
-      if (event.code === 'KeyA') {
-        event.preventDefault();
-        set_range([frame_slider_value, range?.[1] ?? frame_slider_value]);
-      }
-
-      if (event.code === 'KeyE') {
-        event.preventDefault();
-        set_range([range?.[0] ?? frame_slider_value, frame_slider_value]);
-      }
-
       if (event.code === 'KeyP') {
         event.preventDefault();
         set_is_review_rending_active((is_active) => !is_active);
