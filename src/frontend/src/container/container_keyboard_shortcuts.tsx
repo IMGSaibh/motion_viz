@@ -39,7 +39,7 @@ export function ContainerKeyboardShortcuts(): null {
   const add_slider_label = use_add_slider_label_ctx();
   const can_save_label = use_can_save_label_cxt();
   const { rula_hotkey_state, set_rula_hotkey_state, hotkey_profile, set_hotkey_profile } = use_rula_hotkey_context();
-  const { frame_count, go_to_frame, pause, play_pause, print_scene_components, reset_engine, stop } =
+  const { frame_count, go_to_frame, pause, play_pause, print_scene_components, reset_engine, set_selected_motion, stop } =
     use_three_js_engine_ctx();
 
   useEffect(() => {
@@ -123,6 +123,7 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'KeyR') {
         event.preventDefault();
         reset_engine();
+        set_selected_motion(null);
         set_frame_slider_value(0);
         set_range(null);
         clear_slider_label_list();
@@ -245,6 +246,7 @@ export function ContainerKeyboardShortcuts(): null {
     rula_hotkey_state,
     rula_selected,
     reset_engine,
+    set_selected_motion,
     set_frame_slider_value,
     set_is_review_rending_active,
     set_owas_selected,
