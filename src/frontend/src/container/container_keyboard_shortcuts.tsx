@@ -64,6 +64,30 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'Escape') {
         event.preventDefault();
         set_range(null);
+
+        if (hotkey_profile === HotkeyProfile.RULA_PROFILE && rula_hotkey_state.context !== RulaHotkeyContext.ROOT) {
+          const active_category = rula_hotkey_state.context;
+          switch (active_category) {
+            case 'CAT_UPPERARM':
+              set_rula_selected({ ...rula_selected, CAT_UPPERARM: { feature_id: null, optional_feature_ids: [] } });
+              break;
+            case 'CAT_LOWERARM':
+              set_rula_selected({ ...rula_selected, CAT_LOWERARM: null });
+              break;
+            case 'CAT_WRIST':
+              set_rula_selected({ ...rula_selected, CAT_WRIST: { feature_id: null, optional_feature_ids: [] } });
+              break;
+            case 'CAT_NECK':
+              set_rula_selected({ ...rula_selected, CAT_NECK: { feature_id: null, optional_feature_ids: [] } });
+              break;
+            case 'CAT_TRUNK':
+              set_rula_selected({ ...rula_selected, CAT_TRUNK: { feature_id: null, optional_feature_ids: [] } });
+              break;
+            case 'CAT_LEGS':
+              set_rula_selected({ ...rula_selected, CAT_LEGS: null });
+              break;
+          }
+        }
       }
 
       if (event.code === 'Space') {

@@ -185,19 +185,22 @@ export function WidgetRulaButtons(props: Props) {
     category: RulaCategory,
     available_images: readonly LabelImage[],
     committed: readonly string[],
-  ): readonly string[] =>
-    hotkey_state.context === category
-      ? [
-          ...(hotkey_state.pending_primary_index === null
-            ? []
-            : [available_images[hotkey_state.pending_primary_index]?.name].filter(
-                (name): name is string => name !== undefined,
-              )),
-          ...hotkey_state.pending_optional_indices
-            .map((index) => available_images[index]?.name)
-            .filter((name): name is string => name !== undefined),
-        ]
-      : committed;
+  ): readonly string[] => {
+    if (hotkey_state.context !== category) return committed;
+
+    const pending = [
+      ...(hotkey_state.pending_primary_index === null
+        ? []
+        : [available_images[hotkey_state.pending_primary_index]?.name].filter(
+            (name): name is string => name !== undefined,
+          )),
+      ...hotkey_state.pending_optional_indices
+        .map((index) => available_images[index]?.name)
+        .filter((name): name is string => name !== undefined),
+    ];
+
+    return pending.length > 0 ? pending : committed;
+  };
 
   const handleSelect = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
     if (cat === 'CAT_UPPERARM' && isOptional) {
@@ -258,23 +261,11 @@ export function WidgetRulaButtons(props: Props) {
     if (!canSaveRula) return;
 
     const categories: LabelCategory[] = [
-      create_label_category_with_features(
-        1,
-        'CAT_UPPERARM',
-        getSelectedFeatureIds(rula_selected.CAT_UPPERARM),
-      ),
+      create_label_category_with_features(1, 'CAT_UPPERARM', getSelectedFeatureIds(rula_selected.CAT_UPPERARM)),
       create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM!),
-      create_label_category_with_features(
-        3,
-        'CAT_WRIST',
-        getSelectedFeatureIds(rula_selected.CAT_WRIST),
-      ),
+      create_label_category_with_features(3, 'CAT_WRIST', getSelectedFeatureIds(rula_selected.CAT_WRIST)),
       create_label_category_with_features(4, 'CAT_NECK', getSelectedFeatureIds(rula_selected.CAT_NECK)),
-      create_label_category_with_features(
-        5,
-        'CAT_TRUNK',
-        getSelectedFeatureIds(rula_selected.CAT_TRUNK),
-      ),
+      create_label_category_with_features(5, 'CAT_TRUNK', getSelectedFeatureIds(rula_selected.CAT_TRUNK)),
       create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS!),
     ];
 
