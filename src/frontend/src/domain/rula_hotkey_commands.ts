@@ -100,8 +100,10 @@ export function resolve_rula_hotkey_command(state: RulaHotkeyState, code: string
 
   const config = RULA_CATEGORY_COMMANDS.find((candidate) => candidate.category === state.context);
   if (!config) return null;
-  if (code === 'Tab' && config.optional_count) return { type: RulaHotkeyCommandType.ENABLE_OPTIONALS };
   if (code === 'Enter') {
+    if (state.feature_mode === RulaFeatureMode.PRIMARY && config.optional_count) {
+      return { type: RulaHotkeyCommandType.ENABLE_OPTIONALS };
+    }
     return { type: RulaHotkeyCommandType.COMMIT_CATEGORY, next_context: config.next_context };
   }
 
@@ -126,7 +128,14 @@ export function transition_rula_hotkey_state(state: RulaHotkeyState, command: Ru
         pending_optional_indices: [],
       };
     case RulaHotkeyCommandType.SELECT_FEATURE:
-      if (!command.optional) return { ...state, pending_primary_index: command.feature_index };
+      if (!command.optional) {
+        const config = RULA_CATEGORY_COMMANDS.find((candidate) => candidate.category === state.context);
+        return {
+          ...state,
+          feature_mode: config?.optional_count ? RulaFeatureMode.OPTIONAL : RulaFeatureMode.PRIMARY,
+          pending_primary_index: command.feature_index,
+        };
+      }
       return {
         ...state,
         pending_optional_indices: state.pending_optional_indices.includes(command.feature_index)
@@ -146,14 +155,21 @@ export function transition_rula_hotkey_state(state: RulaHotkeyState, command: Ru
     case RulaHotkeyCommandType.COMMIT_LABEL:
       return { ...INITIAL_RULA_HOTKEY_STATE };
     case RulaHotkeyCommandType.BACK:
-      return state.context === RulaHotkeyContext.ROOT
-        ? { ...INITIAL_RULA_HOTKEY_STATE }
-        : {
-            ...state,
-            context: RulaHotkeyContext.ROOT,
-            feature_mode: RulaFeatureMode.PRIMARY,
-            pending_primary_index: null,
-            pending_optional_indices: [],
-          };
+      if (state.context === RulaHotkeyContext.ROOT) return { ...INITIAL_RULA_HOTKEY_STATE };
+      if (state.feature_mode === RulaFeatureMode.OPTIONAL) {
+        return {
+          ...state,
+          feature_mode: RulaFeatureMode.PRIMARY,
+          pending_primary_index: null,
+          pending_optional_indices: [],
+        };
+      }
+      return {
+        ...state,
+        context: RulaHotkeyContext.ROOT,
+        feature_mode: RulaFeatureMode.PRIMARY,
+        pending_primary_index: null,
+        pending_optional_indices: [],
+      };
   }
 }

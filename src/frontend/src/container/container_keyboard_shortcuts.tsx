@@ -16,6 +16,7 @@ import {
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 import {
   INITIAL_RULA_HOTKEY_STATE,
+  RulaFeatureMode,
   RulaHotkeyCommandType,
   RulaHotkeyContext,
   resolve_rula_hotkey_command,
@@ -63,7 +64,6 @@ export function ContainerKeyboardShortcuts(): null {
 
       if (event.code === 'Escape') {
         event.preventDefault();
-        set_range(null);
 
         if (hotkey_profile === HotkeyProfile.RULA_PROFILE && rula_hotkey_state.context !== RulaHotkeyContext.ROOT) {
           const active_category = rula_hotkey_state.context;
@@ -130,9 +130,48 @@ export function ContainerKeyboardShortcuts(): null {
           if (
             rula_command.type === RulaHotkeyCommandType.COMMIT_CATEGORY &&
             rula_hotkey_state.context !== RulaHotkeyContext.ROOT &&
-            !commit_rula_category(rula_hotkey_state.context)
+            (() => {
+              const committed_selection = commit_rula_category(rula_hotkey_state.context);
+              if (!committed_selection) return true;
+
+              if (
+                rula_command.next_context === RulaHotkeyContext.ROOT &&
+                is_complete_rula_selection(committed_selection) &&
+                can_save_label('RULA', range ?? [frame_slider_value, frame_slider_value])
+              ) {
+                commit_rula_label(committed_selection);
+              }
+              return false;
+            })()
           ) {
             return;
+          }
+
+          if (
+            rula_command.type === RulaHotkeyCommandType.BACK &&
+            rula_hotkey_state.context !== RulaHotkeyContext.ROOT &&
+            rula_hotkey_state.feature_mode === RulaFeatureMode.OPTIONAL
+          ) {
+            switch (rula_hotkey_state.context) {
+              case 'CAT_UPPERARM':
+                set_rula_selected({ ...rula_selected, CAT_UPPERARM: { feature_id: null, optional_feature_ids: [] } });
+                break;
+              case 'CAT_LOWERARM':
+                set_rula_selected({ ...rula_selected, CAT_LOWERARM: null });
+                break;
+              case 'CAT_WRIST':
+                set_rula_selected({ ...rula_selected, CAT_WRIST: { feature_id: null, optional_feature_ids: [] } });
+                break;
+              case 'CAT_NECK':
+                set_rula_selected({ ...rula_selected, CAT_NECK: { feature_id: null, optional_feature_ids: [] } });
+                break;
+              case 'CAT_TRUNK':
+                set_rula_selected({ ...rula_selected, CAT_TRUNK: { feature_id: null, optional_feature_ids: [] } });
+                break;
+              case 'CAT_LEGS':
+                set_rula_selected({ ...rula_selected, CAT_LEGS: null });
+                break;
+            }
           }
 
           if (rula_command.type === RulaHotkeyCommandType.COMMIT_LABEL && !commit_rula_label()) {
@@ -198,57 +237,59 @@ export function ContainerKeyboardShortcuts(): null {
 
     function commit_rula_category(
       category: Exclude<typeof rula_hotkey_state.context, RulaHotkeyContext.ROOT>,
-    ): boolean {
+    ): RulaSelection | null {
       const primary =
         rula_hotkey_state.pending_primary_index === null ? null : rula_hotkey_state.pending_primary_index + 1;
       const optionals = rula_hotkey_state.pending_optional_indices.map((index) => index + 1);
-      if (!primary) return false;
+      if (!primary) return null;
 
-      set_rula_selected(
-        (() => {
-          switch (category) {
-            case 'CAT_UPPERARM':
-              return { ...rula_selected, CAT_UPPERARM: { feature_id: primary, optional_feature_ids: optionals } };
-            case 'CAT_WRIST':
-              return { ...rula_selected, CAT_WRIST: { feature_id: primary, optional_feature_ids: optionals } };
-            case 'CAT_NECK':
-              return { ...rula_selected, CAT_NECK: { feature_id: primary, optional_feature_ids: optionals } };
-            case 'CAT_TRUNK':
-              return { ...rula_selected, CAT_TRUNK: { feature_id: primary, optional_feature_ids: optionals } };
-            case 'CAT_LOWERARM':
-              return { ...rula_selected, CAT_LOWERARM: primary };
-            case 'CAT_LEGS':
-              return { ...rula_selected, CAT_LEGS: primary };
-          }
-        })() as RulaSelection,
-      );
-      return true;
+      const next_selection: RulaSelection = (() => {
+        switch (category) {
+          case 'CAT_UPPERARM':
+            return { ...rula_selected, CAT_UPPERARM: { feature_id: primary, optional_feature_ids: optionals } };
+          case 'CAT_WRIST':
+            return { ...rula_selected, CAT_WRIST: { feature_id: primary, optional_feature_ids: optionals } };
+          case 'CAT_NECK':
+            return { ...rula_selected, CAT_NECK: { feature_id: primary, optional_feature_ids: optionals } };
+          case 'CAT_TRUNK':
+            return { ...rula_selected, CAT_TRUNK: { feature_id: primary, optional_feature_ids: optionals } };
+          case 'CAT_LOWERARM':
+            return { ...rula_selected, CAT_LOWERARM: primary };
+          case 'CAT_LEGS':
+            return { ...rula_selected, CAT_LEGS: primary };
+        }
+      })();
+      set_rula_selected(next_selection);
+      return next_selection;
     }
 
-    function commit_rula_label(): boolean {
+    function is_complete_rula_selection(selection: RulaSelection): boolean {
+      return Boolean(
+        selection.CAT_UPPERARM.feature_id &&
+        selection.CAT_LOWERARM &&
+        selection.CAT_WRIST.feature_id &&
+        selection.CAT_NECK.feature_id &&
+        selection.CAT_TRUNK.feature_id &&
+        selection.CAT_LEGS,
+      );
+    }
+
+    function commit_rula_label(selection = rula_selected): boolean {
       const effective_range = range ?? [frame_slider_value, frame_slider_value];
       if (!can_save_label('RULA', effective_range)) return false;
-      if (
-        !rula_selected.CAT_UPPERARM.feature_id ||
-        !rula_selected.CAT_LOWERARM ||
-        !rula_selected.CAT_WRIST.feature_id ||
-        !rula_selected.CAT_NECK.feature_id ||
-        !rula_selected.CAT_TRUNK.feature_id ||
-        !rula_selected.CAT_LEGS
-      )
-        return false;
+      if (!is_complete_rula_selection(selection)) return false;
 
       const selected_feature_ids = (selection: typeof rula_selected.CAT_UPPERARM): number[] => [
         selection.feature_id!,
         ...selection.optional_feature_ids,
       ];
       const categories: LabelCategory[] = [
-        create_label_category_with_features(1, 'CAT_UPPERARM', selected_feature_ids(rula_selected.CAT_UPPERARM)),
-        create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
-        create_label_category_with_features(3, 'CAT_WRIST', selected_feature_ids(rula_selected.CAT_WRIST)),
-        create_label_category_with_features(4, 'CAT_NECK', selected_feature_ids(rula_selected.CAT_NECK)),
-        create_label_category_with_features(5, 'CAT_TRUNK', selected_feature_ids(rula_selected.CAT_TRUNK)),
-        create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
+        create_label_category_with_features(1, 'CAT_UPPERARM', selected_feature_ids(selection.CAT_UPPERARM)),
+        create_label_category(2, 'CAT_LOWERARM', selection.CAT_LOWERARM!),
+        create_label_category_with_features(3, 'CAT_WRIST', selected_feature_ids(selection.CAT_WRIST)),
+        create_label_category_with_features(4, 'CAT_NECK', selected_feature_ids(selection.CAT_NECK)),
+        create_label_category_with_features(5, 'CAT_TRUNK', selected_feature_ids(selection.CAT_TRUNK)),
+        create_label_category(6, 'CAT_LEGS', selection.CAT_LEGS!),
       ];
       add_slider_label({
         id: uid(),
