@@ -35,7 +35,7 @@ export function uid() {
 }
 
 export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  return aFrom < bTo && aTo > bFrom;
+  return aFrom <= bTo && aTo >= bFrom;
 }
 
 export function can_save_for_range(args: {
@@ -51,7 +51,7 @@ export function can_save_for_range(args: {
     if (args.id && label.id === args.id) return false;
     const mf = Math.min(label.start_frame, label.end_frame);
     const mt = Math.max(label.start_frame, label.end_frame);
-    return fromN < mt && toN > mf;
+    return overlaps(fromN, toN, mf, mt);
   });
 
   return !hasOverlapSameCategory;
