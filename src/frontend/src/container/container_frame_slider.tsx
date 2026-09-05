@@ -89,6 +89,7 @@ export function ContainerFrameSlider() {
       if (!frame_count) return;
       frame_slider_track_scrubbing_reference.current = true;
       const frame = compute_slider_track_frame(e.clientX);
+      set_range(null);
       frame_slider_drag_start_reference.current =
         e.button === 0 && hotkey_profile === HotkeyProfile.RULA_PROFILE ? frame : null;
       update_slider_track_frame_tick(frame);
