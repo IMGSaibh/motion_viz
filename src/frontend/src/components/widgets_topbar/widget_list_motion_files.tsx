@@ -1,6 +1,7 @@
-import Select from '@mui/material/Select';
+import { useState } from 'react';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
 type Props = {
@@ -18,27 +19,40 @@ type Props = {
  * belong in this widget.
  */
 export function WidgetListFiles(props: Props) {
+  const [menu_anchor, set_menu_anchor] = useState<null | HTMLElement>(null);
+  const is_menu_open = Boolean(menu_anchor);
+
+  function handle_open(event: React.MouseEvent<HTMLButtonElement>) {
+    set_menu_anchor(event.currentTarget);
+    props.motion_file_list_on_open();
+  }
+
+  function handle_select(filename: string) {
+    set_menu_anchor(null);
+    props.motion_file_list_on_select(filename);
+  }
+
   return (
     <FormControl fullWidth size="small">
-      <InputLabel shrink>{'Selected file'}</InputLabel>
-      <Select
-        value={props.motion_file_selected || ''}
-        label={props.motion_file_selected}
-        onOpen={props.motion_file_list_on_open}
+      <Button
+        variant="outlined"
+        onClick={handle_open}
+        aria-haspopup="menu"
+        aria-expanded={is_menu_open ? 'true' : undefined}
+        sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
       >
-        <MenuItem value="" onClick={() => props.motion_file_list_on_select('')}>
+        {props.motion_file_selected || 'Select file'}
+      </Button>
+      <Menu anchorEl={menu_anchor} open={is_menu_open} onClose={() => set_menu_anchor(null)}>
+        <MenuItem onClick={() => handle_select('')}>
           <em>Select file</em>
         </MenuItem>
         {props.motion_files.map((file_obj) => (
-          <MenuItem
-            key={file_obj.name}
-            value={file_obj.name}
-            onClick={() => props.motion_file_list_on_select(file_obj.name)}
-          >
+          <MenuItem key={file_obj.name} onClick={() => handle_select(file_obj.name)}>
             [{file_obj.type.toUpperCase()}] {file_obj.name}
           </MenuItem>
         ))}
-      </Select>
+      </Menu>
     </FormControl>
   );
 }
