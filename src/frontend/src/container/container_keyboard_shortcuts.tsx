@@ -66,6 +66,12 @@ export function ContainerKeyboardShortcuts(): null {
         set_range(null);
       }
 
+      if (event.code === 'Space') {
+        event.preventDefault();
+        play_pause();
+        return;
+      }
+
       if (hotkey_profile === HotkeyProfile.RULA_PROFILE && range && frame_count) {
         const last_frame = Math.max(0, frame_count - 1);
 
@@ -114,11 +120,6 @@ export function ContainerKeyboardShortcuts(): null {
         }
 
         return;
-      }
-
-      if (event.code === 'Space') {
-        event.preventDefault();
-        play_pause();
       }
 
       if (event.code === 'KeyS') {

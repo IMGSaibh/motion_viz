@@ -8,7 +8,7 @@ export const HOTKEY_PROFILE: Readonly<Record<HotkeyProfile, string>> = {
   [HotkeyProfile.RULA_PROFILE]: 'Profile: RULA',
 };
 
-export const INITIAL_HOTKEY_PROFILE: HotkeyProfile = HotkeyProfile.PLAY_PROFILE;
+export const INITIAL_HOTKEY_PROFILE: HotkeyProfile = HotkeyProfile.RULA_PROFILE;
 
 export function toggle_hotkey_profile(hotkey_profile: HotkeyProfile): HotkeyProfile {
   return hotkey_profile === HotkeyProfile.PLAY_PROFILE ? HotkeyProfile.RULA_PROFILE : HotkeyProfile.PLAY_PROFILE;
