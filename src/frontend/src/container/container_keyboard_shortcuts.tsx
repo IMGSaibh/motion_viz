@@ -6,6 +6,11 @@ import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 import { HotkeyProfile, toggle_hotkey_profile } from '@/domain/hotkey_profile';
+import {
+  apply_rula_hotkey_command,
+  INITIAL_RULA_HOTKEY_STATE,
+  resolve_rula_hotkey,
+} from '@/domain/rula_hotkey_commands';
 
 /**
  * Orchestrates application-wide keyboard commands between shared contexts and the Three.js engine.
@@ -19,7 +24,8 @@ export function ContainerKeyboardShortcuts(): null {
     use_frame_slider_context();
   const { rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
-  const { hotkey_profile, set_hotkey_profile } = use_rula_hotkey_context();
+  const { hotkey_profile, set_hotkey_profile, rula_hotkey_state, set_rula_hotkey_state, set_rula_save_requested } =
+    use_rula_hotkey_context();
   const {
     frame_count,
     go_to_frame,
@@ -36,6 +42,7 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'Tab') {
         event.preventDefault();
         set_hotkey_profile(toggle_hotkey_profile(hotkey_profile));
+        set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
         return;
       }
 
@@ -43,6 +50,30 @@ export function ContainerKeyboardShortcuts(): null {
         event.preventDefault();
         play_pause();
         return;
+      }
+
+      if (hotkey_profile === HotkeyProfile.RULA_PROFILE) {
+        const result = resolve_rula_hotkey(rula_hotkey_state, {
+          key: event.key,
+          code: event.code,
+        });
+        if (result.command?.type === 'save') {
+          event.preventDefault();
+          set_rula_save_requested(true);
+          set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
+          return;
+        }
+        if (result.command?.type === 'select-primary' || result.command?.type === 'toggle-optional') {
+          event.preventDefault();
+          set_rula_selected(apply_rula_hotkey_command(rula_selected, result.command));
+          set_rula_hotkey_state(result.state);
+          return;
+        }
+        if (result.command?.type === 'select-category' || result.command?.type === 'reset') {
+          event.preventDefault();
+          set_rula_hotkey_state(result.state);
+          return;
+        }
       }
 
       if (hotkey_profile === HotkeyProfile.RULA_PROFILE && range && frame_count) {
@@ -85,6 +116,7 @@ export function ContainerKeyboardShortcuts(): null {
         set_frame_slider_value(0);
         set_range(null);
         clear_slider_label_list();
+        set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
         set_rula_selected(create_empty_rula_selection());
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
@@ -140,6 +172,9 @@ export function ContainerKeyboardShortcuts(): null {
     set_owas_selected,
     set_range,
     set_rula_selected,
+    rula_hotkey_state,
+    set_rula_hotkey_state,
+    set_rula_save_requested,
     set_hotkey_profile,
     stop,
   ]);

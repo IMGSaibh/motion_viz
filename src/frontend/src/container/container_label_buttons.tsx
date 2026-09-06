@@ -4,12 +4,14 @@ import {
   create_label_category_with_features,
   uid,
 } from '@/domain/label_logic';
+import { useEffect } from 'react';
 import { use_add_slider_label_ctx } from '@/context/context_slider_label_list';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import type { ErgoLabel, RulaCategory, LabelCategory, OwasCategory } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 
 type RulaOptionalCategory = 'CAT_UPPERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK';
 
@@ -30,6 +32,7 @@ export function ContainerLabelButtons() {
   const { range, frame_slider_value, set_range } = use_frame_slider_context();
   const effectiveRange = range ?? [frame_slider_value, frame_slider_value];
   const can_save_label = use_can_save_label_cxt();
+  const { rula_save_requested, set_rula_save_requested } = use_rula_hotkey_context();
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
@@ -56,6 +59,14 @@ export function ContainerLabelButtons() {
             ? selection.optional_feature_ids.filter((id) => id !== featureId)
             : [...selection.optional_feature_ids, featureId],
         },
+      });
+      return;
+    }
+
+    if (isRulaOptionalCategory(cat)) {
+      set_rula_selected({
+        ...rula_selected,
+        [cat]: { ...rula_selected[cat], feature_id: featureId },
       });
       return;
     }
@@ -97,6 +108,12 @@ export function ContainerLabelButtons() {
     set_range(null);
     set_rula_selected(create_empty_rula_selection());
   };
+
+  useEffect(() => {
+    if (!rula_save_requested) return;
+    set_rula_save_requested(false);
+    on_rula_save_label();
+  }, [rula_save_requested, set_rula_save_requested, on_rula_save_label]);
 
   // saves category and feature selections to the container state, which is used to construct a label when the user clicks "Save"
   const on_owas_select = (cat: OwasCategory, featureId: number) => {

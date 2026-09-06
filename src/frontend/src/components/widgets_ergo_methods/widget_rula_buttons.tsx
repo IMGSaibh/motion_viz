@@ -9,7 +9,9 @@ import {
   get_label_images_rula_cat_w,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import type { LabelImage, RulaCategory, RulaFeatureSelection, RulaSelection } from '@/domain/datatypes';
+import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 
 type Props = {
   on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
@@ -30,6 +32,7 @@ function RulaCategoryButtonsGrid({
   title,
   rula_button_images,
   selected_feature_ids,
+  isActiveCategory,
   onSelect,
   optionalStartIndex,
   isLast,
@@ -38,6 +41,7 @@ function RulaCategoryButtonsGrid({
   title: string;
   rula_button_images: readonly LabelImage[];
   selected_feature_ids: readonly number[];
+  isActiveCategory: boolean;
   onSelect: (slot: RulaCategory, featureId: number, isOptional: boolean) => void;
   optionalStartIndex?: number;
   isLast?: boolean;
@@ -46,10 +50,12 @@ function RulaCategoryButtonsGrid({
     <Box
       sx={(theme) => ({
         borderRight: isLast ? 'none' : `1px solid ${theme.palette.wip_color_theme[200]}`,
+        borderTop: isActiveCategory ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent',
         height: '100%',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
+        backgroundColor: isActiveCategory ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
       })}
     >
       <Box
@@ -58,6 +64,7 @@ function RulaCategoryButtonsGrid({
           pb: 1,
           pt: 1,
           textAlign: 'center',
+          color: isActiveCategory ? 'primary.main' : 'inherit',
         }}
       >
         {title}
@@ -132,6 +139,7 @@ function RulaCategoryButtonsGrid({
  * Selection rules, range validation, and label construction belong in the container.
  */
 export function WidgetRulaButtons(props: Props) {
+  const { rula_hotkey_state } = use_rula_hotkey_context();
   const label_images_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
   const label_images_cat_la = useMemo(() => get_label_images_rula_cat_la(), []);
   const label_images_cat_w = useMemo(() => get_label_images_rula_cat_w(), []);
@@ -153,6 +161,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
             selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_UPPERARM)}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_UPPERARM'}
             onSelect={props.on_rula_select}
             optionalStartIndex={5}
           />
@@ -164,6 +173,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
             selected_feature_ids={props.rula_selected.CAT_LOWERARM ? [props.rula_selected.CAT_LOWERARM] : []}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_LOWERARM'}
             onSelect={props.on_rula_select}
           />
         </Grid>
@@ -174,6 +184,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Wrist"
             rula_button_images={label_images_cat_w}
             selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_WRIST)}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_WRIST'}
             onSelect={props.on_rula_select}
             optionalStartIndex={3}
           />
@@ -185,6 +196,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Neck"
             rula_button_images={label_images_cat_n}
             selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_NECK)}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_NECK'}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -195,6 +207,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Trunk"
             rula_button_images={label_images_cat_t}
             selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_TRUNK)}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_TRUNK'}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -206,6 +219,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Legs"
             rula_button_images={label_images_cat_l}
             selected_feature_ids={props.rula_selected.CAT_LEGS ? [props.rula_selected.CAT_LEGS] : []}
+            isActiveCategory={rula_hotkey_state.context === 'CAT_LEGS'}
             onSelect={props.on_rula_select}
           />
         </Grid>
