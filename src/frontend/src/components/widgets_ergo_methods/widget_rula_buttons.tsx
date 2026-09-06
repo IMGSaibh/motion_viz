@@ -13,9 +13,9 @@ import type { LabelImage, RulaCategory, RulaFeatureSelection, RulaSelection } fr
 
 type Props = {
   rula_selected: RulaSelection;
-  onSelect: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
-  onSave: () => void;
-  canSave: boolean;
+  on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
+  on_rula_save_label: () => void;
+  can_save_rula: boolean;
 };
 
 function getSelectedImageNames(selection: RulaFeatureSelection, images: readonly LabelImage[]): string[] {
@@ -130,7 +130,6 @@ function RulaCategoryButtonsGrid({
 
 /**
  * Renders the RULA category controls and forwards user actions to its container.
- *
  * Selection rules, range validation, and label construction belong in the container.
  */
 export function WidgetRulaButtons(props: Props) {
@@ -164,7 +163,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_UPPERARM, label_images_cat_ua)}
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
             optionalStartIndex={5}
           />
         </Grid>
@@ -181,7 +180,7 @@ export function WidgetRulaButtons(props: Props) {
                   )
                 : []
             }
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
           />
         </Grid>
 
@@ -191,7 +190,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Wrist"
             rula_button_images={label_images_cat_w}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_WRIST, label_images_cat_w)}
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
             optionalStartIndex={3}
           />
         </Grid>
@@ -202,7 +201,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Neck"
             rula_button_images={label_images_cat_n}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_NECK, label_images_cat_n)}
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
         </Grid>
@@ -212,7 +211,7 @@ export function WidgetRulaButtons(props: Props) {
             title="Trunk"
             rula_button_images={label_images_cat_t}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_TRUNK, label_images_cat_t)}
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
         </Grid>
@@ -229,7 +228,7 @@ export function WidgetRulaButtons(props: Props) {
                   )
                 : []
             }
-            onSelect={props.onSelect}
+            onSelect={props.on_rula_select}
           />
         </Grid>
 
@@ -239,8 +238,8 @@ export function WidgetRulaButtons(props: Props) {
             <IconButton
               size="small"
               aria-label="Save label"
-              onClick={props.onSave}
-              disabled={!allSelected || !props.canSave}
+              onClick={props.on_rula_save_label}
+              disabled={!allSelected || !props.can_save_rula}
               sx={{ border: 1, borderRadius: 0 }}
             >
               <SaveIcon fontSize="large" />
