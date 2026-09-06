@@ -18,19 +18,17 @@ type Props = {
   can_save_rula: boolean;
 };
 
-function getSelectedImageNames(selection: RulaFeatureSelection, images: readonly LabelImage[]): string[] {
-  return [selection.feature_id, ...selection.optional_feature_ids].flatMap((id) => {
-    if (id === null) return [];
-    const name = images[id - 1]?.name;
-    return name ? [name] : [];
-  });
+function getSelectedFeatureIds(selection: RulaFeatureSelection): number[] {
+  return selection.feature_id === null
+    ? selection.optional_feature_ids
+    : [selection.feature_id, ...selection.optional_feature_ids];
 }
 
 function RulaCategoryButtonsGrid({
   cat,
   title,
   rula_button_images,
-  selected_cat_images,
+  selected_feature_ids,
   onSelect,
   optionalStartIndex,
   isLast,
@@ -38,7 +36,7 @@ function RulaCategoryButtonsGrid({
   cat: RulaCategory;
   title: string;
   rula_button_images: readonly LabelImage[];
-  selected_cat_images: readonly string[];
+  selected_feature_ids: readonly number[];
   onSelect: (slot: RulaCategory, featureId: number, isOptional: boolean) => void;
   optionalStartIndex?: number;
   isLast?: boolean;
@@ -75,10 +73,10 @@ function RulaCategoryButtonsGrid({
       >
         {rula_button_images.map((item, i) => {
           const isOptional = optionalStartIndex !== undefined && i >= optionalStartIndex;
-          const isSelected = selected_cat_images.includes(item.name);
+          const isSelected = selected_feature_ids.includes(i + 1);
           const hasSelectedRequiredFeature = rula_button_images
             .slice(0, optionalStartIndex)
-            .some((image) => selected_cat_images.includes(image.name));
+            .some((_, imageIndex) => selected_feature_ids.includes(imageIndex + 1));
           const isDimmed = !isOptional && hasSelectedRequiredFeature && !isSelected;
           return (
             <ButtonBase
@@ -162,7 +160,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_cat_images={getSelectedImageNames(rula_selected.CAT_UPPERARM, label_images_cat_ua)}
+            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_UPPERARM)}
             onSelect={props.on_rula_select}
             optionalStartIndex={5}
           />
@@ -173,13 +171,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_cat_images={
-              rula_selected.CAT_LOWERARM
-                ? [label_images_cat_la[rula_selected.CAT_LOWERARM - 1]?.name].filter(
-                    (name): name is string => name !== undefined,
-                  )
-                : []
-            }
+            selected_feature_ids={rula_selected.CAT_LOWERARM ? [rula_selected.CAT_LOWERARM] : []}
             onSelect={props.on_rula_select}
           />
         </Grid>
@@ -189,7 +181,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_cat_images={getSelectedImageNames(rula_selected.CAT_WRIST, label_images_cat_w)}
+            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_WRIST)}
             onSelect={props.on_rula_select}
             optionalStartIndex={3}
           />
@@ -200,7 +192,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_cat_images={getSelectedImageNames(rula_selected.CAT_NECK, label_images_cat_n)}
+            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_NECK)}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -210,7 +202,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_cat_images={getSelectedImageNames(rula_selected.CAT_TRUNK, label_images_cat_t)}
+            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_TRUNK)}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -221,13 +213,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_cat_images={
-              rula_selected.CAT_LEGS
-                ? [label_images_cat_l[rula_selected.CAT_LEGS - 1]?.name].filter(
-                    (name): name is string => name !== undefined,
-                  )
-                : []
-            }
+            selected_feature_ids={rula_selected.CAT_LEGS ? [rula_selected.CAT_LEGS] : []}
             onSelect={props.on_rula_select}
           />
         </Grid>

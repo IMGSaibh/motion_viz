@@ -22,11 +22,11 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 export function ContainerLabelButtons() {
   const add_label = use_add_slider_label_ctx();
   const { range, frame_slider_value, set_range } = use_frame_slider_context();
-  const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
-  const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
-  const can_save_label = use_can_save_label_cxt();
   const effectiveRange = range ?? [frame_slider_value, frame_slider_value];
+  const can_save_label = use_can_save_label_cxt();
+  const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
+  const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const can_save_owas_label = can_save_label('OWAS', effectiveRange);
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
 
