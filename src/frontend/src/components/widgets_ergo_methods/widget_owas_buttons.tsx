@@ -14,7 +14,7 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
-  on_click_save_label?: (label: ErgoLabel) => void;
+  on_owas_save_label?: (label: ErgoLabel) => void;
 };
 
 function CategoryGrid({
@@ -150,7 +150,7 @@ export function WidgetOwasButtons(props: Props) {
       categories,
     };
 
-    props.on_click_save_label?.(label);
+    props.on_owas_save_label?.(label);
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   };
 

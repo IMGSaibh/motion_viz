@@ -3,10 +3,14 @@ import { WidgetRulaButtons } from '@/components/widgets_ergo_methods/widget_rula
 import { WidgetOwasButtons } from '@/components/widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '@/components/widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import type { ErgoLabel } from '@/domain/datatypes';
+import type { ErgoLabel, RulaCategory, RulaSelection } from '@/domain/datatypes';
 
 type Props = {
-  on_click_save_label?: (label: ErgoLabel) => void;
+  on_owas_save_label?: (label: ErgoLabel) => void;
+  rula_selected: RulaSelection;
+  on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
+  on_rula_save: () => void;
+  can_save_rula: boolean;
 };
 
 /**
@@ -81,9 +85,16 @@ export function PresenterLabelButtons(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <WidgetRulaButtons onClick={props.on_click_save_label} />}
-      {method === 'OWAS' && <WidgetOwasButtons on_click_save_label={props.on_click_save_label} />}
-      {method === 'LMM' && <WidgetLmmButtons onClick={props.on_click_save_label} />}
+      {method === 'RULA' && (
+        <WidgetRulaButtons
+          rula_selected={props.rula_selected}
+          onSelect={props.on_rula_select}
+          onSave={props.on_rula_save}
+          canSave={props.can_save_rula}
+        />
+      )}
+      {method === 'OWAS' && <WidgetOwasButtons on_owas_save_label={props.on_owas_save_label} />}
+      {method === 'LMM' && <WidgetLmmButtons onClick={props.on_owas_save_label} />}
     </Box>
   );
 }

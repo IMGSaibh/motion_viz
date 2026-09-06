@@ -1,10 +1,4 @@
 import { useMemo } from 'react';
-import {
-  create_empty_rula_selection,
-  create_label_category,
-  create_label_category_with_features,
-  uid,
-} from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
 import {
   get_label_images_rula_cat_l,
@@ -15,20 +9,13 @@ import {
   get_label_images_rula_cat_w,
 } from '@/Assets/label_images';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
-import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import type {
-  LabelImage,
-  LabelCategory,
-  ErgoLabel,
-  RulaCategory,
-  Range,
-  RulaFeatureSelection,
-} from '@/domain/datatypes';
-import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
-import { use_frame_slider_context } from '@/context/context_frame_slider';
+import type { LabelImage, RulaCategory, RulaFeatureSelection, RulaSelection } from '@/domain/datatypes';
 
 type Props = {
-  onClick?: (label: ErgoLabel) => void;
+  rula_selected: RulaSelection;
+  onSelect: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
+  onSave: () => void;
+  canSave: boolean;
 };
 
 function getSelectedImageNames(selection: RulaFeatureSelection, images: readonly LabelImage[]): string[] {
@@ -39,11 +26,7 @@ function getSelectedImageNames(selection: RulaFeatureSelection, images: readonly
   });
 }
 
-function getSelectedFeatureIds(selection: RulaFeatureSelection): number[] {
-  return [...(selection.feature_id ? [selection.feature_id] : []), ...selection.optional_feature_ids];
-}
-
-function CategoryGrid({
+function RulaCategoryButtonsGrid({
   cat,
   title,
   rula_button_images,
@@ -146,12 +129,9 @@ function CategoryGrid({
 }
 
 /**
- * Renders the RULA category controls and assembles a completed RULA label selection.
+ * Renders the RULA category controls and forwards user actions to its container.
  *
- * Method-specific selection UI and conversion of selected images into RULA label categories
- * belong here. Shared in-progress selections remain in the ergonomic-method context, generic
- * overlap rules in the label context/domain layer, and storing the emitted label in the
- * label-buttons container.
+ * Selection rules, range validation, and label construction belong in the container.
  */
 export function WidgetRulaButtons(props: Props) {
   const label_images_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
@@ -161,9 +141,7 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
   const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
-  const { range, frame_slider_value } = use_frame_slider_context();
-
-  const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
+  const { rula_selected } = props;
   const allSelected =
     rula_selected.CAT_UPPERARM.feature_id !== null &&
     rula_selected.CAT_LOWERARM !== null &&
@@ -171,91 +149,6 @@ export function WidgetRulaButtons(props: Props) {
     rula_selected.CAT_NECK.feature_id !== null &&
     rula_selected.CAT_TRUNK.feature_id !== null &&
     rula_selected.CAT_LEGS !== null;
-
-  const can_save_label = use_can_save_label_cxt();
-  const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
-  const canSaveRula = can_save_label('RULA', effectiveRange);
-
-  const handleSelect = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
-    if (cat === 'CAT_UPPERARM' && isOptional) {
-      const isSelected = rula_selected.CAT_UPPERARM.optional_feature_ids.includes(featureId);
-      set_rula_selected({
-        ...rula_selected,
-        CAT_UPPERARM: {
-          ...rula_selected.CAT_UPPERARM,
-          optional_feature_ids: isSelected
-            ? rula_selected.CAT_UPPERARM.optional_feature_ids.filter((id) => id !== featureId)
-            : [...rula_selected.CAT_UPPERARM.optional_feature_ids, featureId],
-        },
-      });
-      return;
-    }
-    if (cat === 'CAT_UPPERARM') {
-      set_rula_selected({
-        ...rula_selected,
-        CAT_UPPERARM: { ...rula_selected.CAT_UPPERARM, feature_id: featureId },
-      });
-      return;
-    }
-    if (cat === 'CAT_WRIST') {
-      const optionals = rula_selected.CAT_WRIST.optional_feature_ids;
-      set_rula_selected({
-        ...rula_selected,
-        CAT_WRIST: isOptional
-          ? {
-              ...rula_selected.CAT_WRIST,
-              optional_feature_ids: optionals.includes(featureId)
-                ? optionals.filter((id) => id !== featureId)
-                : [...optionals, featureId],
-            }
-          : { ...rula_selected.CAT_WRIST, feature_id: featureId },
-      });
-      return;
-    }
-    if (cat === 'CAT_NECK' || cat === 'CAT_TRUNK') {
-      const selection = rula_selected[cat];
-      set_rula_selected({
-        ...rula_selected,
-        [cat]: isOptional
-          ? {
-              ...selection,
-              optional_feature_ids: selection.optional_feature_ids.includes(featureId)
-                ? selection.optional_feature_ids.filter((id) => id !== featureId)
-                : [...selection.optional_feature_ids, featureId],
-            }
-          : { ...selection, feature_id: featureId },
-      });
-      return;
-    }
-    set_rula_selected({ ...rula_selected, [cat]: featureId });
-  };
-
-  const on_handle_save = () => {
-    if (!allSelected) return;
-    if (!canSaveRula) return;
-
-    const categories: LabelCategory[] = [
-      create_label_category_with_features(1, 'CAT_UPPERARM', getSelectedFeatureIds(rula_selected.CAT_UPPERARM)),
-      create_label_category(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM!),
-      create_label_category_with_features(3, 'CAT_WRIST', getSelectedFeatureIds(rula_selected.CAT_WRIST)),
-      create_label_category_with_features(4, 'CAT_NECK', getSelectedFeatureIds(rula_selected.CAT_NECK)),
-      create_label_category_with_features(5, 'CAT_TRUNK', getSelectedFeatureIds(rula_selected.CAT_TRUNK)),
-      create_label_category(6, 'CAT_LEGS', rula_selected.CAT_LEGS!),
-    ];
-
-    const from = Math.min(effectiveRange[0], effectiveRange[1]);
-    const to = Math.max(effectiveRange[0], effectiveRange[1]);
-    const label: ErgoLabel = {
-      id: uid(),
-      start_frame: from,
-      end_frame: to,
-      ergo_method: 'RULA',
-      categories,
-    };
-
-    props.onClick?.(label);
-    set_rula_selected(create_empty_rula_selection());
-  };
 
   return (
     <Box
@@ -266,18 +159,18 @@ export function WidgetRulaButtons(props: Props) {
     >
       <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_UPPERARM, label_images_cat_ua)}
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
             optionalStartIndex={5}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
@@ -288,44 +181,44 @@ export function WidgetRulaButtons(props: Props) {
                   )
                 : []
             }
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_WRIST, label_images_cat_w)}
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
             optionalStartIndex={3}
           />
         </Grid>
 
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_NECK, label_images_cat_n)}
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
             optionalStartIndex={4}
           />
         </Grid>
         <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
             selected_cat_images={getSelectedImageNames(rula_selected.CAT_TRUNK, label_images_cat_t)}
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
             optionalStartIndex={4}
           />
         </Grid>
 
         <Grid size={{ md: 1 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
+          <RulaCategoryButtonsGrid
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
@@ -336,7 +229,7 @@ export function WidgetRulaButtons(props: Props) {
                   )
                 : []
             }
-            onSelect={handleSelect}
+            onSelect={props.onSelect}
           />
         </Grid>
 
@@ -346,8 +239,8 @@ export function WidgetRulaButtons(props: Props) {
             <IconButton
               size="small"
               aria-label="Save label"
-              onClick={on_handle_save}
-              disabled={!allSelected || !canSaveRula}
+              onClick={props.onSave}
+              disabled={!allSelected || !props.canSave}
               sx={{ border: 1, borderRadius: 0 }}
             >
               <SaveIcon fontSize="large" />
