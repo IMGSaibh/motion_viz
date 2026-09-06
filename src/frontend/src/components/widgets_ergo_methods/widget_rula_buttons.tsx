@@ -26,7 +26,6 @@ import type {
 } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 
 type Props = {
   onClick?: (label: ErgoLabel) => void;
@@ -52,7 +51,6 @@ function CategoryGrid({
   onSelect,
   optionalStartIndex,
   isLast,
-  isActive,
 }: {
   cat: RulaCategory;
   title: string;
@@ -61,7 +59,6 @@ function CategoryGrid({
   onSelect: (slot: RulaCategory, featureId: number, isOptional: boolean) => void;
   optionalStartIndex?: number;
   isLast?: boolean;
-  isActive: boolean;
 }) {
   return (
     <Box
@@ -74,13 +71,12 @@ function CategoryGrid({
       })}
     >
       <Box
-        sx={(theme) => ({
+        sx={{
           fontSize: 12,
           pb: 1,
           pt: 1,
           textAlign: 'center',
-          bgcolor: isActive ? theme.palette.action.selected : undefined,
-        })}
+        }}
       >
         {title}
       </Box>
@@ -166,7 +162,6 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
   const { range, frame_slider_value } = use_frame_slider_context();
-  const { rula_hotkey_state: hotkey_state } = use_rula_hotkey_context();
 
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const allSelected =
@@ -180,27 +175,6 @@ export function WidgetRulaButtons(props: Props) {
   const can_save_label = use_can_save_label_cxt();
   const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
   const canSaveRula = can_save_label('RULA', effectiveRange);
-
-  const selected_names = (
-    category: RulaCategory,
-    available_images: readonly LabelImage[],
-    committed: readonly string[],
-  ): readonly string[] => {
-    if (hotkey_state.context !== category) return committed;
-
-    const pending = [
-      ...(hotkey_state.pending_primary_index === null
-        ? []
-        : [available_images[hotkey_state.pending_primary_index]?.name].filter(
-            (name): name is string => name !== undefined,
-          )),
-      ...hotkey_state.pending_optional_indices
-        .map((index) => available_images[index]?.name)
-        .filter((name): name is string => name !== undefined),
-    ];
-
-    return pending.length > 0 ? pending : committed;
-  };
 
   const handleSelect = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
     if (cat === 'CAT_UPPERARM' && isOptional) {
@@ -296,12 +270,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_cat_images={selected_names(
-              'CAT_UPPERARM',
-              label_images_cat_ua,
-              getSelectedImageNames(rula_selected.CAT_UPPERARM, label_images_cat_ua),
-            )}
-            isActive={hotkey_state.context === 'CAT_UPPERARM'}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_UPPERARM, label_images_cat_ua)}
             onSelect={handleSelect}
             optionalStartIndex={5}
           />
@@ -312,16 +281,13 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_cat_images={selected_names(
-              'CAT_LOWERARM',
-              label_images_cat_la,
+            selected_cat_images={
               rula_selected.CAT_LOWERARM
                 ? [label_images_cat_la[rula_selected.CAT_LOWERARM - 1]?.name].filter(
                     (name): name is string => name !== undefined,
                   )
-                : [],
-            )}
-            isActive={hotkey_state.context === 'CAT_LOWERARM'}
+                : []
+            }
             onSelect={handleSelect}
           />
         </Grid>
@@ -331,12 +297,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_cat_images={selected_names(
-              'CAT_WRIST',
-              label_images_cat_w,
-              getSelectedImageNames(rula_selected.CAT_WRIST, label_images_cat_w),
-            )}
-            isActive={hotkey_state.context === 'CAT_WRIST'}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_WRIST, label_images_cat_w)}
             onSelect={handleSelect}
             optionalStartIndex={3}
           />
@@ -347,12 +308,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_cat_images={selected_names(
-              'CAT_NECK',
-              label_images_cat_n,
-              getSelectedImageNames(rula_selected.CAT_NECK, label_images_cat_n),
-            )}
-            isActive={hotkey_state.context === 'CAT_NECK'}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_NECK, label_images_cat_n)}
             onSelect={handleSelect}
             optionalStartIndex={4}
           />
@@ -362,12 +318,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_cat_images={selected_names(
-              'CAT_TRUNK',
-              label_images_cat_t,
-              getSelectedImageNames(rula_selected.CAT_TRUNK, label_images_cat_t),
-            )}
-            isActive={hotkey_state.context === 'CAT_TRUNK'}
+            selected_cat_images={getSelectedImageNames(rula_selected.CAT_TRUNK, label_images_cat_t)}
             onSelect={handleSelect}
             optionalStartIndex={4}
           />
@@ -378,16 +329,13 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_cat_images={selected_names(
-              'CAT_LEGS',
-              label_images_cat_l,
+            selected_cat_images={
               rula_selected.CAT_LEGS
                 ? [label_images_cat_l[rula_selected.CAT_LEGS - 1]?.name].filter(
                     (name): name is string => name !== undefined,
                   )
-                : [],
-            )}
-            isActive={hotkey_state.context === 'CAT_LEGS'}
+                : []
+            }
             onSelect={handleSelect}
           />
         </Grid>
