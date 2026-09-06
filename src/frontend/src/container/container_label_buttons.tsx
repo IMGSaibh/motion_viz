@@ -27,6 +27,13 @@ export function ContainerLabelButtons() {
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
+  const all_rula_selected =
+    rula_selected.CAT_UPPERARM.feature_id !== null &&
+    rula_selected.CAT_LOWERARM !== null &&
+    rula_selected.CAT_WRIST.feature_id !== null &&
+    rula_selected.CAT_NECK.feature_id !== null &&
+    rula_selected.CAT_TRUNK.feature_id !== null &&
+    rula_selected.CAT_LEGS !== null;
 
   const can_save_owas_label = can_save_label('OWAS', effectiveRange);
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
@@ -86,14 +93,7 @@ export function ContainerLabelButtons() {
   };
 
   const on_rula_save_label = () => {
-    const allSelected =
-      rula_selected.CAT_UPPERARM.feature_id !== null &&
-      rula_selected.CAT_LOWERARM !== null &&
-      rula_selected.CAT_WRIST.feature_id !== null &&
-      rula_selected.CAT_NECK.feature_id !== null &&
-      rula_selected.CAT_TRUNK.feature_id !== null &&
-      rula_selected.CAT_LEGS !== null;
-    if (!allSelected || !can_save_rula_label) return;
+    if (!all_rula_selected || !can_save_rula_label) return;
 
     const categories: LabelCategory[] = [
       create_label_category_with_features(1, 'CAT_UPPERARM', [
@@ -158,7 +158,8 @@ export function ContainerLabelButtons() {
     <PresenterLabelButtons
       on_rula_select={on_rula_select}
       on_rula_save_label={on_rula_save_label}
-      all_rula_selected={rula_selected}
+      rula_selected={rula_selected}
+      all_rula_selected={all_rula_selected}
       can_save_rula={can_save_rula_label}
       on_owas_select={on_owas_select}
       on_owas_save_label={on_owas_save_label}

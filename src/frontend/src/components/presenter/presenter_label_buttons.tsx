@@ -12,8 +12,9 @@ type Props = {
   all_owas_selected: boolean;
   on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
   on_rula_save_label: () => void;
+  rula_selected: RulaSelection;
   can_save_rula: boolean;
-  all_rula_selected: RulaSelection;
+  all_rula_selected: boolean;
 };
 
 /**
@@ -92,6 +93,7 @@ export function PresenterLabelButtons(props: Props) {
         <WidgetRulaButtons
           on_rula_select={props.on_rula_select}
           on_rula_save_label={props.on_rula_save_label}
+          rula_selected={props.rula_selected}
           all_rula_selected={props.all_rula_selected}
           can_save_rula={props.can_save_rula}
         />

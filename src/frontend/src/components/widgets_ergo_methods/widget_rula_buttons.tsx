@@ -14,7 +14,8 @@ import type { LabelImage, RulaCategory, RulaFeatureSelection, RulaSelection } fr
 type Props = {
   on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
   on_rula_save_label: () => void;
-  all_rula_selected: RulaSelection;
+  rula_selected: RulaSelection;
+  all_rula_selected: boolean;
   can_save_rula: boolean;
 };
 
@@ -138,15 +139,6 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
   const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
-  const { all_rula_selected: rula_selected } = props;
-  const allSelected =
-    rula_selected.CAT_UPPERARM.feature_id !== null &&
-    rula_selected.CAT_LOWERARM !== null &&
-    rula_selected.CAT_WRIST.feature_id !== null &&
-    rula_selected.CAT_NECK.feature_id !== null &&
-    rula_selected.CAT_TRUNK.feature_id !== null &&
-    rula_selected.CAT_LEGS !== null;
-
   return (
     <Box
       sx={(theme) => ({
@@ -160,7 +152,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_UPPERARM)}
+            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_UPPERARM)}
             onSelect={props.on_rula_select}
             optionalStartIndex={5}
           />
@@ -171,7 +163,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_feature_ids={rula_selected.CAT_LOWERARM ? [rula_selected.CAT_LOWERARM] : []}
+            selected_feature_ids={props.rula_selected.CAT_LOWERARM ? [props.rula_selected.CAT_LOWERARM] : []}
             onSelect={props.on_rula_select}
           />
         </Grid>
@@ -181,7 +173,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_WRIST)}
+            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_WRIST)}
             onSelect={props.on_rula_select}
             optionalStartIndex={3}
           />
@@ -192,7 +184,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_NECK)}
+            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_NECK)}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -202,7 +194,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_feature_ids={getSelectedFeatureIds(rula_selected.CAT_TRUNK)}
+            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_TRUNK)}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
           />
@@ -213,7 +205,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_feature_ids={rula_selected.CAT_LEGS ? [rula_selected.CAT_LEGS] : []}
+            selected_feature_ids={props.rula_selected.CAT_LEGS ? [props.rula_selected.CAT_LEGS] : []}
             onSelect={props.on_rula_select}
           />
         </Grid>
@@ -225,7 +217,7 @@ export function WidgetRulaButtons(props: Props) {
               size="small"
               aria-label="Save label"
               onClick={props.on_rula_save_label}
-              disabled={!allSelected || !props.can_save_rula}
+              disabled={!props.all_rula_selected || !props.can_save_rula}
               sx={{ border: 1, borderRadius: 0 }}
             >
               <SaveIcon fontSize="large" />
