@@ -5,6 +5,7 @@ import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
+import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { HotkeyProfile, toggle_hotkey_profile } from '@/domain/hotkey_profile';
 import {
   apply_rula_hotkey_command,
@@ -24,6 +25,7 @@ export function ContainerKeyboardShortcuts(): null {
     use_frame_slider_context();
   const { rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
+  const { warning } = use_snackbar_ctx();
   const { hotkey_profile, set_hotkey_profile, rula_hotkey_state, set_rula_hotkey_state, set_rula_save_requested } =
     use_rula_hotkey_context();
   const {
@@ -33,6 +35,7 @@ export function ContainerKeyboardShortcuts(): null {
     play_pause,
     print_scene_components,
     reset_engine,
+    selected_motion,
     set_selected_motion,
     stop,
   } = use_three_js_engine_ctx();
@@ -57,6 +60,11 @@ export function ContainerKeyboardShortcuts(): null {
           key: event.key,
           code: event.code,
         });
+        if (result.command && result.command.type !== 'reset' && !selected_motion) {
+          event.preventDefault();
+          warning('Load motion file for labeling');
+          return;
+        }
         if (result.command?.type === 'save') {
           event.preventDefault();
           set_rula_save_requested(true);
@@ -177,6 +185,8 @@ export function ContainerKeyboardShortcuts(): null {
     set_rula_save_requested,
     set_hotkey_profile,
     stop,
+    selected_motion,
+    warning,
   ]);
 
   return null;
