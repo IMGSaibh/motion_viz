@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import {
   create_empty_rula_selection,
   create_label_category,
@@ -11,6 +10,13 @@ import { use_frame_slider_context } from '@/context/context_frame_slider';
 import type { ErgoLabel, RulaCategory, LabelCategory, OwasCategory } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+
+type RulaOptionalCategory = 'CAT_UPPERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK';
+
+function isRulaOptionalCategory(cat: RulaCategory): cat is RulaOptionalCategory {
+  return cat === 'CAT_UPPERARM' || cat === 'CAT_WRIST' || cat === 'CAT_NECK' || cat === 'CAT_TRUNK';
+}
+
 /**
  * Connects ergonomic label controls to the shared label and frame-range contexts.
  *
@@ -39,56 +45,21 @@ export function ContainerLabelButtons() {
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
 
   const on_rula_select = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
-    if (cat === 'CAT_UPPERARM' && isOptional) {
-      const isSelected = rula_selected.CAT_UPPERARM.optional_feature_ids.includes(featureId);
+    if (isOptional && isRulaOptionalCategory(cat)) {
+      const selection = rula_selected[cat];
+      const isSelected = selection.optional_feature_ids.includes(featureId);
       set_rula_selected({
         ...rula_selected,
-        CAT_UPPERARM: {
-          ...rula_selected.CAT_UPPERARM,
+        [cat]: {
+          ...selection,
           optional_feature_ids: isSelected
-            ? rula_selected.CAT_UPPERARM.optional_feature_ids.filter((id: number) => id !== featureId)
-            : [...rula_selected.CAT_UPPERARM.optional_feature_ids, featureId],
+            ? selection.optional_feature_ids.filter((id) => id !== featureId)
+            : [...selection.optional_feature_ids, featureId],
         },
       });
       return;
     }
-    if (cat === 'CAT_UPPERARM') {
-      set_rula_selected({
-        ...rula_selected,
-        CAT_UPPERARM: { ...rula_selected.CAT_UPPERARM, feature_id: featureId },
-      });
-      return;
-    }
-    if (cat === 'CAT_WRIST') {
-      const optionals = rula_selected.CAT_WRIST.optional_feature_ids;
-      set_rula_selected({
-        ...rula_selected,
-        CAT_WRIST: isOptional
-          ? {
-              ...rula_selected.CAT_WRIST,
-              optional_feature_ids: optionals.includes(featureId)
-                ? optionals.filter((id: number) => id !== featureId)
-                : [...optionals, featureId],
-            }
-          : { ...rula_selected.CAT_WRIST, feature_id: featureId },
-      });
-      return;
-    }
-    if (cat === 'CAT_NECK' || cat === 'CAT_TRUNK') {
-      const selection = rula_selected[cat];
-      set_rula_selected({
-        ...rula_selected,
-        [cat]: isOptional
-          ? {
-              ...selection,
-              optional_feature_ids: selection.optional_feature_ids.includes(featureId)
-                ? selection.optional_feature_ids.filter((id: number) => id !== featureId)
-                : [...selection.optional_feature_ids, featureId],
-            }
-          : { ...selection, feature_id: featureId },
-      });
-      return;
-    }
+
     set_rula_selected({ ...rula_selected, [cat]: featureId });
   };
 
