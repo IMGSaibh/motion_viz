@@ -10,10 +10,10 @@ type Props = {
   on_owas_save_label?: () => void;
   can_save_owas_label: boolean;
   all_owas_selected: boolean;
-  rula_selected: RulaSelection;
   on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
   on_rula_save_label: () => void;
   can_save_rula: boolean;
+  all_rula_selected: RulaSelection;
 };
 
 /**
@@ -90,9 +90,9 @@ export function PresenterLabelButtons(props: Props) {
 
       {method === 'RULA' && (
         <WidgetRulaButtons
-          rula_selected={props.rula_selected}
           on_rula_select={props.on_rula_select}
           on_rula_save_label={props.on_rula_save_label}
+          all_rula_selected={props.all_rula_selected}
           can_save_rula={props.can_save_rula}
         />
       )}
@@ -100,8 +100,8 @@ export function PresenterLabelButtons(props: Props) {
         <WidgetOwasButtons
           on_owas_save_label={props.on_owas_save_label}
           on_owas_select={props.on_owas_select}
-          can_save_owas_label={props.can_save_owas_label}
           all_owas_selected={props.all_owas_selected}
+          can_save_owas_label={props.can_save_owas_label}
         />
       )}
       {method === 'LMM' && <WidgetLmmButtons onClick={props.on_owas_save_label} />}

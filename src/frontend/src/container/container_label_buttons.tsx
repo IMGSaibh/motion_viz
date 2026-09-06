@@ -27,6 +27,7 @@ export function ContainerLabelButtons() {
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
+
   const can_save_owas_label = can_save_label('OWAS', effectiveRange);
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
 
@@ -155,14 +156,14 @@ export function ContainerLabelButtons() {
 
   return (
     <PresenterLabelButtons
-      on_owas_select={on_owas_select}
-      on_owas_save_label={on_owas_save_label}
-      can_save_owas_label={can_save_owas_label}
-      all_owas_selected={all_owas_selected}
-      rula_selected={rula_selected}
       on_rula_select={on_rula_select}
       on_rula_save_label={on_rula_save_label}
+      all_rula_selected={rula_selected}
       can_save_rula={can_save_rula_label}
+      on_owas_select={on_owas_select}
+      on_owas_save_label={on_owas_save_label}
+      all_owas_selected={all_owas_selected}
+      can_save_owas_label={can_save_owas_label}
     />
   );
 }

@@ -12,9 +12,9 @@ import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import type { LabelImage, RulaCategory, RulaFeatureSelection, RulaSelection } from '@/domain/datatypes';
 
 type Props = {
-  rula_selected: RulaSelection;
   on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
   on_rula_save_label: () => void;
+  all_rula_selected: RulaSelection;
   can_save_rula: boolean;
 };
 
@@ -138,7 +138,7 @@ export function WidgetRulaButtons(props: Props) {
   const label_images_cat_t = useMemo(() => get_label_images_rula_cat_t(), []);
   const label_images_cat_l = useMemo(() => get_label_images_rula_cat_l(), []);
 
-  const { rula_selected } = props;
+  const { all_rula_selected: rula_selected } = props;
   const allSelected =
     rula_selected.CAT_UPPERARM.feature_id !== null &&
     rula_selected.CAT_LOWERARM !== null &&

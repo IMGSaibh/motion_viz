@@ -13,8 +13,8 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 type Props = {
   on_owas_select: (cat: OwasCategory, featureId: number) => void;
   on_owas_save_label?: () => void;
-  can_save_owas_label: boolean;
   all_owas_selected: boolean;
+  can_save_owas_label: boolean;
 };
 
 function CategoryGrid({
@@ -115,7 +115,6 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
-
   const { owas_selected } = use_ergo_methods_cxt();
 
   return (
