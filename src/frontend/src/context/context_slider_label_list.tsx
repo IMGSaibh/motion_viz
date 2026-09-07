@@ -1,11 +1,6 @@
 import { type PropsWithChildren, useCallback, useMemo, useReducer, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type {
-  ErgoLabel,
-  LabelCategory,
-  LabelFeature,
-  RulaFeatureSelection,
-} from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, LabelFeature, RulaFeatureSelection } from '@/domain/datatypes';
 import {
   can_save_for_range,
   create_empty_rula_selection,
@@ -108,6 +103,8 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [ergo_labels],
   );
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const save_current_edited_label = useCallback(() => {
     if (!editing_id) return;
     if (!range) return;
@@ -130,27 +127,11 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     const categories: LabelCategory[] | undefined =
       editingLabel.ergo_method === 'RULA'
         ? [
-            create_label_category_with_features(
-              1,
-              'CAT_UPPERARM',
-              getSelectedFeatureIds(rula_selected.CAT_UPPERARM),
-            ),
+            create_label_category_with_features(1, 'CAT_UPPERARM', getSelectedFeatureIds(rula_selected.CAT_UPPERARM)),
             createCategory(2, 'CAT_LOWERARM', rula_selected.CAT_LOWERARM),
-            create_label_category_with_features(
-              3,
-              'CAT_WRIST',
-              getSelectedFeatureIds(rula_selected.CAT_WRIST),
-            ),
-            create_label_category_with_features(
-              4,
-              'CAT_NECK',
-              getSelectedFeatureIds(rula_selected.CAT_NECK),
-            ),
-            create_label_category_with_features(
-              5,
-              'CAT_TRUNK',
-              getSelectedFeatureIds(rula_selected.CAT_TRUNK),
-            ),
+            create_label_category_with_features(3, 'CAT_WRIST', getSelectedFeatureIds(rula_selected.CAT_WRIST)),
+            create_label_category_with_features(4, 'CAT_NECK', getSelectedFeatureIds(rula_selected.CAT_NECK)),
+            create_label_category_with_features(5, 'CAT_TRUNK', getSelectedFeatureIds(rula_selected.CAT_TRUNK)),
             createCategory(6, 'CAT_LEGS', rula_selected.CAT_LEGS),
           ].filter((category): category is LabelCategory => category !== null)
         : editingLabel.ergo_method === 'OWAS'
@@ -397,5 +378,12 @@ export function use_can_save_label_cxt() {
         id: v.editing_id,
       });
     };
+  });
+}
+
+export function use_is_editing_label_cxt() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_is_editing_label_cxt must be used within <FrameSliderLabellistProvider>');
+    return v.editing_id !== null;
   });
 }

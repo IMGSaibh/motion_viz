@@ -5,13 +5,14 @@ import {
   uid,
 } from '@/domain/label_logic';
 import { useEffect } from 'react';
-import { use_add_slider_label_ctx } from '@/context/context_slider_label_list';
+import { use_add_slider_label_ctx, use_save_edit_label_cxt } from '@/context/context_slider_label_list';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import type { ErgoLabel, RulaCategory, LabelCategory, OwasCategory } from '@/domain/datatypes';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
+import { use_is_editing_label_cxt } from '@/context/context_slider_label_list';
 
 type RulaOptionalCategory = 'CAT_UPPERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK';
 
@@ -36,6 +37,8 @@ export function ContainerLabelButtons() {
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
+  const saveEdit = use_save_edit_label_cxt();
+
   const all_rula_selected =
     rula_selected.CAT_UPPERARM.feature_id !== null &&
     rula_selected.CAT_LOWERARM !== null &&
@@ -46,6 +49,7 @@ export function ContainerLabelButtons() {
 
   const can_save_owas_label = can_save_label('OWAS', effectiveRange);
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
+  const is_label_editing = use_is_editing_label_cxt();
 
   const on_rula_select = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
     if (isOptional && isRulaOptionalCategory(cat)) {
@@ -76,6 +80,12 @@ export function ContainerLabelButtons() {
 
   const on_rula_save_label = () => {
     if (!all_rula_selected || !can_save_rula_label) return;
+
+    if (is_label_editing) {
+      console.log('Saving edited label');
+      saveEdit();
+      return;
+    }
 
     const categories: LabelCategory[] = [
       create_label_category_with_features(1, 'CAT_UPPERARM', [
