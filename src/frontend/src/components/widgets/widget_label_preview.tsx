@@ -1,9 +1,11 @@
 import { Box } from '@mui/material';
 import type { LabelCategory, LabelImage } from '@/domain/datatypes';
+import { get_label_image_by_feature_id } from '@/Assets/label_images';
 
 type Props = {
   categories?: LabelCategory[];
   label_image?: LabelImage | null; // optional fallback
+  ergo_method?: string;
 };
 
 /**
@@ -15,7 +17,10 @@ type Props = {
  */
 export function WidgetLabelPreview(props: Props) {
   const categoryImages = (props.categories ?? []).flatMap((category) =>
-    category.features.map((feature) => feature.image),
+    category.features.flatMap((feature) => {
+      const image = get_label_image_by_feature_id(props.ergo_method, category.name, feature.id);
+      return image ? [image] : [];
+    }),
   );
 
   const imagesToShow =

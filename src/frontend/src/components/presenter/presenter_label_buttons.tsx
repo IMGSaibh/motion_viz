@@ -3,10 +3,18 @@ import { WidgetRulaButtons } from '@/components/widgets_ergo_methods/widget_rula
 import { WidgetOwasButtons } from '@/components/widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '@/components/widgets_ergo_methods/widget_lmm_label_buttons';
 import { useState } from 'react';
-import type { ErgoLabel } from '@/domain/datatypes';
+import type { RulaCategory, RulaSelection, OwasCategory } from '@/domain/datatypes';
 
 type Props = {
-  on_click_save_label?: (label: ErgoLabel) => void;
+  on_owas_select: (cat: OwasCategory, featureId: number) => void;
+  on_owas_save_label?: () => void;
+  can_save_owas_label: boolean;
+  all_owas_selected: boolean;
+  on_rula_select: (cat: RulaCategory, featureId: number, isOptional: boolean) => void;
+  on_rula_save_label: () => void;
+  rula_selected: RulaSelection;
+  can_save_rula: boolean;
+  all_rula_selected: boolean;
 };
 
 /**
@@ -81,9 +89,24 @@ export function PresenterLabelButtons(props: Props) {
         <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
-      {method === 'RULA' && <WidgetRulaButtons onClick={props.on_click_save_label} />}
-      {method === 'OWAS' && <WidgetOwasButtons on_click_save_label={props.on_click_save_label} />}
-      {method === 'LMM' && <WidgetLmmButtons onClick={props.on_click_save_label} />}
+      {method === 'RULA' && (
+        <WidgetRulaButtons
+          on_rula_select={props.on_rula_select}
+          on_rula_save_label={props.on_rula_save_label}
+          rula_selected={props.rula_selected}
+          all_rula_selected={props.all_rula_selected}
+          can_save_rula={props.can_save_rula}
+        />
+      )}
+      {method === 'OWAS' && (
+        <WidgetOwasButtons
+          on_owas_save_label={props.on_owas_save_label}
+          on_owas_select={props.on_owas_select}
+          all_owas_selected={props.all_owas_selected}
+          can_save_owas_label={props.can_save_owas_label}
+        />
+      )}
+      {method === 'LMM' && <WidgetLmmButtons onClick={props.on_owas_save_label} />}
     </Box>
   );
 }
