@@ -82,7 +82,6 @@ export function ContainerLabelButtons() {
     if (!all_rula_selected || !can_save_rula_label) return;
 
     if (is_label_editing) {
-      console.log('Saving edited label');
       saveEdit();
       return;
     }
