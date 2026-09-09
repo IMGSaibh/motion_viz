@@ -1,29 +1,29 @@
-import type { ErgoLabel, LabelCategory, LabelImage, RulaSelection } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, RulaSelection } from '@/domain/datatypes';
 
 export function create_empty_rula_selection(): RulaSelection {
   return {
-    CAT_UPPERARM: { feature: null, optionals: [] },
+    CAT_UPPERARM: { feature_id: null, optional_feature_ids: [] },
     CAT_LOWERARM: null,
-    CAT_WRIST: { feature: null, optionals: [] },
-    CAT_NECK: { feature: null, optionals: [] },
-    CAT_TRUNK: { feature: null, optionals: [] },
+    CAT_WRIST: { feature_id: null, optional_feature_ids: [] },
+    CAT_NECK: { feature_id: null, optional_feature_ids: [] },
+    CAT_TRUNK: { feature_id: null, optional_feature_ids: [] },
     CAT_LEGS: null,
   };
 }
 
-export function create_label_category(id: number, name: string, image: LabelImage): LabelCategory {
-  return { id, name, features: [{ id: 1, name: image.name, image }] };
+export function create_label_category(id: number, name: string, feature_id: number): LabelCategory {
+  return { id, name, features: [{ id: feature_id }] };
 }
 
 export function create_label_category_with_features(
   id: number,
   name: string,
-  images: readonly LabelImage[],
+  feature_ids: readonly number[],
 ): LabelCategory {
   return {
     id,
     name,
-    features: images.map((image, index) => ({ id: index + 1, name: image.name, image })),
+    features: feature_ids.map((feature_id) => ({ id: feature_id })),
   };
 }
 
@@ -35,7 +35,7 @@ export function uid() {
 }
 
 export function overlaps(aFrom: number, aTo: number, bFrom: number, bTo: number) {
-  return aFrom < bTo && aTo > bFrom;
+  return aFrom <= bTo && aTo >= bFrom;
 }
 
 export function can_save_for_range(args: {
@@ -51,7 +51,7 @@ export function can_save_for_range(args: {
     if (args.id && label.id === args.id) return false;
     const mf = Math.min(label.start_frame, label.end_frame);
     const mt = Math.max(label.start_frame, label.end_frame);
-    return fromN < mt && toN > mf;
+    return overlaps(fromN, toN, mf, mt);
   });
 
   return !hasOverlapSameCategory;

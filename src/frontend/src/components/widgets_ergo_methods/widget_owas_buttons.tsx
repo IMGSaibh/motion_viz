@@ -4,32 +4,32 @@ import {
   get_label_images_cat3_owas,
   get_label_images_cat4_owas,
 } from '@/Assets/label_images';
-import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
 import { useMemo } from 'react';
-import { create_label_category, uid } from '@/domain/label_logic';
 import SaveIcon from '@mui/icons-material/Save';
-import type { LabelImage, LabelCategory, ErgoLabel, OwasCategory, Range } from '@/domain/datatypes';
+import type { LabelImage, OwasCategory } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
-import { use_frame_slider_context } from '@/context/context_frame_slider';
 
 type Props = {
-  on_click_save_label?: (label: ErgoLabel) => void;
+  on_owas_select: (cat: OwasCategory, featureId: number) => void;
+  on_owas_save_label?: () => void;
+  all_owas_selected: boolean;
+  can_save_owas_label: boolean;
 };
 
 function CategoryGrid({
   cat,
   title,
   owas_button_images,
-  selected_cat_images,
+  selected_feature_id,
   onSelect,
   isLast,
 }: {
   cat: OwasCategory;
   title: string;
   owas_button_images: readonly LabelImage[];
-  selected_cat_images: string | null;
-  onSelect: (slot: OwasCategory, img: LabelImage) => void;
+  selected_feature_id?: number | null;
+  onSelect: (slot: OwasCategory, featureId: number) => void;
   isLast?: boolean;
 }) {
   return (
@@ -54,12 +54,12 @@ function CategoryGrid({
         }}
       >
         {owas_button_images.map((item, i) => {
-          const isSelected = selected_cat_images === item.name;
-          const isDimmed = selected_cat_images !== null && !isSelected;
+          const isSelected = selected_feature_id === i + 1;
+          const isDimmed = selected_feature_id != null && !isSelected;
           return (
             <ButtonBase
               key={`${item.category}-${item.name}-${i}`}
-              onClick={() => onSelect(cat, item)}
+              onClick={() => onSelect(cat, i + 1)}
               sx={(theme) => ({
                 border: `1px solid ${theme.palette.wip_color_theme[300]}`,
                 borderRadius: 0,
@@ -115,44 +115,7 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
-
-  const { range, frame_slider_value } = use_frame_slider_context();
-
-  const can_save_label = use_can_save_label_cxt();
-  const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
-
-  const allSelected = Object.values(owas_selected).every(Boolean);
-  const effectiveRange: Range = range ?? [frame_slider_value, frame_slider_value];
-  const canSaveOwas = can_save_label('OWAS', effectiveRange);
-
-  const handleSelect = (cat: OwasCategory, img: LabelImage) => {
-    set_owas_selected({ ...owas_selected, [cat]: img });
-  };
-
-  const handleSave = () => {
-    if (!allSelected) return;
-    if (!canSaveOwas) return;
-
-    const categories: LabelCategory[] = [
-      create_label_category(1, 'CAT_BACK', owas_selected.CAT_BACK!),
-      create_label_category(2, 'CAT_ARMS', owas_selected.CAT_ARMS!),
-      create_label_category(3, 'CAT_LEGS', owas_selected.CAT_LEGS!),
-      create_label_category(4, 'CAT_LOAD', owas_selected.CAT_LOAD!),
-    ];
-
-    const from = Math.min(effectiveRange[0], effectiveRange[1]);
-    const to = Math.max(effectiveRange[0], effectiveRange[1]);
-    const label: ErgoLabel = {
-      id: uid(),
-      start_frame: from,
-      end_frame: to,
-      ergo_method: 'OWAS',
-      categories,
-    };
-
-    props.on_click_save_label?.(label);
-    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
-  };
+  const { owas_selected } = use_ergo_methods_cxt();
 
   return (
     <Box
@@ -167,8 +130,8 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_BACK"
             title="Back Category"
             owas_button_images={label_images_cat1}
-            selected_cat_images={owas_selected.CAT_BACK?.name ?? null}
-            onSelect={handleSelect}
+            selected_feature_id={owas_selected.CAT_BACK}
+            onSelect={props.on_owas_select}
           />
         </Grid>
 
@@ -177,8 +140,8 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_ARMS"
             title="Arms Category"
             owas_button_images={label_images_cat2}
-            selected_cat_images={owas_selected.CAT_ARMS?.name ?? null}
-            onSelect={handleSelect}
+            selected_feature_id={owas_selected.CAT_ARMS}
+            onSelect={props.on_owas_select}
           />
         </Grid>
 
@@ -187,8 +150,8 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs Category"
             owas_button_images={label_images_cat3}
-            selected_cat_images={owas_selected.CAT_LEGS?.name ?? null}
-            onSelect={handleSelect}
+            selected_feature_id={owas_selected.CAT_LEGS}
+            onSelect={props.on_owas_select}
           />
         </Grid>
         <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
@@ -196,18 +159,18 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_LOAD"
             title="Load Category"
             owas_button_images={label_images_cat4}
-            selected_cat_images={owas_selected.CAT_LOAD?.name ?? null}
-            onSelect={handleSelect}
+            selected_feature_id={owas_selected.CAT_LOAD}
+            onSelect={props.on_owas_select}
           />
         </Grid>
-        {/* Actions */}
+        {/* Save Button */}
         <Grid size={{ md: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <IconButton
               size="small"
               aria-label="Save label"
-              onClick={handleSave}
-              disabled={!allSelected || !canSaveOwas}
+              onClick={props.on_owas_save_label}
+              disabled={!props.all_owas_selected || !props.can_save_owas_label}
               sx={{ border: 1, borderRadius: 0 }}
             >
               <SaveIcon fontSize="large" />

@@ -11,6 +11,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { WidgetLabelPreview } from './widget_label_preview';
 import ClearIcon from '@mui/icons-material/Clear';
 import type { ErgoLabel } from '@/domain/datatypes';
+import { get_label_image_by_feature_id } from '@/Assets/label_images';
 
 import {
   use_start_edit_label_cxt,
@@ -109,7 +110,7 @@ export function WidgetLabelList(props: Props) {
                       borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                     })}
                   >
-                    <WidgetLabelPreview categories={ergoLabel.categories ?? null} />
+                    <WidgetLabelPreview categories={ergoLabel.categories ?? null} ergo_method={ergoLabel.ergo_method} />
                   </Grid>
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
@@ -132,7 +133,11 @@ export function WidgetLabelList(props: Props) {
                     >
                       <Typography variant="body2" noWrap>
                         {ergoLabel.categories.flatMap((category) =>
-                          category.features.map((feature) => feature.name),
+                          category.features.map(
+                            (feature) =>
+                              get_label_image_by_feature_id(ergoLabel.ergo_method, category.name, feature.id)?.name ??
+                              String(feature.id),
+                          ),
                         ).join(' | ')}
                       </Typography>
                       <Typography variant="caption" noWrap>

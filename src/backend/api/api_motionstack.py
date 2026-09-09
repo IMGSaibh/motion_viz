@@ -62,7 +62,11 @@ async def convert_with_motionstack():
     ]
 
     for mfile in mvnx_files:
+<<<<<<< HEAD
             file_pairs.append((mfile,"xsens_mvnx"))
+=======
+            file_pairs.append((str(mfile),"xsens_mvnx"))
+>>>>>>> main
 
     print("Start converting files")
     for mocap_file, descriptor_file in file_pairs:
