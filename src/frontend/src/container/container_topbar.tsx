@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import type { SelectChangeEvent } from '@mui/material/Select';
 import type { MotionDescriptorData } from '@/api/api_motion_files';
 import { PresenterTopbar } from '@/components/presenter/presenter_topbar';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
@@ -27,14 +26,13 @@ function get_error_message(error: unknown, fallback: string): string {
  * presenter/widgets.
  */
 export function ContainerTopbar() {
-  const { set_selected_motion, load_motion_file, go_to_frame, stop } = use_three_js_engine_ctx();
+  const { selected_motion, set_selected_motion, load_motion_file, go_to_frame, stop } = use_three_js_engine_ctx();
   const { set_range } = use_frame_slider_context();
   const { success, warning, error } = use_snackbar_ctx();
   const { set_rula_selected, set_owas_selected } = use_ergo_methods_cxt();
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
-  const [motion_file_selected, set_motion_file_selected] = useState<string | null>(null);
 
   const motion_config_references = {
     format: useRef<HTMLInputElement>(null),
@@ -110,7 +108,6 @@ export function ContainerTopbar() {
   }
 
   function reset_current_motion() {
-    set_motion_file_selected('');
     set_selected_motion(null);
     stop();
     go_to_frame(0);
@@ -124,12 +121,10 @@ export function ContainerTopbar() {
     if (result.error) error(get_error_message(result.error, 'Could not refresh file list'));
   }
 
-  async function handle_motion_file_list_on_change(event: SelectChangeEvent<string>) {
-    const filename = event.target.value;
+  async function handle_motion_file_list_on_select(filename: string) {
     reset_current_motion();
     if (!filename) return;
 
-    set_motion_file_selected(filename);
     set_selected_motion(filename);
     try {
       await load_motion_file(filename);
@@ -173,8 +168,8 @@ export function ContainerTopbar() {
       convert_motionstack_files_on_click={handle_convert_with_motionstack}
       motionstack_conversion_is_pending={motionstack_conversion.isPending}
       motion_files={motion_files.data ?? []}
-      motion_file_selected={motion_file_selected}
-      motion_file_list_on_change={handle_motion_file_list_on_change}
+      motion_file_selected={selected_motion}
+      motion_file_list_on_select={handle_motion_file_list_on_select}
       motion_file_list_on_open={handle_motion_file_list_on_open}
     />
   );
