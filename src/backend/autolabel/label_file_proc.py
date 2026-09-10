@@ -1,9 +1,9 @@
-
 import json
 import pandas as pd
 import numpy as np
-from mocap_loader import MotionDataReader 
 import pathlib
+
+from motionstack.reader import MotionReader
 
 import os
 THIS_DIR = pathlib.Path(__file__)
@@ -28,10 +28,14 @@ def create_dataframe_from_json_label_file(filepath):
     label_data = load_label_json_label_file(filepath)
 
     motion_filename = get_motion_filename_from_label_filename(filepath)
-    motion_data = MotionDataReader(
+    motion_data = MotionReader(
         motion_filename,
-        'bvh_pos_100'
+        'bvh_100'
     )
+
+    motion_rs = np.array(motion_data.motion.get_rotations())    
+    motion_ps = np.array(motion_data.motion.get_positions())
+
     df = pd.DataFrame(columns=['FILEPATH', 'FRAME_INDEX', 'ORIENTATION', 'POSITION', 'LABEL', 'ERGO_METHOD'])
 
     for label in label_data['labels']:
@@ -42,8 +46,8 @@ def create_dataframe_from_json_label_file(filepath):
             df.loc[len(df)] = {  
             'FILEPATH':  filepath,
             'FRAME_INDEX': frame_nr,            
-            'ORIENTATION' : motion_data.motion.rotations[frame_nr],
-            'POSITION' : motion_data.motion.positions[frame_nr],
+            'ORIENTATION' : motion_rs[frame_nr],
+            'POSITION' : motion_ps[frame_nr],
             'LABEL': [item["element_id"] for item in label["categories"]],
             'ERGO_METHOD': label['ergo_method']
             }
@@ -51,8 +55,10 @@ def create_dataframe_from_json_label_file(filepath):
     return df
 
 def get_X_y_from_dataframe(df):
-    X = np.array(df[['ORIENTATION']].to_numpy().tolist())
-    y = np.array(df['LABEL'].to_numpy().tolist())
+
+    l = np.array(df['ORIENTATION'].tolist(), dtype='float64')
+    X = l.astype('float64')
+    y = np.array(df['LABEL'].tolist(), dtype='int')
     X_scaled, scaler = scale_data(X)
 
     return X_scaled, y, scaler
@@ -60,11 +66,12 @@ def get_X_y_from_dataframe(df):
 def scale_data(X):
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X.reshape(-1, X.shape[-1])).reshape(X.shape)
+    #X = X.reshape(-1, X.shape[-1])
+    X_scaled = scaler.fit_transform(X)#.reshape(X.shape)
     return X_scaled, scaler
 
 
-def process_label_file(filepath):
+def process(filepath):
     # if corresponsig pkl available
     if os.path.exists(os.path.join('/home/aiwlab/hack/motion_viz/data/labels/',pathlib.Path(filepath).stem + '.pkl')):
         df = pd.read_pickle(os.path.join('/home/aiwlab/hack/motion_viz/data/labels/',pathlib.Path(filepath).stem + '.pkl'))
