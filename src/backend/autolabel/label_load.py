@@ -46,7 +46,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
 # Core processor class
 # --------------------------------------------------------------------------- #
 @dataclass
-class LabelProcessor:
+class LabelLoader:
     """
     High‑level helper that turns a JSON label file + its corresponding BVH
     motion file into a tidy ``pandas.DataFrame`` and finally into
@@ -54,13 +54,13 @@ class LabelProcessor:
 
     Typical usage
     -------------
-    >>> from label_processor import LabelProcessor
-    >>> proc = LabelProcessor(
+    >>> from label_loader import LabelLoader
+    >>> proc = LabelLoader(
     ...     label_root="/home/aiwlab/hack/motion_viz/data/labels",
     ...     bvh_root="/data/bvh",
     ...     cache_root="/home/aiwlab/hack/motion_viz/data/labels",
     ... )
-    >>> X, y, scaler = proc.process("my_label_file.json")
+    >>> X, y, scaler = proc.load("my_label_file.json")
     """
 
     # ------------------------------------------------------------------- #
@@ -75,7 +75,7 @@ class LabelProcessor:
     # ------------------------------------------------------------------- #
     # Internals – created once per instance
     # ------------------------------------------------------------------- #
-    _logger: logging.Logger = logging.getLogger("LabelProcessor")
+    _logger: logging.Logger = logging.getLogger("LabelLoader")
 
     # ------------------------------------------------------------------- #
     # Construction helpers
@@ -99,13 +99,13 @@ class LabelProcessor:
             raise RuntimeError(
                 "MotionReader could not be imported. "
                 "Pass a custom ``motion_reader_cls`` when constructing "
-                "LabelProcessor if you are running in an environment without "
+                "LabelLoader if you are running in an environment without "
                 "the `motionstack` package."
             )
 
     # ------------------------------------------------------------------- #
     # Low‑level helpers – they are *private* because external users should
-    # go through the high‑level ``process`` method.
+    # go through the high‑level ``load`` method.
     # ------------------------------------------------------------------- #
     def _load_label_json(self, json_path: pathlib.Path) -> dict:
         """Read a JSON label file and return the parsed dictionary."""
@@ -247,7 +247,7 @@ class LabelProcessor:
     # ------------------------------------------------------------------- #
     # Public API
     # ------------------------------------------------------------------- #
-    def process(self, label_file: str | pathlib.Path) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
+    def load(self, label_file: str | pathlib.Path) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
         """
         End‑to‑end processing of a JSON label file.
 
