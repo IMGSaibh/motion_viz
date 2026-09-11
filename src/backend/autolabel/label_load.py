@@ -192,7 +192,7 @@ class LabelLoader:
             start = int(label["start_frame"])
             end = int(label["end_frame"])
             # Grab the list of element IDs once – the original code kept it as a list.
-            element_ids = [cat["element_id"] for cat in label["categories"]]
+            feature_ids = [cat["feature_id"] for cat in label["categories"]]
 
             for frame_nr in range(start, end):
                 rows.append(
@@ -201,7 +201,7 @@ class LabelLoader:
                         "FRAME_INDEX": frame_nr,
                         "ORIENTATION": rotations[frame_nr],
                         "POSITION": positions[frame_nr],
-                        "LABEL": element_ids,
+                        "LABEL": feature_ids,
                         "ERGO_METHOD": label["ergo_method"],
                     }
                 )
@@ -222,6 +222,47 @@ class LabelLoader:
         )
         return df
 
+
+    def _one_hot_multi_label(self, df, col, max_label=None):
+        """
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Must contain the column `col`.
+        col : str
+            Name of the column that holds an iterable of labels (list, tuple,
+            set, or a string that can be split).
+        max_label : int | None
+            If you know the highest possible label, pass it so the result has a
+            fixed width (otherwise the width is derived from the data).
+
+        Returns
+        -------
+        pd.DataFrame
+            One‑hot matrix (rows = original rows, columns = 1 … max_label)
+        """
+        # 1️⃣ Ensure every entry is a list‑like object
+        ser = df[col].apply(lambda x: x if isinstance(x, (list, tuple, set)) else str(x).split(','))
+
+        # 2️⃣ explode ⇒ one row per (original_index, single_label)
+        exploded = ser.explode()
+
+        # 3️⃣ one‑hot each exploded row
+        dummies = pd.get_dummies(exploded, dtype=int, prefix='', prefix_sep='')
+
+        # 4️⃣ sum back to the original index (groupby) → multi‑hot rows
+        one_hot = dummies.groupby(level=0).sum().astype(int)
+
+        # 5️⃣ optional: enforce a fixed number of columns (1‑based indexing)
+        if max_label is not None:
+            full_cols = list(range(1, max_label + 1))
+            one_hot = one_hot.reindex(columns=full_cols, fill_value=0)
+
+        # 6️⃣ make column names nicer (optional)
+        one_hot.columns = [f"{col}_{c}" for c in one_hot.columns]
+
+        return one_hot
+
     def _prepare_X_y(
         self, df: pd.DataFrame
     ) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
@@ -241,6 +282,8 @@ class LabelLoader:
         X_scaled, scaler = scale_data(X_raw)
 
         # ``LABEL`` is a *list* per row; we convert to a 2‑D integer array.
+        label = df["LABEL"]
+        oh_label = self._o
         y_raw = np.stack(df["LABEL"].tolist()).astype(np.int64)
         return X_scaled, y_raw, scaler
 

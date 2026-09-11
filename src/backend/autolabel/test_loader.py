@@ -15,7 +15,7 @@ processor = LabelLoader(
 # ------------------------------------------------------------------- #
 # Process a single JSON file (relative or absolute path works)
 # ------------------------------------------------------------------- #
-X, y, scaler = processor.load("NaturalTalking_01.bvh_short.json")
+X, y, scaler = processor.load("Female1_D3_ConversationGestures.json")
 
 print("X shape:", X.shape)          # e.g. (n_frames, n_joints*4)
 print("y shape:", y.shape)          # e.g. (n_frames, n_labels_per_frame)
