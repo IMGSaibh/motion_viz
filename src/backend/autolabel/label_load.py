@@ -223,45 +223,18 @@ class LabelLoader:
         return df
 
 
-    def _one_hot_multi_label(self, df, col, max_label=None):
-        """
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Must contain the column `col`.
-        col : str
-            Name of the column that holds an iterable of labels (list, tuple,
-            set, or a string that can be split).
-        max_label : int | None
-            If you know the highest possible label, pass it so the result has a
-            fixed width (otherwise the width is derived from the data).
+    def one_hot_encode_labels(self, df, max_length, column="LABEL"):
+        def encode_cell(cell):
+            return [
+                # -1 to match feature id with array index
+                np.eye(max_length, dtype=int)[np.array(labels) - 1].sum(axis=0)
+                for labels in cell
+            ]
 
-        Returns
-        -------
-        pd.DataFrame
-            One‑hot matrix (rows = original rows, columns = 1 … max_label)
-        """
-        # 1️⃣ Ensure every entry is a list‑like object
-        ser = df[col].apply(lambda x: x if isinstance(x, (list, tuple, set)) else str(x).split(','))
+        df = df.copy()
+        df["ONEHOT"] = df[column].apply(encode_cell)
 
-        # 2️⃣ explode ⇒ one row per (original_index, single_label)
-        exploded = ser.explode()
-
-        # 3️⃣ one‑hot each exploded row
-        dummies = pd.get_dummies(exploded, dtype=int, prefix='', prefix_sep='')
-
-        # 4️⃣ sum back to the original index (groupby) → multi‑hot rows
-        one_hot = dummies.groupby(level=0).sum().astype(int)
-
-        # 5️⃣ optional: enforce a fixed number of columns (1‑based indexing)
-        if max_label is not None:
-            full_cols = list(range(1, max_label + 1))
-            one_hot = one_hot.reindex(columns=full_cols, fill_value=0)
-
-        # 6️⃣ make column names nicer (optional)
-        one_hot.columns = [f"{col}_{c}" for c in one_hot.columns]
-
-        return one_hot
+        return df
 
     def _prepare_X_y(
         self, df: pd.DataFrame
@@ -281,10 +254,9 @@ class LabelLoader:
         X_raw = np.stack(df["ORIENTATION"].tolist()).astype(np.float64)
         X_scaled, scaler = scale_data(X_raw)
 
-        # ``LABEL`` is a *list* per row; we convert to a 2‑D integer array.
-        label = df["LABEL"]
-        oh_label = self._o
-        y_raw = np.stack(df["LABEL"].tolist()).astype(np.int64)
+        # One Hot encoded Labels. 8, since this the maximum per category label in RULA
+        df = self.one_hot_encode_labels(df, 8)
+        y_raw = np.stack(df["ONEHOT"].tolist()).astype(np.int64)
         return X_scaled, y_raw, scaler
 
     # ------------------------------------------------------------------- #
