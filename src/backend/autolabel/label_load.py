@@ -38,7 +38,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
         The scaled matrix and the fitted ``StandardScaler`` instance.
     """
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(X.reshape(X.shape[0],X.shape[1]*X.shape[2]))
     return X_scaled, scaler
 
 
@@ -57,7 +57,7 @@ class LabelLoader:
     >>> from label_loader import LabelLoader
     >>> proc = LabelLoader(
     ...     label_root="/home/aiwlab/hack/motion_viz/data/labels",
-    ...     bvh_root="/data/bvh",
+    ...     motion_root="/data/bvh",
     ...     cache_root="/home/aiwlab/hack/motion_viz/data/labels",
     ... )
     >>> X, y, scaler = proc.load("my_label_file.json")
@@ -67,10 +67,11 @@ class LabelLoader:
     # Public configuration attributes (all are pathlib.Path objects)
     # ------------------------------------------------------------------- #
     label_root: pathlib.Path                # folder that contains *.json label files
-    bvh_root: pathlib.Path                  # folder that contains *.bvh motion files
+    motion_root: pathlib.Path                  # folder that contains motion files
     cache_root: pathlib.Path               # where *.pkl cache files will be stored
     motion_reader_cls: Callable[[pathlib.Path, str], Any] = MotionReader  # default reader
     motion_suffix: str = "bvh_100"          # suffix that MotionReader expects
+
 
     # ------------------------------------------------------------------- #
     # Internals – created once per instance
@@ -83,16 +84,16 @@ class LabelLoader:
     def __post_init__(self) -> None:
         """Normalise all path‑like arguments to ``Path`` objects."""
         self.label_root = pathlib.Path(self.label_root)
-        self.bvh_root = pathlib.Path(self.bvh_root)
+        self.motion_root = pathlib.Path(self.motion_root)
         self.cache_root = pathlib.Path(self.cache_root)
 
         if not self.label_root.is_dir():
             raise FileNotFoundError(
                 f"The label root directory does not exist: {self.label_root}"
             )
-        if not self.bvh_root.is_dir():
+        if not self.motion_root.is_dir():
             raise FileNotFoundError(
-                f"The BVH root directory does not exist: {self.bvh_root}"
+                f"The BVH root directory does not exist: {self.motion_root}"
             )
 
         if self.motion_reader_cls is None:
@@ -102,6 +103,7 @@ class LabelLoader:
                 "LabelLoader if you are running in an environment without "
                 "the `motionstack` package."
             )
+
 
     # ------------------------------------------------------------------- #
     # Low‑level helpers – they are *private* because external users should
@@ -125,12 +127,19 @@ class LabelLoader:
         The original code used a relative path that walked four directories
         up – we keep the same behaviour but make it explicit.
         """
+        if self.motion_suffix.startswith('bvh'):
+            file_suffix = 'bvh'
+        elif self.motion_suffix.endswith('pkl'):
+            file_suffix = 'pkl'
+        else:
+            file_suffix = self.motion_suffix
+        
         stem = label_path.stem
-        candidate = self.bvh_root / f"{stem}.bvh"
+        candidate = self.motion_root / f"{stem}.{file_suffix}"
         if not candidate.is_file():
             raise FileNotFoundError(
                 f"Corresponding motion file not found for label {label_path!s}. "
-                f"Expected BVH at {candidate!s}"
+                f"Expected {file_suffix}-file at {candidate!s}"
             )
         return candidate
 
@@ -194,7 +203,7 @@ class LabelLoader:
             # Grab the list of element IDs once – the original code kept it as a list.
             feature_ids = [cat["feature_id"] for cat in label["categories"]]
 
-            for frame_nr in range(start, end):
+            for frame_nr in range(start, end+1):
                 rows.append(
                     {
                         "FILEPATH": str(json_path),
@@ -287,7 +296,7 @@ class LabelLoader:
         if not label_path.is_absolute():
             label_path = self.label_root / label_path
 
-        cache_path = self.cache_root / f"{label_path.stem}.pkl"
+        cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
 
         # ------------------------------------------------------------------- #
         # Load from cache if available
