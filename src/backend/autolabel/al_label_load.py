@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
+
 # --------------------------------------------------------------------------- #
 # Optional: if you want a default import that works out‑of‑the‑box
 # --------------------------------------------------------------------------- #
@@ -69,7 +70,6 @@ class LabelLoader:
     label_root: pathlib.Path                # folder that contains *.json label files
     motion_root: pathlib.Path                  # folder that contains motion files
     cache_root: pathlib.Path               # where *.pkl cache files will be stored
-    motion_reader_cls: Callable[[pathlib.Path, str], Any] = MotionReader  # default reader
     motion_suffix: str = "bvh_100"          # suffix that MotionReader expects
 
 
@@ -96,13 +96,6 @@ class LabelLoader:
                 f"The BVH root directory does not exist: {self.motion_root}"
             )
 
-        if self.motion_reader_cls is None:
-            raise RuntimeError(
-                "MotionReader could not be imported. "
-                "Pass a custom ``motion_reader_cls`` when constructing "
-                "LabelLoader if you are running in an environment without "
-                "the `motionstack` package."
-            )
 
 
     # ------------------------------------------------------------------- #
@@ -146,7 +139,7 @@ class LabelLoader:
     def _get_label_path_from_motion(self, motion_path: pathlib.Path) -> pathlib.Path:
         """
         Reverse of ``_get_motion_path_from_label`` – useful when you only have
-        the BVH file and want to locate the JSON file.
+        the motion file and want to locate the label-JSON file.
 
         Currently returns ``<label_root>/<stem>.json``.
         """
@@ -159,20 +152,21 @@ class LabelLoader:
             )
         return candidate
 
-    def _read_motion(self, bvh_path: pathlib.Path) -> Tuple[np.ndarray, np.ndarray]:
+    def _read_motion(self, motion_path: pathlib.Path) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Load a BVH file via ``MotionReader`` and return two numpy arrays:
-
-        * rotations – shape ``(n_frames, n_joints, 4)`` (quaternion)
-        * positions – shape ``(n_frames, n_joints, 3)`` (XYZ)
+        Loads a motionstack-converted npy-file with shape:
+        * ``(n_frames, n_joints, 7)``,
+        * where 
+        * [0-2] are positions (x,y,z)
+        * and
+        * [3-6] quaternions in w,x,y,z
         """
-        self._logger.debug("Reading motion data from %s", bvh_path)
-        mr = self.motion_reader_cls(bvh_path, self.motion_suffix)
-
-        # The original script assumed that ``motion.get_rotations`` and
-        # ``motion.get_positions`` already return list‑like structures.
-        rotations = np.array(mr.motion.get_rotations())
-        positions = np.array(mr.motion.get_positions())
+        self._logger.debug("Reading motion data from %s", motion_path)
+        motiondata = np.load(motion_path)       
+   
+        positions = motiondata[:,:,[0,1,2]]
+        rotations = motiondata[:,:,[3,4,5,6]]
+        
         return rotations, positions
 
     def _create_dataframe(
