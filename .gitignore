@@ -42,3 +42,7 @@ dist/
 
 # === motion-viz files ===
 /data/
+
+
+# === test-files ===
+test*.py
