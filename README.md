@@ -13,6 +13,7 @@ backend and ThreeJS Engine frontend.
 # Installation (using vs code editor is recommended)
 
 ## Create data folder
+
 ```bash
 mkdir data
 ```
@@ -180,15 +181,3 @@ main.py
 │
 └── main.tsx                            ← Root
 ```
-
-- Container
-  - maintains local state
-  - calls hooks or backend functions
-  - is familiar with the Three.js manager
-  - handles events
-  - passes data as props to presenter components
-  - This component controls this specific area of the interface
-  - It is therefore associated with a specific feature or UI area
-- Context
-  - This data and states should be available for multiple components in the
-    component tree.
