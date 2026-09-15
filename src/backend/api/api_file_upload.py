@@ -8,12 +8,12 @@ router = APIRouter()
 @router.post("/upload")
 async def upload(files: List[UploadFile] = File(...)):
     target_dirs = {
-        ".bvh": Path("data/bvh"),
-        ".csv": Path("data/csv"),
-        ".fbx": Path("data/fbx"),
-        ".json": Path("data/json"),
-        ".mvnx": Path("data/mvnx"),
-        ".npy": Path("data/npy"),
+        ".bvh": Path("data/originals"),
+        ".csv": Path("data/originals"),
+        ".fbx": Path("data/originals"),
+        ".json": Path("data/originals"),
+        ".mvnx": Path("data/originals"),
+        ".npy": Path("data/originals"),
     }
     # make sure all target directories exist
     for target in target_dirs.values():

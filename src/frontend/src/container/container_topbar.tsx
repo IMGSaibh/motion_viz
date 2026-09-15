@@ -121,27 +121,26 @@ export function ContainerTopbar() {
     if (result.error) error(get_error_message(result.error, 'Could not refresh file list'));
   }
 
-  async function handle_motion_file_list_on_select(filename: string) {
+  async function handle_motion_file_list_on_select(relativ_file_url: string) {
     reset_current_motion();
-    if (!filename) return;
+    if (!relativ_file_url) return;
 
-    set_selected_motion(filename);
+    set_selected_motion(relativ_file_url);
     try {
-      await load_motion_file(filename);
+      await load_motion_file(relativ_file_url);
       stop();
       go_to_frame(0);
       set_frame_slider_value(0);
       set_range(null);
-
-      const loaded_labels = await load_labels.mutateAsync(filename);
+      const loaded_labels = await load_labels.mutateAsync(relativ_file_url);
       load_slider_labels_for_file(loaded_labels);
       set_rula_selected(create_empty_rula_selection());
       set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
 
-      if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${filename}`);
+      if (loaded_labels.length > 0) success(`Loaded ${loaded_labels.length} label(s) for ${relativ_file_url}`);
     } catch (requestError: unknown) {
       clear_slider_label_list();
-      error(get_error_message(requestError, `Could not load ${filename}`));
+      error(get_error_message(requestError, `Could not load ${relativ_file_url}`));
     }
   }
 
