@@ -9,10 +9,11 @@ workspacefolder = Path.cwd()
 @router.get("/list_files")
 async def list_motion_files(response: Response):
     orignals_dir_path = Path.joinpath(workspacefolder, "data/originals/")
+    npy_dir_path = Path.joinpath(workspacefolder, "data/npy/")
     result = {
         "bvh": sorted("data/originals/" + f.name for f in orignals_dir_path.glob("*.bvh")),
         "fbx": sorted("data/originals/" + f.name for f in orignals_dir_path.glob("*.fbx")),
-        "npy": sorted("data/originals/" + f.name for f in orignals_dir_path.glob("*.npy")),
+        "npy": sorted("data/npy/" + f.name for f in npy_dir_path.glob("*.npy")),
     }
 
     response.headers["Cache-Control"] = "max-age=30"

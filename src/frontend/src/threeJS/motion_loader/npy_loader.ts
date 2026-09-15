@@ -124,16 +124,16 @@ export class NPY_loader {
     //   wireframe: true,
     // });
 
-    const jointGraph = skeleton['joint-graph'];
-    if (!jointGraph) {
-      console.error("ERROR: Skeleton JSON does not contain a 'joint-graph'!");
+    // const jointGraph = skeleton;
+    if (!skeleton || !Array.isArray(skeleton)) {
+      console.error('ERROR: Skeleton JSON is not a valid joint array!');
       return;
     }
 
     // Rebuild the NPY skeleton from the parent-child graph.
     this.npy_skeleton = [];
 
-    for (const joint of jointGraph) {
+    for (const joint of skeleton) {
       const childIdx = joint.id;
       const parentIdx = joint.pid;
 
