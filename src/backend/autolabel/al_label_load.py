@@ -49,7 +49,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
 @dataclass
 class LabelLoader:
     """
-    High‑level helper that turns a JSON label file + its corresponding BVH
+    High‑level helper that turns a JSON label file + its corresponding motion
     motion file into a tidy ``pandas.DataFrame`` and finally into
     ``(X, y, scaler)`` ready for ML pipelines.
 
@@ -271,7 +271,7 @@ class LabelLoader:
 
         1. Look for a cached ``*.pkl`` version in ``cache_root``.
         2. If it does **not** exist:
-           * read the matching BVH file,
+           * read the matching motion file,
            * build the DataFrame,
            * store the DataFrame as ``*.pkl`` for future runs.
         3. Return the scaled feature matrix ``X``, the integer label matrix ``y``,
@@ -305,7 +305,7 @@ class LabelLoader:
             self._logger.info(
                 "Cache miss for %s – building DataFrame from scratch.", label_path.name
             )
-            bvh_path = self._get_motion_path_from_label(label_path)
+            motion_path = self._get_motion_path_from_label(label_path)
             rotations, positions = self._read_motion(bvh_path)
             df = self._create_dataframe(label_path, rotations, positions)
 
