@@ -81,14 +81,14 @@ export class ThreeJSEngine {
     this.loop.stop();
   }
 
-  async load_motionfile_and_player(filename: string | null) {
-    if (!filename) {
+  async load_motionfile_and_player(relativ_file_url: string | null) {
+    if (!relativ_file_url) {
       console.log('no motion file selected');
       return;
     }
-    const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
-    const fileUrl = api_get_base_url(`/data/${file_extension}/${filename}`);
+    const fileUrl = api_get_base_url(`${relativ_file_url}`);
+    const file_extension = relativ_file_url.split('.').pop();
 
     // Loaders own scene objects and parsing; players expose a common playback contract to this manager.
     switch (file_extension) {

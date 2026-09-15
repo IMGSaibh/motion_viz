@@ -1,4 +1,6 @@
+from marshal import load
 from pathlib import Path
+from posixpath import join
 from fastapi import APIRouter
 from motionstack.reader import MotionReader
 import numpy as np
@@ -9,60 +11,49 @@ workspacefolder = Path.cwd()
 async def convert_with_motionstack():
    
     workspacefolder = Path.cwd()
-    mvnx_dir_path = Path.joinpath(workspacefolder, "data/mvnx/")
+    orignals_dir_path = Path.joinpath(workspacefolder, "data/originals/")
     npy_dir_path = Path.joinpath(workspacefolder, "data/npy")
-    json_dir = Path.joinpath(workspacefolder, "data/json")
-
-
-    mvnx_dir_path.mkdir(parents=True, exist_ok=True)
-    json_dir.mkdir(parents=True, exist_ok=True)
     npy_dir_path.mkdir(parents=True, exist_ok=True)
-    
-    mvnx_files = list(mvnx_dir_path.glob("*.mvnx"))
 
-    if not mvnx_files:
-        return {
-            "message": "",
-            "warning": "no pose viewer compatible files found.",
-        }
-    
 
     # Pairs of descriptor_file and mocap_file
     # ======================================= Work activities =======================================
     file_pairs = [
 
         # aimove
-        (f"{workspacefolder}/data/bvh/S3P03R3.bvh",
-        "bvh_pos_100"),                                                                            
+        (f"{orignals_dir_path}/S3P03R3.bvh","bvh_pos_100"),                                                                            
 
         # mmhd
-        (f"{workspacefolder}/data/mvnx/Subj_01_Isokin_L_02kg_St.mvnx",
-          "xsens_mvnx"),                                                                                 
+        (f"{orignals_dir_path}/Subj_01_Isokin_L_02kg_St.mvnx","xsens_mvnx"),                                                                                 
 
         # carda
-        (f"{workspacefolder}/data/bvh/xsens_003_WS10_2023_09_21_cropped.bvh",
-          "bvh_pos_1000"),                                                                          
+        (f"{orignals_dir_path}/xsens_003_WS10_2023_09_21_cropped.bvh","bvh_pos_1000"),                                                                          
 
         # andy data
-        (f"{workspacefolder}/data/mvnx/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx",
-                       "xsens_mvnx"),                                                                 
+        (f"{orignals_dir_path}/Participant_541_Setup_A_Seq_4_Trial_2.xsens.mvnx","xsens_mvnx"),                                                                 
 
         # inhard
-        (f"{workspacefolder}/data/bvh/P01_R01_short.bvh",
-        "bvh_pos_100"),                                                                                  
+        (f"{orignals_dir_path}/P01_R01_short.bvh","bvh_pos_100"),
 
         # # Vicon Poeticon
-        (f"{workspacefolder}/data/bvh/7-10-09-cleaning-002-suitA.bvh",
-          "bvh_pos_100"),                                                                               
+        (f"{orignals_dir_path}/7-10-09-cleaning-002-suitA.bvh","bvh_pos_100"),                                                                               
 
         #  Lara 
-        (f"{workspacefolder}/data/csv/L02_S01_R04_A17_N01_norm_data.csv",
-        "lara_csv"),                                                                                        
+        (f"{orignals_dir_path}/L02_S01_R04_A17_N01_norm_data.csv","lara_csv"),                                                                                        
 
     ]
 
+    mvnx_files = list(orignals_dir_path.glob("*.mvnx"))
+
+    if not mvnx_files:
+        return {
+            "message": "",
+            "warning": "no pose viewer compatible files found.",
+        }
+
     for mfile in mvnx_files:
             file_pairs.append((str(mfile),"xsens_mvnx"))
+
 
     print("Start converting files")
     for mocap_file, descriptor_file in file_pairs:
