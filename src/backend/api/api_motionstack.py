@@ -56,10 +56,10 @@ async def convert_with_motionstack():
         }
 
     for mfile in mvnx_files:
-            file_pairs.append((str(mfile),"xsens_xlsx_pos_only"))
+            file_pairs.append((str(mfile),"xsens_mvnx"))
 
     for bfile in bvh_files:
-            file_pairs.append((str(bfile),"bvh_100"))
+            file_pairs.append((str(bfile),"bvh_10"))
 
     print("Start converting files")
     for mocap_file, descriptor_file in file_pairs:
@@ -76,6 +76,7 @@ async def convert_with_motionstack():
             
             save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
             position_array = np.ascontiguousarray(reader.motion.get_positions())
+            rotations = reader.motion.get_rotations()
             np.save(save_npy_path, position_array)
             print(f"Successful converted {mocap_file} to {save_npy_path}")
 

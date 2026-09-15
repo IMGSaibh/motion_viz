@@ -52,7 +52,7 @@ export class NPY_loader {
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.joint_size = 0.2;
+    this.joint_size = 0.02;
     this.scene = scene;
     this.joint_indices_names = [];
     this.joint_indices_names_text = new THREE.Group();
@@ -99,7 +99,7 @@ export class NPY_loader {
       this.joints.push(sphere);
 
       this.joint_indices_names[i].text = String(i);
-      this.joint_indices_names[i].fontSize = 2.2;
+      this.joint_indices_names[i].fontSize = 0.02;
       this.joint_indices_names[i].anchorX = 'center';
       this.joint_indices_names[i].anchorY = 'middle';
       this.joint_indices_names[i].color = 0x000000;
@@ -114,7 +114,7 @@ export class NPY_loader {
   }
 
   _create_bones(skeleton: any, renderer: THREE.WebGLRenderer | null = null) {
-    const boneGeometry = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 8);
+    const boneGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.5, 8);
     const boneMaterial = new THREE.MeshNormalMaterial({
       // wireframe: true,
     });
