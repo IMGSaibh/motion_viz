@@ -12,14 +12,6 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-# --------------------------------------------------------------------------- #
-# Optional: if you want a default import that works out‑of‑the‑box
-# --------------------------------------------------------------------------- #
-try:
-    from motionstack.reader import MotionReader  # type: ignore
-except Exception:  # pragma: no cover
-    MotionReader = None  # noqa: N801  (kept for typing purposes only)
-
 
 # --------------------------------------------------------------------------- #
 # Helper – simple wrapper around StandardScaler (kept public for re‑use)
