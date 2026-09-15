@@ -70,7 +70,6 @@ class LabelLoader:
     label_root: pathlib.Path                # folder that contains *.json label files
     motion_root: pathlib.Path                  # folder that contains motion files
     cache_root: pathlib.Path               # where *.pkl cache files will be stored
-    motion_suffix: str           # suffix that MotionReader expects
 
 
     # ------------------------------------------------------------------- #
@@ -86,11 +85,6 @@ class LabelLoader:
         self.label_root = pathlib.Path(self.label_root)
         self.motion_root = pathlib.Path(self.motion_root)
         self.cache_root = pathlib.Path(self.cache_root)
-
-        if not self.motion_suffix:
-            raise ValueError(
-                f"No Motion suffix defined."
-            )
 
         if not self.label_root.is_dir():
             raise FileNotFoundError(
@@ -118,28 +112,6 @@ class LabelLoader:
         except json.JSONDecodeError as exc:
             raise ValueError(f"Invalid JSON in file {json_path}") from exc
 
-    def _get_motion_path_from_label(self, label_path: pathlib.Path) -> pathlib.Path:
-        """
-        Derive the expected BVH file name from a label file name.
-
-        The original code used a relative path that walked four directories
-        up – we keep the same behaviour but make it explicit.
-        """
-        if self.motion_suffix.startswith('bvh'):
-            file_suffix = 'bvh'
-        elif self.motion_suffix.endswith('pkl'):
-            file_suffix = 'pkl'
-        else:
-            file_suffix = self.motion_suffix
-        
-        stem = label_path.stem
-        candidate = self.motion_root / f"{stem}.{file_suffix}"
-        if not candidate.is_file():
-            raise FileNotFoundError(
-                f"Corresponding motion file not found for label {label_path!s}. "
-                f"Expected {file_suffix}-file at {candidate!s}"
-            )
-        return candidate
 
     def _get_label_path_from_motion(self, motion_path: pathlib.Path) -> pathlib.Path:
         """
