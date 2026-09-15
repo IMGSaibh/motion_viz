@@ -77,7 +77,11 @@ async def convert_with_motionstack():
             save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
             position_array = np.ascontiguousarray(reader.motion.get_positions())
             rotations = reader.motion.get_rotations()
-            np.save(save_npy_path, position_array)
+            rotation_array = np.ascontiguousarray(rotations)
+            # combines position and rotation arrays to (frames, joints, 7): [x, y, z, qx, qy, qz, qw]
+            combined_array = np.concatenate([position_array, rotation_array], axis=-1)
+
+            np.save(save_npy_path, combined_array)
             print(f"Successful converted {mocap_file} to {save_npy_path}")
 
             joint_graph = reader.skeleton.joint_graph
