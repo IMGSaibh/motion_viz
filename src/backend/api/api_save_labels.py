@@ -44,12 +44,13 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
             "categories": [category.model_dump() for category in item.categories],
         })
 
-    target_dir = Path("data/labels")
+    mocap_file_ending = Path(payload.motion_name).suffix.strip('.')
+    path_to_mocap_file = f"data/{mocap_file_ending}/{payload.motion_name}"
+    
+    target_dir = Path(f"data/labels/{mocap_file_ending}/").parent
     target_dir.mkdir(parents=True, exist_ok=True)
-    label_json_file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
 
-    mocap_file_ending = Path(payload.motion_name).suffix
-    path_to_mocap_file = f"data/{mocap_file_ending[1:]}/{payload.motion_name}"
+    label_json_file_path = target_dir / f"{Path(payload.motion_name).stem}.json"
 
     label_file = {
         "file_path": path_to_mocap_file,
