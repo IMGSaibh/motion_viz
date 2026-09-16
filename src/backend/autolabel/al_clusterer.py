@@ -32,66 +32,9 @@ from sklearn.metrics import silhouette_score
 
 from tensorflow.keras.models import Model
 
-# ------------------------------------------------------------------- #
-# 1️⃣  Loader
-# ------------------------------------------------------------------- #
-class BaseLoader(ABC):
-    """Abstract loader – subclasses must implement ``load``."""
-
-    @abstractmethod
-    def load(self) -> Tuple[np.ndarray, np.ndarray]:
-        """Return (X, y) where
-
-        * ``X`` – numeric feature matrix, shape (n_samples, n_features)
-        * ``y`` – ground‑truth labels, shape (n_samples,)
-        """
-        ...
-
 
 # ------------------------------------------------------------------- #
-# Concrete wrapper around the *your* existing `LabelLoader`.  This is
-# deliberately tiny – you can replace it with any other data source.
-# ------------------------------------------------------------------- #
-class LabelLoaderAdapter(BaseLoader):
-    """
-    Adapter that turns the ``al_label_load.LabelLoader`` class into a
-    ``BaseLoader`` implementation.
-
-    Parameters
-    ----------
-    json_file : str | Path
-        The JSON file you want to read (relative to ``label_root``).
-    label_root, motion_root, cache_root : Path
-        Same arguments you already pass to ``LabelLoader``.
-    """
-
-    def __init__(
-        self,
-        json_file: Union[str, Path],
-        label_root: Union[str, Path] = "data/labels",
-        motion_root: Union[str, Path] = "data/npy",
-        cache_root: Union[str, Path] = "data/labels",
-    ):
-        from al_label_load import LabelLoader  # local import to avoid hard dependency
-
-        self.json_file = Path(json_file)
-        self.loader = LabelLoader(
-            label_root=Path(label_root),
-            motion_root=Path(motion_root),
-            cache_root=Path(cache_root),
-        )
-
-    def load(self) -> Tuple[np.ndarray, np.ndarray]:
-        X, y, _ = self.loader.load(str(self.json_file))
-
-        # Flatten the label tensor and collapse each row into a single string.
-        y_flat = y.reshape(y.shape[0], -1)
-        y_str = np.array(["_".join(map(str, row)) for row in y_flat])
-        return X.astype(np.float32), y_str
-
-
-# ------------------------------------------------------------------- #
-# 2️⃣  Dimension‑reducer
+# Dimension‑reducer
 # ------------------------------------------------------------------- #
 class BaseReducer(ABC):
     """Abstract reducer – subclasses must implement ``fit_transform``."""
@@ -202,7 +145,7 @@ class AutoEncoderReducer(BaseReducer):
 
 
 # ------------------------------------------------------------------- #
-# 3️⃣  Clusterer
+# Clusterer
 # ------------------------------------------------------------------- #
 class BaseClusterer(ABC):
     """Abstract clustering algorithm."""
@@ -266,7 +209,7 @@ class KMeansClusterer(BaseClusterer):
 
 
 # ------------------------------------------------------------------- #
-# 4️⃣  Cluster evaluator
+# Cluster evaluator
 # ------------------------------------------------------------------- #
 @dataclass
 class ClusterEval:
