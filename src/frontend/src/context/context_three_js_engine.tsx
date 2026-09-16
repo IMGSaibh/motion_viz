@@ -61,14 +61,13 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const load_motion_file = useCallback(
-    async (file: string) => {
+    async (relativ_file_url: string) => {
       if (!threejs_mngr_ref.current) return; // Engine not ready
 
       threejs_mngr_ref.current.cleanup_player?.();
       threejs_mngr_ref.current.cleanup_loop?.();
       threejs_mngr_ref.current.cleanup_thumbnail_render?.();
-
-      await threejs_mngr_ref.current.load_motionfile_and_player(file);
+      await threejs_mngr_ref.current.load_motionfile_and_player(relativ_file_url);
 
       const framecount = threejs_mngr_ref.current.get_frame_count?.() ?? 0;
       set_frame_count(framecount);

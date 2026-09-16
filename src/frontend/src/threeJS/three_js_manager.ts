@@ -81,14 +81,14 @@ export class ThreeJSEngine {
     this.loop.stop();
   }
 
-  async load_motionfile_and_player(filename: string | null) {
-    if (!filename) {
+  async load_motionfile_and_player(relativ_file_url: string | null) {
+    if (!relativ_file_url) {
       console.log('no motion file selected');
       return;
     }
-    const file_extension = filename.split('.').pop()?.toLowerCase() ?? '';
     // const fileUrl = `http://localhost:8000/data/${file_extension}/${filename}`;
-    const fileUrl = api_get_base_url(`/data/${file_extension}/${filename}`);
+    const fileUrl = api_get_base_url(`${relativ_file_url}`);
+    const file_extension = relativ_file_url.split('.').pop();
 
     // Loaders own scene objects and parsing; players expose a common playback contract to this manager.
     switch (file_extension) {
@@ -110,7 +110,7 @@ export class ThreeJSEngine {
         this.npy_loader = new NPY_loader(this.scene);
         await this.npy_loader.load_npy_animation(fileUrl);
 
-        const skeletonPath = fileUrl.replace('/data/npy/', '/data/json/').replace(/\.npy$/i, '.json');
+        const skeletonPath = fileUrl.replace('/data/npy/', '/data/skeletons/').replace(/\.npy$/i, '.json');
         await this.npy_loader.create_skeleton(skeletonPath);
         this.npy_player = new NPY_Player(this.npy_loader);
         this.loop.updatables.push(this.npy_player.npy_player_object);

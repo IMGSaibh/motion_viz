@@ -162,8 +162,10 @@ export function save_blob({ blob, file_name }: LabelsDownload): void {
   }
 }
 
-export async function load_labels_for_file(filename: string): Promise<ErgoLabel[]> {
-  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${encodeURIComponent(filename)}`), {
+export async function load_labels_for_file(relativ_file_url: string): Promise<ErgoLabel[]> {
+  const motionFileName = relativ_file_url.split('/').pop() ?? relativ_file_url;
+
+  const response = await fetch(api_get_base_url(`${ENDPOINTS.load}/${encodeURIComponent(motionFileName)}`), {
     method: 'GET',
   });
   await assert_response_ok(response, 'Load labels');

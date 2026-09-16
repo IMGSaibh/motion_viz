@@ -27,9 +27,9 @@ export function WidgetListFiles(props: Props) {
     props.motion_file_list_on_open();
   }
 
-  function handle_select(filename: string) {
+  function handle_select(relativ_file_url: string) {
     set_menu_anchor(null);
-    props.motion_file_list_on_select(filename);
+    props.motion_file_list_on_select(relativ_file_url);
   }
 
   return (
@@ -47,11 +47,14 @@ export function WidgetListFiles(props: Props) {
         <MenuItem onClick={() => handle_select('')}>
           <em>Select file</em>
         </MenuItem>
-        {props.motion_files.map((file_obj) => (
-          <MenuItem key={file_obj.name} onClick={() => handle_select(file_obj.name)}>
-            [{file_obj.type.toUpperCase()}] {file_obj.name}
-          </MenuItem>
-        ))}
+        {props.motion_files.map((file_obj) => {
+          const fileNameOnly = file_obj.name.split('/').pop();
+          return (
+            <MenuItem key={file_obj.name} onClick={() => handle_select(file_obj.name)}>
+              [{file_obj.type.toUpperCase()}] {fileNameOnly}
+            </MenuItem>
+          );
+        })}
       </Menu>
     </FormControl>
   );
