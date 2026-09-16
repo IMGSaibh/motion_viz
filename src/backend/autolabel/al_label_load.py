@@ -31,7 +31,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
         The scaled matrix and the fitted ``StandardScaler`` instance.
     """
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X.reshape(X.shape[0],X.shape[1]*X.shape[2]))
+    X_scaled = scaler.fit_transform(X)
     return X_scaled, scaler
 
 
@@ -224,12 +224,17 @@ class LabelLoader:
         """
         # ``ORIENTATION`` holds a quaternion per row – we need to flatten it.
         X_raw = np.stack(df["ORIENTATION"].tolist()).astype(np.float64)
+
+        # flatten
+        X_raw = X_raw.reshape(X_raw.shape[0],X_raw.shape[1]*X_raw.shape[2])
         X_scaled, scaler = scale_data(X_raw)
 
         # One Hot encoded Labels. 8, since this the maximum per category label in RULA
         df = self.one_hot_encode_labels(df, 8)
         y_raw = np.stack(df["ONEHOT"].tolist()).astype(np.int64)
-        return X_scaled, y_raw, scaler
+
+        # quaternions do not need scaling
+        return X_raw, y_raw, scaler
 
     # ------------------------------------------------------------------- #
     # Public API
