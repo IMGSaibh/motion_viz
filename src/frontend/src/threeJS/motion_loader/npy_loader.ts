@@ -52,7 +52,7 @@ export class NPY_loader {
     this.elapsed = 0;
     this.speed = 1.0;
     this.fps = 60;
-    this.joint_size = 0.2;
+    this.joint_size = 0.02;
     this.scene = scene;
     this.joint_indices_names = [];
     this.joint_indices_names_text = new THREE.Group();
@@ -99,7 +99,7 @@ export class NPY_loader {
       this.joints.push(sphere);
 
       this.joint_indices_names[i].text = String(i);
-      this.joint_indices_names[i].fontSize = 2.2;
+      this.joint_indices_names[i].fontSize = 0.02;
       this.joint_indices_names[i].anchorX = 'center';
       this.joint_indices_names[i].anchorY = 'middle';
       this.joint_indices_names[i].color = 0x000000;
@@ -114,7 +114,7 @@ export class NPY_loader {
   }
 
   _create_bones(skeleton: any, renderer: THREE.WebGLRenderer | null = null) {
-    const boneGeometry = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 8);
+    const boneGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.5, 8);
     const boneMaterial = new THREE.MeshNormalMaterial({
       // wireframe: true,
     });
@@ -124,16 +124,16 @@ export class NPY_loader {
     //   wireframe: true,
     // });
 
-    const jointGraph = skeleton['joint-graph'];
-    if (!jointGraph) {
-      console.error("ERROR: Skeleton JSON does not contain a 'joint-graph'!");
+    // const jointGraph = skeleton;
+    if (!skeleton || !Array.isArray(skeleton)) {
+      console.error('ERROR: Skeleton JSON is not a valid joint array!');
       return;
     }
 
     // Rebuild the NPY skeleton from the parent-child graph.
     this.npy_skeleton = [];
 
-    for (const joint of jointGraph) {
+    for (const joint of skeleton) {
       const childIdx = joint.id;
       const parentIdx = joint.pid;
 
@@ -161,11 +161,11 @@ export class NPY_loader {
     const direction = new THREE.Vector3();
     const middle_point = new THREE.Vector3();
 
-    const base = frameIdx * this.jointCount * 3;
+    const base = frameIdx * this.jointCount * 7;
     for (let i = 0; i < this.jointCount; i++) {
-      const x = this.numpy_data[base + i * 3 + 0];
-      const y = this.numpy_data[base + i * 3 + 1];
-      const z = this.numpy_data[base + i * 3 + 2];
+      const x = this.numpy_data[base + i * 7 + 0];
+      const y = this.numpy_data[base + i * 7 + 1];
+      const z = this.numpy_data[base + i * 7 + 2];
       this.joints[i].position.set(x, y, z);
 
       this.joint_indices_names[i].position.set(x, y + this.joint_size * 2.2, z);

@@ -41,20 +41,20 @@ import btn_rula_t_6 from '@/Assets/rula_images/rula_plus.png';
 import btn_rula_l_1 from '@/Assets/rula_images/rula_plus.png';
 
 // owas images
-import btn1_owas from '@/Assets/owas_images/Label_1.png';
-import btn2_owas from '@/Assets/owas_images/Label_2.png';
-import btn3_owas from '@/Assets/owas_images/Label_3.png';
-import btn4_owas from '@/Assets/owas_images/Label_4.png';
-import btn5_owas from '@/Assets/owas_images/Label_5.png';
-import btn6_owas from '@/Assets/owas_images/Label_6.png';
-import btn7_owas from '@/Assets/owas_images/Label_7.png';
-import btn8_owas from '@/Assets/owas_images/Label_8.png';
-import btn9_owas from '@/Assets/owas_images/Label_9.png';
-import btn10_owas from '@/Assets/owas_images/Label_10.png';
-import btn11_owas from '@/Assets/owas_images/Label_11.png';
-import btn12_owas from '@/Assets/owas_images/Label_12.png';
-import btn13_owas from '@/Assets/owas_images/Label_13.png';
-import btn14_owas from '@/Assets/owas_images/Label_14.png';
+import btn_owas_b_1 from '@/Assets/owas_images/owas_back_1_straight.png';
+import btn_owas_b_2 from '@/Assets/owas_images/owas_back_2_bent.png';
+import btn_owas_b_3 from '@/Assets/owas_images/owas_back_3_straight_twisted.png';
+import btn_owas_b_4 from '@/Assets/owas_images/owas_back_4_bent_twisted.png';
+import btn_owas_a_1 from '@/Assets/owas_images/owas_arms_1_below.png';
+import btn_owas_a_2 from '@/Assets/owas_images/owas_arms_2_one_above.png';
+import btn_owas_a_3 from '@/Assets/owas_images/owas_arms_3_both_above.png';
+import btn_owas_l_1 from '@/Assets/owas_images/owas_legs_1_straight.png';
+import btn_owas_l_2 from '@/Assets/owas_images/owas_legs_2_one_load.png';
+import btn_owas_l_3 from '@/Assets/owas_images/owas_legs_3_both_bent.png';
+import btn_owas_l_4 from '@/Assets/owas_images/owas_legs_4_load_one.png';
+import btn_owas_l_5 from '@/Assets/owas_images/owas_legs_5_kneeling.png';
+import btn_owas_l_6 from '@/Assets/owas_images/owas_legs_6_moved.png';
+import btn_owas_l_7 from '@/Assets/owas_images/owas_legs_7_hanging.png';
 
 // lmm images
 import btn1_lmm from '@/Assets/lmm_images/Label_1.png';
@@ -147,32 +147,32 @@ export function get_label_all_label_images_rula(): ReadonlyMap<string, LabelImag
 
 // OWAS IMAGES
 const LABEL_IMAGES_CAT1_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 2', src: btn2_owas, category: 'CAT_BACK' },
-  { name: 'Code 1', src: btn1_owas, category: 'CAT_BACK' },
-  { name: 'Code 3', src: btn3_owas, category: 'CAT_BACK' },
-  { name: 'Code 4', src: btn4_owas, category: 'CAT_BACK' },
+  { name: 'straight', src: btn_owas_b_1, category: 'CAT_BACK' },
+  { name: 'bent', src: btn_owas_b_2, category: 'CAT_BACK' },  
+  { name: 'straight and twisted', src: btn_owas_b_3, category: 'CAT_BACK' },
+  { name: 'bent and twisted', src: btn_owas_b_4, category: 'CAT_BACK' },
 ];
 
 const LABEL_IMAGES_CAT2_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'CAT_ARMS' },
-  { name: 'Code 2', src: btn6_owas, category: 'CAT_ARMS' },
-  { name: 'Code 3', src: btn7_owas, category: 'CAT_ARMS' },
+  { name: 'both limbs on or below shoulder level', src: btn_owas_a_1, category: 'CAT_ARMS' },
+  { name: 'one limb on or above shoulder level', src: btn_owas_a_2, category: 'CAT_ARMS' },
+  { name: 'both limbs abouve shoulder level', src: btn_owas_a_3, category: 'CAT_ARMS' },
 ];
 
 const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn8_owas, category: 'CAT_LEGS' },
-  { name: 'Code 2', src: btn9_owas, category: 'CAT_LEGS' },
-  { name: 'Code 3', src: btn10_owas, category: 'CAT_LEGS' },
-  { name: 'Code 4', src: btn11_owas, category: 'CAT_LEGS' },
-  { name: 'Code 5', src: btn12_owas, category: 'CAT_LEGS' },
-  { name: 'Code 6', src: btn13_owas, category: 'CAT_LEGS' },
-  { name: 'Code 7', src: btn14_owas, category: 'CAT_LEGS' },
+  { name: 'loading on both limbs, straight', src: btn_owas_l_1, category: 'CAT_LEGS' },
+  { name: 'loading on one limb, straight', src: btn_owas_l_2, category: 'CAT_LEGS' },
+  { name: 'loading on both limbs, bent', src: btn_owas_l_3, category: 'CAT_LEGS' },
+  { name: 'loading on one limb, bent', src: btn_owas_l_4, category: 'CAT_LEGS' },
+  { name: 'loading on one limb, kneeling ', src: btn_owas_l_5, category: 'CAT_LEGS' },
+  { name: 'body is moved by the limbs', src: btn_owas_l_6, category: 'CAT_LEGS' },
+  { name: 'both limbs hanging free', src: btn_owas_l_7, category: 'CAT_LEGS' },
 ];
 
 const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'Code 1', src: btn5_owas, category: 'CAT_LOAD' },
-  { name: 'Code 2', src: btn6_owas, category: 'CAT_LOAD' },
-  { name: 'Code 3', src: btn7_owas, category: 'CAT_LOAD' },
+  { name: 'TODO', src: btn_owas_a_1, category: 'CAT_LOAD' },
+  { name: 'TODO', src: btn_owas_a_2, category: 'CAT_LOAD' },
+  { name: 'TODO', src: btn_owas_a_3, category: 'CAT_LOAD' },
 ];
 
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {
