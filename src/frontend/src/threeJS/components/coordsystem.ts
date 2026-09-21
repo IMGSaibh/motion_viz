@@ -19,7 +19,7 @@ export function createMetricAxis({
   color = 0xff0000,
   axis = 'x',
   tickSize = 0.1,
-  linewidth = 2,
+  linewidth = 4,
 }: MetricAxisOptions): THREE.Group {
   const group = new THREE.Group();
 
@@ -69,7 +69,7 @@ export function createMetricAxis({
 
     const label = new Text();
     label.text = i.toString() + 'm';
-    label.fontSize = 0.1;
+    label.fontSize = 0.2;
     label.color = color;
     label.anchorX = 'center';
     label.anchorY = 'top';
@@ -92,7 +92,7 @@ export function createMetricAxis({
 
   const axisLabel = new Text();
   axisLabel.text = axis.toUpperCase();
-  axisLabel.fontSize = 0.3;
+  axisLabel.fontSize = 0.5;
   axisLabel.color = color;
   axisLabel.anchorX = 'center';
   axisLabel.anchorY = 'middle';
