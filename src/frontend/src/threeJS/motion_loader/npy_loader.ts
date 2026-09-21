@@ -161,7 +161,7 @@ export class NPY_loader {
     const direction = new THREE.Vector3();
     const middle_point = new THREE.Vector3();
 
-    const base = frameIdx * this.jointCount * 3;
+    const base = frameIdx * this.jointCount * 7;
     for (let i = 0; i < this.jointCount; i++) {
       const x = this.numpy_data[base + i * 7 + 0];
       const y = this.numpy_data[base + i * 7 + 1];

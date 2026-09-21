@@ -68,7 +68,7 @@ async def convert_with_motionstack():
         reader = None
 
         try:
-            reader = MotionReader(mocap_file, descriptor_file)
+            reader = MotionReader(mocap_file, descriptor_file, axis_flip=True)
         except:
             print(f"Could not load motion file {mocap_file}")
 
@@ -76,7 +76,7 @@ async def convert_with_motionstack():
             
             save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
 
-            pos = np.array(reader.motion.get_positions())
+            pos = np.asarray(reader.motion.get_positions())
             rot = np.array(reader.motion.get_rotations())
             # combines position and rotation arrays to (frames, joints, 7): [x, y, z, qx, qy, qz, qw]
             out = np.concatenate((pos, rot), axis = 2)
