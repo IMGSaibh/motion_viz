@@ -12,6 +12,7 @@ import { useMotionFiles } from '@/hooks/use_motion_files';
 import { useMotionstackConversion } from '@/hooks/use_motionstack_conversion';
 import { useLoadLabels } from '@/hooks/use_load_labels';
 import { create_empty_rula_selection } from '@/domain/label_logic';
+import { useStartTraining } from '@/hooks/use_start_training';
 
 function get_error_message(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -53,6 +54,7 @@ export function ContainerTopbar() {
   const motion_descriptor = useMotionDescriptor();
   const motionstack_conversion = useMotionstackConversion();
   const load_labels = useLoadLabels();
+  const start_training = useStartTraining();
 
   const { frame_slider_value, set_frame_slider_value } = use_frame_slider_context();
   const clear_slider_label_list = use_clear_label_list_ctx();
@@ -154,6 +156,16 @@ export function ContainerTopbar() {
     }
   }
 
+  async function handle_start_training_with_selected_files(selectedFiles: string[]) {
+    try {
+      const response = await start_training.mutateAsync(selectedFiles);
+      if (response.warning) warning(response.warning);
+      else success(`${response.message} ${response.sample_count} labeled sample(s) prepared.`);
+    } catch (requestError: unknown) {
+      error(get_error_message(requestError, 'Could not start training'));
+    }
+  }
+
   return (
     <PresenterTopbar
       file_dialog_reference={file_dialog_reference}
@@ -170,6 +182,8 @@ export function ContainerTopbar() {
       motion_file_selected={selected_motion}
       motion_file_list_on_select={handle_motion_file_list_on_select}
       motion_file_list_on_open={handle_motion_file_list_on_open}
+      training_is_pending={start_training.isPending}
+      start_training_with_selected_files={handle_start_training_with_selected_files}
     />
   );
 }

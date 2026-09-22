@@ -38,11 +38,16 @@ export type FileUploadResponse = MessageResponse & {
   unsupported_files: string[];
 };
 
+export type StartTrainingResponse = MessageResponse & {
+  sample_count: number;
+};
+
 const ENDPOINTS = {
   motionstackConversion: '/api_motionstack/convert_with_motionstack',
   motionDescriptor: '/api_motion_descriptor/motion_descriptor',
   fileUpload: '/api_file_upload/upload',
   motionFiles: '/api_list_files/list_files',
+  startTraining: '/api_autolabel/start_training',
 } as const;
 
 // API modules own transport details and runtime validation; hooks only manage request state and caching.
@@ -95,4 +100,22 @@ export async function list_motion_files(signal?: AbortSignal): Promise<MotionFil
     ...read_string_array(record, 'fbx').map((name) => ({ type: 'fbx' as const, name })),
     ...read_string_array(record, 'npy').map((name) => ({ type: 'npy' as const, name })),
   ];
+}
+
+export async function start_training(motionFiles: string[]): Promise<StartTrainingResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.startTraining), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ motion_files: motionFiles }),
+  });
+  await assert_response_ok(response, 'Start training');
+  const record = parse_record(await response.json(), 'start training');
+  const sampleCount = record.sample_count;
+  if (typeof sampleCount !== 'number' || !Number.isInteger(sampleCount) || sampleCount < 0) {
+    throw new Error('Invalid response field: sample_count');
+  }
+  return {
+    ...parse_message_response(record, 'start training'),
+    sample_count: sampleCount,
+  };
 }

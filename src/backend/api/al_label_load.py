@@ -5,11 +5,39 @@ import json
 import logging
 import pathlib
 from dataclasses import dataclass
-from typing import Callable, List, Tuple, Any
+from typing import List, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+
+
+from pathlib import Path
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+router = APIRouter()
+workspacefolder = Path.cwd()
+
+
+class TrainingRequest(BaseModel):
+    motion_files: list[str] = Field(min_length=1)
+
+@router.post("/start_training")
+def start_training(request: TrainingRequest):
+
+    print("Starting training with motion files:", request.motion_files)
+    workspace = pathlib.Path.cwd()
+    print("Current working directory:", workspace)
+    # loader = LabelLoader(
+    #     label_root=workspace / "data" / "labels",
+    #     motion_root=workspace / "data" / "npy",
+    #     cache_root=workspace / "data" / "labels",
+    # )
+
+
+
 
 
 
@@ -290,3 +318,6 @@ class LabelLoader:
         # ------------------------------------------------------------------- #
         X, y, scaler = self._prepare_X_y(df)
         return X, y, scaler
+
+
+
