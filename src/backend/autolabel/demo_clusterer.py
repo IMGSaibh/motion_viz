@@ -27,9 +27,13 @@ if __name__ == "__main__":
         batch_size=128,
         verbose=1,
     )
+    reducer = al_clusterer.PCAReducer(
+        n_components = 6,
+        random_state = 42
+    )
 
     # clustering algorithm
-    clusterer = al_clusterer.KMeansClusterer(n_clusters=20, random_state=42)
+    clusterer = al_clusterer.KMeansClusterer(n_clusters=40, random_state=42)
 
     # evaluator – thresholds can be tweaked per experiment
     evaluator = al_clusterer.ClusterEvaluator(
