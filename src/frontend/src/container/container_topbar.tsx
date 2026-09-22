@@ -160,7 +160,7 @@ export function ContainerTopbar() {
     try {
       const response = await start_training.mutateAsync(selectedFiles);
       if (response.warning) warning(response.warning);
-      else success(`${response.message} ${response.sample_count} labeled sample(s) prepared.`);
+      else success(`${response.message}`);
     } catch (requestError: unknown) {
       error(get_error_message(requestError, 'Could not start training'));
     }

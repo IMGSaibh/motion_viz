@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 router = APIRouter()
 workspacefolder = Path.cwd()
+logger = logging.getLogger(__name__)
 
 
 class TrainingRequest(BaseModel):
@@ -26,15 +27,44 @@ class TrainingRequest(BaseModel):
 
 @router.post("/start_training")
 def start_training(request: TrainingRequest):
-
-    print("Starting training with motion files:", request.motion_files)
     workspace = pathlib.Path.cwd()
-    print("Current working directory:", workspace)
-    # loader = LabelLoader(
-    #     label_root=workspace / "data" / "labels",
-    #     motion_root=workspace / "data" / "npy",
-    #     cache_root=workspace / "data" / "labels",
-    # )
+    motion_root = (workspace / "data" / "npy").resolve()
+    label_root = (workspace / "data" / "labels").resolve()
+    motionfile_labelfile_pairs: list[tuple[pathlib.Path, pathlib.Path]] = []
+
+    for supplied_path in request.motion_files:
+        motion_path = (workspace / supplied_path).resolve()
+        if motion_path.parent != motion_root or motion_path.suffix.lower() != ".npy":
+            raise HTTPException(status_code=400, detail=f"Invalid NPY path: {supplied_path}")
+        if not motion_path.is_file():
+            raise HTTPException(status_code=404, detail=f"NPY file not found: {supplied_path}")
+
+        label_path = label_root / f"{motion_path.stem}.json"
+        if not label_path.is_file():
+            raise HTTPException(
+                status_code=400,
+                detail=f"Label file not found for motion file: {supplied_path}",
+            )
+        motionfile_labelfile_pairs.append((motion_path, label_path))
+
+    try:
+        loader = LabelLoader(
+            label_root=label_root,
+            motion_root=motion_root,
+            cache_root=label_root,
+        )
+        for _, label_file in motionfile_labelfile_pairs:
+            loader.load(label_file)
+    except (FileNotFoundError, ValueError, IndexError) as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except OSError as error:
+        logger.exception("Could not load training data")
+        raise HTTPException(status_code=500, detail="Could not load training data") from error
+
+    return {
+        "message": "Start training.",
+        "warning": "",
+    }
 
 
 

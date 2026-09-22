@@ -2,9 +2,25 @@ export async function assert_response_ok(response: Response, operation: string):
   if (response.ok) return;
 
   const contentType = response.headers.get('content-type') ?? '';
-  const body = contentType.includes('application/json')
-    ? JSON.stringify(await response.json())
-    : await response.text();
+  let body: string;
+
+  if (contentType.includes('application/json')) {
+    const responseBody: unknown = await response.json();
+    const responseRecord =
+      typeof responseBody === 'object' &&
+      responseBody !== null &&
+      !Array.isArray(responseBody)
+        ? (responseBody as Record<string, unknown>)
+        : undefined;
+    const detail =
+      typeof responseRecord?.detail === 'string'
+        ? responseRecord.detail
+        : undefined;
+
+    body = detail ?? JSON.stringify(responseBody);
+  } else {
+    body = await response.text();
+  }
 
   throw new Error(`${operation} failed (${response.status}): ${body}`);
 }

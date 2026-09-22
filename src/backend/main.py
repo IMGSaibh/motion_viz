@@ -6,7 +6,7 @@ from backend.api import api_motion_descriptor
 from backend.api import api_motionstack
 from backend.api import api_save_labels
 from backend.api import api_download_labels
-from backend.api import api_autolabel
+from backend.api import api_label_load
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -46,7 +46,7 @@ app.include_router(api_motion_descriptor.router, prefix="/api_motion_descriptor"
 app.include_router(api_motionstack.router, prefix="/api_motionstack")
 app.include_router(api_save_labels.router, prefix="/api_save_labels")
 app.include_router(api_download_labels.router, prefix="/api_download_labels")
-app.include_router(api_autolabel.router, prefix="/al_label_load")
+app.include_router(api_label_load.router, prefix="/api_label_load")
 
 
 
