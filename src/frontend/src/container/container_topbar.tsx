@@ -34,6 +34,7 @@ export function ContainerTopbar() {
 
   const file_dialog_reference = useRef<HTMLInputElement>(null);
   const [motion_config_is_open, set_motion_config_is_open] = useState(false);
+  const [descriptor_type_selected, set_descriptor_type_selected] = useState<string | null>(null);
 
   const motion_config_references = {
     format: useRef<HTMLInputElement>(null),
@@ -166,24 +167,35 @@ export function ContainerTopbar() {
     }
   }
 
+  function handle_descriptor_type_selected(descriptor_type: string) {
+    // set_descriptor_type_selected(descriptor_type);
+    set_descriptor_type_selected(descriptor_type);
+  }
+  function handle_descriptor_type_list_on_open() {
+    // set_descriptor_type_list_open(true);
+  }
+
   return (
     <PresenterTopbar
       file_dialog_reference={file_dialog_reference}
       file_dialog_on_change={handle_file_dialog_on_change}
       file_upload_is_pending={file_upload.isPending}
+      convert_motionstack_files_on_click={handle_convert_with_motionstack}
+      motionstack_conversion_is_pending={motionstack_conversion.isPending}
+      descriptor_type_selected={descriptor_type_selected}
+      descriptor_type_on_select={handle_descriptor_type_selected}
+      descriptor_type_list_on_open={handle_descriptor_type_list_on_open}
       motion_config_reference={motion_config_references}
       motion_config_is_open={motion_config_is_open}
       motion_config_on_click={handle_motion_config_on_click}
       motion_config_create_on_click={handle_motion_config_create_on_click}
-      motion_descriptor_is_pending={motion_descriptor.isPending}
-      convert_motionstack_files_on_click={handle_convert_with_motionstack}
-      motionstack_conversion_is_pending={motionstack_conversion.isPending}
-      motion_files={motion_files.data ?? []}
+      motion_config_is_pending={motion_descriptor.isPending}
+      files_for_training_on_open={handle_motion_file_list_on_open}
+      files_for_training={motion_files.data ?? []}
+      is_training_pending={start_training.isPending}
+      start_training_with_selected_files={handle_start_training_with_selected_files}
       motion_file_selected={selected_motion}
       motion_file_list_on_select={handle_motion_file_list_on_select}
-      motion_file_list_on_open={handle_motion_file_list_on_open}
-      training_is_pending={start_training.isPending}
-      start_training_with_selected_files={handle_start_training_with_selected_files}
     />
   );
 }

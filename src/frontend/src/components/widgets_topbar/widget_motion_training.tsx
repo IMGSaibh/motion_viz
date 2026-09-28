@@ -15,9 +15,9 @@ import {
 } from '@mui/material';
 
 type Props = {
-  npy_files: string[];
-  is_pending: boolean;
-  refresh_files: () => void;
+  files_for_training: string[];
+  is_training_pending: boolean;
+  files_for_training_on_open: () => void;
   start_training_with_selected_files: (selectedFiles: string[]) => void;
 };
 
@@ -29,11 +29,11 @@ export function WidgetMotionTraining(props: Props) {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   useEffect(() => {
-    setSelectedFiles((current) => current.filter((file) => props.npy_files.includes(file)));
-  }, [props.npy_files]);
+    setSelectedFiles((current) => current.filter((file) => props.files_for_training.includes(file)));
+  }, [props.files_for_training]);
 
   function openDialog() {
-    props.refresh_files();
+    props.files_for_training_on_open();
     setIsOpen(true);
   }
 
@@ -47,10 +47,11 @@ export function WidgetMotionTraining(props: Props) {
     props.start_training_with_selected_files(selectedFiles);
   }
 
-  const allFilesSelected = props.npy_files.length > 0 && selectedFiles.length === props.npy_files.length;
+  const allFilesSelected =
+    props.files_for_training.length > 0 && selectedFiles.length === props.files_for_training.length;
 
   function toggleAllFiles() {
-    setSelectedFiles(allFilesSelected ? [] : props.npy_files);
+    setSelectedFiles(allFilesSelected ? [] : props.files_for_training);
   }
 
   return (
@@ -59,15 +60,20 @@ export function WidgetMotionTraining(props: Props) {
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ py: 1.5 }}>Select NPY Files for Training</DialogTitle>
         <DialogContent dividers sx={{ py: 1 }}>
-          {props.npy_files.length === 0 ? (
+          {props.files_for_training.length === 0 ? (
             <Typography color="text.secondary">No NPY files available.</Typography>
           ) : (
             <Stack spacing={0.5}>
-              <Button size="small" onClick={toggleAllFiles} disabled={props.is_pending} sx={{ alignSelf: 'flex-start' }}>
+              <Button
+                size="small"
+                onClick={toggleAllFiles}
+                disabled={props.is_training_pending}
+                sx={{ alignSelf: 'flex-start' }}
+              >
                 {allFilesSelected ? 'Auswahl aufheben' : 'Alles auswählen'}
               </Button>
               <List dense disablePadding>
-                {props.npy_files.map((file) => {
+                {props.files_for_training.map((file) => {
                   const isSelected = selectedFiles.includes(file);
                   return (
                     <ListItemButton
@@ -75,7 +81,7 @@ export function WidgetMotionTraining(props: Props) {
                       component="li"
                       dense
                       selected={isSelected}
-                      disabled={props.is_pending}
+                      disabled={props.is_training_pending}
                       onClick={() => toggleFile(file)}
                       role="checkbox"
                       aria-checked={isSelected}
@@ -102,13 +108,13 @@ export function WidgetMotionTraining(props: Props) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsOpen(false)} disabled={props.is_pending}>
+          <Button onClick={() => setIsOpen(false)} disabled={props.is_training_pending}>
             Close
           </Button>
           <Button
             onClick={startTraining}
             variant="contained"
-            disabled={props.is_pending || selectedFiles.length === 0}
+            disabled={props.is_training_pending || selectedFiles.length === 0}
           >
             Start Training
           </Button>
