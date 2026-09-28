@@ -1,6 +1,7 @@
 import { WidgetFileOperations } from '@/components/widgets_topbar/widget_file_operations';
 import { WidgetMotionDescriptorBar } from '@/components/widgets_topbar/widget_motion_descriptor';
 import { WidgetConvertMotionFile } from '@/components/widgets_topbar/widget_motion_file_conversion';
+import { WidgetMotionTraining } from '@/components/widgets_topbar/widget_motion_training';
 import { WidgetListFiles } from '@/components/widgets_topbar/widget_list_motion_files';
 import { AppBar, Toolbar, Stack, Box, Container } from '@mui/material';
 import { WidgetHotkeyProfile } from '@/components/widgets_topbar/widget_hotkey_profile';
@@ -23,6 +24,9 @@ type Props = {
   motion_file_selected: string | null;
   motion_file_list_on_select: (filename: string) => void;
   motion_file_list_on_open: () => void;
+
+  training_is_pending: boolean;
+  start_training_with_selected_files: (selectedFiles: string[]) => void;
 };
 
 /**
@@ -55,6 +59,14 @@ export function PresenterTopbar(props: Props) {
                     {...{
                       convert_motionstack_files_on_click: props.convert_motionstack_files_on_click,
                       motionstack_conversion_is_pending: props.motionstack_conversion_is_pending,
+                    }}
+                  />
+                  <WidgetMotionTraining
+                    {...{
+                      npy_files: props.motion_files.filter((file) => file.type === 'npy').map((file) => file.name),
+                      is_pending: props.training_is_pending,
+                      refresh_files: props.motion_file_list_on_open,
+                      start_training_with_selected_files: props.start_training_with_selected_files,
                     }}
                   />
                   <WidgetMotionDescriptorBar
