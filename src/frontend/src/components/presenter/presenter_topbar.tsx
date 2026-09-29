@@ -15,17 +15,20 @@ type Props = {
   motion_config_is_open: boolean;
   motion_config_on_click: () => void;
   motion_config_create_on_click: () => void;
-  motion_descriptor_is_pending: boolean;
+  motion_config_is_pending: boolean;
 
   convert_motionstack_files_on_click: (e: React.MouseEvent<HTMLButtonElement>) => void;
   motionstack_conversion_is_pending: boolean;
+  descriptor_type_selected: string | null;
+  descriptor_type_on_select: (descriptor_type: string) => void;
+  descriptor_type_list_on_open: () => void;
 
-  motion_files: Array<{ type: string; name: string }>;
+  files_for_training: Array<{ type: string; name: string }>;
   motion_file_selected: string | null;
   motion_file_list_on_select: (filename: string) => void;
-  motion_file_list_on_open: () => void;
+  files_for_training_on_open: () => void;
 
-  training_is_pending: boolean;
+  is_training_pending: boolean;
   start_training_with_selected_files: (selectedFiles: string[]) => void;
 };
 
@@ -52,20 +55,25 @@ export function PresenterTopbar(props: Props) {
                     {...{
                       file_dialog_reference: props.file_dialog_reference,
                       file_dialog_on_change: props.file_dialog_on_change,
-                      is_pending: props.file_upload_is_pending,
+                      file_upload_is_pending: props.file_upload_is_pending,
                     }}
                   />
                   <WidgetConvertMotionFile
                     {...{
                       convert_motionstack_files_on_click: props.convert_motionstack_files_on_click,
                       motionstack_conversion_is_pending: props.motionstack_conversion_is_pending,
+                      descriptor_type_selected: props.descriptor_type_selected,
+                      descriptor_type_on_select: props.descriptor_type_on_select,
+                      descriptor_type_list_on_open: props.descriptor_type_list_on_open,
                     }}
                   />
                   <WidgetMotionTraining
                     {...{
-                      npy_files: props.motion_files.filter((file) => file.type === 'npy').map((file) => file.name),
-                      is_pending: props.training_is_pending,
-                      refresh_files: props.motion_file_list_on_open,
+                      files_for_training: props.files_for_training
+                        .filter((file) => file.type === 'npy')
+                        .map((file) => file.name),
+                      is_training_pending: props.is_training_pending,
+                      files_for_training_on_open: props.files_for_training_on_open,
                       start_training_with_selected_files: props.start_training_with_selected_files,
                     }}
                   />
@@ -75,7 +83,7 @@ export function PresenterTopbar(props: Props) {
                       motion_config_is_open: props.motion_config_is_open,
                       motion_config_on_click: props.motion_config_on_click,
                       motion_config_create_on_click: props.motion_config_create_on_click,
-                      is_pending: props.motion_descriptor_is_pending,
+                      motion_config_is_pending: props.motion_config_is_pending,
                     }}
                   />
                 </Box>
@@ -85,10 +93,10 @@ export function PresenterTopbar(props: Props) {
               {/* RIGHT: Select – fixed min width */}
               <Box sx={{ minWidth: 280, flexShrink: 0 }}>
                 <WidgetListFiles
-                  motion_files={props.motion_files}
+                  motion_files={props.files_for_training}
                   motion_file_selected={props.motion_file_selected}
                   motion_file_list_on_select={props.motion_file_list_on_select}
-                  motion_file_list_on_open={props.motion_file_list_on_open}
+                  motion_file_list_on_open={props.files_for_training_on_open}
                 />
               </Box>
             </Stack>

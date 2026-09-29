@@ -5,7 +5,7 @@ backend and ThreeJS Engine frontend.
 
 # Requirements
 
-- Python 3.10
+- Python >=3.12
 - Node.js 18+ (npm)
 - Poetry (for Python environment management)
 - Visual Studio Build Tools 2022
@@ -112,72 +112,98 @@ poetry install
 }
 ```
 
-# Architecture - React Container-Presenter-Pattern -
+# Hotkeys
+
+The active profile is shown in the top bar. The application starts with the RULA
+profile active.
+
+## Available in both profiles
+
+| Key                          | Action                                                       |
+| ---------------------------- | ------------------------------------------------------------ |
+| `Tab`                        | Switch between the Play and RULA profiles                    |
+| `Space`                      | Play or pause the motion                                     |
+| `Left Arrow` / `Right Arrow` | Move one frame backward or forward                           |
+| `S`                          | Stop playback and return to frame 0                          |
+| `R`                          | Reset the engine, current motion, labels and selections      |
+| `P`                          | Toggle the frame-preview rendering                           |
+| `D`                          | Print the Three.js scene components to the developer console |
+
+## RULA profile
+
+The number keys use a two-step workflow: first select a RULA category, then
+select a feature in that category.
+
+| Key      | Action at category selection                                |
+| -------- | ----------------------------------------------------------- |
+| `1`      | Upper arm                                                   |
+| `2`      | Lower arm                                                   |
+| `3`      | Wrist                                                       |
+| `4`      | Neck                                                        |
+| `5`      | Trunk                                                       |
+| `6`      | Legs                                                        |
+| `Escape` | Cancel the active category and return to category selection |
+| `Enter`  | Save the current RULA label                                 |
+
+Available feature keys after selecting a category:
+
+| Category  | Primary feature | Optional feature toggle |
+| --------- | --------------- | ----------------------- |
+| Upper arm | `1`-`5`         | `6`-`8`                 |
+| Lower arm | `1`-`3`         | -                       |
+| Wrist     | `1`-`3`         | `4`                     |
+| Neck      | `1`-`4`         | `5`-`6`                 |
+| Trunk     | `1`-`4`         | `5`-`6`                 |
+| Legs      | `1`             | -                       |
+
+Dragging on the frame slider in the RULA profile creates a label range. With a
+range selected, `Left Arrow` and `Right Arrow` extend its left and right edges.
+Hold `Ctrl` with the arrow key to move the opposite edge inward.
+
+# Architecture - React Container-Presenter Pattern
+
+The FastAPI backend exposes feature-oriented routers and serves the data files
+used by the frontend. The React frontend separates HTTP transport,
+orchestration, presentation and the React-independent Three.js engine.
 
 ### backend
 
-```bash
-/api
-├── api_1.py
-├── api_2.py
-├── api_3.py
-├── ...
-/motion_parser
-├── bvh_parser.py
-├── pv_parser.py
-├── ...
-main.py
+```text
+src/backend/
+|-- api/                 # FastAPI routers for files, conversion, labels and training
+|-- json_schema/         # label schema and schema helpers
+`-- main.py              # FastAPI setup, static mounts and router registration
 ```
 
 ### frontend
 
-```bash
-/src
-│
-|── /api
-|   |── api_response.ts                 ← shared HTTP response handling and validation
-|   |── motion_api.ts                   ← motion-related FastAPI requests
-|   └── labels_api.ts                   ← label-related FastAPI requests
-|
-|── /hooks
-|   |── use_bvh_conversion.ts           ← React Query mutation orchestration
-|   |── use_motion_files.ts             ← React Query motion-file query
-|   └── use_*.ts                        ← feature-specific React Query hooks
-|
-|── /utils
-|   └── api_url.ts                      ← API base URL construction
-|
-│
-├── /threeJS                            ← 3D webgl engine
-│   └── three_manager.ts                ← 3D webgl engine manager to use in react and frontend
-│   └──/components                      ← 3D webgl engine (camera, scene, ...)
-│   └──/system                          ← 3D webgl engine (renderer, engine loop, holds all updatable objects)
-│   └──/motion_loader                   ← loads motion files (bvh, mvnx, ...)
-│   └──/motion_player                   ← plays a motion file (bvh, fbx, npy, ...)
-│
-├── /components
-│   ├── /widgets
-│   │   ├── widget_1.tsx                ← UI only (Presenter)
-│   │   ├── widget_2.tsx                ← UI only (Presenter)
-│   │   └── widget_3.tsx                ← UI only (Presenter)
-│   │   └── ....
-│   └── widget_presenter_1.tsx          ← UI shell for multiple widgets
-│   └── widget_presenter_2.tsx          ← UI shell for multiple widgets
-│   └── widget_presenter_3.tsx          ← UI shell for multiple widgets
-│   └── ...                             ← UI shell for multiple widgets
-│
-├── /containers
-│   └── container_widgetname_1.tsx      ← maintains local state + calls backend + passes data to presenter
-│   └── container_widgetname_2.tsx      ← maintains local state + calls backend + passes data to presenter
-│   └── container_widgetname_2.tsx      ← container also can uses contexts
-│   └── ...
-│
-├── /context
-│   └── context_1.tsx                   ← Components must access the same data + state management
-│   └── context_2.tsx                   ← Components must access the same data + state management
-│   └── ...
-│
-├── app.tsx                             ← contains all containers
-│
-└── main.tsx                            ← Root
+```text
+src/frontend/src/
+|-- api/
+|   |-- api_motion_files.ts   # motion-file and conversion requests
+|   |-- api_motion_labels.ts  # label requests
+|   `-- api_response.ts       # shared response validation
+|-- hooks/                    # feature-specific React Query hooks
+|-- container/                # state, event handling and feature orchestration
+|-- components/
+|   |-- presenter/            # layout and composition of UI widgets
+|   |-- widgets/              # slider and label-list UI
+|   |-- widgets_topbar/       # top-bar UI
+|   `-- widgets_ergo_methods/ # ergonomic-method controls
+|-- context/                  # state shared by distant components
+|-- domain/                   # UI-independent types and label/hotkey rules
+|-- threeJS/
+|   |-- components/           # cameras and scene objects
+|   |-- system/               # renderer, resize handling and engine loop
+|   |-- motion_loader/        # BVH, FBX and NPY loading
+|   |-- motion_player/        # BVH, FBX and NPY playback
+|   `-- three_js_manager.ts   # interface between React and the Three.js engine
+|-- utils/                    # shared frontend utilities
+|-- app.tsx                   # providers, scene and application containers
+`-- main.tsx                  # React entry point
 ```
+
+Containers connect contexts, hooks and the Three.js manager to presenters.
+Presenters compose UI-only widgets. API calls stay in `api/` and are exposed to
+containers through hooks; Three.js lifecycle and playback logic remain in
+`threeJS/`.

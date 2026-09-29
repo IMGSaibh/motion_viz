@@ -41,11 +41,11 @@ export function WidgetListFiles(props: Props) {
         aria-expanded={is_menu_open ? 'true' : undefined}
         sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
       >
-        {props.motion_file_selected || 'Select file'}
+        {props.motion_file_selected || 'SELECT FILE'}
       </Button>
       <Menu anchorEl={menu_anchor} open={is_menu_open} onClose={() => set_menu_anchor(null)}>
         <MenuItem onClick={() => handle_select('')}>
-          <em>Select file</em>
+          <em>SELECT FILE</em>
         </MenuItem>
         {props.motion_files.map((file_obj) => {
           const fileNameOnly = file_obj.name.split('/').pop();
