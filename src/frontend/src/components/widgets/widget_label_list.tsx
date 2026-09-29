@@ -110,7 +110,18 @@ export function WidgetLabelList(props: Props) {
                       borderRight: `1px solid ${theme.palette.wip_color_theme[200]}`,
                     })}
                   >
-                    <WidgetLabelPreview categories={ergoLabel.categories ?? null} ergo_method={ergoLabel.ergo_method} />
+                    <Typography variant="body2" noWrap>
+                      {ergoLabel.categories
+                        .flatMap((category) =>
+                          category.features.map(
+                            (feature) =>
+                              get_label_image_by_feature_id(ergoLabel.ergo_method, category.name, feature.id)?.name ??
+                              String(feature.id),
+                          ),
+                        )
+                        .join(' | ')}
+                    </Typography>
+                    {/* <WidgetLabelPreview categories={ergoLabel.categories ?? null} ergo_method={ergoLabel.ergo_method} /> */}
                   </Grid>
                   <Grid size={{ md: 10 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <LabelSliderTemplate
@@ -131,15 +142,17 @@ export function WidgetLabelList(props: Props) {
                         borderLeft: `1px solid ${theme.palette.wip_color_theme[200]}`,
                       })}
                     >
-                      <Typography variant="body2" noWrap>
-                        {ergoLabel.categories.flatMap((category) =>
-                          category.features.map(
-                            (feature) =>
-                              get_label_image_by_feature_id(ergoLabel.ergo_method, category.name, feature.id)?.name ??
-                              String(feature.id),
-                          ),
-                        ).join(' | ')}
-                      </Typography>
+                      {/* <Typography variant="body2" noWrap>
+                        {ergoLabel.categories
+                          .flatMap((category) =>
+                            category.features.map(
+                              (feature) =>
+                                get_label_image_by_feature_id(ergoLabel.ergo_method, category.name, feature.id)?.name ??
+                                String(feature.id),
+                            ),
+                          )
+                          .join(' | ')}
+                      </Typography> */}
                       <Typography variant="caption" noWrap>
                         {`Methode ${ergoLabel.ergo_method}`}
                       </Typography>
