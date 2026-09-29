@@ -1,4 +1,5 @@
 import json
+import warnings
 from marshal import load
 from pathlib import Path
 from posixpath import join
@@ -69,18 +70,21 @@ async def convert_with_motionstack(request: MotionstackConversionRequest):
             file_pairs.append((str(bfile), request.descriptor_type))
 
     print("Start converting files")
+    converted_count = 0
+    failed_count = 0
+
     for mocap_file, descriptor_file in file_pairs:
         print(f"processing {mocap_file} with {descriptor_file}")
 
-        reader = None
-
         try:
-            reader = MotionReader(mocap_file, descriptor_file, axis_flip=True)
-        except:
-            print(f"Could not load motion file {mocap_file}")
+            with warnings.catch_warnings(record=True) as reader_warnings:
+                warnings.simplefilter("always")
+                reader = MotionReader(mocap_file, descriptor_file, axis_flip=True)
 
-        if reader:
-            
+            if reader_warnings:
+                warning_messages = "; ".join(str(item.message) for item in reader_warnings)
+                print(f"MotionReader warning for {mocap_file}: {warning_messages}")
+
             save_npy_path = Path.joinpath(npy_dir_path, Path(mocap_file).stem)  # Remove file extension
 
             pos = np.asarray(reader.motion.get_positions())
@@ -97,6 +101,24 @@ async def convert_with_motionstack(request: MotionstackConversionRequest):
                 json.dump(joint_graph, json_file, indent=4)
             print(f"Successful built skeleton for {mocap_file}")
 
+            Path(mocap_file).unlink()
+            print(f"Deleted successfully converted original file {mocap_file}")
+            converted_count += 1
+        except Exception as conversion_error:
+            failed_count += 1
+            print(f"Could not convert motion file {mocap_file}: {conversion_error}")
+
+    if converted_count == 0:
+        return {
+            "message": "",
+            "warning": "No files were converted. Check whether the selected descriptor type matches the motion files.",
+        }
+
+    if failed_count > 0:
+        return {
+            "message": "",
+            "warning": f"{converted_count} file(s) converted; {failed_count} file(s) could not be converted.",
+        }
 
     return {
         "message": "pose viewer compatible files converted",
