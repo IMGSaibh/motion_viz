@@ -5,11 +5,17 @@ from posixpath import join
 from fastapi import APIRouter
 from motionstack.reader import MotionReader
 import numpy as np
+from pydantic import BaseModel
+
 router = APIRouter()
 workspacefolder = Path.cwd()
 
+
+class MotionstackConversionRequest(BaseModel):
+    descriptor_type: str
+
 @router.post("/convert_with_motionstack")
-async def convert_with_motionstack():
+async def convert_with_motionstack(request: MotionstackConversionRequest):
    
     workspacefolder = Path.cwd()
     orignals_dir_path = Path.joinpath(workspacefolder, "data/originals/")
@@ -56,10 +62,10 @@ async def convert_with_motionstack():
         }
 
     for mfile in mvnx_files:
-            file_pairs.append((str(mfile),"xsens_mvnx"))
+            file_pairs.append((str(mfile), request.descriptor_type))
 
     for bfile in bvh_files:
-            file_pairs.append((str(bfile),"bvh_10"))
+            file_pairs.append((str(bfile), request.descriptor_type))
 
     print("Start converting files")
     for mocap_file, descriptor_file in file_pairs:

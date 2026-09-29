@@ -52,8 +52,12 @@ function parse_message_response(value: unknown, responseName: string): MessageRe
   return { message: read_string(record, 'message'), warning: read_string(record, 'warning') };
 }
 
-export async function convert_motionstack_files(): Promise<MessageResponse> {
-  const response = await fetch(api_get_base_url(ENDPOINTS.motionstackConversion), { method: 'POST' });
+export async function convert_motionstack_files(descriptorType: string): Promise<MessageResponse> {
+  const response = await fetch(api_get_base_url(ENDPOINTS.motionstackConversion), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ descriptor_type: descriptorType }),
+  });
   await assert_response_ok(response, 'Motionstack conversion');
   return parse_message_response(await response.json(), 'Motionstack conversion');
 }

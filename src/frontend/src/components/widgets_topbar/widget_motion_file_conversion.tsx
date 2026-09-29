@@ -27,6 +27,7 @@ export function WidgetConvertMotionFile(props: Props) {
     props.descriptor_type_list_on_open();
   }
   function handle_select(descriptor_type: string) {
+    props.descriptor_type_on_select(descriptor_type);
     set_menu_anchor(null);
   }
 
@@ -94,7 +95,11 @@ export function WidgetConvertMotionFile(props: Props) {
           <em>Select file</em>
         </MenuItem>
         {descriptor_types.map((descriptor_type) => {
-          return <MenuItem onClick={() => handle_select(descriptor_type)}>{descriptor_type}</MenuItem>;
+          return (
+            <MenuItem key={descriptor_type} onClick={() => handle_select(descriptor_type)}>
+              {descriptor_type}
+            </MenuItem>
+          );
         })}
       </Menu>
     </>

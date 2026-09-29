@@ -148,8 +148,13 @@ export function ContainerTopbar() {
   }
 
   async function handle_convert_with_motionstack() {
+    if (!descriptor_type_selected) {
+      warning('Please select a descriptor type.');
+      return;
+    }
+
     try {
-      const response = await motionstack_conversion.mutateAsync();
+      const response = await motionstack_conversion.mutateAsync(descriptor_type_selected);
       if (response.warning) warning(response.warning);
       else success(response.message || 'Conversion with motionstack completed.');
     } catch (requestError: unknown) {
@@ -168,8 +173,7 @@ export function ContainerTopbar() {
   }
 
   function handle_descriptor_type_selected(descriptor_type: string) {
-    // set_descriptor_type_selected(descriptor_type);
-    set_descriptor_type_selected(descriptor_type);
+    set_descriptor_type_selected(descriptor_type || null);
   }
   function handle_descriptor_type_list_on_open() {
     // set_descriptor_type_list_open(true);
