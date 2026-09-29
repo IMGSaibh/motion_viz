@@ -55,6 +55,7 @@ async def convert_with_motionstack(request: MotionstackConversionRequest):
     mvnx_files = list(orignals_dir_path.glob("*.mvnx"))
     bvh_files = list(orignals_dir_path.glob("*.bvh"))
 
+
     if not mvnx_files and not bvh_files:
         return {
             "message": "",

@@ -88,16 +88,16 @@ export function WidgetConvertMotionFile(props: Props) {
         aria-expanded={is_menu_open ? 'true' : undefined}
         sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
       >
-        {props.descriptor_type_selected || 'Select descriptor type'}
+        {props.descriptor_type_selected?.toUpperCase() || 'SELECT DESCRIPTOR TYPE'}
       </Button>
       <Menu anchorEl={menu_anchor} open={is_menu_open} onClose={() => set_menu_anchor(null)}>
         <MenuItem onClick={() => handle_select('')}>
-          <em>Select file</em>
+          <em>SELECT DESCRIPTOR TYPE</em>
         </MenuItem>
         {descriptor_types.map((descriptor_type) => {
           return (
             <MenuItem key={descriptor_type} onClick={() => handle_select(descriptor_type)}>
-              {descriptor_type}
+              {descriptor_type.toUpperCase()}
             </MenuItem>
           );
         })}
