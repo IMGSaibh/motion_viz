@@ -15,7 +15,6 @@ if __name__ == "__main__":
 
     y_flat = y.reshape(y.shape[0], -1)
     y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])
-    y = y_flat_str
 
 
     # dimension reducer – switch between PCA and AE by changing the class
@@ -36,8 +35,8 @@ if __name__ == "__main__":
     clusterer = al_clusterer.KMeansClusterer(n_clusters=40, random_state=42)
 
     # evaluator – thresholds can be tweaked per experiment
-    evaluator = al_clusterer.ClusterEvaluator(
-        y_true=y_flat_str,  # placeholder – will be replaced after loading
+    evaluator = al_clusterer.ClusterEvaluatorMultiCat(
+        y_true=y_flat_str, 
         min_cluster_size=5,
         precision_thr=0.7,
         recall_thr=0.01,
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     clusterer.fit(X_red)
     labels = clusterer.predict(X_red)
     sil = clusterer.silhouette(X_red, labels)
-    print(f"k‑means fitted – silhouette={sil:.4f}")
+    print(f"k-means fitted - silhouette={sil:.4f}")
 
     # -------------------------------------------------------------
     # Evaluate
