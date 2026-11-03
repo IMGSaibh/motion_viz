@@ -37,7 +37,7 @@ from tensorflow.keras.models import Model
 # Dimension‑reducer
 # ------------------------------------------------------------------- #
 class BaseReducer(ABC):
-    """Abstract reducer – subclasses must implement ``fit_transform``."""
+    """Abstract reducer - subclasses must implement ``fit_transform``."""
 
     @abstractmethod
     def fit_transform(self, X: np.ndarray) -> Tuple[np.ndarray, Any]:
@@ -213,7 +213,7 @@ class KMeansClusterer(BaseClusterer):
 # ------------------------------------------------------------------- #
 @dataclass
 class ClusterEval:
-    """Per‑cluster evaluation metrics."""
+    """Per-cluster evaluation metrics."""
     cluster_id: int
     size: int
     dominant_label: Any
@@ -222,28 +222,101 @@ class ClusterEval:
     label_counts: Dict[Any, int] = field(default_factory=dict)
 
 
-class ClusterEvaluator:
-    """
-    Compute precision/recall per cluster and expose a few convenience
-    methods (summary table, JSON‑serialisable dict, …​).
-    """
+class BaseClusterEvaluator(ABC):
+    """Shared cluster evaluation workflow and reporting."""
+
+    y_true_file_type = "npy"
 
     def __init__(
         self,
-        y_true: np.ndarray,
+        y_true: Any,
         min_cluster_size: int = 5,
         precision_thr: float = 0.5,
         recall_thr: float = 0.5,
     ):
-        self.y_true = y_true
+        self.y_true = self._load_y_true(y_true)
         self.min_cluster_size = min_cluster_size
         self.precision_thr = precision_thr
         self.recall_thr = recall_thr
-
         self.all_clusters: List[ClusterEval] = []
         self.valid_clusters: List[ClusterEval] = []
 
-    # -----------------------------------------------------------------
+    def _load_y_true(self, y_true: Any) -> Any:
+        if not isinstance(y_true, (str, Path)):
+            return y_true
+
+        path = Path(y_true)
+        if self.y_true_file_type == "npy":
+            return np.load(path, allow_pickle=False)
+        if self.y_true_file_type == "json":
+            with path.open("r", encoding="utf-8") as file:
+                return json.load(file)
+        raise ValueError(
+            f"Unsupported y_true_file_type: {self.y_true_file_type!r}"
+        )
+
+    @abstractmethod
+    def _evaluate_one(self, cluster_labels: np.ndarray, cid: int) -> ClusterEval:
+        """Return metrics for one cluster."""
+        ...
+
+    def evaluate(self, cluster_labels: np.ndarray) -> None:
+        """Populate ``self.all_clusters`` and ``self.valid_clusters``."""
+        self.all_clusters = [
+            self._evaluate_one(cluster_labels, int(cid))
+            for cid in np.unique(cluster_labels)
+        ]
+        self.valid_clusters = [
+            cluster
+            for cluster in self.all_clusters
+            if cluster.size >= self.min_cluster_size
+            and cluster.precision >= self.precision_thr
+            and cluster.recall >= self.recall_thr
+        ]
+
+    def summary(self) -> str:
+        """Plain-text table that you can ``print``."""
+        lines = [
+            "\n=== ALL CLUSTERS (sorted by precision) ===",
+            f"{'ID':>4} {'Prec.':>6} {'Rec.':>6} {'Size':>5} Dominant",
+            "-" * 44,
+        ]
+        for cluster in sorted(
+            self.all_clusters, key=lambda item: item.precision, reverse=True
+        ):
+            lines.append(
+                f"{cluster.cluster_id:>4} {cluster.precision:6.3f} "
+                f"{cluster.recall:6.3f} {cluster.size:5d} "
+                f"{cluster.dominant_label}"
+            )
+
+        if self.valid_clusters:
+            avg_prec = np.mean([cluster.precision for cluster in self.valid_clusters])
+            avg_rec = np.mean([cluster.recall for cluster in self.valid_clusters])
+        else:
+            avg_prec = avg_rec = 0.0
+
+        lines.extend(
+            [
+                "\n=== VALID-CLUSTER SUMMARY ===",
+                f"Requested clusters   : {len(self.all_clusters)}",
+                f"Valid clusters found : {len(self.valid_clusters)}",
+                f"Avg precision (valid): {avg_prec:.4f}",
+                f"Avg recall (valid)   : {avg_rec:.4f}",
+            ]
+        )
+        return "\n".join(lines)
+
+    def as_dict(self) -> Dict[str, Any]:
+        """JSON-serialisable representation (handy for logging)."""
+        return {
+            "all_clusters": [asdict(cluster) for cluster in self.all_clusters],
+            "valid_clusters": [asdict(cluster) for cluster in self.valid_clusters],
+        }
+
+class ClusterEvaluator(BaseClusterEvaluator):
+    """Compute precision/recall per cluster using the dominant label."""
+
     def _evaluate_one(self, cluster_labels: np.ndarray, cid: int) -> ClusterEval:
         mask = cluster_labels == cid
         size = int(mask.sum())
@@ -260,11 +333,9 @@ class ClusterEvaluator:
 
         labels, counts = np.unique(self.y_true[mask], return_counts=True)
         dominant = labels[np.argmax(counts)]
-
         tp = int(counts.max())
         fp = size - tp
         fn = int((self.y_true == dominant).sum()) - tp
-
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
         label_counts = dict(zip(labels, counts.astype(int)))
@@ -278,62 +349,40 @@ class ClusterEvaluator:
             label_counts=label_counts,
         )
 
-    # -----------------------------------------------------------------
-    def evaluate(self, cluster_labels: np.ndarray) -> None:
-        """Populate ``self.all_clusters`` and ``self.valid_clusters``."""
-        self.all_clusters = [
-            self._evaluate_one(cluster_labels, int(cid))
-            for cid in np.unique(cluster_labels)
-        ]
+class ClusterEvaluatorMultiCat(BaseClusterEvaluator):
+    """Compute precision/recall per cluster using the dominant label."""
 
-        self.valid_clusters = [
-            c
-            for c in self.all_clusters
-            if (c.size >= self.min_cluster_size)
-            and (c.precision >= self.precision_thr)
-            and (c.recall >= self.recall_thr)
-        ]
+    def _evaluate_one(self, cluster_labels: np.ndarray, cid: int) -> ClusterEval:
+        mask = cluster_labels == cid
+        size = int(mask.sum())
 
-    # -----------------------------------------------------------------
-    def summary(self) -> str:
-        """Plain‑text table that you can ``print``."""
-        lines = [
-            "\n=== ALL CLUSTERS (sorted by precision) ===",
-            f"{'ID':>4} {'Prec.':>6} {'Rec.':>6} {'Size':>5} Dominant",
-            "-" * 44,
-        ]
-
-        for c in sorted(self.all_clusters, key=lambda x: x.precision, reverse=True):
-            lines.append(
-                f"{c.cluster_id:>4} {c.precision:6.3f} {c.recall:6.3f} "
-                f"{c.size:5d} {c.dominant_label}"
+        if size < self.min_cluster_size:
+            return ClusterEval(
+                cluster_id=cid,
+                size=size,
+                dominant_label=None,
+                precision=0.0,
+                recall=0.0,
+                label_counts={},
             )
 
-        # Global stats for the *valid* clusters
-        if self.valid_clusters:
-            avg_prec = np.mean([c.precision for c in self.valid_clusters])
-            avg_rec = np.mean([c.recall for c in self.valid_clusters])
-        else:
-            avg_prec = avg_rec = 0.0
+        labels, counts = np.unique(self.y_true[mask], return_counts=True)
+        dominant = labels[np.argmax(counts)]
+        tp = int(counts.max())
+        fp = size - tp
+        fn = int((self.y_true == dominant).sum()) - tp
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        label_counts = dict(zip(labels, counts.astype(int)))
 
-        lines.extend(
-            [
-                "\n=== VALID‑CLUSTER SUMMARY ===",
-                f"Requested clusters   : {len(self.all_clusters)}",
-                f"Valid clusters found : {len(self.valid_clusters)}",
-                f"Avg precision (valid): {avg_prec:.4f}",
-                f"Avg recall (valid)   : {avg_rec:.4f}",
-            ]
+        return ClusterEval(
+            cluster_id=cid,
+            size=size,
+            dominant_label=dominant,
+            precision=precision,
+            recall=recall,
+            label_counts=label_counts,
         )
-        return "\n".join(lines)
-
-    # -----------------------------------------------------------------
-    def as_dict(self) -> Dict[str, Any]:
-        """JSON‑serialisable representation (handy for logging)."""
-        return {
-            "all_clusters": [asdict(c) for c in self.all_clusters],
-            "valid_clusters": [asdict(c) for c in self.valid_clusters],
-        }
 
 
 
