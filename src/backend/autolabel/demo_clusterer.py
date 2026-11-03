@@ -11,12 +11,11 @@ if __name__ == "__main__":
     motion_root="data/npy",
     cache_root="data/labels"
     )
-    X, y, scaler = processor.load("andy_60_re.json")
+    X, y, scaler = processor.load("xsens_002_WS10_2023_09_21_cropped.json")
 
     y_flat = y.reshape(y.shape[0], -1)
-    y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])
-    y = y_flat_str
-
+    y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])  
+    
 
     # dimension reducer – switch between PCA and AE by changing the class
     # reducer = PCAReducer(n_components=6)
