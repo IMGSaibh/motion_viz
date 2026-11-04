@@ -12,6 +12,11 @@ import {
   INITIAL_RULA_HOTKEY_STATE,
   resolve_rula_hotkey,
 } from '@/domain/rula_hotkey_commands';
+import {
+  apply_owas_hotkey_command,
+  INITIAL_OWAS_HOTKEY_STATE,
+  resolve_owas_hotkey,
+} from '@/domain/owas_hotkey_commands';
 
 /**
  * Orchestrates application-wide keyboard commands between shared contexts and the Three.js engine.
@@ -23,12 +28,20 @@ import {
 export function ContainerKeyboardShortcuts(): null {
   const { frame_slider_value, range, set_frame_slider_value, set_range, set_is_review_rending_active } =
     use_frame_slider_context();
-  const { rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
+  const { owas_selected, rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
   const ergo_labels = use_get_labels_cxt();
   const { warning } = use_snackbar_ctx();
-  const { hotkey_profile, set_hotkey_profile, rula_hotkey_state, set_rula_hotkey_state, set_rula_save_requested } =
-    use_rula_hotkey_context();
+  const {
+    hotkey_profile,
+    set_hotkey_profile,
+    rula_hotkey_state,
+    set_rula_hotkey_state,
+    set_rula_save_requested,
+    owas_hotkey_state,
+    set_owas_hotkey_state,
+    set_owas_save_requested,
+  } = use_rula_hotkey_context();
   const {
     frame_count,
     go_to_frame,
@@ -47,6 +60,7 @@ export function ContainerKeyboardShortcuts(): null {
         event.preventDefault();
         set_hotkey_profile(toggle_hotkey_profile(hotkey_profile));
         set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
+        set_owas_hotkey_state(INITIAL_OWAS_HOTKEY_STATE);
         return;
       }
 
@@ -112,7 +126,40 @@ export function ContainerKeyboardShortcuts(): null {
         }
       }
 
-      if (hotkey_profile === HotkeyProfile.RULA_PROFILE && range && frame_count) {
+      if (hotkey_profile === HotkeyProfile.OWAS_PROFILE) {
+        const result = resolve_owas_hotkey(owas_hotkey_state, {
+          key: event.key,
+          code: event.code,
+        });
+        if (result.command && result.command.type !== 'reset' && !selected_motion) {
+          event.preventDefault();
+          warning('Load motion file for labeling');
+          return;
+        }
+        if (result.command?.type === 'save') {
+          event.preventDefault();
+          set_owas_save_requested(true);
+          set_owas_hotkey_state(INITIAL_OWAS_HOTKEY_STATE);
+          return;
+        }
+        if (result.command?.type === 'select-feature') {
+          event.preventDefault();
+          set_owas_selected(apply_owas_hotkey_command(owas_selected, result.command));
+          set_owas_hotkey_state(result.state);
+          return;
+        }
+        if (result.command?.type === 'select-category' || result.command?.type === 'reset') {
+          event.preventDefault();
+          set_owas_hotkey_state(result.state);
+          return;
+        }
+      }
+
+      if (
+        (hotkey_profile === HotkeyProfile.RULA_PROFILE || hotkey_profile === HotkeyProfile.OWAS_PROFILE) &&
+        range &&
+        frame_count
+      ) {
         const last_frame = Math.max(0, frame_count - 1);
 
         if (event.code === 'ArrowLeft') {
@@ -162,6 +209,7 @@ export function ContainerKeyboardShortcuts(): null {
         set_range(null);
         clear_slider_label_list();
         set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
+        set_owas_hotkey_state(INITIAL_OWAS_HOTKEY_STATE);
         set_rula_selected(create_empty_rula_selection());
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
       }
@@ -211,6 +259,7 @@ export function ContainerKeyboardShortcuts(): null {
     range,
     hotkey_profile,
     rula_selected,
+    owas_selected,
     reset_engine,
     set_selected_motion,
     set_frame_slider_value,
@@ -220,7 +269,10 @@ export function ContainerKeyboardShortcuts(): null {
     set_rula_selected,
     rula_hotkey_state,
     set_rula_hotkey_state,
+    owas_hotkey_state,
+    set_owas_hotkey_state,
     set_rula_save_requested,
+    set_owas_save_requested,
     set_hotkey_profile,
     stop,
     selected_motion,

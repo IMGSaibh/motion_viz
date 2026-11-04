@@ -115,13 +115,13 @@ poetry install
 # Hotkeys
 
 The active profile is shown in the top bar. The application starts with the RULA
-profile active.
+profile active. Press `Tab` to cycle through Play, RULA, and OWAS profiles.
 
-## Available in both profiles
+## Available in all profiles
 
 | Key                          | Action                                                       |
 | ---------------------------- | ------------------------------------------------------------ |
-| `Tab`                        | Switch between the Play and RULA profiles                    |
+| `Tab`                        | Cycle between the Play, RULA, and OWAS profiles               |
 | `Space`                      | Play or pause the motion                                     |
 | `Left Arrow` / `Right Arrow` | Move one frame backward or forward                           |
 | `S`                          | Stop playback and return to frame 0                          |
@@ -156,9 +156,32 @@ Available feature keys after selecting a category:
 | Trunk     | `1`-`4`         | `5`-`6`                 |
 | Legs      | `1`             | -                       |
 
-Dragging on the frame slider in the RULA profile creates a label range. With a
-range selected, `Left Arrow` and `Right Arrow` extend its left and right edges.
-Hold `Ctrl` with the arrow key to move the opposite edge inward.
+## OWAS profile
+
+The number keys use the same two-step workflow: first select a category, then
+select a feature in that category. OWAS has no optional category features.
+
+| Key      | Action at category selection                                |
+| -------- | ----------------------------------------------------------- |
+| `1`      | Back                                                        |
+| `2`      | Arms                                                        |
+| `3`      | Legs                                                        |
+| `4`      | Load                                                        |
+| `Escape` | Cancel the active category and return to category selection |
+| `Enter`  | Save the current OWAS label                                 |
+
+Available feature keys after selecting a category:
+
+| Category | Feature keys |
+| -------- | ------------ |
+| Back     | `1`-`4`      |
+| Arms     | `1`-`3`      |
+| Legs     | `1`-`7`      |
+| Load     | `1`-`3`      |
+
+Dragging on the frame slider in either labeling profile creates a label range.
+With a range selected, `Left Arrow` and `Right Arrow` extend its left and right
+edges. Hold `Ctrl` with the arrow key to move the opposite edge inward.
 
 # Architecture - React Container-Presenter Pattern
 

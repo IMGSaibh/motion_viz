@@ -8,7 +8,7 @@ export function WidgetHotkeyProfile() {
   return (
     <Chip
       label={HOTKEY_PROFILE[hotkey_profile]}
-      color={hotkey_profile === HotkeyProfile.RULA_PROFILE ? 'primary' : 'default'}
+      color={hotkey_profile === HotkeyProfile.PLAY_PROFILE ? 'default' : 'primary'}
       size="small"
     />
   );

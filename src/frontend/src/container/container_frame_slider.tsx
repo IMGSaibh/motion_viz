@@ -91,7 +91,7 @@ export function ContainerFrameSlider() {
       const frame = compute_slider_track_frame(e.clientX);
       set_range(null);
       frame_slider_drag_start_reference.current =
-        e.button === 0 && hotkey_profile === HotkeyProfile.RULA_PROFILE ? frame : null;
+        e.button === 0 && hotkey_profile !== HotkeyProfile.PLAY_PROFILE ? frame : null;
       update_slider_track_frame_tick(frame);
     },
     [frame_count, compute_slider_track_frame, hotkey_profile, update_slider_track_frame_tick],
@@ -106,7 +106,7 @@ export function ContainerFrameSlider() {
         update_slider_track_frame_tick(frame_idx);
         const drag_start_frame = frame_slider_drag_start_reference.current;
         if (
-          hotkey_profile === HotkeyProfile.RULA_PROFILE &&
+          hotkey_profile !== HotkeyProfile.PLAY_PROFILE &&
           (e.buttons & 1) !== 0 &&
           drag_start_frame !== null &&
           frame_idx !== drag_start_frame
