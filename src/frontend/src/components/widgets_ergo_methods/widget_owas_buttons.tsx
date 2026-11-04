@@ -9,6 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, OwasCategory } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
+import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 
 type Props = {
   on_owas_select: (cat: OwasCategory, featureId: number) => void;
@@ -24,6 +25,7 @@ function CategoryGrid({
   selected_feature_id,
   onSelect,
   isLast,
+  isActiveCategory,
 }: {
   cat: OwasCategory;
   title: string;
@@ -31,11 +33,14 @@ function CategoryGrid({
   selected_feature_id?: number | null;
   onSelect: (slot: OwasCategory, featureId: number) => void;
   isLast?: boolean;
+  isActiveCategory: boolean;
 }) {
   return (
     <Box
       sx={(theme) => ({
         borderRight: isLast ? 'none' : `1px solid ${theme.palette.wip_color_theme[200]}`,
+        outline: isActiveCategory ? `2px solid ${theme.palette.primary.main}` : 'none',
+        outlineOffset: -2,
         height: '100%',
         width: '100%',
         display: 'flex',
@@ -116,6 +121,7 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
   const { owas_selected } = use_ergo_methods_cxt();
+  const { owas_hotkey_state } = use_rula_hotkey_context();
 
   return (
     <Box
@@ -131,6 +137,7 @@ export function WidgetOwasButtons(props: Props) {
             title="Back Category"
             owas_button_images={label_images_cat1}
             selected_feature_id={owas_selected.CAT_BACK}
+            isActiveCategory={owas_hotkey_state.context === 'CAT_BACK'}
             onSelect={props.on_owas_select}
           />
         </Grid>
@@ -141,6 +148,7 @@ export function WidgetOwasButtons(props: Props) {
             title="Arms Category"
             owas_button_images={label_images_cat2}
             selected_feature_id={owas_selected.CAT_ARMS}
+            isActiveCategory={owas_hotkey_state.context === 'CAT_ARMS'}
             onSelect={props.on_owas_select}
           />
         </Grid>
@@ -151,6 +159,7 @@ export function WidgetOwasButtons(props: Props) {
             title="Legs Category"
             owas_button_images={label_images_cat3}
             selected_feature_id={owas_selected.CAT_LEGS}
+            isActiveCategory={owas_hotkey_state.context === 'CAT_LEGS'}
             onSelect={props.on_owas_select}
           />
         </Grid>
@@ -160,6 +169,7 @@ export function WidgetOwasButtons(props: Props) {
             title="Load Category"
             owas_button_images={label_images_cat4}
             selected_feature_id={owas_selected.CAT_LOAD}
+            isActiveCategory={owas_hotkey_state.context === 'CAT_LOAD'}
             onSelect={props.on_owas_select}
           />
         </Grid>

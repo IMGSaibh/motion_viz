@@ -33,7 +33,12 @@ export function ContainerLabelButtons() {
   const { range, frame_slider_value, set_range } = use_frame_slider_context();
   const effectiveRange = range ?? [frame_slider_value, frame_slider_value];
   const can_save_label = use_can_save_label_cxt();
-  const { rula_save_requested, set_rula_save_requested } = use_rula_hotkey_context();
+  const {
+    rula_save_requested,
+    set_rula_save_requested,
+    owas_save_requested,
+    set_owas_save_requested,
+  } = use_rula_hotkey_context();
   const { owas_selected, set_owas_selected } = use_ergo_methods_cxt();
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
@@ -150,6 +155,12 @@ export function ContainerLabelButtons() {
     set_range(null);
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
   };
+
+  useEffect(() => {
+    if (!owas_save_requested) return;
+    set_owas_save_requested(false);
+    on_owas_save_label();
+  }, [owas_save_requested, set_owas_save_requested, on_owas_save_label]);
 
   return (
     <PresenterLabelButtons
