@@ -47,6 +47,6 @@ dist/
 # === test-files ===
 test*.py
 
-# === trained model files ===
+# === cluster (non-volatile) cache files
 *_model.pkl
 *_model.keras

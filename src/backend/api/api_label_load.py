@@ -76,7 +76,7 @@ def start_training(request: TrainingRequest):
 # --------------------------------------------------------------------------- #
 def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
     """
-    Scale ``X`` column‑wise to zero-mean / unit-variance.
+    Scale ``X`` column-wise to zero-mean / unit-variance.
 
     Parameters
     ----------
@@ -99,7 +99,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
 @dataclass
 class LabelLoader:
     """
-    High‑level helper that turns a JSON label file + its corresponding motion
+    High-level helper that turns a JSON label file + its corresponding motion
     motion file into a tidy ``pandas.DataFrame`` and finally into
     ``(X, y, scaler)`` ready for ML pipelines.
 
