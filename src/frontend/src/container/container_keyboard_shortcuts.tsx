@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import { use_clear_label_list_ctx } from '@/context/context_slider_label_list';
+import { use_clear_label_list_ctx, use_get_labels_cxt } from '@/context/context_slider_label_list';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
 import { create_empty_rula_selection } from '@/domain/label_logic';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
@@ -25,6 +25,7 @@ export function ContainerKeyboardShortcuts(): null {
     use_frame_slider_context();
   const { rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
+  const ergo_labels = use_get_labels_cxt();
   const { warning } = use_snackbar_ctx();
   const { hotkey_profile, set_hotkey_profile, rula_hotkey_state, set_rula_hotkey_state, set_rula_save_requested } =
     use_rula_hotkey_context();
@@ -52,6 +53,33 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'Space') {
         event.preventDefault();
         play_pause();
+        return;
+      }
+
+      if (event.shiftKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
+        event.preventDefault();
+        if (!frame_count || ergo_labels.length === 0) return;
+
+        const target_label = ergo_labels
+          .filter((label) =>
+            event.code === 'ArrowRight'
+              ? label.start_frame > frame_slider_value
+              : label.end_frame < frame_slider_value,
+          )
+          .sort((left, right) =>
+            event.code === 'ArrowRight'
+              ? left.start_frame - right.start_frame
+              : right.end_frame - left.end_frame,
+          )[0];
+
+        if (!target_label) return;
+        const target_frame = Math.max(
+          0,
+          Math.min(frame_count - 1, event.code === 'ArrowRight' ? target_label.start_frame : target_label.end_frame),
+        );
+        pause();
+        set_frame_slider_value(target_frame);
+        go_to_frame(target_frame);
         return;
       }
 
@@ -173,6 +201,7 @@ export function ContainerKeyboardShortcuts(): null {
     return () => window.removeEventListener('keydown', handle_key_down);
   }, [
     clear_slider_label_list,
+    ergo_labels,
     frame_count,
     frame_slider_value,
     go_to_frame,
