@@ -11,7 +11,7 @@ if __name__ == "__main__":
     motion_root="data/npy",
     cache_root="data/labels"
     )
-    X, y, scaler = processor.load("xsens_002_WS10_2023_09_21_cropped.json")
+    X, y, scaler = processor.load("andy_60_re.json")
 
     y_flat = y.reshape(y.shape[0], -1)
     y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])  

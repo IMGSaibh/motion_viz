@@ -12,7 +12,6 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-
 # --------------------------------------------------------------------------- #
 # Helper – simple wrapper around StandardScaler (kept public for re‑use)
 # --------------------------------------------------------------------------- #
