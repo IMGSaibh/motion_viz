@@ -117,6 +117,15 @@ export function ContainerKeyboardShortcuts(): null {
         set_frame_slider_value(0);
       }
 
+      if (event.code === 'KeyB') {
+        if (!frame_count) return;
+        event.preventDefault();
+        const random_frame = Math.floor(Math.random() * frame_count);
+        pause();
+        set_frame_slider_value(random_frame);
+        go_to_frame(random_frame);
+      }
+
       if (event.code === 'KeyR') {
         event.preventDefault();
         reset_engine();
