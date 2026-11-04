@@ -169,12 +169,6 @@ const LABEL_IMAGES_CAT3_OWAS: ReadonlyArray<LabelImage> = [
   { name: 'both limbs hanging free', src: btn_owas_l_7, category: 'CAT_LEGS' },
 ];
 
-const LABEL_IMAGES_CAT4_OWAS: ReadonlyArray<LabelImage> = [
-  { name: 'TODO', src: btn_owas_a_1, category: 'CAT_LOAD' },
-  { name: 'TODO', src: btn_owas_a_2, category: 'CAT_LOAD' },
-  { name: 'TODO', src: btn_owas_a_3, category: 'CAT_LOAD' },
-];
-
 export function get_label_images_cat1_owas(): ReadonlyArray<LabelImage> {
   return LABEL_IMAGES_CAT1_OWAS;
 }
@@ -187,17 +181,12 @@ export function get_label_images_cat3_owas(): ReadonlyArray<LabelImage> {
   return LABEL_IMAGES_CAT3_OWAS;
 }
 
-export function get_label_images_cat4_owas(): ReadonlyArray<LabelImage> {
-  return LABEL_IMAGES_CAT4_OWAS;
-}
-
 export function get_label_all_label_images_owas(): ReadonlyMap<string, LabelImage> {
   const map = new Map<string, LabelImage>();
 
   for (const item of LABEL_IMAGES_CAT1_OWAS) map.set(item.name, item);
   for (const item of LABEL_IMAGES_CAT2_OWAS) map.set(item.name, item);
   for (const item of LABEL_IMAGES_CAT3_OWAS) map.set(item.name, item);
-  for (const item of LABEL_IMAGES_CAT4_OWAS) map.set(item.name, item);
   return map;
 }
 
@@ -232,7 +221,6 @@ const OWAS_IMAGES_BY_CATEGORY: Readonly<Record<string, readonly LabelImage[]>> =
   CAT_BACK: LABEL_IMAGES_CAT1_OWAS,
   CAT_ARMS: LABEL_IMAGES_CAT2_OWAS,
   CAT_LEGS: LABEL_IMAGES_CAT3_OWAS,
-  CAT_LOAD: LABEL_IMAGES_CAT4_OWAS,
 };
 
 export function get_label_image_by_feature_id(

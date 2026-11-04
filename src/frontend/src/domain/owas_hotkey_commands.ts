@@ -28,13 +28,12 @@ export type OwasHotkeyResult = {
   command?: OwasHotkeyCommand;
 };
 
-const OWAS_CATEGORIES: readonly OwasCategory[] = ['CAT_BACK', 'CAT_ARMS', 'CAT_LEGS', 'CAT_LOAD'];
+const OWAS_CATEGORIES: readonly OwasCategory[] = ['CAT_BACK', 'CAT_ARMS', 'CAT_LEGS'];
 
 const FEATURE_COUNT: Readonly<Record<OwasCategory, number>> = {
   CAT_BACK: 4,
   CAT_ARMS: 3,
   CAT_LEGS: 7,
-  CAT_LOAD: 3,
 };
 
 function get_digit(key: string, code?: string): number | null {

@@ -24,7 +24,6 @@ export function ErgoMethodsContexProvider({ children }: { children: React.ReactN
     CAT_BACK: null,
     CAT_ARMS: null,
     CAT_LEGS: null,
-    CAT_LOAD: null,
   });
 
   // TODO: use memoized default value if needed
