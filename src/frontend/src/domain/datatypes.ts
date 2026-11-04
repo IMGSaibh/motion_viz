@@ -34,7 +34,7 @@ export type LabelImage = {
 };
 
 export type RulaCategory = 'CAT_UPPERARM' | 'CAT_LOWERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK' | 'CAT_LEGS';
-export type OwasCategory = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS' | 'CAT_LOAD';
+export type OwasCategory = 'CAT_BACK' | 'CAT_ARMS' | 'CAT_LEGS';
 
 export type RulaFeatureSelection = {
   feature_id: number | null;

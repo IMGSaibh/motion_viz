@@ -141,7 +141,6 @@ export function ContainerLabelButtons() {
       create_label_category(1, 'CAT_BACK', owas_selected.CAT_BACK!),
       create_label_category(2, 'CAT_ARMS', owas_selected.CAT_ARMS!),
       create_label_category(3, 'CAT_LEGS', owas_selected.CAT_LEGS!),
-      create_label_category(4, 'CAT_LOAD', owas_selected.CAT_LOAD!),
     ];
 
     const label: ErgoLabel = {
@@ -153,7 +152,7 @@ export function ContainerLabelButtons() {
     };
     add_label(label);
     set_range(null);
-    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null });
   };
 
   useEffect(() => {

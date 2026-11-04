@@ -96,7 +96,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
           CAT_BACK: by_name.CAT_BACK ?? null,
           CAT_ARMS: by_name.CAT_ARMS ?? null,
           CAT_LEGS: by_name.CAT_LEGS ?? null,
-          CAT_LOAD: by_name.CAT_LOAD ?? null,
         });
       }
     },
@@ -139,7 +138,6 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
               createCategory(1, 'CAT_BACK', owas_selected.CAT_BACK),
               createCategory(2, 'CAT_ARMS', owas_selected.CAT_ARMS),
               createCategory(3, 'CAT_LEGS', owas_selected.CAT_LEGS),
-              createCategory(4, 'CAT_LOAD', owas_selected.CAT_LOAD),
             ].filter((category): category is LabelCategory => category !== null)
           : undefined;
 
@@ -156,7 +154,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     // A completed edit must not leak its range into the next label creation.
     set_range(null);
     set_rula_selected(create_empty_rula_selection());
-    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
+    set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null });
   }, [editing_id, range, ergo_labels, rula_selected, owas_selected, set_range]);
 
   const cancel_current_edit_label = useCallback(() => {

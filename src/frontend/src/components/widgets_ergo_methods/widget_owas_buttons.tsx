@@ -2,7 +2,6 @@ import {
   get_label_images_cat1_owas,
   get_label_images_cat2_owas,
   get_label_images_cat3_owas,
-  get_label_images_cat4_owas,
 } from '@/Assets/label_images';
 import { useMemo } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
@@ -119,7 +118,6 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat1 = useMemo(() => get_label_images_cat1_owas(), []);
   const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
-  const label_images_cat4 = useMemo(() => get_label_images_cat4_owas(), []);
   const { owas_selected } = use_ergo_methods_cxt();
   const { owas_hotkey_state } = use_rula_hotkey_context();
 
@@ -160,16 +158,6 @@ export function WidgetOwasButtons(props: Props) {
             owas_button_images={label_images_cat3}
             selected_feature_id={owas_selected.CAT_LEGS}
             isActiveCategory={owas_hotkey_state.context === 'CAT_LEGS'}
-            onSelect={props.on_owas_select}
-          />
-        </Grid>
-        <Grid size={{ md: 3 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
-          <CategoryGrid
-            cat="CAT_LOAD"
-            title="Load Category"
-            owas_button_images={label_images_cat4}
-            selected_feature_id={owas_selected.CAT_LOAD}
-            isActiveCategory={owas_hotkey_state.context === 'CAT_LOAD'}
             onSelect={props.on_owas_select}
           />
         </Grid>

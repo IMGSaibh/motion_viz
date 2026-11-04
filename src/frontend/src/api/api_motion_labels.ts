@@ -50,7 +50,6 @@ const OWAS_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [
   { id: 1, cat_name: 'CAT_BACK' },
   { id: 2, cat_name: 'CAT_ARMS' },
   { id: 3, cat_name: 'CAT_LEGS' },
-  { id: 4, cat_name: 'CAT_LOAD' },
 ];
 
 const RULA_CATEGORY_DEFINITIONS: readonly CategoryDefinition[] = [

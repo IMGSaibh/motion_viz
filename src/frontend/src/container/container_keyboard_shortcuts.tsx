@@ -211,7 +211,7 @@ export function ContainerKeyboardShortcuts(): null {
         set_rula_hotkey_state(INITIAL_RULA_HOTKEY_STATE);
         set_owas_hotkey_state(INITIAL_OWAS_HOTKEY_STATE);
         set_rula_selected(create_empty_rula_selection());
-        set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null, CAT_LOAD: null });
+        set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null });
       }
 
       // TODO: refactor min and max logic. Maybe not needed.
