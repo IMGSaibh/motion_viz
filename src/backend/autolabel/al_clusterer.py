@@ -19,12 +19,12 @@ from __future__ import annotations
 
 import os
 import json
+import pickle
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
-import joblib
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -70,7 +70,8 @@ class PCAReducer(BaseReducer):
     def save(self, reducer_obj: PCA, out_dir: Path, stem: str) -> Path:
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / f"{stem}_pca.pkl"
-        joblib.dump(reducer_obj, path)
+        with path.open("wb") as file:
+            pickle.dump(reducer_obj, file)
         return path
 
 
@@ -167,7 +168,7 @@ class BaseClusterer(ABC):
 
     @abstractmethod
     def save(self, out_dir: Path, stem: str) -> Path:
-        """Persist the fitted model (joblib) and return the file path."""
+        """Persist the fitted model and return the file path."""
         ...
 
 
@@ -204,7 +205,8 @@ class KMeansClusterer(BaseClusterer):
             raise RuntimeError("Fit the model before saving.")
         out_dir.mkdir(parents=True, exist_ok=True)
         path = out_dir / f"{stem}_kmeans.pkl"
-        joblib.dump(self._model, path)
+        with path.open("wb") as file:
+            pickle.dump(self._model, file)
         return path
 
 
