@@ -13,6 +13,7 @@ export type ErgoLabel = {
   id: string | undefined;
   start_frame: number;
   end_frame: number;
+  generated?: boolean;
   ergo_method?: string;
   categories: LabelCategory[];
 };

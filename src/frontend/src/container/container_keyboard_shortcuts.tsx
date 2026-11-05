@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import { use_clear_label_list_ctx, use_get_labels_cxt } from '@/context/context_slider_label_list';
@@ -26,6 +26,7 @@ import {
  * the UI containers and widgets, while RULA command transitions remain in the domain layer.
  */
 export function ContainerKeyboardShortcuts(): null {
+  const arrow_hold_started_at = useRef<{ ArrowLeft?: number; ArrowRight?: number }>({});
   const { frame_slider_value, range, set_frame_slider_value, set_range, set_is_review_rending_active } =
     use_frame_slider_context();
   const { owas_selected, rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
@@ -56,6 +57,15 @@ export function ContainerKeyboardShortcuts(): null {
 
   useEffect(() => {
     function handle_key_down(event: KeyboardEvent): void {
+      if (
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.shiftKey &&
+        (event.code === 'ArrowLeft' || event.code === 'ArrowRight')
+      ) {
+        arrow_hold_started_at.current[event.code] ??= event.timeStamp;
+      }
+
       if (event.code === 'Tab') {
         event.preventDefault();
         set_hotkey_profile(toggle_hotkey_profile(hotkey_profile));
@@ -70,7 +80,13 @@ export function ContainerKeyboardShortcuts(): null {
         return;
       }
 
-      if (event.shiftKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && event.code === 'KeyC') {
+        event.preventDefault();
+        set_range(null);
+        return;
+      }
+
+      if (event.altKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
         event.preventDefault();
         if (!frame_count || ergo_labels.length === 0) return;
 
@@ -157,32 +173,63 @@ export function ContainerKeyboardShortcuts(): null {
 
       if (
         (hotkey_profile === HotkeyProfile.RULA_PROFILE || hotkey_profile === HotkeyProfile.OWAS_PROFILE) &&
-        range &&
         frame_count
       ) {
         const last_frame = Math.max(0, frame_count - 1);
 
-        if (event.code === 'ArrowLeft') {
+        if (event.shiftKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
-          const next_frame = event.ctrlKey ? Math.max(range[0], range[1] - 1) : Math.max(0, range[0] - 1);
-          const next_range = event.ctrlKey ? [range[0], next_frame] : [next_frame, range[1]];
-          set_range(next_range as [number, number]);
+          const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const adjust_start = event.ctrlKey;
+
+          if (!range) {
+            const next_frame = Math.max(0, Math.min(last_frame, frame_slider_value + direction * 10));
+            if (next_frame === frame_slider_value) return;
+            set_range([
+              Math.min(frame_slider_value, next_frame),
+              Math.max(frame_slider_value, next_frame),
+            ]);
+            pause();
+            set_frame_slider_value(next_frame);
+            go_to_frame(next_frame);
+            return;
+          }
+
+          const next_range = [...range] as [number, number];
+          const edge_index = adjust_start ? 0 : 1;
+          const minimum = adjust_start ? 0 : range[0];
+          const maximum = adjust_start ? range[1] : last_frame;
+          const next_frame = Math.max(minimum, Math.min(maximum, range[edge_index] + direction * 10));
+          if (next_frame === range[edge_index]) return;
+          next_range[edge_index] = next_frame;
+          set_range(next_range);
           pause();
           set_frame_slider_value(next_frame);
           go_to_frame(next_frame);
           return;
         }
 
-        if (event.code === 'ArrowRight') {
+        if (event.ctrlKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
-          const next_frame = event.ctrlKey ? Math.min(range[1], range[0] + 1) : Math.min(last_frame, range[1] + 1);
-          const next_range = event.ctrlKey ? [next_frame, range[1]] : [range[0], next_frame];
-          set_range(next_range as [number, number]);
+          const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const anchor_frame = range
+            ? direction > 0
+              ? range[1]
+              : range[0]
+            : frame_slider_value;
+          const next_frame = Math.max(0, Math.min(last_frame, anchor_frame + direction * 10));
+          if (next_frame === anchor_frame) return;
+          set_range(
+            direction > 0
+              ? [range?.[0] ?? anchor_frame, next_frame]
+              : [next_frame, range?.[1] ?? anchor_frame],
+          );
           pause();
           set_frame_slider_value(next_frame);
           go_to_frame(next_frame);
           return;
         }
+
       }
 
       if (event.code === 'KeyS') {
@@ -214,24 +261,28 @@ export function ContainerKeyboardShortcuts(): null {
         set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null });
       }
 
-      // TODO: refactor min and max logic. Maybe not needed.
-      if (event.code === 'ArrowRight') {
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && event.code === 'ArrowRight') {
         event.preventDefault();
         if (!frame_count) return;
-        const next_frame = Math.min(Math.max(0, frame_count - 1), frame_slider_value + 1);
+        const hold_started_at = arrow_hold_started_at.current.ArrowRight ?? event.timeStamp;
+        const step = event.timeStamp - hold_started_at >= 1000 ? 10 : 1;
+        const next_frame = Math.min(Math.max(0, frame_count - 1), frame_slider_value + step);
         pause();
         set_frame_slider_value(next_frame);
         go_to_frame(next_frame);
+        return;
       }
 
-      // TODO: refactor min and max logic. Maybe not needed.
-      if (event.code === 'ArrowLeft') {
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && event.code === 'ArrowLeft') {
         event.preventDefault();
         if (!frame_count) return;
-        const previous_frame = Math.max(0, frame_slider_value - 1);
+        const hold_started_at = arrow_hold_started_at.current.ArrowLeft ?? event.timeStamp;
+        const step = event.timeStamp - hold_started_at >= 1000 ? 10 : 1;
+        const previous_frame = Math.max(0, frame_slider_value - step);
         pause();
         set_frame_slider_value(previous_frame);
         go_to_frame(previous_frame);
+        return;
       }
 
       if (event.code === 'KeyD') {
@@ -245,8 +296,24 @@ export function ContainerKeyboardShortcuts(): null {
       }
     }
 
+    function handle_key_up(event: KeyboardEvent): void {
+      if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
+        delete arrow_hold_started_at.current[event.code];
+      }
+    }
+
+    function handle_window_blur(): void {
+      arrow_hold_started_at.current = {};
+    }
+
     window.addEventListener('keydown', handle_key_down);
-    return () => window.removeEventListener('keydown', handle_key_down);
+    window.addEventListener('keyup', handle_key_up);
+    window.addEventListener('blur', handle_window_blur);
+    return () => {
+      window.removeEventListener('keydown', handle_key_down);
+      window.removeEventListener('keyup', handle_key_up);
+      window.removeEventListener('blur', handle_window_blur);
+    };
   }, [
     clear_slider_label_list,
     ergo_labels,

@@ -78,6 +78,9 @@ function parse_labels(value: unknown): ErgoLabel[] {
     if (label.ergo_method !== undefined && typeof label.ergo_method !== 'string') {
       throw new Error(`Invalid label ${index + 1} field: ergo_method`);
     }
+    if (label.generated !== undefined && typeof label.generated !== 'boolean') {
+      throw new Error(`Invalid label ${index + 1} field: generated`);
+    }
     const ergoMethod = label.ergo_method ?? '';
     if (!Array.isArray(label.categories)) throw new Error(`Invalid label ${index + 1} field: categories`);
 
@@ -102,6 +105,7 @@ function parse_labels(value: unknown): ErgoLabel[] {
       id: uid(),
       start_frame: startFrame,
       end_frame: endFrame,
+      generated: label.generated ?? false,
       ergo_method: ergoMethod,
       categories,
     };
