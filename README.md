@@ -180,11 +180,12 @@ Available feature keys after selecting a category:
 | Load     | `1`-`3`      |
 
 Dragging on the frame slider in either labeling profile creates a label range.
-With a range selected, `Left Arrow` and `Right Arrow` extend its left and right
-edges by one frame. Hold `Ctrl` with `Right Arrow` or `Left Arrow` to extend the
-range by 10 frames at the corresponding edge and move the playhead there. With
-no range selected, the current playhead is the starting edge, matching a slider
-drag.
+Unmodified `Left Arrow` and `Right Arrow` move the playhead by one frame without
+changing the range; after holding either key for one second, each repeat moves
+the playhead by 10 frames.
+Hold `Ctrl` with `Right Arrow` or `Left Arrow` to extend the range by 10 frames
+at the corresponding edge and move the playhead there. With no range selected,
+the current playhead is the starting edge, matching a slider drag.
 Use `Shift` with an arrow key to move the range end by 10 frames, or `Ctrl+Shift`
 with an arrow key to move the range start. Use `Alt` with an arrow key to jump
 to the next or previous labeled frame.
