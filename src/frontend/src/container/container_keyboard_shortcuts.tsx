@@ -80,6 +80,12 @@ export function ContainerKeyboardShortcuts(): null {
         return;
       }
 
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && event.code === 'KeyC') {
+        event.preventDefault();
+        set_range(null);
+        return;
+      }
+
       if (event.altKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
         event.preventDefault();
         if (!frame_count || ergo_labels.length === 0) return;
