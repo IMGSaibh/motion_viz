@@ -15,6 +15,13 @@ from sklearn.preprocessing import StandardScaler
 # --------------------------------------------------------------------------- #
 # Helper – simple wrapper around StandardScaler (kept public for re‑use)
 # --------------------------------------------------------------------------- #
+
+
+def redo_one_hot(arr, dimension, length):
+    arr = np.array(arr).reshape(length, dimension)
+    return tuple(np.argmax(row) + 1 for row in arr)
+
+    
 def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
     """
     Scale ``X`` column‑wise to zero-mean / unit-variance.
