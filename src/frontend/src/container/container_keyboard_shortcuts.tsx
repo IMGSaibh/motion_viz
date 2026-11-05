@@ -70,7 +70,7 @@ export function ContainerKeyboardShortcuts(): null {
         return;
       }
 
-      if (event.shiftKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
+      if (event.altKey && (event.code === 'ArrowRight' || event.code === 'ArrowLeft')) {
         event.preventDefault();
         if (!frame_count || ergo_labels.length === 0) return;
 
@@ -157,31 +157,83 @@ export function ContainerKeyboardShortcuts(): null {
 
       if (
         (hotkey_profile === HotkeyProfile.RULA_PROFILE || hotkey_profile === HotkeyProfile.OWAS_PROFILE) &&
-        range &&
         frame_count
       ) {
         const last_frame = Math.max(0, frame_count - 1);
 
-        if (event.code === 'ArrowLeft') {
+        if (event.shiftKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
-          const next_frame = event.ctrlKey ? Math.max(range[0], range[1] - 1) : Math.max(0, range[0] - 1);
-          const next_range = event.ctrlKey ? [range[0], next_frame] : [next_frame, range[1]];
-          set_range(next_range as [number, number]);
+          const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const adjust_start = event.ctrlKey;
+
+          if (!range) {
+            const next_frame = Math.max(0, Math.min(last_frame, frame_slider_value + direction * 10));
+            if (next_frame === frame_slider_value) return;
+            set_range([
+              Math.min(frame_slider_value, next_frame),
+              Math.max(frame_slider_value, next_frame),
+            ]);
+            pause();
+            set_frame_slider_value(next_frame);
+            go_to_frame(next_frame);
+            return;
+          }
+
+          const next_range = [...range] as [number, number];
+          const edge_index = adjust_start ? 0 : 1;
+          const minimum = adjust_start ? 0 : range[0];
+          const maximum = adjust_start ? range[1] : last_frame;
+          const next_frame = Math.max(minimum, Math.min(maximum, range[edge_index] + direction * 10));
+          if (next_frame === range[edge_index]) return;
+          next_range[edge_index] = next_frame;
+          set_range(next_range);
           pause();
           set_frame_slider_value(next_frame);
           go_to_frame(next_frame);
           return;
         }
 
-        if (event.code === 'ArrowRight') {
+        if (event.ctrlKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
-          const next_frame = event.ctrlKey ? Math.min(range[1], range[0] + 1) : Math.min(last_frame, range[1] + 1);
-          const next_range = event.ctrlKey ? [next_frame, range[1]] : [range[0], next_frame];
-          set_range(next_range as [number, number]);
+          const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const anchor_frame = range
+            ? direction > 0
+              ? range[1]
+              : range[0]
+            : frame_slider_value;
+          const next_frame = Math.max(0, Math.min(last_frame, anchor_frame + direction * 10));
+          if (next_frame === anchor_frame) return;
+          set_range(
+            direction > 0
+              ? [range?.[0] ?? anchor_frame, next_frame]
+              : [next_frame, range?.[1] ?? anchor_frame],
+          );
           pause();
           set_frame_slider_value(next_frame);
           go_to_frame(next_frame);
           return;
+        }
+
+        if (range) {
+          if (event.code === 'ArrowLeft') {
+            event.preventDefault();
+            const next_frame = Math.max(0, range[0] - 1);
+            set_range([next_frame, range[1]]);
+            pause();
+            set_frame_slider_value(next_frame);
+            go_to_frame(next_frame);
+            return;
+          }
+
+          if (event.code === 'ArrowRight') {
+            event.preventDefault();
+            const next_frame = Math.min(last_frame, range[1] + 1);
+            set_range([range[0], next_frame]);
+            pause();
+            set_frame_slider_value(next_frame);
+            go_to_frame(next_frame);
+            return;
+          }
         }
       }
 

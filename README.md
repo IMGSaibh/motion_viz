@@ -181,7 +181,13 @@ Available feature keys after selecting a category:
 
 Dragging on the frame slider in either labeling profile creates a label range.
 With a range selected, `Left Arrow` and `Right Arrow` extend its left and right
-edges. Hold `Ctrl` with the arrow key to move the opposite edge inward.
+edges by one frame. Hold `Ctrl` with `Right Arrow` or `Left Arrow` to extend the
+range by 10 frames at the corresponding edge and move the playhead there. With
+no range selected, the current playhead is the starting edge, matching a slider
+drag.
+Use `Shift` with an arrow key to move the range end by 10 frames, or `Ctrl+Shift`
+with an arrow key to move the range start. Use `Alt` with an arrow key to jump
+to the next or previous labeled frame.
 
 # Architecture - React Container-Presenter Pattern
 
