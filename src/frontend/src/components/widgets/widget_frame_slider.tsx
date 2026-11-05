@@ -2,8 +2,9 @@ import * as React from 'react';
 import { Box, ButtonBase, Grid, Typography } from '@mui/material';
 import { PLAY_BUTTON_IMAGE } from '@/Assets/label_images';
 import { PAUSE_BUTTON_IMAGE } from '@/Assets/label_images';
-import { use_current_label_range_geometry_cxt } from '@/context/context_slider_label_list';
+import { use_current_label_range_geometry_cxt, use_get_labels_cxt } from '@/context/context_slider_label_list';
 import { use_can_save_label_cxt } from '@/context/context_slider_label_list';
+import type { ErgoLabel } from '@/domain/datatypes';
 
 type Props = {
   frame_slider_value: number;
@@ -20,6 +21,38 @@ type Props = {
   on_click_play_toggle?: () => void;
 };
 
+function count_marked_frames(labels: ErgoLabel[], frame_count: number, generated: boolean): number {
+  if (frame_count <= 0) return 0;
+
+  const intervals = labels
+    .filter((label) => (label.generated ?? false) === generated)
+    .map((label) => {
+      const start = Math.max(0, Math.min(frame_count - 1, Math.trunc(label.start_frame)));
+      const end = Math.max(0, Math.min(frame_count - 1, Math.trunc(label.end_frame)));
+      return [Math.min(start, end), Math.max(start, end)] as const;
+    })
+    .sort(([leftStart], [rightStart]) => leftStart - rightStart);
+
+  let total = 0;
+  let currentStart: number | null = null;
+  let currentEnd = -1;
+
+  for (const [start, end] of intervals) {
+    if (currentStart === null) {
+      currentStart = start;
+      currentEnd = end;
+    } else if (start <= currentEnd + 1) {
+      currentEnd = Math.max(currentEnd, end);
+    } else {
+      total += currentEnd - currentStart + 1;
+      currentStart = start;
+      currentEnd = end;
+    }
+  }
+
+  return currentStart === null ? total : total + currentEnd - currentStart + 1;
+}
+
 /**
  * Renders the frame track, play control, playhead, hover marker, and active-range overlay.
  *
@@ -35,6 +68,9 @@ export function WidgetFrameSlider(props: Props) {
   const hoverPct =
     hasFrames && props.hover_frame !== null ? ((props.hover_frame + 0.5) / props.frame_count) * 100 : null;
   const currentLabelGeom = use_current_label_range_geometry_cxt(props.frame_count);
+  const saved_labels = use_get_labels_cxt();
+  const generated_frame_count = count_marked_frames(saved_labels, props.frame_count, true);
+  const manual_frame_count = count_marked_frames(saved_labels, props.frame_count, false);
   const can_save_label = use_can_save_label_cxt();
   const canSaveRula = can_save_label('RULA');
   const canSaveOwas = can_save_label('OWAS');
@@ -186,8 +222,14 @@ export function WidgetFrameSlider(props: Props) {
         size={{ md: 1 }}
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'left' }}
       >
-        <Typography variant="body2">
-          Frame: {clamped_frame} <br /> Total: [0 – {props.frame_count}]
+        <Typography variant="caption">
+          Frame: {clamped_frame}
+          <br />
+          Total frames: {props.frame_count}
+          <br />
+          Manual: {manual_frame_count}
+          <br />
+          Generated: {generated_frame_count}
         </Typography>
       </Grid>
     </Grid>

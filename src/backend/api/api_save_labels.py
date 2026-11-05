@@ -39,6 +39,7 @@ async def save_labels_to_json(payload: SaveLabelsRequest):
         a, b = sorted((item.start_frame, item.end_frame))
         labels.append({
             "ergo_method": item.ergo_method,
+            "generated": False,
             "start_frame": a,
             "end_frame": b,
             "categories": [category.model_dump() for category in item.categories],
