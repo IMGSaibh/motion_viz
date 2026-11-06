@@ -51,7 +51,7 @@ export function WidgetFrameLabelBar(props: Props) {
             aria-hidden
           >
             {/* Persisted labels remain visible independently of the transient range selection. */}
-            {saved_labels.map(({ id, start_frame: start_frame, end_frame: end_frame }) => {
+            {saved_labels.map(({ id, start_frame: start_frame, end_frame: end_frame, generated }) => {
               const vvFrom = clamp(Math.min(start_frame, end_frame));
               const vvTo = clamp(Math.max(start_frame, end_frame));
               const vvLen = Math.max(0, vvTo - vvFrom + 1);
@@ -60,12 +60,17 @@ export function WidgetFrameLabelBar(props: Props) {
               const vScale =
                 props.frame_count > 0 ? Math.max(0, Math.round((vvLen / props.frame_count) * 10000) / 10000) : 0;
 
+              // Blue for generated, green for manual
+              const color = generated === true
+                ? theme.palette.wip_color_theme[600] // blue
+                : theme.palette.wip_color_theme[700]; // green
+
               return (
                 <Box
                   key={id}
                   className={id}
                   sx={(theme) => ({
-                    bgcolor: theme.palette.wip_color_theme[600],
+                    bgcolor: color,
                     position: 'absolute',
                     inset: 0,
                     width: '100%',
