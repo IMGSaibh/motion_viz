@@ -95,6 +95,8 @@ class AutoEncoderReducer(BaseReducer):
 
         inp = Input(shape=(input_dim,))
         x = inp
+        if not hasattr(self.hidden_layers, '__iter__'):
+            self.hidden_layers = [self.hidden_layers]
         for units in self.hidden_layers:
             x = Dense(units)(x)
             x = LeakyReLU(alpha=0.1)(x)
@@ -114,27 +116,33 @@ class AutoEncoderReducer(BaseReducer):
 
     # -----------------------------------------------------------------
     def fit_transform(self, X: np.ndarray) -> Tuple[np.ndarray, Model]:
+        import tensorflow as tf
         from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
-        ae = self._build_ae(X.shape[1])
+        gpus = tf.config.list_physical_devices("GPU")
+        device = "/GPU:0" if gpus else "/CPU:0"
+
+        print(f"GPUs found: {gpus}")
 
         callbacks = [
             EarlyStopping(monitor="val_loss", patience=15, restore_best_weights=True),
             ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1),
         ]
 
-        ae.fit(
-            X,
-            X,
-            epochs=self.epochs,
-            batch_size=self.batch_size,
-            shuffle=True,
-            verbose=self.verbose,
-            callbacks=callbacks,
-        )
+        with tf.device(device):
+            ae = self._build_ae(X.shape[1])
+            ae.fit(
+                X,
+                X,
+                epochs=self.epochs,
+                batch_size=self.batch_size,
+                shuffle=True,
+                verbose=self.verbose,
+                callbacks=callbacks,
+            )
 
-        encoder = Model(ae.input, ae.get_layer("bottleneck").output)
-        X_red = encoder.predict(X, batch_size=256, verbose=0)
+            encoder = Model(ae.input, ae.get_layer("bottleneck").output)
+            X_red = encoder.predict(X, batch_size=256, verbose=0)
         return X_red, ae
 
     # -----------------------------------------------------------------
