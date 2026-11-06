@@ -242,6 +242,8 @@ class BaseClusterEvaluator(ABC):
         self.recall_thr = recall_thr
         self.all_clusters: List[ClusterEval] = []
         self.valid_clusters: List[ClusterEval] = []
+      
+
 
     def _load_y_true(self, y_true: Any) -> Any:
         if not isinstance(y_true, (str, Path)):
@@ -280,16 +282,18 @@ class BaseClusterEvaluator(ABC):
         """Plain-text table that you can ``print``."""
         lines = [
             "\n=== ALL CLUSTERS (sorted by precision) ===",
-            f"{'ID':>4} {'Prec.':>6} {'Rec.':>6} {'Size':>5} Dominant",
+            f"{'ID':>4} {'Prec.':>6} {'Rec.':>6} {'Size':>5} Dominant (* = valid)",
             "-" * 44,
         ]
+        valid_cluster_ids = {cluster.cluster_id for cluster in self.valid_clusters}
         for cluster in sorted(
             self.all_clusters, key=lambda item: item.precision, reverse=True
         ):
+            marker = " *" if cluster.cluster_id in valid_cluster_ids else ""
             lines.append(
                 f"{cluster.cluster_id:>4} {cluster.precision:6.3f} "
                 f"{cluster.recall:6.3f} {cluster.size:5d} "
-                f"{cluster.dominant_label}"
+                f"{cluster.dominant_label}{marker}"
             )
 
         if self.valid_clusters:
@@ -298,11 +302,18 @@ class BaseClusterEvaluator(ABC):
         else:
             avg_prec = avg_rec = 0.0
 
+        valid_frame_count = sum(cluster.size for cluster in self.valid_clusters)
+        all_frame_count = sum(cluster.size for cluster in self.all_clusters)
+        valid_frame_ratio = (
+            valid_frame_count / all_frame_count if all_frame_count else 0.0
+        )
+
         lines.extend(
             [
                 "\n=== VALID-CLUSTER SUMMARY ===",
                 f"Requested clusters   : {len(self.all_clusters)}",
                 f"Valid clusters found : {len(self.valid_clusters)}",
+                f"Frames in valid      : {valid_frame_count} ({valid_frame_ratio:.1%})",
                 f"Avg precision (valid): {avg_prec:.4f}",
                 f"Avg recall (valid)   : {avg_rec:.4f}",
             ]

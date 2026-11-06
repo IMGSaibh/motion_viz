@@ -56,7 +56,7 @@ if __name__ == "__main__":
     evaluator = al_clusterer.ClusterEvaluator(
         y_true=y_flat_str,  # placeholder – will be replaced after loading
         min_cluster_size=5,
-        precision_thr=0.7,
+        precision_thr=0.9,
         recall_thr=0.01,
     )
 
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     config_dir.mkdir(parents=True, exist_ok=False)
 
     reducer_path = reducer.save(reducer_obj, config_dir, "reducer")
-    clusterer_path = clusterer.save(config_dir, "clusterer")
-    relevant_cluster_ids = [cluster.cluster_id for cluster in evaluator.valid_clusters]
+    clusterer_path = clusterer.save(config_dir, "clusterer")    
+    relevant_cluster_id_label = {cluster.cluster_id: str(cluster.dominant_label) for cluster in evaluator.valid_clusters}
 
     config = {
         "config_name": config_name,
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             "min_cluster_size": evaluator.min_cluster_size,
             "precision_threshold": evaluator.precision_thr,
             "recall_threshold": evaluator.recall_thr,
-            "relevant_cluster_ids": relevant_cluster_ids,
+            "relevant_cluster_id_label": relevant_cluster_id_label,
         },
     }
     with (config_dir / "config.json").open("w", encoding="utf-8") as config_file:
