@@ -86,8 +86,8 @@ if __name__ == "__main__":
     # -------------------------------------------------------------
     dataset_slug = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(filename).name).strip("._-")
     dataset_slug = dataset_slug or "dataset"
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
-    config_name = f"{dataset_slug}_{timestamp}_{uuid.uuid4().hex}"
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    config_name = f"{dataset_slug}_{timestamp}"
     config_dir = Path(__file__).resolve().parent / "models" / config_name
     config_dir.mkdir(parents=True, exist_ok=False)
 
