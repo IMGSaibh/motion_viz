@@ -1,131 +1,137 @@
-import al_clusterer
-from al_label_load import LabelLoader
-import al_label_load
-import numpy as np
-from pathlib import Path
-import argparse
-from datetime import datetime, timezone
+from __future__ import annotations
+
 import json
 import re
 import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+
+from backend.autolabel import al_clusterer, al_label_load
+from backend.autolabel.al_label_load import LabelLoader
 
 
+class PerformClustering:
+    """Load a labelled motion dataset and evaluate clustering configurations."""
 
+    def __init__(
+        self,
+        filename: str | Path,
+        label_root: str | Path | None = None,
+        motion_root: str | Path | None = None,
+        cache_root: str | Path | None = None,
+        models_root: str | Path | None = None,
+    ) -> None:
+        repo_root = Path(__file__).resolve().parents[3]
+        self.label_root = Path(label_root) if label_root else repo_root / "data" / "labels"
+        self.motion_root = Path(motion_root) if motion_root else repo_root / "data" / "npy"
+        self.cache_root = Path(cache_root) if cache_root else self.label_root
+        self.models_root = (
+            Path(models_root)
+            if models_root
+            else Path(__file__).resolve().parent / "models"
+        )
 
-if __name__ == "__main__":
+        label_path = Path(filename)
+        if label_path.suffix.lower() != ".json":
+            label_path = label_path.with_suffix(".json")
+        self.filename = label_path.name
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("filename")
-    args = parser.parse_args()
+        processor = LabelLoader(
+            label_root=self.label_root,
+            motion_root=self.motion_root,
+            cache_root=self.cache_root,
+        )
+        self.X, y, _scaler = processor.load(label_path)
+        y_flat = y.reshape(y.shape[0], -1)
+        self.y_true = np.array(
+            [
+                "_".join(map(str, al_label_load.redo_one_hot(row, 8, 3)))
+                for row in y_flat
+            ]
+        )
 
-    filename = args.filename
+    def run(
+        self,
+        reducer: al_clusterer.BaseReducer,
+        clusterer: al_clusterer.BaseClusterer,
+        min_cluster_size: int = 5,
+        precision_threshold: float = 0.9,
+        recall_threshold: float = 0.01,
+    ) -> dict[str, Any]:
+        """Fit, evaluate, and save one reducer/clusterer configuration."""
+        reduced_features, reducer_model = reducer.fit_transform(self.X)
+        clusterer.fit(reduced_features)
+        cluster_labels = clusterer.predict(reduced_features)
+        silhouette = clusterer.silhouette(reduced_features, cluster_labels)
 
-    print(f"loading: {filename}")
+        evaluator = al_clusterer.ClusterEvaluator(
+            y_true=self.y_true,
+            min_cluster_size=min_cluster_size,
+            precision_thr=precision_threshold,
+            recall_thr=recall_threshold,
+        )
+        evaluator.evaluate(cluster_labels)
 
-    processor = LabelLoader(
-    label_root="data/labels",
-    motion_root="data/npy",
-    cache_root="data/labels"
-    )
-    X, y, scaler = processor.load(f"{filename}.json")
+        dataset_slug = re.sub(
+            r"[^A-Za-z0-9._-]+", "_", Path(self.filename).stem
+        ).strip("._-") or "dataset"
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+        config_name = f"{dataset_slug}_{timestamp}_{uuid.uuid4().hex[:8]}"
+        config_dir = self.models_root / config_name
+        config_dir.mkdir(parents=True, exist_ok=False)
 
-    y_flat = y.reshape(y.shape[0], -1)
-    y_flat_str = np.array(['_'.join(map(str, al_label_load.redo_one_hot(arr, 8, 3))) for arr in y_flat])
-    a = 1
-    #y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])  
-    
-
-    # dimension reducer – switch between PCA and AE by changing the class
-    # reducer = PCAReducer(n_components=6)
-    reducer = al_clusterer.AutoEncoderReducer(
-        encoding_dim=32,
-        hidden_layers=(256,64),
-        epochs=500,          # fewer epochs for the demo
-        batch_size=128,
-        verbose=1,
-    )
-    reducer = al_clusterer.PCAReducer(
-        n_components = 6,
-        random_state = 42
-    )
-
-    # clustering algorithm
-    clusterer = al_clusterer.KMeansClusterer(n_clusters=40, random_state=42)
-
-    # evaluator – thresholds can be tweaked per experiment
-    evaluator = al_clusterer.ClusterEvaluator(
-        y_true=y_flat_str,  # placeholder – will be replaced after loading
-        min_cluster_size=5,
-        precision_thr=0.9,
-        recall_thr=0.01,
-    )
-
-
-    # -------------------------------------------------------------
-    # Reduce Dimension
-    # -------------------------------------------------------------
-    X_red, reducer_obj = reducer.fit_transform(X)
-    print(f"[✔] Reduced to {X_red.shape[1]} dimensions")
-
-    # -------------------------------------------------------------
-    # Cluster 
-    # -------------------------------------------------------------
-    clusterer.fit(X_red)
-    labels = clusterer.predict(X_red)
-    sil = clusterer.silhouette(X_red, labels)
-    print(f"k-means fitted - silhouette={sil:.4f}")
-
-    # -------------------------------------------------------------
-    # Evaluate
-    # -------------------------------------------------------------
-    evaluator.evaluate(labels)
-    print(evaluator.summary())
-
-    # -------------------------------------------------------------
-    # Save models and evaluator-qualified cluster IDs
-    # -------------------------------------------------------------
-    dataset_slug = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(filename).name).strip("._-")
-    dataset_slug = dataset_slug or "dataset"
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
-    config_name = f"{dataset_slug}_{timestamp}"
-    config_dir = Path(__file__).resolve().parent / "models" / config_name
-    config_dir.mkdir(parents=True, exist_ok=False)
-
-    reducer_path = reducer.save(reducer_obj, config_dir, "reducer")
-    clusterer_path = clusterer.save(config_dir, "clusterer")    
-    relevant_cluster_id_label = {cluster.cluster_id: str(cluster.dominant_label) for cluster in evaluator.valid_clusters}
-
-    config = {
-        "config_name": config_name,
-        "dataset": filename,
-        "created_at_utc": datetime.now(timezone.utc).isoformat(),
-        "reducer": {
-            "type": type(reducer).__name__,
-            "parameters": {
-                key: value for key, value in vars(reducer).items()
-                if not key.startswith("_")
+        reducer_path = reducer.save(reducer_model, config_dir, "reducer")
+        clusterer_path = clusterer.save(config_dir, "clusterer")
+        relevant_cluster_id_label = {
+            cluster.cluster_id: str(cluster.dominant_label)
+            for cluster in evaluator.valid_clusters
+        }
+        config = {
+            "config_name": config_name,
+            "dataset": Path(self.filename).stem,
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
+            "reducer": {
+                "type": type(reducer).__name__,
+                "parameters": {
+                    key: value
+                    for key, value in vars(reducer).items()
+                    if not key.startswith("_")
+                },
+                "artifact": reducer_path.name,
             },
-            "artifact": reducer_path.name,
-        },
-        "clusterer": {
-            "type": type(clusterer).__name__,
-            "parameters": {
-                key: value for key, value in vars(clusterer).items()
-                if not key.startswith("_")
+            "clusterer": {
+                "type": type(clusterer).__name__,
+                "parameters": {
+                    key: value
+                    for key, value in vars(clusterer).items()
+                    if not key.startswith("_")
+                },
+                "artifact": clusterer_path.name,
             },
-            "artifact": clusterer_path.name,
-        },
-        "evaluator": {
-            "min_cluster_size": evaluator.min_cluster_size,
-            "precision_threshold": evaluator.precision_thr,
-            "recall_threshold": evaluator.recall_thr,
-            "relevant_cluster_id_label": relevant_cluster_id_label,
-        },
-    }
-    with (config_dir / "config.json").open("w", encoding="utf-8") as config_file:
-        json.dump(config, config_file, indent=2)
-        config_file.write("\n")
+            "evaluator": {
+                "min_cluster_size": evaluator.min_cluster_size,
+                "precision_threshold": evaluator.precision_thr,
+                "recall_threshold": evaluator.recall_thr,
+                "relevant_cluster_id_label": relevant_cluster_id_label,
+            },
+        }
+        with (config_dir / "config.json").open("w", encoding="utf-8") as config_file:
+            json.dump(config, config_file, indent=2)
+            config_file.write("\n")
 
-    print(f"Saved model config: {config_dir}")
-
-
+        valid_frame_count = sum(
+            cluster.size for cluster in evaluator.valid_clusters
+        )
+        total_frame_count = sum(cluster.size for cluster in evaluator.all_clusters)
+        return {
+            "config_name": config_name,
+            "silhouette": silhouette,
+            "valid_clusters": len(evaluator.valid_clusters),
+            "valid_frame_ratio": (
+                valid_frame_count / total_frame_count if total_frame_count else 0.0
+            ),
+            "config_dir": str(config_dir),
+        }

@@ -85,6 +85,7 @@ class AutoEncoderReducer(BaseReducer):
     epochs: int = 500
     batch_size: int = 128
     verbose: int = 0
+    random_state: int = 42
 
     # -----------------------------------------------------------------
     # Helper – build the Keras model
@@ -121,6 +122,7 @@ class AutoEncoderReducer(BaseReducer):
 
         gpus = tf.config.list_physical_devices("GPU")
         device = "/GPU:0" if gpus else "/CPU:0"
+        tf.keras.utils.set_random_seed(self.random_state)
 
         print(f"GPUs found: {gpus}")
 
