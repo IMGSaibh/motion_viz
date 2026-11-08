@@ -57,12 +57,7 @@ export function ContainerKeyboardShortcuts(): null {
 
   useEffect(() => {
     function handle_key_down(event: KeyboardEvent): void {
-      if (
-        !event.ctrlKey &&
-        !event.altKey &&
-        !event.shiftKey &&
-        (event.code === 'ArrowLeft' || event.code === 'ArrowRight')
-      ) {
+      if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
         arrow_hold_started_at.current[event.code] ??= event.timeStamp;
       }
 
@@ -180,10 +175,12 @@ export function ContainerKeyboardShortcuts(): null {
         if (event.shiftKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
           const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const hold_started_at = arrow_hold_started_at.current[event.code] ?? event.timeStamp;
+          const step = event.timeStamp - hold_started_at > 1000 ? 10 : 1;
           const adjust_start = event.ctrlKey;
 
           if (!range) {
-            const next_frame = Math.max(0, Math.min(last_frame, frame_slider_value + direction * 10));
+            const next_frame = Math.max(0, Math.min(last_frame, frame_slider_value + direction * step));
             if (next_frame === frame_slider_value) return;
             set_range([
               Math.min(frame_slider_value, next_frame),
@@ -199,7 +196,7 @@ export function ContainerKeyboardShortcuts(): null {
           const edge_index = adjust_start ? 0 : 1;
           const minimum = adjust_start ? 0 : range[0];
           const maximum = adjust_start ? range[1] : last_frame;
-          const next_frame = Math.max(minimum, Math.min(maximum, range[edge_index] + direction * 10));
+          const next_frame = Math.max(minimum, Math.min(maximum, range[edge_index] + direction * step));
           if (next_frame === range[edge_index]) return;
           next_range[edge_index] = next_frame;
           set_range(next_range);
@@ -212,12 +209,14 @@ export function ContainerKeyboardShortcuts(): null {
         if (event.ctrlKey && (event.code === 'ArrowLeft' || event.code === 'ArrowRight')) {
           event.preventDefault();
           const direction = event.code === 'ArrowRight' ? 1 : -1;
+          const hold_started_at = arrow_hold_started_at.current[event.code] ?? event.timeStamp;
+          const step = event.timeStamp - hold_started_at > 1000 ? 10 : 1;
           const anchor_frame = range
             ? direction > 0
               ? range[1]
               : range[0]
             : frame_slider_value;
-          const next_frame = Math.max(0, Math.min(last_frame, anchor_frame + direction * 10));
+          const next_frame = Math.max(0, Math.min(last_frame, anchor_frame + direction * step));
           if (next_frame === anchor_frame) return;
           set_range(
             direction > 0
