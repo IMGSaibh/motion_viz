@@ -74,10 +74,11 @@ function RulaCategoryButtonsGrid({
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 112px))',
           gap: 1,
           flexGrow: 1,
           alignContent: 'start',
+          justifyContent: 'start',
         }}
       >
         {rula_button_images.map((item, i) => {
