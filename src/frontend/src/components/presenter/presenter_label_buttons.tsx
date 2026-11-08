@@ -2,8 +2,8 @@ import { Box, Grid, Tabs, Tab } from '@mui/material';
 import { WidgetRulaButtons } from '@/components/widgets_ergo_methods/widget_rula_buttons';
 import { WidgetOwasButtons } from '@/components/widgets_ergo_methods/widget_owas_buttons';
 import { WidgetLmmButtons } from '@/components/widgets_ergo_methods/widget_lmm_label_buttons';
-import { useState } from 'react';
-import type { RulaCategory, RulaSelection, OwasCategory } from '@/domain/datatypes';
+import { useEffect, useState } from 'react';
+import type { RulaCategory, RulaSelection, OwasCategory, OwasSelection } from '@/domain/datatypes';
 
 type Props = {
   on_owas_select: (cat: OwasCategory, featureId: number) => void;
@@ -15,6 +15,9 @@ type Props = {
   rula_selected: RulaSelection;
   can_save_rula: boolean;
   all_rula_selected: boolean;
+  display_rula_selection: RulaSelection | null;
+  display_owas_selection: OwasSelection | null;
+  active_label_method: 'RULA' | 'OWAS' | null;
 };
 
 /**
@@ -27,6 +30,10 @@ type Props = {
  */
 export function PresenterLabelButtons(props: Props) {
   const [method, setMethod] = useState<string>('RULA');
+
+  useEffect(() => {
+    if (props.active_label_method) setMethod(props.active_label_method);
+  }, [props.active_label_method]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setMethod(newValue);
@@ -96,6 +103,7 @@ export function PresenterLabelButtons(props: Props) {
           rula_selected={props.rula_selected}
           all_rula_selected={props.all_rula_selected}
           can_save_rula={props.can_save_rula}
+          display_selection={props.display_rula_selection}
         />
       )}
       {method === 'OWAS' && (
@@ -104,6 +112,7 @@ export function PresenterLabelButtons(props: Props) {
           on_owas_select={props.on_owas_select}
           all_owas_selected={props.all_owas_selected}
           can_save_owas_label={props.can_save_owas_label}
+          display_selection={props.display_owas_selection}
         />
       )}
       {method === 'LMM' && <WidgetLmmButtons onClick={props.on_owas_save_label} />}

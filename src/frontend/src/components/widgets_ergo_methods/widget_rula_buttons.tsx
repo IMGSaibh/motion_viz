@@ -19,6 +19,7 @@ type Props = {
   rula_selected: RulaSelection;
   all_rula_selected: boolean;
   can_save_rula: boolean;
+  display_selection: RulaSelection | null;
 };
 
 function getSelectedFeatureIds(selection: RulaFeatureSelection): number[] {
@@ -140,6 +141,7 @@ function RulaCategoryButtonsGrid({
  */
 export function WidgetRulaButtons(props: Props) {
   const { rula_hotkey_state } = use_rula_hotkey_context();
+  const displayedSelection = props.display_selection ?? props.rula_selected;
   const label_images_cat_ua = useMemo(() => get_label_images_rula_cat_ua(), []);
   const label_images_cat_la = useMemo(() => get_label_images_rula_cat_la(), []);
   const label_images_cat_w = useMemo(() => get_label_images_rula_cat_w(), []);
@@ -160,7 +162,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_UPPERARM"
             title="Upper Arm"
             rula_button_images={label_images_cat_ua}
-            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_UPPERARM)}
+            selected_feature_ids={getSelectedFeatureIds(displayedSelection.CAT_UPPERARM)}
             isActiveCategory={rula_hotkey_state.context === 'CAT_UPPERARM'}
             onSelect={props.on_rula_select}
             optionalStartIndex={5}
@@ -172,7 +174,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LOWERARM"
             title="Lower Arm"
             rula_button_images={label_images_cat_la}
-            selected_feature_ids={props.rula_selected.CAT_LOWERARM ? [props.rula_selected.CAT_LOWERARM] : []}
+            selected_feature_ids={displayedSelection.CAT_LOWERARM ? [displayedSelection.CAT_LOWERARM] : []}
             isActiveCategory={rula_hotkey_state.context === 'CAT_LOWERARM'}
             onSelect={props.on_rula_select}
           />
@@ -183,7 +185,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_WRIST"
             title="Wrist"
             rula_button_images={label_images_cat_w}
-            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_WRIST)}
+            selected_feature_ids={getSelectedFeatureIds(displayedSelection.CAT_WRIST)}
             isActiveCategory={rula_hotkey_state.context === 'CAT_WRIST'}
             onSelect={props.on_rula_select}
             optionalStartIndex={3}
@@ -195,7 +197,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_NECK"
             title="Neck"
             rula_button_images={label_images_cat_n}
-            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_NECK)}
+            selected_feature_ids={getSelectedFeatureIds(displayedSelection.CAT_NECK)}
             isActiveCategory={rula_hotkey_state.context === 'CAT_NECK'}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
@@ -206,7 +208,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_TRUNK"
             title="Trunk"
             rula_button_images={label_images_cat_t}
-            selected_feature_ids={getSelectedFeatureIds(props.rula_selected.CAT_TRUNK)}
+            selected_feature_ids={getSelectedFeatureIds(displayedSelection.CAT_TRUNK)}
             isActiveCategory={rula_hotkey_state.context === 'CAT_TRUNK'}
             onSelect={props.on_rula_select}
             optionalStartIndex={4}
@@ -218,7 +220,7 @@ export function WidgetRulaButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs"
             rula_button_images={label_images_cat_l}
-            selected_feature_ids={props.rula_selected.CAT_LEGS ? [props.rula_selected.CAT_LEGS] : []}
+            selected_feature_ids={displayedSelection.CAT_LEGS ? [displayedSelection.CAT_LEGS] : []}
             isActiveCategory={rula_hotkey_state.context === 'CAT_LEGS'}
             onSelect={props.on_rula_select}
           />

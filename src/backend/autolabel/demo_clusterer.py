@@ -2,16 +2,24 @@ import al_clusterer
 from al_label_load import LabelLoader
 import numpy as np
 from pathlib import Path
-
+import argparse
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename")
+    args = parser.parse_args()
+
+    filename = args.filename
+
+    print(f"loading: {filename}")
 
     processor = LabelLoader(
     label_root="data/labels",
     motion_root="data/npy",
     cache_root="data/labels"
     )
-    X, y, scaler = processor.load("andy_60_re.json")
+    X, y, scaler = processor.load(f"{filename}.json")
 
     y_flat = y.reshape(y.shape[0], -1)
     y_flat_str = np.array(["_".join(map(str, r)) for r in y_flat])  
