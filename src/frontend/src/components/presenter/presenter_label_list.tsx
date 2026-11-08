@@ -33,7 +33,7 @@ export function PresenterLabelList(props: Props) {
       })}
     >
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 4 }} sx={{ display: 'flex', alignItems: 'center' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Dropdown-Header */}
 
           <Button
@@ -43,16 +43,16 @@ export function PresenterLabelList(props: Props) {
                 sx={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms' }}
               />
             }
-            sx={{ width: '100%' }}
+            sx={{ flex: '1 1 140px', minWidth: 0 }}
           >
             Label-List {props.lable_list.length > 0 ? `(${props.lable_list.length})` : ''}
           </Button>
 
-          <Button onClick={props.delete_label_list_on_click} sx={{ width: '100%' }}>
+          <Button onClick={props.delete_label_list_on_click} sx={{ flex: '1 1 140px', minWidth: 0 }}>
             <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Clear Label-List
           </Button>
-          <Button onClick={() => props.save_label_list_on_click?.()} sx={{ width: '100%' }}>
+          <Button onClick={() => props.save_label_list_on_click?.()} sx={{ flex: '1 1 140px', minWidth: 0 }}>
             <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Save Label-List
           </Button>
@@ -61,14 +61,12 @@ export function PresenterLabelList(props: Props) {
               props.download_labels_on_click?.();
             }}
             disabled={props.download_is_pending}
-            sx={{ width: '100%' }}
+            sx={{ flex: '1 1 140px', minWidth: 0 }}
           >
             <GetAppIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Download Labels
           </Button>
         </Grid>
-        <Grid size={{ md: 4 }}></Grid>
-        <Grid size={{ md: 4 }}></Grid>
       </Grid>
       <WidgetLabelList
         labels={props.lable_list}

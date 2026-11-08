@@ -129,10 +129,29 @@ export function WidgetLmmButtons({ onClick }: Props) {
           </FormControl>
         </Grid>
       </Grid> */}
-      <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 12 }}>
-          <Box sx={{ height: '63px', fontSize: 14 }}>Not implemented yet</Box>
-        </Grid>
+      <Grid container spacing={1} direction="column" alignItems="stretch">
+        {[category_1_llm, category_2_llm, category_3_llm].map((category) => (
+          <Grid key={category} size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+            <Box
+              sx={(theme) => ({
+                minHeight: 72,
+                height: '100%',
+                p: 1,
+                border: `1px solid ${theme.palette.wip_color_theme[200]}`,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                fontSize: 12,
+                overflowWrap: 'anywhere',
+              })}
+            >
+              <Box>{category}</Box>
+              <Box sx={{ mt: 0.5, color: 'text.secondary' }}>Not implemented yet</Box>
+            </Box>
+          </Grid>
+        ))}
       </Grid>
     </>
   );

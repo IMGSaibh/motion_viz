@@ -48,7 +48,7 @@ export function PresenterLabelButtons(props: Props) {
     >
       {/* TAB MENU */}
       <Grid container spacing={0} alignItems="center" wrap="nowrap">
-        <Grid size={{ md: 4 }}>
+        <Grid size={{ xs: 12 }}>
           <Tabs
             value={method}
             onChange={handleTabChange}
@@ -92,8 +92,6 @@ export function PresenterLabelButtons(props: Props) {
             />
           </Tabs>
         </Grid>
-        <Grid size={{ md: 4 }}></Grid>
-        <Grid size={{ md: 4 }}></Grid>
       </Grid>
 
       {method === 'RULA' && (
