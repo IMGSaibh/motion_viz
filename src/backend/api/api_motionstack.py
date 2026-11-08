@@ -56,7 +56,7 @@ async def convert_with_motionstack(request: MotionstackConversionRequest):
         try:
             with warnings.catch_warnings(record=True) as reader_warnings:
                 warnings.simplefilter("always")
-                reader = MotionReader(mocap_file, descriptor_file, axis_flip=True)
+                reader = MotionReader(mocap_file, descriptor_file)
 
             if reader_warnings:
                 warning_messages = "; ".join(str(item.message) for item in reader_warnings)
