@@ -6,6 +6,7 @@ import {
 import { useMemo } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import type { LabelImage, OwasCategory } from '@/domain/datatypes';
+import type { OwasSelection } from '@/domain/datatypes';
 import { Box, ButtonBase, Grid, IconButton } from '@mui/material';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
@@ -15,6 +16,7 @@ type Props = {
   on_owas_save_label?: () => void;
   all_owas_selected: boolean;
   can_save_owas_label: boolean;
+  display_selection: OwasSelection | null;
 };
 
 function CategoryGrid({
@@ -119,6 +121,7 @@ export function WidgetOwasButtons(props: Props) {
   const label_images_cat2 = useMemo(() => get_label_images_cat2_owas(), []);
   const label_images_cat3 = useMemo(() => get_label_images_cat3_owas(), []);
   const { owas_selected } = use_ergo_methods_cxt();
+  const displayedSelection = props.display_selection ?? owas_selected;
   const { owas_hotkey_state } = use_rula_hotkey_context();
 
   return (
@@ -134,7 +137,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_BACK"
             title="Back Category"
             owas_button_images={label_images_cat1}
-            selected_feature_id={owas_selected.CAT_BACK}
+            selected_feature_id={displayedSelection.CAT_BACK}
             isActiveCategory={owas_hotkey_state.context === 'CAT_BACK'}
             onSelect={props.on_owas_select}
           />
@@ -145,7 +148,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_ARMS"
             title="Arms Category"
             owas_button_images={label_images_cat2}
-            selected_feature_id={owas_selected.CAT_ARMS}
+            selected_feature_id={displayedSelection.CAT_ARMS}
             isActiveCategory={owas_hotkey_state.context === 'CAT_ARMS'}
             onSelect={props.on_owas_select}
           />
@@ -156,7 +159,7 @@ export function WidgetOwasButtons(props: Props) {
             cat="CAT_LEGS"
             title="Legs Category"
             owas_button_images={label_images_cat3}
-            selected_feature_id={owas_selected.CAT_LEGS}
+            selected_feature_id={displayedSelection.CAT_LEGS}
             isActiveCategory={owas_hotkey_state.context === 'CAT_LEGS'}
             onSelect={props.on_owas_select}
           />
