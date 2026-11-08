@@ -26,7 +26,7 @@ dependencies = [
     "joblib",
 ]
 [project.optional-dependencies]
-dev = ["black>=24.3.0", "isort>=5.13.0", "pytest>=8.1.0"]w
+dev = ["black>=24.3.0", "isort>=5.13.0", "pytest>=8.1.0"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
