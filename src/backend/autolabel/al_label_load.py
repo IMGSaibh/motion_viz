@@ -47,7 +47,7 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
 @dataclass
 class LabelLoader:
     """
-    High‑level helper that turns a JSON label file + its corresponding motion
+    High-level helper that turns a JSON label file + its corresponding motion
     motion file into a tidy ``pandas.DataFrame`` and finally into
     ``(X, y, scaler)`` ready for ML pipelines.
 
@@ -245,6 +245,24 @@ class LabelLoader:
     # ------------------------------------------------------------------- #
     # Public API
     # ------------------------------------------------------------------- #
+    def _load_dataframe(self, label_path: pathlib.Path) -> pd.DataFrame:
+        cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
+
+        if cache_path.is_file():
+            self._logger.info("Loading cached DataFrame from %s", cache_path)
+            return pd.read_pickle(cache_path)
+
+        self._logger.info(
+            "Cache miss for %s – building DataFrame from scratch.", label_path.name
+        )
+        motion_file = self.motion_root / f"{label_path.stem}.npy"
+        rotations, positions = self._read_motion(motion_file)
+        df = self._create_dataframe(label_path, rotations, positions)
+
+        self._logger.debug("Saving cache to %s", cache_path)
+        df.to_pickle(cache_path)
+        return df
+
     def load(self, label_file: str | pathlib.Path) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
         """
         1. Look for a cached ``*.pkl`` version in ``cache_root``.
@@ -258,7 +276,9 @@ class LabelLoader:
         Parameters
         ----------
         label_file:
-            Path (relative to ``label_root`` or absolute) of the JSON label file.
+            Path (relative to ``label_root`` or absolute) of a JSON label file
+            or a directory containing JSON label files. For a directory, all
+            top-level ``*.json`` files are combined into one dataset.
 
         Returns
         -------
@@ -268,28 +288,16 @@ class LabelLoader:
         if not label_path.is_absolute():
             label_path = self.label_root / label_path
 
-        cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
-
-        # ------------------------------------------------------------------- #
-        # Load from cache if available
-        # ------------------------------------------------------------------- #
-        if cache_path.is_file():
-            self._logger.info("Loading cached DataFrame from %s", cache_path)
-            df = pd.read_pickle(cache_path)
-        else:
-            # ------------------------------------------------------------------- #
-            # No cache → full pipeline
-            # ------------------------------------------------------------------- #
-            self._logger.info(
-                "Cache miss for %s – building DataFrame from scratch.", label_path.name
+        if label_path.is_dir():
+            label_paths = sorted(label_path.glob("*.json"))
+            if not label_paths:
+                raise ValueError(f"No JSON label files found in directory: {label_path}")
+            df = pd.concat(
+                [self._load_dataframe(path) for path in label_paths],
+                ignore_index=True,
             )
-
-            motion_file = self.motion_root / f"{label_path.stem}.npy"
-            rotations, positions = self._read_motion(motion_file)            
-            df = self._create_dataframe(label_path, rotations, positions)
-
-            self._logger.debug("Saving cache to %s", cache_path)
-            df.to_pickle(cache_path)
+        else:
+            df = self._load_dataframe(label_path)
 
         # ------------------------------------------------------------------- #
         # Convert to ML‑ready matrices
