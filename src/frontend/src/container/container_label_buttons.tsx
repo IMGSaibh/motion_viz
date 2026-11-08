@@ -88,20 +88,8 @@ export function ContainerLabelButtons() {
   const can_save_owas_label = can_save_label('OWAS', effectiveRange);
   const all_owas_selected = Object.values(owas_selected).every(Boolean);
   const is_label_editing = use_is_editing_label_cxt();
-  const hasSelection =
-    Object.values(owas_selected).some(Boolean) ||
-    rula_selected.CAT_UPPERARM.feature_id !== null ||
-    rula_selected.CAT_UPPERARM.optional_feature_ids.length > 0 ||
-    rula_selected.CAT_LOWERARM !== null ||
-    rula_selected.CAT_WRIST.feature_id !== null ||
-    rula_selected.CAT_WRIST.optional_feature_ids.length > 0 ||
-    rula_selected.CAT_NECK.feature_id !== null ||
-    rula_selected.CAT_NECK.optional_feature_ids.length > 0 ||
-    rula_selected.CAT_TRUNK.feature_id !== null ||
-    rula_selected.CAT_TRUNK.optional_feature_ids.length > 0 ||
-    rula_selected.CAT_LEGS !== null;
   const frame_label =
-    range === null && !is_label_editing && !hasSelection
+    range === null && !is_label_editing
       ? ergo_labels.find((label) => frame_slider_value >= label.start_frame && frame_slider_value <= label.end_frame)
       : undefined;
   const display_rula_selection = frame_label?.ergo_method === 'RULA' ? getRulaSelectionFromLabel(frame_label) : null;
