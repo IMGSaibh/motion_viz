@@ -2,10 +2,16 @@ import {
   create_empty_rula_selection,
   create_label_category,
   create_label_category_with_features,
+  get_owas_selection_from_label,
+  get_rula_selection_from_label,
   uid,
 } from '@/domain/label_logic';
 import { useEffect } from 'react';
-import { use_add_slider_label_ctx, use_save_edit_label_cxt } from '@/context/context_slider_label_list';
+import {
+  use_add_slider_label_ctx,
+  use_save_edit_label_cxt,
+  use_start_edit_label_cxt,
+} from '@/context/context_slider_label_list';
 import { PresenterLabelButtons } from '@/components/presenter/presenter_label_buttons';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
 import type { ErgoLabel, RulaCategory, LabelCategory, OwasCategory, OwasSelection, RulaSelection } from '@/domain/datatypes';
@@ -14,37 +20,6 @@ import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 import { use_is_editing_label_cxt } from '@/context/context_slider_label_list';
 import { use_get_labels_cxt } from '@/context/context_slider_label_list';
-
-function getRulaSelectionFromLabel(label: ErgoLabel): RulaSelection {
-  const getFeatures = (category: string) =>
-    label.categories.find((item) => item.name === category)?.features.map((feature) => feature.id) ?? [];
-  const createFeatureSelection = (category: string) => {
-    const [feature_id = null, ...optional_feature_ids] = getFeatures(category);
-    return { feature_id, optional_feature_ids };
-  };
-  const lowerArmFeatures = getFeatures('CAT_LOWERARM');
-  const legsFeatures = getFeatures('CAT_LEGS');
-
-  return {
-    CAT_UPPERARM: createFeatureSelection('CAT_UPPERARM'),
-    CAT_LOWERARM: lowerArmFeatures[0] ?? null,
-    CAT_WRIST: createFeatureSelection('CAT_WRIST'),
-    CAT_NECK: createFeatureSelection('CAT_NECK'),
-    CAT_TRUNK: createFeatureSelection('CAT_TRUNK'),
-    CAT_LEGS: legsFeatures[0] ?? null,
-  };
-}
-
-function getOwasSelectionFromLabel(label: ErgoLabel): OwasSelection {
-  const getFeature = (category: string) =>
-    label.categories.find((item) => item.name === category)?.features[0]?.id ?? null;
-
-  return {
-    CAT_BACK: getFeature('CAT_BACK'),
-    CAT_ARMS: getFeature('CAT_ARMS'),
-    CAT_LEGS: getFeature('CAT_LEGS'),
-  };
-}
 
 type RulaOptionalCategory = 'CAT_UPPERARM' | 'CAT_WRIST' | 'CAT_NECK' | 'CAT_TRUNK';
 
@@ -76,6 +51,7 @@ export function ContainerLabelButtons() {
   const can_save_rula_label = can_save_label('RULA', effectiveRange);
   const { rula_selected, set_rula_selected } = use_ergo_methods_cxt();
   const saveEdit = use_save_edit_label_cxt();
+  const startEdit = use_start_edit_label_cxt();
 
   const all_rula_selected =
     rula_selected.CAT_UPPERARM.feature_id !== null &&
@@ -92,15 +68,18 @@ export function ContainerLabelButtons() {
     range === null && !is_label_editing
       ? ergo_labels.find((label) => frame_slider_value >= label.start_frame && frame_slider_value <= label.end_frame)
       : undefined;
-  const display_rula_selection = frame_label?.ergo_method === 'RULA' ? getRulaSelectionFromLabel(frame_label) : null;
-  const display_owas_selection = frame_label?.ergo_method === 'OWAS' ? getOwasSelectionFromLabel(frame_label) : null;
+  const display_rula_selection = frame_label?.ergo_method === 'RULA' ? get_rula_selection_from_label(frame_label) : null;
+  const display_owas_selection = frame_label?.ergo_method === 'OWAS' ? get_owas_selection_from_label(frame_label) : null;
 
   const on_rula_select = (cat: RulaCategory, featureId: number, isOptional: boolean) => {
+    const selectionToUpdate = display_rula_selection ?? rula_selected;
+    if (frame_label?.ergo_method === 'RULA' && frame_label.id) startEdit(frame_label.id);
+
     if (isOptional && isRulaOptionalCategory(cat)) {
-      const selection = rula_selected[cat];
+      const selection = selectionToUpdate[cat];
       const isSelected = selection.optional_feature_ids.includes(featureId);
       set_rula_selected({
-        ...rula_selected,
+        ...selectionToUpdate,
         [cat]: {
           ...selection,
           optional_feature_ids: isSelected
@@ -113,13 +92,13 @@ export function ContainerLabelButtons() {
 
     if (isRulaOptionalCategory(cat)) {
       set_rula_selected({
-        ...rula_selected,
-        [cat]: { ...rula_selected[cat], feature_id: featureId },
+        ...selectionToUpdate,
+        [cat]: { ...selectionToUpdate[cat], feature_id: featureId },
       });
       return;
     }
 
-    set_rula_selected({ ...rula_selected, [cat]: featureId });
+    set_rula_selected({ ...selectionToUpdate, [cat]: featureId });
   };
 
   const on_rula_save_label = () => {
@@ -170,10 +149,16 @@ export function ContainerLabelButtons() {
 
   // saves category and feature selections to the container state, which is used to construct a label when the user clicks "Save"
   const on_owas_select = (cat: OwasCategory, featureId: number) => {
-    set_owas_selected({ ...owas_selected, [cat]: featureId });
+    const selectionToUpdate = display_owas_selection ?? owas_selected;
+    if (frame_label?.ergo_method === 'OWAS' && frame_label.id) startEdit(frame_label.id);
+    set_owas_selected({ ...selectionToUpdate, [cat]: featureId });
   };
 
   const on_owas_save_label = () => {
+    if (is_label_editing) {
+      saveEdit();
+      return;
+    }
     if (!all_owas_selected) return;
     if (!can_save_owas_label) return;
     const categories: LabelCategory[] = [

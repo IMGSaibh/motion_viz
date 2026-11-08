@@ -1,9 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { use_ergo_methods_cxt } from '@/context/contex_ergo_methods';
 import { use_frame_slider_context } from '@/context/context_frame_slider';
-import { use_clear_label_list_ctx, use_get_labels_cxt } from '@/context/context_slider_label_list';
+import {
+  use_clear_label_list_ctx,
+  use_get_labels_cxt,
+  use_is_editing_label_cxt,
+  use_start_edit_label_cxt,
+} from '@/context/context_slider_label_list';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
-import { create_empty_rula_selection } from '@/domain/label_logic';
+import {
+  create_empty_rula_selection,
+  get_owas_selection_from_label,
+  get_rula_selection_from_label,
+} from '@/domain/label_logic';
 import { use_rula_hotkey_context } from '@/context/context_rula_hotkeys';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { HotkeyProfile, toggle_hotkey_profile } from '@/domain/hotkey_profile';
@@ -32,6 +41,8 @@ export function ContainerKeyboardShortcuts(): null {
   const { owas_selected, rula_selected, set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const clear_slider_label_list = use_clear_label_list_ctx();
   const ergo_labels = use_get_labels_cxt();
+  const is_editing_label = use_is_editing_label_cxt();
+  const start_edit_label = use_start_edit_label_cxt();
   const { warning } = use_snackbar_ctx();
   const {
     hotkey_profile,
@@ -131,7 +142,18 @@ export function ContainerKeyboardShortcuts(): null {
         }
         if (result.command?.type === 'select-primary' || result.command?.type === 'toggle-optional') {
           event.preventDefault();
-          set_rula_selected(apply_rula_hotkey_command(rula_selected, result.command));
+          const frame_label =
+            range === null && !is_editing_label
+              ? ergo_labels.find(
+                  (label) =>
+                    label.ergo_method === 'RULA' &&
+                    frame_slider_value >= label.start_frame &&
+                    frame_slider_value <= label.end_frame,
+                )
+              : undefined;
+          if (frame_label?.id) start_edit_label(frame_label.id);
+          const selection = frame_label ? get_rula_selection_from_label(frame_label) : rula_selected;
+          set_rula_selected(apply_rula_hotkey_command(selection, result.command));
           set_rula_hotkey_state(result.state);
           return;
         }
@@ -160,7 +182,18 @@ export function ContainerKeyboardShortcuts(): null {
         }
         if (result.command?.type === 'select-feature') {
           event.preventDefault();
-          set_owas_selected(apply_owas_hotkey_command(owas_selected, result.command));
+          const frame_label =
+            range === null && !is_editing_label
+              ? ergo_labels.find(
+                  (label) =>
+                    label.ergo_method === 'OWAS' &&
+                    frame_slider_value >= label.start_frame &&
+                    frame_slider_value <= label.end_frame,
+                )
+              : undefined;
+          if (frame_label?.id) start_edit_label(frame_label.id);
+          const selection = frame_label ? get_owas_selection_from_label(frame_label) : owas_selected;
+          set_owas_selected(apply_owas_hotkey_command(selection, result.command));
           set_owas_hotkey_state(result.state);
           return;
         }
@@ -317,6 +350,7 @@ export function ContainerKeyboardShortcuts(): null {
   }, [
     clear_slider_label_list,
     ergo_labels,
+    is_editing_label,
     frame_count,
     frame_slider_value,
     go_to_frame,
@@ -332,6 +366,7 @@ export function ContainerKeyboardShortcuts(): null {
     set_frame_slider_value,
     set_is_review_rending_active,
     set_owas_selected,
+    start_edit_label,
     set_range,
     set_rula_selected,
     rula_hotkey_state,
