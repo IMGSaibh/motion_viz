@@ -7,38 +7,10 @@ import pathlib
 from dataclasses import dataclass
 from typing import Callable, List, Tuple, Any
 
+import al_utils
+
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-
-
-# --------------------------------------------------------------------------- #
-# Helper – simple wrapper around StandardScaler (kept public for re‑use)
-# --------------------------------------------------------------------------- #
-
-
-def redo_one_hot(arr, dimension, length):
-    arr = np.array(arr).reshape(length, dimension)
-    return tuple(np.argmax(row) + 1 for row in arr)
-
-    
-def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
-    """
-    Scale ``X`` column‑wise to zero-mean / unit-variance.
-
-    Parameters
-    ----------
-    X:
-        2-D array with shape ``(n_samples, n_features)``.
-
-    Returns
-    -------
-    X_scaled, scaler
-        The scaled matrix and the fitted ``StandardScaler`` instance.
-    """
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    return X_scaled, scaler
 
 
 # --------------------------------------------------------------------------- #
@@ -46,38 +18,13 @@ def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
 # --------------------------------------------------------------------------- #
 @dataclass
 class LabelLoader:
-    """
-    High-level helper that turns a JSON label file + its corresponding motion
-    motion file into a tidy ``pandas.DataFrame`` and finally into
-    ``(X, y, scaler)`` ready for ML pipelines.
 
-    Typical usage
-    -------------
-    >>> from label_loader import LabelLoader
-    >>> proc = LabelLoader(
-    ...     label_root="/home/aiwlab/hack/motion_viz/data/labels",
-    ...     motion_root="/data/bvh",
-    ...     cache_root="/home/aiwlab/hack/motion_viz/data/labels",
-    ... )
-    >>> X, y, scaler = proc.load("my_label_file.json")
-    """
-
-    # ------------------------------------------------------------------- #
-    # Public configuration attributes (all are pathlib.Path objects)
-    # ------------------------------------------------------------------- #
     label_root: pathlib.Path                # folder that contains *.json label files
     motion_root: pathlib.Path                  # folder that contains motion files
     cache_root: pathlib.Path               # where *.pkl cache files will be stored
 
-
-    # ------------------------------------------------------------------- #
-    # Internals – created once per instance
-    # ------------------------------------------------------------------- #
     _logger: logging.Logger = logging.getLogger("LabelLoader")
 
-    # ------------------------------------------------------------------- #
-    # Construction helpers
-    # ------------------------------------------------------------------- #
     def __post_init__(self) -> None:
         """Normalise all path-like arguments to ``Path`` objects."""
         self.label_root = pathlib.Path(self.label_root)
@@ -93,12 +40,6 @@ class LabelLoader:
                 f"The BVH root directory does not exist: {self.motion_root}"
             )
 
-
-
-    # ------------------------------------------------------------------- #
-    # Low‑level helpers – they are *private* because external users should
-    # go through the high‑level ``load`` method.
-    # ------------------------------------------------------------------- #
     def _load_label_json(self, json_path: pathlib.Path) -> dict:
         """Read a JSON label file and return the parsed dictionary."""
         self._logger.debug("Loading label JSON from %s", json_path)
@@ -137,7 +78,12 @@ class LabelLoader:
         * [3-6] quaternions in w,x,y,z
         """
         self._logger.debug("Reading motion data from %s", motion_path)
-        motiondata = np.load(motion_path)       
+        try:
+            motiondata = np.load(motion_path)
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"Motion file not found: {motion_path}") from exc
+        except (OSError, ValueError) as exc:
+            raise ValueError(f"Could not read motion file: {motion_path}") from exc
    
         positions = motiondata[:,:,[0,1,2]]
         rotations = motiondata[:,:,[3,4,5,6]]
@@ -150,20 +96,9 @@ class LabelLoader:
         rotations: np.ndarray,
         positions: np.ndarray,
     ) -> pd.DataFrame:
-        """
-        Build the tidy ``DataFrame`` required by downstream code.
-
-        Columns:
-          - FILEPATH   - original JSON file (string)
-          - FRAME_INDEX - integer frame number
-          - ORIENTATION - quaternion (numpy array, kept as an object)
-          - POSITION    - XYZ array (object)
-          - LABEL       - list of element_id's (int)
-          - ERGO_METHOD - raw method string from the label file
-        """
+       
         label_dict = self._load_label_json(json_path)
 
-        # Pre‑allocate a list of rows - far faster than ``df.loc[len(df)]`` in a loop.
         rows: List[dict] = []
 
         for label in label_dict.get("labels", []):
@@ -200,107 +135,75 @@ class LabelLoader:
         )
         return df
 
+    def _prepare_X_y(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
 
-    def one_hot_encode_labels(self, df, max_length, column="LABEL"):
-        def encode_cell(cell):
-            return [
-                # -1 to match feature id with array index
-                np.eye(max_length, dtype=int)[np.array(labels) - 1].sum(axis=0)
-                for labels in cell
-            ]
-
-        df = df.copy()
-        df["ONEHOT"] = df[column].apply(encode_cell)
-
-        return df
-
-    def _prepare_X_y(
-        self, df: pd.DataFrame
-    ) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
-        """
-        Convert the DataFrame columns ``ORIENTATION`` as features and ``LABEL`` as targets into ``X``
-        and ``y`` suitable for scikit-learn.
-
-        Returns
-        -------
-        X_scaled, y, scaler
-            ``X_scaled`` - scaled orientation matrix (float64)
-            ``y``       - integer label matrix (shape ``(n_samples, n_labels)``)
-            ``scaler``  - fitted ``StandardScaler`` so that you can inverse‑transform later.
-        """
-        # ``ORIENTATION`` holds a quaternion per row – we need to flatten it.
+        # ``ORIENTATION`` holds a quaternion per row - we need to flatten it.
         X_raw = np.stack(df["ORIENTATION"].tolist()).astype(np.float64)
 
         # flatten
         X_raw = X_raw.reshape(X_raw.shape[0],X_raw.shape[1]*X_raw.shape[2])
-        X_scaled, scaler = scale_data(X_raw)
-
+        
         # One Hot encoded Labels. 8, since this the maximum per category label in RULA
-        df = self.one_hot_encode_labels(df, 8)
+        df = al_utils.one_hot_encode_labels(df, 8)
         y_raw = np.stack(df["ONEHOT"].tolist()).astype(np.int64)
 
         # quaternions do not need scaling
-        return X_raw, y_raw, scaler
+        return X_raw, y_raw
 
-    # ------------------------------------------------------------------- #
-    # Public API
-    # ------------------------------------------------------------------- #
     def _load_dataframe(self, label_path: pathlib.Path) -> pd.DataFrame:
+        print(f"[LOADER] creating DataFrame for {label_path}")
         cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
 
         if cache_path.is_file():
+            print(f"[LOADER] found cached Dataframe from {cache_path}")
             self._logger.info("Loading cached DataFrame from %s", cache_path)
             return pd.read_pickle(cache_path)
 
+        print(f"[LOADER] no cache for {label_path.name}")
         self._logger.info(
-            "Cache miss for %s – building DataFrame from scratch.", label_path.name
+            "Cache miss for %s - building DataFrame from scratch.", label_path.name
         )
         motion_file = self.motion_root / f"{label_path.stem}.npy"
-        rotations, positions = self._read_motion(motion_file)
+
+        try:
+            rotations, positions = self._read_motion(motion_file)
+
+        except FileNotFoundError as exc:
+            print(f"[LOADER] Motion file {motion_file} not found")
+            return None
+        
+       
         df = self._create_dataframe(label_path, rotations, positions)
 
         self._logger.debug("Saving cache to %s", cache_path)
         df.to_pickle(cache_path)
         return df
 
-    def load(self, label_file: str | pathlib.Path) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
-        """
-        1. Look for a cached ``*.pkl`` version in ``cache_root``.
-        2. If it does **not** exist:
-           * read the matching motion file,
-           * build the DataFrame,
-           * store the DataFrame as ``*.pkl`` for future runs.
-        3. Return the scaled feature matrix ``X``, the integer label matrix ``y``,
-           and the fitted ``StandardScaler`` instance.
+    def load(self, label_files: list[str | pathlib.Path]) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
 
-        Parameters
-        ----------
-        label_file:
-            Path (relative to ``label_root`` or absolute) of a JSON label file
-            or a directory containing JSON label files. For a directory, all
-            top-level ``*.json`` files are combined into one dataset.
+        ret = []
+        for label_file in label_files:
+            
+            print(f"[LOADER] processing {label_file}")
+            
+            label_path = pathlib.Path(label_file)
+            if not label_path.is_absolute():
+                label_path = self.label_root / label_path
 
-        Returns
-        -------
-        X_scaled, y, scaler
-        """
-        label_path = pathlib.Path(label_file)
-        if not label_path.is_absolute():
-            label_path = self.label_root / label_path
+            if label_path.is_dir():
+                label_files = [f for f in label_path.iterdir() if f.is_file()]
+            else:
+                label_files = [label_path] if label_path.is_file() else []
 
-        if label_path.is_dir():
-            label_paths = sorted(label_path.glob("*.json"))
-            if not label_paths:
-                raise ValueError(f"No JSON label files found in directory: {label_path}")
-            df = pd.concat(
-                [self._load_dataframe(path) for path in label_paths],
-                ignore_index=True,
-            )
-        else:
-            df = self._load_dataframe(label_path)
-
-        # ------------------------------------------------------------------- #
-        # Convert to ML‑ready matrices
-        # ------------------------------------------------------------------- #
-        X, y, scaler = self._prepare_X_y(df)
-        return X, y, scaler
+            for label_file in label_files:
+                if pathlib.Path(label_file).suffix == ".json":
+                    print(f"[LOADER] loading {label_file}")
+                    try:
+                        df = self._load_dataframe(label_file)
+                    except FileNotFoundError as exc:
+                        print(f"[LOADER] could not create dataframe for {label_file}")
+                    if df is not None:
+                        X, y = self._prepare_X_y(df)
+                        ret.append((X,y,label_file.stem))
+            
+        return ret

@@ -9,16 +9,15 @@ from typing import Any
 
 import numpy as np
 
-from backend.autolabel import al_clusterer, al_label_load
+from backend.autolabel import al_clusterer, al_label_load, al_utils
 from backend.autolabel.al_label_load import LabelLoader
-
 
 class PerformClustering:
     """Load a labelled motion dataset and evaluate clustering configurations."""
 
     def __init__(
         self,
-        filename: str | Path,
+        filenames: list[str | Path],
         label_root: str | Path | None = None,
         motion_root: str | Path | None = None,
         cache_root: str | Path | None = None,
@@ -34,24 +33,33 @@ class PerformClustering:
             else Path(__file__).resolve().parent / "models"
         )
 
-        label_path = Path(filename)
-        if label_path.suffix.lower() != ".json":
-            label_path = label_path.with_suffix(".json")
-        self.filename = label_path.name
+        #label_path = Path(filename)
+        #if label_path.suffix.lower() != ".json":
+        #    label_path = label_path.with_suffix(".json")
+        #self.filename = self.label_root.name
+
+        self.pathname = "_".join(Path(f).stem for f in filenames)
 
         processor = LabelLoader(
             label_root=self.label_root,
             motion_root=self.motion_root,
             cache_root=self.cache_root,
         )
-        self.X, y, _scaler = processor.load(label_path)
-        y_flat = y.reshape(y.shape[0], -1)
-        self.y_true = np.array(
-            [
-                "_".join(map(str, al_label_load.redo_one_hot(row, 8, 3)))
-                for row in y_flat
-            ]
-        )
+        #self.X, y = processor.load([self.label_root])
+
+        loaded_files = processor.load(filenames)
+        self.data = []
+        for (X,y,filename) in loaded_files:
+            
+            y_flat = y.reshape(y.shape[0], -1)
+            y_true = np.array(
+                [
+                    "_".join(map(str, al_utils.redo_one_hot(row, 8, 3)))
+                    for row in y_flat
+                ]
+            )
+            self.data.append((X,y_true, filename))
+        pass
 
     def run(
         self,
@@ -62,13 +70,24 @@ class PerformClustering:
         recall_threshold: float = 0.01,
     ) -> dict[str, Any]:
         """Fit, evaluate, and save one reducer/clusterer configuration."""
+
+        self.X = np.concatenate([d[0] for d in self.data], axis=0)
+        self.y = np.concatenate([d[1] for d in self.data], axis=0)
+
+        try:
+            assert len(self.X) == len(self.y)
+        except LookupError:
+            raise LookupError("Count of features and labels does not match.")
+
+        print(f"Loaded {len(self.X)} Frames with {len(np.unique(self.y))} unique labels from {len(self.data)} files.")
+
         reduced_features, reducer_model = reducer.fit_transform(self.X)
         clusterer.fit(reduced_features)
         cluster_labels = clusterer.predict(reduced_features)
         silhouette = clusterer.silhouette(reduced_features, cluster_labels)
 
         evaluator = al_clusterer.ClusterEvaluator(
-            y_true=self.y_true,
+            y_true=self.y,
             min_cluster_size=min_cluster_size,
             precision_thr=precision_threshold,
             recall_thr=recall_threshold,
@@ -76,7 +95,7 @@ class PerformClustering:
         evaluator.evaluate(cluster_labels)
 
         dataset_slug = re.sub(
-            r"[^A-Za-z0-9._-]+", "_", Path(self.filename).stem
+            r"[^A-Za-z0-9._-]+", "_", self.pathname
         ).strip("._-") or "dataset"
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
         config_name = f"{dataset_slug}_{timestamp}_{uuid.uuid4().hex[:8]}"
@@ -91,7 +110,7 @@ class PerformClustering:
         }
         config = {
             "config_name": config_name,
-            "dataset": Path(self.filename).stem,
+            "dataset": self.pathname,
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "reducer": {
                 "type": type(reducer).__name__,
