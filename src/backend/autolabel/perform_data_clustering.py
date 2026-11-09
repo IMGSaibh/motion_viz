@@ -47,7 +47,7 @@ class PerformClustering:
         )
         #self.X, y = processor.load([self.label_root])
 
-        loaded_files = processor.load(filenames)
+        loaded_files = processor.load([self.motion_root])
         self.data = []
         for (X,y,filename) in loaded_files:
             

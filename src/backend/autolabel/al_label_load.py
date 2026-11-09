@@ -7,7 +7,7 @@ import pathlib
 from dataclasses import dataclass
 from typing import Callable, List, Tuple, Any
 
-import al_utils
+from backend.autolabel import al_utils
 
 import numpy as np
 import pandas as pd
@@ -198,12 +198,23 @@ class LabelLoader:
             for label_file in label_files:
                 if pathlib.Path(label_file).suffix == ".json":
                     print(f"[LOADER] loading {label_file}")
-                    try:
-                        df = self._load_dataframe(label_file)
-                    except FileNotFoundError as exc:
-                        print(f"[LOADER] could not create dataframe for {label_file}")
-                    if df is not None:
-                        X, y = self._prepare_X_y(df)
-                        ret.append((X,y,label_file.stem))
-            
+                    file_to_read = label_file
+                    
+                elif pathlib.Path(label_file).suffix == ".npy":
+                    # Read corresponding label file from label_root
+                    print(f"[LOADER] reading json file of {label_file} from {pathlib.Path(self.label_root)} ")
+                    file_to_read = pathlib.Path(self.label_root) / f"{label_file.stem}.json"
+                else:
+                    print(f"[LOADER] file type not supported")
+                    df = None                    
+
+                try:
+                    df = self._load_dataframe(file_to_read)
+                except FileNotFoundError as exc:
+                    print(f"[LOADER] could not create dataframe for {file_to_read}")
+                
+                if df is not None:
+                    X, y = self._prepare_X_y(df)
+                    ret.append((X,y,file_to_read.stem))
+        
         return ret
