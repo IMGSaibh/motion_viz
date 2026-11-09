@@ -9,9 +9,8 @@ from typing import Any
 
 import numpy as np
 
-from backend.autolabel import al_clusterer, al_label_load
+from backend.autolabel import al_clusterer, al_label_load, al_utils
 from backend.autolabel.al_label_load import LabelLoader
-
 
 class PerformClustering:
     """Load a labelled motion dataset and evaluate clustering configurations."""
@@ -48,7 +47,7 @@ class PerformClustering:
         y_flat = y.reshape(y.shape[0], -1)
         self.y_true = np.array(
             [
-                "_".join(map(str, al_label_load.redo_one_hot(row, 8, 3)))
+                "_".join(map(str, al_utils.redo_one_hot(row, 8, 3)))
                 for row in y_flat
             ]
         )

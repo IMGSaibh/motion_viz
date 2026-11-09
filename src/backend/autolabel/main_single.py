@@ -11,7 +11,7 @@ from backend.autolabel.perform_data_clustering import PerformClustering
 
 
 FILENAME = "xsens_002_WS10_2023_09_21_cropped.json"
-USE_PCA = False
+USE_PCA = True
 PCA_COMPONENTS = 6
 AUTOENCODER_CONFIG = {
     "encoding_dim": 16,

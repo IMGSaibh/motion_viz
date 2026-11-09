@@ -7,38 +7,10 @@ import pathlib
 from dataclasses import dataclass
 from typing import Callable, List, Tuple, Any
 
+import al_utils
+
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-
-
-# --------------------------------------------------------------------------- #
-# Helper – simple wrapper around StandardScaler (kept public for re‑use)
-# --------------------------------------------------------------------------- #
-
-
-def redo_one_hot(arr, dimension, length):
-    arr = np.array(arr).reshape(length, dimension)
-    return tuple(np.argmax(row) + 1 for row in arr)
-
-    
-def scale_data(X: np.ndarray) -> Tuple[np.ndarray, StandardScaler]:
-    """
-    Scale ``X`` column‑wise to zero-mean / unit-variance.
-
-    Parameters
-    ----------
-    X:
-        2-D array with shape ``(n_samples, n_features)``.
-
-    Returns
-    -------
-    X_scaled, scaler
-        The scaled matrix and the fitted ``StandardScaler`` instance.
-    """
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    return X_scaled, scaler
 
 
 # --------------------------------------------------------------------------- #
@@ -158,20 +130,6 @@ class LabelLoader:
         )
         return df
 
-
-    def one_hot_encode_labels(self, df, max_length, column="LABEL"):
-        def encode_cell(cell):
-            return [
-                # -1 to match feature id with array index
-                np.eye(max_length, dtype=int)[np.array(labels) - 1].sum(axis=0)
-                for labels in cell
-            ]
-
-        df = df.copy()
-        df["ONEHOT"] = df[column].apply(encode_cell)
-
-        return df
-
     def _prepare_X_y(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
 
         # ``ORIENTATION`` holds a quaternion per row - we need to flatten it.
@@ -181,7 +139,7 @@ class LabelLoader:
         X_raw = X_raw.reshape(X_raw.shape[0],X_raw.shape[1]*X_raw.shape[2])
         
         # One Hot encoded Labels. 8, since this the maximum per category label in RULA
-        df = self.one_hot_encode_labels(df, 8)
+        df = al_utils.one_hot_encode_labels(df, 8)
         y_raw = np.stack(df["ONEHOT"].tolist()).astype(np.int64)
 
         # quaternions do not need scaling
