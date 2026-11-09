@@ -16,37 +16,36 @@ from backend.autolabel.perform_data_clustering import PerformClustering
 
 
 FILENAMES = ["xsens_002_WS10_2023_09_21_cropped.json"]
-PCA_COMPONENTS = (4, 6, 8)
+PCA_COMPONENTS = (4,)
 AUTOENCODER_CONFIGS = (
     {"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
     {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 128, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000, "batch_size": 32},
-    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 1000, "batch_size": 32},
-    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 1000, "batch_size": 64},
-    {"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 16},
-    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 64},
+    #{"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 128, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
+    #{"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000, "batch_size": 32},
+    #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 1000, "batch_size": 32},
+    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 1000, "batch_size": 64},
+    #{"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 16},
+    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 64},
 )
 
-
-KMEANS_CLUSTERS = (20, 40, 60)
+KMEANS_CLUSTERS = (10,20)
 MIN_CLUSTER_SIZE = 5
 PRECISION_THRESHOLD = 0.9
-RECALL_THRESHOLD = 0.01
+RECALL_THRESHOLD = 0.2
 RANDOM_STATE = 42
-N_REPEATS = 5
+N_REPEATS = 2
 
 
 def main() -> None:
@@ -144,13 +143,47 @@ def main() -> None:
             )
 
     if results:
-        best = max(results, key=lambda result: result["means"]["silhouette"])
-        print(
-            f"Best mean silhouette: {best['reducer_type']}="
-            f"{best['reducer_parameters']}, KMeans={best['clusters']} "
-            f"({best['means']['silhouette']:.4f} +/- "
-            f"{best['deviations']['silhouette']:.4f})"
+        top_results = sorted(
+            results,
+            key=lambda result: result["means"]["valid_clusters"],
+            reverse=True,
+        )[:10]
+        print("\nTop configurations by mean valid clusters:")
+        headers = (
+            "Rank",
+            "Config name",
+            "Reducer",
+            "Parameters",
+            "KMeans",
+            "Valid clusters (mean +/- std)",
+            "Silhouette (mean +/- std)",
+            "Valid frame ratio (mean +/- std)",
         )
+        table_rows = []
+        for rank, result in enumerate(top_results, start=1):
+            table_rows.append(
+                (
+                    str(rank),
+                    result["config_name"],
+                    result["reducer_type"],
+                    str(result["reducer_parameters"]),
+                    str(result["clusters"]),
+                    f"{result['means']['valid_clusters']:.2f} +/- "
+                    f"{result['deviations']['valid_clusters']:.2f}",
+                    f"{result['means']['silhouette']:.4f} +/- "
+                    f"{result['deviations']['silhouette']:.4f}",
+                    f"{result['means']['valid_frame_ratio']:.1%} +/- "
+                    f"{result['deviations']['valid_frame_ratio']:.1%}",
+                )
+            )
+        column_widths = [
+            max(len(headers[index]), *(len(row[index]) for row in table_rows))
+            for index in range(len(headers))
+        ]
+        print(" | ".join(header.ljust(width) for header, width in zip(headers, column_widths)))
+        print("-+-".join("-" * width for width in column_widths))
+        for row in table_rows:
+            print(" | ".join(value.ljust(width) for value, width in zip(row, column_widths)))
     else:
         raise RuntimeError("no parameter combinations completed successfully")
 
