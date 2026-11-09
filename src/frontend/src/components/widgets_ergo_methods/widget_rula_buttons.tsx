@@ -74,10 +74,11 @@ function RulaCategoryButtonsGrid({
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 112px))',
           gap: 1,
           flexGrow: 1,
           alignContent: 'start',
+          justifyContent: 'start',
         }}
       >
         {rula_button_images.map((item, i) => {
@@ -156,8 +157,8 @@ export function WidgetRulaButtons(props: Props) {
         borderBottom: `1px solid ${theme.palette.wip_color_theme[200]}`,
       })}
     >
-      <Grid container spacing={0} wrap="nowrap" alignItems="stretch">
-        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+      <Grid container spacing={0} direction="column" alignItems="stretch">
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_UPPERARM"
             title="Upper Arm"
@@ -169,7 +170,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_LOWERARM"
             title="Lower Arm"
@@ -180,7 +181,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_WRIST"
             title="Wrist"
@@ -192,7 +193,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_NECK"
             title="Neck"
@@ -203,7 +204,7 @@ export function WidgetRulaButtons(props: Props) {
             optionalStartIndex={4}
           />
         </Grid>
-        <Grid size={{ md: 2 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_TRUNK"
             title="Trunk"
@@ -215,7 +216,7 @@ export function WidgetRulaButtons(props: Props) {
           />
         </Grid>
 
-        <Grid size={{ md: 1 }} sx={{ display: 'flex', alignSelf: 'stretch' }}>
+        <Grid size={{ xs: 12 }} sx={{ display: 'flex' }}>
           <RulaCategoryButtonsGrid
             cat="CAT_LEGS"
             title="Legs"
@@ -227,7 +228,7 @@ export function WidgetRulaButtons(props: Props) {
         </Grid>
 
         {/* Save Button */}
-        <Grid size={{ md: 1 }}>
+        <Grid size={{ xs: 12 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <IconButton
               size="small"

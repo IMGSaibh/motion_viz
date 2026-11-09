@@ -1,4 +1,35 @@
-import type { ErgoLabel, LabelCategory, RulaSelection } from '@/domain/datatypes';
+import type { ErgoLabel, LabelCategory, OwasSelection, RulaSelection } from '@/domain/datatypes';
+
+export function get_rula_selection_from_label(label: ErgoLabel): RulaSelection {
+  const getFeatures = (category: string) =>
+    label.categories.find((item) => item.name === category)?.features.map((feature) => feature.id) ?? [];
+  const createFeatureSelection = (category: string) => {
+    const [feature_id = null, ...optional_feature_ids] = getFeatures(category);
+    return { feature_id, optional_feature_ids };
+  };
+  const lowerArmFeatures = getFeatures('CAT_LOWERARM');
+  const legsFeatures = getFeatures('CAT_LEGS');
+
+  return {
+    CAT_UPPERARM: createFeatureSelection('CAT_UPPERARM'),
+    CAT_LOWERARM: lowerArmFeatures[0] ?? null,
+    CAT_WRIST: createFeatureSelection('CAT_WRIST'),
+    CAT_NECK: createFeatureSelection('CAT_NECK'),
+    CAT_TRUNK: createFeatureSelection('CAT_TRUNK'),
+    CAT_LEGS: legsFeatures[0] ?? null,
+  };
+}
+
+export function get_owas_selection_from_label(label: ErgoLabel): OwasSelection {
+  const getFeature = (category: string) =>
+    label.categories.find((item) => item.name === category)?.features[0]?.id ?? null;
+
+  return {
+    CAT_BACK: getFeature('CAT_BACK'),
+    CAT_ARMS: getFeature('CAT_ARMS'),
+    CAT_LEGS: getFeature('CAT_LEGS'),
+  };
+}
 
 export function create_empty_rula_selection(): RulaSelection {
   return {

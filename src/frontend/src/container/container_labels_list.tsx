@@ -77,7 +77,6 @@ export function ContainerLabelsList() {
       delete_label_list_on_click={delete_label_list_on_click}
       save_label_list_on_click={save_label_list_on_click}
       download_labels_on_click={download_labels_on_click}
-      save_is_pending={save_labels.isPending}
       download_is_pending={labels_download.isPending}
     />
   );
