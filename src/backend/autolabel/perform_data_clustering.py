@@ -44,7 +44,7 @@ class PerformClustering:
             motion_root=self.motion_root,
             cache_root=self.cache_root,
         )
-        self.X, y, _scaler = processor.load(label_path)
+        self.X, y = processor.load(label_path)
         y_flat = y.reshape(y.shape[0], -1)
         self.y_true = np.array(
             [

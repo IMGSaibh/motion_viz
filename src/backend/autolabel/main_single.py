@@ -22,9 +22,9 @@ AUTOENCODER_CONFIG = {
 KMEANS_N_CLUSTERS = 60
 MIN_CLUSTER_SIZE = 10
 PRECISION_THRESHOLD = 0.95
-RECALL_THRESHOLD = 0.01
+RECALL_THRESHOLD = 0.0
 RANDOM_STATE = 42
-N_REPEATS = 5
+N_REPEATS = 1
 
 
 def main() -> None:
@@ -36,19 +36,24 @@ def main() -> None:
     trial_results = []
 
     for repeat in range(N_REPEATS):
+        print(f"--- Repeat No.{repeat}")
         random_state = RANDOM_STATE + repeat
         parameters = {
             **reducer_parameters,
             "random_state": random_state,
         }
         if USE_PCA:
+            print(f"--- Using PCA")
             reducer = PCAReducer(**parameters)
         else:
+            print(f"--- Using AE")
             reducer = AutoEncoderReducer(**parameters)
+            
         clusterer = KMeansClusterer(
             n_clusters=KMEANS_N_CLUSTERS,
             random_state=random_state,
         )
+        print(f"--- Clustering {KMEANS_N_CLUSTERS} clusters")
         try:
             result = experiment.run(
                 reducer,
@@ -60,12 +65,13 @@ def main() -> None:
         except (ValueError, RuntimeError) as error:
             print(f"Failed repeat {repeat + 1}/{N_REPEATS}: {error}")
             continue
+
         trial_results.append(result)
-        print(f"Completed repeat {repeat + 1}/{N_REPEATS}: {result['config_name']}")
+        print(f"--- Completed repeat {repeat + 1}/{N_REPEATS}: {result['config_name']}")
 
     if len(trial_results) != N_REPEATS:
         raise RuntimeError(
-            f"Completed {len(trial_results)}/{N_REPEATS} repeats; "
+            f"--- Completed {len(trial_results)}/{N_REPEATS} repeats; "
             "cannot calculate a complete summary"
         )
 
@@ -79,13 +85,13 @@ def main() -> None:
         for metric in metrics
     }
     print(
-        f"\n{reducer_type}={reducer_parameters}, "
-        f"\nKMeans={KMEANS_N_CLUSTERS}, n={N_REPEATS}: "
-        f"\nsilhouette={means['silhouette']:.4f} +/- "
+        f"\n--- {reducer_type}={reducer_parameters}, "
+        f"\n--- KMeans={KMEANS_N_CLUSTERS}, n={N_REPEATS}: "
+        f"\n--- silhouette={means['silhouette']:.4f} +/- "
         f"{deviations['silhouette']:.4f}, "
-        f"\nvalid_clusters={means['valid_clusters']:.2f} +/- "
+        f"\n--- valid_clusters={means['valid_clusters']:.2f} +/- "
         f"{deviations['valid_clusters']:.2f}, "
-        f"\nvalid_frame_ratio={means['valid_frame_ratio']:.1%} +/- "
+        f"\n--- valid_frame_ratio={means['valid_frame_ratio']:.1%} +/- "
         f"{deviations['valid_frame_ratio']:.1%}"
     )
 
