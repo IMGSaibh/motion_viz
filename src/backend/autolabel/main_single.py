@@ -10,7 +10,7 @@ from backend.autolabel.al_clusterer import (
 from backend.autolabel.perform_data_clustering import PerformClustering
 
 
-FILENAME = "xsens_002_WS10_2023_09_21_cropped.json"
+FILENAME = "/home/edscher/hack/motion_viz/data/labels"
 USE_PCA = True
 PCA_COMPONENTS = 6
 AUTOENCODER_CONFIG = {
@@ -19,7 +19,7 @@ AUTOENCODER_CONFIG = {
     "epochs": 500,
     "batch_size": 256,
 }
-KMEANS_N_CLUSTERS = 60
+KMEANS_N_CLUSTERS = 5
 MIN_CLUSTER_SIZE = 10
 PRECISION_THRESHOLD = 0.95
 RECALL_THRESHOLD = 0.0
@@ -28,7 +28,7 @@ N_REPEATS = 1
 
 
 def main() -> None:
-    experiment = PerformClustering(FILENAME)
+    experiment = PerformClustering([FILENAME])
     reducer_type = "PCA" if USE_PCA else "AutoEncoder"
     reducer_parameters = (
         {"n_components": PCA_COMPONENTS} if USE_PCA else AUTOENCODER_CONFIG

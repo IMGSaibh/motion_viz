@@ -78,7 +78,12 @@ class LabelLoader:
         * [3-6] quaternions in w,x,y,z
         """
         self._logger.debug("Reading motion data from %s", motion_path)
-        motiondata = np.load(motion_path)       
+        try:
+            motiondata = np.load(motion_path)
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"Motion file not found: {motion_path}") from exc
+        except (OSError, ValueError) as exc:
+            raise ValueError(f"Could not read motion file: {motion_path}") from exc
    
         positions = motiondata[:,:,[0,1,2]]
         rotations = motiondata[:,:,[3,4,5,6]]
@@ -146,39 +151,59 @@ class LabelLoader:
         return X_raw, y_raw
 
     def _load_dataframe(self, label_path: pathlib.Path) -> pd.DataFrame:
+        print(f"[LOADER] creating DataFrame for {label_path}")
         cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
 
         if cache_path.is_file():
+            print(f"[LOADER] found cached Dataframe from {cache_path}")
             self._logger.info("Loading cached DataFrame from %s", cache_path)
             return pd.read_pickle(cache_path)
 
+        print(f"[LOADER] no cache for {label_path.name}")
         self._logger.info(
             "Cache miss for %s - building DataFrame from scratch.", label_path.name
         )
         motion_file = self.motion_root / f"{label_path.stem}.npy"
-        rotations, positions = self._read_motion(motion_file)
+
+        try:
+            rotations, positions = self._read_motion(motion_file)
+
+        except FileNotFoundError as exc:
+            print(f"[LOADER] Motion file {motion_file} not found")
+            return None
+        
+       
         df = self._create_dataframe(label_path, rotations, positions)
 
         self._logger.debug("Saving cache to %s", cache_path)
         df.to_pickle(cache_path)
         return df
 
-    def load(self, label_file: str | pathlib.Path) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
+    def load(self, label_files: list[str | pathlib.Path]) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
 
-        label_path = pathlib.Path(label_file)
-        if not label_path.is_absolute():
-            label_path = self.label_root / label_path
+        ret = []
+        for label_file in label_files:
+            
+            print(f"[LOADER] processing {label_file}")
+            
+            label_path = pathlib.Path(label_file)
+            if not label_path.is_absolute():
+                label_path = self.label_root / label_path
 
-        if label_path.is_dir():
-            label_paths = sorted(label_path.glob("*.json"))
-            if not label_paths:
-                raise ValueError(f"No JSON label files found in directory: {label_path}")
-            df = pd.concat(
-                [self._load_dataframe(path) for path in label_paths],
-                ignore_index=True,
-            )
-        else:
-            df = self._load_dataframe(label_path)
+            if label_path.is_dir():
+                label_files = [f for f in label_path.iterdir() if f.is_file()]
+            else:
+                label_files = [label_path] if label_path.is_file() else []
 
-        X, y = self._prepare_X_y(df)
-        return X, y
+            for label_file in label_files:
+                if pathlib.Path(label_file).suffix == ".json":
+                    print(f"[LOADER] loading {label_file}")
+                    try:
+                        df = self._load_dataframe(label_file)
+                    except FileNotFoundError as exc:
+                        print(f"[LOADER] could not create dataframe for {label_file}")
+                    if df is not None:
+                        X, y = self._prepare_X_y(df)
+                        ret.append((X,y,label_file.stem))
+            
+        return ret
