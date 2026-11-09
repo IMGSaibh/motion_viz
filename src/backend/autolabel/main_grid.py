@@ -2,20 +2,45 @@ from __future__ import annotations
 
 from itertools import product
 from statistics import fmean, pstdev
+from pathlib import Path
 
 from backend.autolabel.al_clusterer import (
     AutoEncoderReducer,
     KMeansClusterer,
     PCAReducer,
 )
+
+from backend.autolabel.al_label_load import LabelLoader
+
 from backend.autolabel.perform_data_clustering import PerformClustering
 
 
-FILENAME = "xsens_002_WS10_2023_09_21_cropped.json"
+FILENAMES = ["xsens_002_WS10_2023_09_21_cropped.json"]
 PCA_COMPONENTS = (4, 6, 8)
 AUTOENCODER_CONFIGS = (
-    {"encoding_dim": 64, "hidden_layers": (16,), "epochs": 500, "batch_size": 32},
+    {"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000, "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 1000, "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 1000, "batch_size": 64},
+    {"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 16},
+    {"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 64},
 )
+
+
 KMEANS_CLUSTERS = (20, 40, 60)
 MIN_CLUSTER_SIZE = 5
 PRECISION_THRESHOLD = 0.9
@@ -25,7 +50,19 @@ N_REPEATS = 5
 
 
 def main() -> None:
-    experiment = PerformClustering(FILENAME)
+    
+    repo_root = Path(__file__).resolve().parents[3]
+    label_root = repo_root / "data" / "labels"
+    motion_root = repo_root / "data" / "npy"
+    cache_root = label_root
+
+    FILENAMES = [motion_root]
+
+    loader = LabelLoader(cache_root=cache_root, label_root=label_root, motion_root=motion_root)
+    loaded_files = loader.load(FILENAMES)
+    X,y = loader.get_data(loaded_files)
+    
+    experiment = PerformClustering(filenames=FILENAMES, X=X, y=y)
     results = []
     reducer_configs = (
         [

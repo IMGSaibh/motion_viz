@@ -17,7 +17,8 @@ class PerformClustering:
 
     def __init__(
         self,
-        filenames: list[str | Path],
+        X,y,
+        filenames: list,
         label_root: str | Path | None = None,
         motion_root: str | Path | None = None,
         cache_root: str | Path | None = None,
@@ -32,34 +33,9 @@ class PerformClustering:
             if models_root
             else Path(__file__).resolve().parent / "models"
         )
-
-        #label_path = Path(filename)
-        #if label_path.suffix.lower() != ".json":
-        #    label_path = label_path.with_suffix(".json")
-        #self.filename = self.label_root.name
-
-        self.pathname = "_".join(Path(f).stem for f in filenames)
-
-        processor = LabelLoader(
-            label_root=self.label_root,
-            motion_root=self.motion_root,
-            cache_root=self.cache_root,
-        )
-        #self.X, y = processor.load([self.label_root])
-
-        loaded_files = processor.load([self.motion_root])
-        self.data = []
-        for (X,y,filename) in loaded_files:
-            
-            y_flat = y.reshape(y.shape[0], -1)
-            y_true = np.array(
-                [
-                    "_".join(map(str, al_utils.redo_one_hot(row, 8, 3)))
-                    for row in y_flat
-                ]
-            )
-            self.data.append((X,y_true, filename))
-        pass
+        self.pathname = "_".join(Path(f).stem for f in filenames)        
+        self.X = X
+        self.y = y
 
     def run(
         self,
@@ -71,15 +47,6 @@ class PerformClustering:
     ) -> dict[str, Any]:
         """Fit, evaluate, and save one reducer/clusterer configuration."""
 
-        self.X = np.concatenate([d[0] for d in self.data], axis=0)
-        self.y = np.concatenate([d[1] for d in self.data], axis=0)
-
-        try:
-            assert len(self.X) == len(self.y)
-        except LookupError:
-            raise LookupError("Count of features and labels does not match.")
-
-        print(f"Loaded {len(self.X)} Frames with {len(np.unique(self.y))} unique labels from {len(self.data)} files.")
 
         reduced_features, reducer_model = reducer.fit_transform(self.X)
         clusterer.fit(reduced_features)

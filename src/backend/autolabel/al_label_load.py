@@ -218,3 +218,28 @@ class LabelLoader:
                     ret.append((X,y,file_to_read.stem))
         
         return ret
+
+    def get_data(self, loaded_files):
+        data = []
+        for (X,y,filename) in loaded_files:
+        
+            y_flat = y.reshape(y.shape[0], -1)
+            y_true = np.array(
+                [
+                    "_".join(map(str, al_utils.redo_one_hot(row, 8, 3)))
+                    for row in y_flat
+                ]
+            )
+            data.append((X,y_true, filename))
+
+        X = np.concatenate([d[0] for d in data], axis=0)
+        y = np.concatenate([d[1] for d in data], axis=0)
+
+        try:
+            assert len(X) == len(y)
+        except LookupError:
+            raise LookupError("Count of features and labels does not match.")
+
+        print(f"Loaded {len(X)} Frames with {len(np.unique(y))} unique labels from {len(data)} files.")
+
+        return X,y
