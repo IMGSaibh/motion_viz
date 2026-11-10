@@ -27,6 +27,7 @@ type FrameSliderLabelListContext = {
   add_slider_label: (m: ErgoLabel) => void;
   load_slider_labels_for_file: (labels: ErgoLabel[]) => void;
   remove_slider_label: (id: string) => void;
+  remove_generated_slider_labels: () => void;
   clear_slider_label_list: () => void;
 
   editing_id: string | null;
@@ -59,6 +60,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
     [ergo_labels],
   );
   const remove_label_rect = useCallback((id: string) => dispatch({ type: 'remove', id }), []);
+  const remove_generated_labels = useCallback(() => dispatch({ type: 'remove-generated' }), []);
   const load_slider_labels_for_file = useCallback((labels: ErgoLabel[]) => dispatch({ type: 'replace', labels }), []);
   const clear_label_rects = useCallback(() => dispatch({ type: 'clear' }), []);
   const start_editing_label = useCallback(
@@ -170,6 +172,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       add_slider_label,
       load_slider_labels_for_file,
       remove_slider_label: remove_label_rect,
+      remove_generated_slider_labels: remove_generated_labels,
       clear_slider_label_list: clear_label_rects,
       editing_id,
       start_editing_label,
@@ -181,6 +184,7 @@ export function FrameSliderLabellistProvider({ children }: PropsWithChildren) {
       add_slider_label,
       load_slider_labels_for_file,
       remove_label_rect,
+      remove_generated_labels,
       clear_label_rects,
       editing_id,
       start_editing_label,
@@ -212,6 +216,10 @@ function markerReducer(labels: ErgoLabel[], action: MarkerAction): ErgoLabel[] {
     }
     case 'remove': {
       const next = labels.filter((x) => x.id !== action.id);
+      return next.length === labels.length ? labels : next;
+    }
+    case 'remove-generated': {
+      const next = labels.filter((label) => label.generated !== true);
       return next.length === labels.length ? labels : next;
     }
     case 'clear': {
@@ -318,6 +326,13 @@ export function use_remove_label_cxt() {
   return useContextSelector(frame_slider_label_list_context, (v) => {
     if (!v) throw new Error('use_remove_label_cxt must be used within <FrameSliderLabellistProvider>');
     return v.remove_slider_label;
+  });
+}
+
+export function use_remove_generated_labels_ctx() {
+  return useContextSelector(frame_slider_label_list_context, (v) => {
+    if (!v) throw new Error('use_remove_generated_labels_ctx must be used within <FrameSliderLabellistProvider>');
+    return v.remove_generated_slider_labels;
   });
 }
 
