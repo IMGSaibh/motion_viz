@@ -7,6 +7,7 @@ import {
   use_clear_label_list_ctx,
   use_get_labels_cxt,
   use_remove_label_cxt,
+  use_remove_generated_labels_ctx,
 } from '@/context/context_slider_label_list';
 import { use_snackbar_ctx } from '@/context/context_snackbar';
 import { use_three_js_engine_ctx } from '@/context/context_three_js_engine';
@@ -28,6 +29,7 @@ export function ContainerLabelsList() {
   const { selected_motion } = use_three_js_engine_ctx();
   const labels = use_get_labels_cxt();
   const remove_label = use_remove_label_cxt();
+  const remove_generated_labels = use_remove_generated_labels_ctx();
   const clear_label_list = use_clear_label_list_ctx();
   const { set_owas_selected, set_rula_selected } = use_ergo_methods_cxt();
   const { success, warning, error } = use_snackbar_ctx();
@@ -46,6 +48,10 @@ export function ContainerLabelsList() {
     set_rula_selected(create_empty_rula_selection());
     set_owas_selected({ CAT_BACK: null, CAT_ARMS: null, CAT_LEGS: null });
   }, [clear_label_list, set_owas_selected, set_rula_selected]);
+
+  const remove_generated_labels_on_click = useCallback(() => {
+    remove_generated_labels();
+  }, [remove_generated_labels]);
 
   const save_label_list_on_click = useCallback(async () => {
     if (!selected_motion) return;
@@ -75,6 +81,7 @@ export function ContainerLabelsList() {
       lable_list={labels}
       delete_label_from_list_on_click={delete_label_from_list_on_click}
       delete_label_list_on_click={delete_label_list_on_click}
+      remove_generated_labels_on_click={remove_generated_labels_on_click}
       save_label_list_on_click={save_label_list_on_click}
       download_labels_on_click={download_labels_on_click}
       download_is_pending={labels_download.isPending}

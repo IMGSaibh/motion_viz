@@ -56,6 +56,7 @@ export type MarkerAction =
   | { type: 'add'; label: ErgoLabel }
   | { type: 'replace'; labels: ErgoLabel[] }
   | { type: 'remove'; id: string }
+  | { type: 'remove-generated' }
   | { type: 'clear' }
   | {
       type: 'update';

@@ -11,6 +11,7 @@ type Props = {
   lable_list: ErgoLabel[];
   delete_label_from_list_on_click?: (id: string) => void;
   delete_label_list_on_click?: () => void;
+  remove_generated_labels_on_click?: () => void;
   save_label_list_on_click?: () => void;
   download_labels_on_click?: () => void;
   download_is_pending: boolean;
@@ -51,6 +52,14 @@ export function PresenterLabelList(props: Props) {
           <Button onClick={props.delete_label_list_on_click} sx={{ flex: '1 1 140px', minWidth: 0 }}>
             <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
             Clear Label-List
+          </Button>
+          <Button
+            onClick={props.remove_generated_labels_on_click}
+            disabled={!props.lable_list.some((label) => label.generated === true)}
+            sx={{ flex: '1 1 140px', minWidth: 0 }}
+          >
+            <DeleteIcon fontSize="small" sx={{ mr: '0.5rem' }} />
+            Remove Generated Labels
           </Button>
           <Button onClick={() => props.save_label_list_on_click?.()} sx={{ flex: '1 1 140px', minWidth: 0 }}>
             <SaveIcon fontSize="small" sx={{ mr: '0.5rem' }} />
