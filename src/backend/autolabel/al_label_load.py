@@ -215,6 +215,7 @@ class LabelLoader:
                 
                 if df is not None:
                     X, y = self._prepare_X_y(df)
+                    print(f"[LOADER] adding {len(X)} labelled frames.")
                     ret.append((X,y,file_to_read.stem))
         
         return ret

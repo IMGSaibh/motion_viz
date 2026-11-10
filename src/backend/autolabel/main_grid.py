@@ -18,20 +18,26 @@ from backend.autolabel.perform_data_clustering import PerformClustering
 FILENAMES = ["xsens_002_WS10_2023_09_21_cropped.json"]
 PCA_COMPONENTS = (4,)
 AUTOENCODER_CONFIGS = (
-    {"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 32,  "hidden_layers": (32,16,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 1000,  "batch_size": 256},
+    {"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 1500,  "batch_size": 32},
+
+    {"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
     #{"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
     #{"encoding_dim": 64,  "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 256},
     #{"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
     #{"encoding_dim": 128, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
     #{"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
     #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 256, "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 256, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 256},
+    {"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 256},
     #{"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
     #{"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000, "batch_size": 32},
     #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 1000, "batch_size": 32},
@@ -45,7 +51,7 @@ MIN_CLUSTER_SIZE = 5
 PRECISION_THRESHOLD = 0.9
 RECALL_THRESHOLD = 0.2
 RANDOM_STATE = 42
-N_REPEATS = 2
+N_REPEATS = 5
 
 
 def main() -> None:
