@@ -19,6 +19,7 @@ type ThreeJSEngineContext = {
   cleanup_loop: () => void;
   cleanup_thumbnail_render: () => void;
   print_scene_components: () => void;
+  step_bird_view: () => void;
   get_thumbnail_for_frame: (i: number) => Promise<string | null>;
   is_playing: boolean;
 };
@@ -115,6 +116,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
   const cleanup_loop = useCallback(() => threejs_mngr_ref.current?.cleanup_loop?.(), []);
   const cleanup_thumbnail_render = useCallback(() => threejs_mngr_ref.current?.cleanup_thumbnail_render?.(), []);
   const print_scene_components = useCallback(() => threejs_mngr_ref.current?.print_scene_components?.(), []);
+  const step_bird_view = useCallback(() => threejs_mngr_ref.current?.step_bird_view?.(), []);
   const reset_engine = useCallback(() => {
     (set_frame_count(0), stop());
     threejs_mngr_ref.current?.cleanup_player?.();
@@ -143,6 +145,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       cleanup_loop,
       cleanup_thumbnail_render,
       print_scene_components,
+      step_bird_view,
       get_thumbnail_for_frame,
       is_playing,
     }),
@@ -160,6 +163,7 @@ export function ThreeJSEngineProvider({ children }: { children: React.ReactNode 
       cleanup_loop,
       cleanup_thumbnail_render,
       print_scene_components,
+      step_bird_view,
       get_thumbnail_for_frame,
       is_playing,
     ],
