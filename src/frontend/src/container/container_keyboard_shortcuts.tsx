@@ -60,6 +60,7 @@ export function ContainerKeyboardShortcuts(): null {
     pause,
     play_pause,
     print_scene_components,
+    step_bird_view,
     reset_engine,
     selected_motion,
     set_selected_motion,
@@ -83,6 +84,12 @@ export function ContainerKeyboardShortcuts(): null {
       if (event.code === 'Space') {
         event.preventDefault();
         play_pause();
+        return;
+      }
+
+      if (!event.ctrlKey && !event.altKey && !event.shiftKey && event.code === 'KeyM') {
+        event.preventDefault();
+        step_bird_view();
         return;
       }
 
@@ -356,6 +363,7 @@ export function ContainerKeyboardShortcuts(): null {
     pause,
     play_pause,
     print_scene_components,
+    step_bird_view,
     range,
     hotkey_profile,
     rula_selected,
