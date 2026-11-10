@@ -18,9 +18,7 @@ if __name__ == "__main__":
     repo_root = Path(__file__).resolve().parents[3]
     autolabel_root = Path(__file__).resolve().parent
     labels_root = repo_root / "data" / "labels"
-    motion_root = repo_root / "data" / "npy"
-
-    
+    motion_root = repo_root / "data" / "npy"    
 
     models_root = autolabel_root / "models"
     if args.modelconfig == "recent":

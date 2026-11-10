@@ -1,16 +1,25 @@
 from __future__ import annotations
 
 from statistics import fmean, pstdev
+from pathlib import Path
 
 from backend.autolabel.al_clusterer import (
     AutoEncoderReducer,
     KMeansClusterer,
     PCAReducer,
 )
+from backend.autolabel.al_label_load import LabelLoader
+
 from backend.autolabel.perform_data_clustering import PerformClustering
 
+from backend.autolabel.al_clusterer import (
+    AutoEncoderReducer,
+    KMeansClusterer,
+    PCAReducer,
+)
 
-FILENAME = "/home/edscher/hack/motion_viz/data/labels"
+
+FILENAMES = ["/home/edscher/hack/motion_viz/data/labels"]
 USE_PCA = True
 PCA_COMPONENTS = 6
 AUTOENCODER_CONFIG = {
@@ -28,7 +37,17 @@ N_REPEATS = 1
 
 
 def main() -> None:
-    experiment = PerformClustering([FILENAME])
+    repo_root = Path(__file__).resolve().parents[3]
+    label_root = repo_root / "data" / "labels"
+    motion_root = repo_root / "data" / "npy"
+    cache_root = label_root
+
+    loader = LabelLoader(cache_root=cache_root, label_root=label_root, motion_root=motion_root)
+    loaded_files = loader.load(FILENAMES)
+    X,y = loader.get_data(loaded_files)
+    
+    experiment = PerformClustering(filenames=FILENAMES, X=X, y=y)
+
     reducer_type = "PCA" if USE_PCA else "AutoEncoder"
     reducer_parameters = (
         {"n_components": PCA_COMPONENTS} if USE_PCA else AUTOENCODER_CONFIG
