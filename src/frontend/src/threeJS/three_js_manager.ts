@@ -43,8 +43,6 @@ export class ThreeJSEngine {
   private thumbnail_renderer: WebGLRenderer;
   private active_motion_group: Group | null = null;
   private bird_view_step = 0;
-  private bird_view_center: Vector3 | null = null;
-  private bird_view_radius = 1;
 
   // Orbit controls survive motion changes; cleanup_loop removes every other updatable object.
   private _orbitControls: OrbitControls | null;
@@ -117,6 +115,7 @@ export class ThreeJSEngine {
         const skeletonPath = fileUrl.replace('/data/npy/', '/data/skeletons/').replace(/\.npy$/i, '.json');
         await this.npy_loader.create_skeleton(skeletonPath);
         this.npy_player = new NPY_Player(this.npy_loader);
+        this.npy_player.go_to_frame(0);
         this.loop.updatables.push(this.npy_player.npy_player_object);
         break;
     }
@@ -124,7 +123,6 @@ export class ThreeJSEngine {
       const motion_group = this.scene.getObjectByName(fileUrl);
       this.active_motion_group = motion_group instanceof Group ? motion_group : null;
       this.bird_view_step = 0;
-      this.bird_view_center = null;
   }
 
   get_current_player(): NPY_Player | BVH_Player | FBX_Player | null {
@@ -218,23 +216,18 @@ export class ThreeJSEngine {
   step_bird_view() {
     if (!this.active_motion_group || !this._orbitControls) return;
 
-    if (!this.bird_view_center) {
-      this.active_motion_group.updateWorldMatrix(true, true);
-      const bounds = new Box3().setFromObject(this.active_motion_group);
-      if (bounds.isEmpty()) return;
+    this.active_motion_group.updateWorldMatrix(true, true);
+    const bounds = new Box3().setFromObject(this.active_motion_group);
+    if (bounds.isEmpty()) return;
 
-      this.bird_view_center = bounds.getCenter(new Vector3());
-      this.bird_view_radius = Math.max(bounds.getSize(new Vector3()).length(), 1);
-    }
-
-    const center = this.bird_view_center;
-    const orbit_radius = this.bird_view_radius;
+    const center = bounds.getCenter(new Vector3());
+    const orbit_radius = Math.max(bounds.getSize(new Vector3()).length(), 1);
     const angle = (this.bird_view_step % 4) * (Math.PI / 2);
 
     this._orbitControls.target.copy(center);
     this.camera.position.set(
       center.x + Math.cos(angle) * orbit_radius,
-      center.y + orbit_radius * 1.8,
+      center.y + orbit_radius * 3.5,
       center.z + Math.sin(angle) * orbit_radius,
     );
     this._orbitControls.update();
@@ -257,7 +250,6 @@ export class ThreeJSEngine {
       this.fbx_player = null;
     }
     this.active_motion_group = null;
-    this.bird_view_center = null;
   }
 
   cleanup_loop() {
