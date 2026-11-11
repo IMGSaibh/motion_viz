@@ -221,13 +221,13 @@ export class ThreeJSEngine {
     if (bounds.isEmpty()) return;
 
     const center = bounds.getCenter(new Vector3());
-    const orbit_radius = Math.max(bounds.getSize(new Vector3()).length(), 1);
+    const orbit_radius = Math.max(bounds.getSize(new Vector3()).length() * 0.65, 0.5);
     const angle = (this.bird_view_step % 4) * (Math.PI / 2);
 
     this._orbitControls.target.copy(center);
     this.camera.position.set(
       center.x + Math.cos(angle) * orbit_radius,
-      center.y + orbit_radius * 3.5,
+      center.y + orbit_radius * 1.5,
       center.z + Math.sin(angle) * orbit_radius,
     );
     this._orbitControls.update();
