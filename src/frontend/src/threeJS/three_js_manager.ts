@@ -40,6 +40,7 @@ export class ThreeJSEngine {
   private renderer: WebGLRenderer;
   private scene_container: HTMLDivElement;
   private camera: PerspectiveCamera;
+  private resizer: Resizer;
   private thumbnail_renderer: WebGLRenderer;
   private active_motion_group: Group | null = null;
   private bird_view_step = 0;
@@ -69,7 +70,7 @@ export class ThreeJSEngine {
     const orbitControls = createOrbitControls(this.camera, this.renderer);
     this._orbitControls = orbitControls;
     this.loop.updatables.push(orbitControls);
-    const resizer = new Resizer(scene_container, this.camera, this.renderer);
+    this.resizer = new Resizer(scene_container, this.camera, this.renderer);
 
     this.thumbnail_renderer = new WebGLRenderer({ preserveDrawingBuffer: true, alpha: true });
     this.thumbnail_renderer.setSize(260, 190, false);
@@ -267,6 +268,7 @@ export class ThreeJSEngine {
     // TODO: dispose other stuff too
     this.cleanup_player();
     this.stop_engine_cycle();
+    this.resizer.dispose();
     this.renderer.dispose();
     this.scene_container.removeChild(this.renderer.domElement);
   }

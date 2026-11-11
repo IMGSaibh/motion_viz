@@ -48,7 +48,6 @@ export default function App() {
       {/* Providers are ordered by dependency: feature contexts may consume engine and slider state. */}
       <SnackbarProvider>
         <ThreeJSEngineProvider>
-          <ThreeJSScene />
           <FrameSliderContexProvider>
             <ErgoMethodsContexProvider>
               <FrameSliderLabellistProvider>
@@ -60,50 +59,71 @@ export default function App() {
                     sx={(theme) => ({
                       position: 'absolute',
                       top: { xs: 56, sm: 64 },
+                      left: 0,
                       right: 0,
                       bottom: 104,
-                      width: { xs: '100%', md: sidebarWidth },
-                      maxWidth: { xs: '100%', md: '80vw' },
-                      boxSizing: 'border-box',
-                      pl: { xs: 0, md: '8px' },
-                      overflowY: 'auto',
-                      bgcolor: theme.palette.background.paper,
+                      display: 'flex',
+                      overflow: 'hidden',
                       zIndex: theme.zIndex.appBar - 1,
                     })}
                   >
                     <Box
-                      role="separator"
-                      aria-label="Resize label sidebar"
-                      aria-orientation="vertical"
-                      aria-valuemin={320}
-                      aria-valuemax={typeof window === 'undefined' ? 1200 : Math.floor(Math.max(320, window.innerWidth * 0.8))}
-                      aria-valuenow={Math.round(sidebarWidth)}
-                      tabIndex={0}
-                      onKeyDown={resizeSidebarFromKeyboard}
-                      onPointerDown={(event: PointerEvent<HTMLDivElement>) => {
-                        event.preventDefault();
-                        event.currentTarget.setPointerCapture(event.pointerId);
-                        setIsResizingSidebar(true);
+                      sx={{
+                        position: 'relative',
+                        flex: '1 1 0',
+                        minWidth: 0,
+                        minHeight: 0,
+                        overflow: 'hidden',
                       }}
-                      onPointerMove={resizeSidebarFromPointer}
-                      onPointerUp={() => setIsResizingSidebar(false)}
-                      onPointerCancel={() => setIsResizingSidebar(false)}
+                    >
+                      <ThreeJSScene />
+                    </Box>
+                    <Box
                       sx={(theme) => ({
-                        position: 'absolute',
-                        display: { xs: 'none', md: 'block' },
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        width: 8,
-                        cursor: 'col-resize',
-                        touchAction: 'none',
-                        userSelect: 'none',
-                        borderLeft: `2px solid ${theme.palette.divider}`,
-                        '&:hover, &:focus-visible': { borderColor: theme.palette.primary.main },
+                        position: 'relative',
+                        flexShrink: 0,
+                        width: { xs: '80vw', md: sidebarWidth },
+                        maxWidth: '80vw',
+                        boxSizing: 'border-box',
+                        pl: { xs: 0, md: '8px' },
+                        overflowY: 'auto',
+                        bgcolor: theme.palette.background.paper,
                       })}
-                    />
-                    <ContainerLabelButtons />
-                    <ContainerLabelsList />
+                    >
+                      <Box
+                        role="separator"
+                        aria-label="Resize label sidebar"
+                        aria-orientation="vertical"
+                        aria-valuemin={320}
+                        aria-valuemax={typeof window === 'undefined' ? 1200 : Math.floor(Math.max(320, window.innerWidth * 0.8))}
+                        aria-valuenow={Math.round(sidebarWidth)}
+                        tabIndex={0}
+                        onKeyDown={resizeSidebarFromKeyboard}
+                        onPointerDown={(event: PointerEvent<HTMLDivElement>) => {
+                          event.preventDefault();
+                          event.currentTarget.setPointerCapture(event.pointerId);
+                          setIsResizingSidebar(true);
+                        }}
+                        onPointerMove={resizeSidebarFromPointer}
+                        onPointerUp={() => setIsResizingSidebar(false)}
+                        onPointerCancel={() => setIsResizingSidebar(false)}
+                        sx={(theme) => ({
+                          position: 'absolute',
+                          display: { xs: 'none', md: 'block' },
+                          top: 0,
+                          bottom: 0,
+                          left: 0,
+                          width: 8,
+                          cursor: 'col-resize',
+                          touchAction: 'none',
+                          userSelect: 'none',
+                          borderLeft: `2px solid ${theme.palette.divider}`,
+                          '&:hover, &:focus-visible': { borderColor: theme.palette.primary.main },
+                        })}
+                      />
+                      <ContainerLabelButtons />
+                      <ContainerLabelsList />
+                    </Box>
                   </Box>
                   <Box
                     sx={(theme) => ({
