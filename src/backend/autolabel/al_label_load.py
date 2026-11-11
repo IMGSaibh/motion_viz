@@ -150,11 +150,11 @@ class LabelLoader:
         # quaternions do not need scaling
         return X_raw, y_raw
 
-    def _load_dataframe(self, label_path: pathlib.Path) -> pd.DataFrame:
+    def _load_dataframe(self, label_path: pathlib.Path, ignore_cache = False) -> pd.DataFrame:
         print(f"[LOADER] creating DataFrame for {label_path}")
         cache_path = self.cache_root / f"{label_path.stem}.json.pkl"
 
-        if cache_path.is_file():
+        if cache_path.is_file() and not ignore_cache :
             print(f"[LOADER] found cached Dataframe from {cache_path}")
             self._logger.info("Loading cached DataFrame from %s", cache_path)
             return pd.read_pickle(cache_path)
@@ -179,7 +179,7 @@ class LabelLoader:
         df.to_pickle(cache_path)
         return df
 
-    def load(self, label_files: list[str | pathlib.Path]) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
+    def load(self, label_files: list[str | pathlib.Path], ignore_cache = False) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
 
         ret = []
         for label_file in label_files:
@@ -209,7 +209,7 @@ class LabelLoader:
                     df = None                    
 
                 try:
-                    df = self._load_dataframe(file_to_read)
+                    df = self._load_dataframe(file_to_read, ignore_cache=ignore_cache)
                 except FileNotFoundError as exc:
                     print(f"[LOADER] could not create dataframe for {file_to_read}")
                 
