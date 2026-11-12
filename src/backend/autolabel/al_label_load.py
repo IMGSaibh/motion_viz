@@ -241,6 +241,6 @@ class LabelLoader:
         except LookupError:
             raise LookupError("Count of features and labels does not match.")
 
-        print(f"Loaded {len(X)} Frames with {len(np.unique(y))} unique labels from {len(data)} files.")
+        print(f"[LOADER] Loaded {len(X)} Frames with {len(np.unique(y))} unique labels from {len(data)} files.")
 
         return X,y
