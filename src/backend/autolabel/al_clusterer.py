@@ -1,20 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Modular clustering toolkit.
-
-Four interchangeable components:
-
-1️⃣  Loader                – reads X, y.
-2️⃣  DimensionReducer      – PCA or Auto‑Encoder.
-3️⃣  Clusterer             – K‑means (or any other algorithm).
-4️⃣  ClusterEvaluator      – precision/recall per cluster.
-
-All classes have a very small public API, which makes them trivial to
-reuse in grid‑searches, notebooks, or production pipelines.
-"""
-
 from __future__ import annotations
 
 import os
@@ -29,6 +15,8 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, LeakyReLU
@@ -54,7 +42,6 @@ class BaseReducer(ABC):
     def save(self, reducer_obj: Any, out_dir: Path, stem: str) -> Path:
         """Persist the fitted reducer and return the saved file path."""
         ...
-
 
 # ------------------------------------------------------------------- #
 # PCA implementation
@@ -108,7 +95,7 @@ class AutoEncoderReducer(BaseReducer):
         x = bottleneck
         for units in reversed(self.hidden_layers):
             x = Dense(units)(x)
-            x = LeakyReLU(alpha=0.1)(x)
+            x = LeakyReLU(negative_slope=0.1)(x)
 
         out = Dense(input_dim)(x)
         ae = Model(inp, out)
@@ -116,27 +103,44 @@ class AutoEncoderReducer(BaseReducer):
         return ae
 
     # -----------------------------------------------------------------
-    def fit_transform(self, X: np.ndarray) -> Tuple[np.ndarray, Model]:        
+    def fit_transform(self, X: np.ndarray) -> Tuple[np.ndarray, Model]:
 
         callbacks = [
-            EarlyStopping(monitor="val_loss", patience=15, restore_best_weights=True),
-            ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1),
+            EarlyStopping(
+                monitor="val_loss",
+                patience=15,
+                restore_best_weights=True
+            ),
+            ReduceLROnPlateau(
+                monitor="val_loss",
+                factor=0.5,
+                patience=5,
+                min_lr=1e-6,
+                verbose=0
+            ),
         ]
 
-
         ae = self._build_ae(X.shape[1])
+
         ae.fit(
             X,
             X,
             epochs=self.epochs,
             batch_size=self.batch_size,
+            validation_split=0.2,
             shuffle=True,
             verbose=self.verbose,
-            #callbacks=callbacks,
+            callbacks=callbacks,
         )
 
         encoder = Model(ae.input, ae.get_layer("bottleneck").output)
-        X_red = encoder.predict(X, batch_size=256, verbose=0)
+
+        X_red = encoder.predict(
+            X,
+            batch_size=256,
+            verbose=0
+        )
+
         return X_red, ae
 
     # -----------------------------------------------------------------
