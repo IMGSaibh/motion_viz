@@ -16,52 +16,28 @@ from backend.autolabel.perform_data_clustering import PerformClustering
 
 
 FILENAMES = ["xsens_002_WS10_2023_09_21_cropped.json"]
-PCA_COMPONENTS = (4,)
+PCA_COMPONENTS = (4,8,16)
 AUTOENCODER_CONFIGS = (
-    #{"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 32,  "hidden_layers": (32,16,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 32,  "hidden_layers": (32,),       "epochs": 1000,  "batch_size": 256},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000,  "batch_size": 32},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1500,  "batch_size": 32},
+    
+    {"encoding_dim": 16,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 32,  "hidden_layers": (8,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 32},   
+    {"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 32},
+    {"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
 
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 64},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000,  "batch_size": 64},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1500,  "batch_size": 64},
-
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 128},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000,  "batch_size": 128},
-    {"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1500,  "batch_size": 128},
-
-    #{"encoding_dim": 64,  "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 64,  "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 64,  "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 256, "hidden_layers": (16,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 256, "hidden_layers": (32,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 256, "hidden_layers": (64,),       "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 256, "hidden_layers": (128,),      "epochs": 500,  "batch_size": 256},
-    #{"encoding_dim": 256, "hidden_layers": (128, 64),   "epochs": 500,  "batch_size": 32},
-    #{"encoding_dim": 32,  "hidden_layers": (16,),       "epochs": 1000, "batch_size": 32},
-    #{"encoding_dim": 64,  "hidden_layers": (32, 16),    "epochs": 1000, "batch_size": 32},
-    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 1000, "batch_size": 64},
-    #{"encoding_dim": 64,  "hidden_layers": (32,),       "epochs": 500,  "batch_size": 16},
-    #{"encoding_dim": 128, "hidden_layers": (64, 32),    "epochs": 500,  "batch_size": 64},
 )
 
-KMEANS_CLUSTERS = (10,20)
+KMEANS_CLUSTERS = (50,100)
 MIN_CLUSTER_SIZE = 5
 PRECISION_THRESHOLD = 0.9
 RECALL_THRESHOLD = 0.2
 RANDOM_STATE = 42
-N_REPEATS = 5
+N_REPEATS = 3
 
 
 def main() -> None:
@@ -74,7 +50,7 @@ def main() -> None:
     FILENAMES = [motion_root]
 
     loader = LabelLoader(cache_root=cache_root, label_root=label_root, motion_root=motion_root)
-    loaded_files = loader.load(FILENAMES)
+    loaded_files = loader.load(FILENAMES, ignore_cache=True)
     X,y = loader.get_data(loaded_files)
     
     experiment = PerformClustering(filenames=FILENAMES, X=X, y=y)
@@ -103,6 +79,7 @@ def main() -> None:
                 clusterer = KMeansClusterer(
                     n_clusters=clusters, random_state=random_state
                 )
+                print(f"[GRID] Trying experiment {repeat+1}/{N_REPEATS}: {reducer_type} with {reducer_parameters} for {clusters} clusters")
                 try:
                     trial_results.append(
                         experiment.run(
@@ -148,7 +125,7 @@ def main() -> None:
             }
             results.append(summary)
             print(
-                f"{reducer_type}={reducer_parameters}, KMeans={clusters}, "
+                f"[GRID] {reducer_type}={reducer_parameters}, KMeans={clusters}, "
                 f"n={N_REPEATS}: "
                 f"silhouette={means['silhouette']:.4f} +/- "
                 f"{deviations['silhouette']:.4f}, "

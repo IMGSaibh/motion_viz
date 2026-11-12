@@ -19,19 +19,26 @@ from backend.autolabel.al_clusterer import (
 )
 
 
-FILENAMES = ["/home/edscher/hack/motion_viz/data/labels"]
-USE_PCA = True
+FILENAMES = ["/home/edscher/hack/motion_viz/data/npy/xsens_003_WS30_2023_10_04_cropped_fixed.npy","/home/edscher/hack/motion_viz/data/npy/xsens_002_WS20_2023_10_03_cropped.npy"]
+
+FILENAMES = [
+    "/home/edscher/hack/motion_viz/data/npy/xsens_003_WS30_2023_10_04_cropped_fixed.npy",
+    "/home/edscher/hack/motion_viz/data/npy/xsens_002_WS20_2023_10_03_cropped.npy",
+    "/home/edscher/hack/motion_viz/data/npy/xsens_004_WS10_2023_10_03_cropped_m36.npy"]
+
+USE_PCA = False
 PCA_COMPONENTS = 6
 AUTOENCODER_CONFIG = {
-    "encoding_dim": 16,
-    "hidden_layers": (256,),
+    "encoding_dim": 32,
+    "hidden_layers": (16,),
     "epochs": 500,
-    "batch_size": 256,
+    "batch_size": 32,
+    "verbose": 1
 }
-KMEANS_N_CLUSTERS = 5
+KMEANS_N_CLUSTERS = 40
 MIN_CLUSTER_SIZE = 10
-PRECISION_THRESHOLD = 0.95
-RECALL_THRESHOLD = 0.0
+PRECISION_THRESHOLD = 0.9
+RECALL_THRESHOLD = 0.2
 RANDOM_STATE = 42
 N_REPEATS = 1
 
